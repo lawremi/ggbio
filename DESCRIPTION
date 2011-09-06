@@ -1,0 +1,12 @@
+Package: ggbio
+Version: 0.0.7
+Title: Static visualization for genomic data.
+Description: ggbio focuses on visualzing genomic data using basic R graphics or grid-based packages, make generic function to works on specific data structure like GRanges object. Providing the ability of summarization and aggregation at the same time visualize them on the genomic scales. 
+Author: Tengfei Yin
+Maintainer: Tengfei Yin <yintengfei@gmail.com>
+Depends: methods, biovizBase
+Imports: methods, IRanges, GenomicRanges, GenomicFeatures, Rsamtools, BSgenome
+License: GPL (>=2)
+LazyLoad: Yes
+Collate: utils.R
+	 qplot-method.R

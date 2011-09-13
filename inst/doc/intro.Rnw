@@ -1,0 +1,392 @@
+%\VignetteIndexEntry{An Introduction to ggbio}
+%\VignetteDepends{}
+%\VignetteKeywords{visualization utilities}
+%\VignettePackage{biovizBase}
+\documentclass[10pt]{article}
+
+% \usepackage{times}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage{graphicx}
+
+\SweaveOpts{width = 5, height = 4.5}
+
+\textwidth=6.5in
+\textheight=8.5in
+%\parskip=.3cm
+\oddsidemargin=-.1in
+\evensidemargin=-.1in
+\headheight=-.3in
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rcode}[1]{{\texttt{#1}}}
+
+\newcommand{\software}[1]{\textsf{#1}}
+\newcommand{\R}{\software{R}}
+\newcommand{\IRanges}{\Rpackage{IRanges}}
+\newcommand{\biovizBase}{\Rpackage{biovizBase}}
+\newcommand{\ggbio}{\Rpackage{ggbio}}
+\newcommand{\visnab}{\Rpackage{visnab}}
+\newcommand{\ggplot}{\Rpackage{ggplot2}}
+\newcommand{\grid}{\Rpackage{grid}}
+\newcommand{\gridExtra}{\Rpackage{gridExtra}}
+\newcommand{\qplot}{\Rfunction{qplot}}
+
+\title{An Introduction to \ggbio{}}
+\author{Tengfei Yin}
+\date{\today}
+
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+<<options,echo=FALSE>>=
+options(width=72)
+@
+
+\section{Introduction}
+\ggbio{} is a \R{} package aim to provide a toolkit for visualization
+of biological data in terms of different kinds of static \R{}
+graphics. This package is mainly built on \ggplot{}
+package\footnote{\url{http://had.co.nz/ggplot2/}}, which is an elegant
+plotting systeim for \R{}, based on the grammar of graphics. So we can
+follow similar API and at the same time, the grammar of graphics. And
+for those parts which require a low level manipulation on
+graphics. \ggplot{} may not be flexible enough, so we also develop
+graphics sometime based on pure \grid{} or \gridExtra{}.
+
+Our goal is to provide high quality graphics for both analysis and
+publication purpose. So we try to follow some rules here:
+\begin{itemize}
+\item Be general. 
+\item Be object-oriented. We provide generic function for most
+  used \R{} objects in \software{Bioconductor} project.
+\item To use \ggplot{} to develop graphics as possible as we can,
+  but hiding details as much as possible. Most function return a
+  \Robject{ggplot} object, which leave users more power to manipualte
+  directly on this object, for instance, adding labels, changing color
+  scheme.etc.
+\item Be easy-to-use and user-friendly.
+\item For specifc question or most used graphics, we provide
+  convenient function to give users the graphics they need as simple
+  as we can.
+\end{itemize}
+
+\section{Grammar of Graphics}
+How to describe a statistical plot in several consecutive steps(Leland Wilkinson):
+\begin{description}
+\item [data] Performs the actual statistical computations, art of the
+  graphics pipeline
+\item [transformation, scale, coordinates] Operations
+\item [geoms] What is actually plotted (points, lignes, but also shapes)
+\item [guides] Axes, legends and other elements that help read the
+  plot
+\item [display] Produces the picture, but should also provide
+  interactivity (brushing, drill down, zooming)
+\end{description}
+
+As Figrue \ref{fig:ggplot2} shows, \ggplot{} redefine the operation
+\textbf{+} to make the manipulation more descriptive.
+
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<ggplot2-example, fig = TRUE>>=      
+library(ggplot2)
+p <- ggplot(data=mtcars) +
+    geom_point(aes(x = mpg,
+                   y = wt,
+                   colour= factor(cyl)))+
+     scale_y_log10() +
+     facet_grid(gear ~ .)
+print(p)    
+@ def 
+   \caption{ggplot2 example}
+   \label{fig:ggplot2}
+\end{figure}        
+ 
+To get more information about how to create high-quality graphics by
+\ggplot{}, please visit the on-line documentation, you could see the
+most used scale/geoms/ colors/coordinate systems/facet...
+
+However, we need to realize the very \textbf{imporatant} difference
+between \ggbio{} and \ggplot{}.
+\begin{itemize}
+\item In most graphcis, the x-scale in \ggbio{} is always on a genomic
+  coordinates or protein space. We don't provide flexible x value as
+  you can do in \ggplot{}, you can only specify the \emph{x} to be
+  \emph{start, end, midpoint} and this only make difference when it's
+  interval data with width over 1.
+\item Based on the rule above, most time, when we facet the graphics,
+  we only allow users facet by rows and the column could be only
+  faceted by space.
+\item Automatically facet by \textbf{seqnames}, because thsoe data are
+  not allowed to be mixed together since their x-scale is always
+  genomic coordinates.
+\end{itemize}
+
+\section{Generic Visualization Method}
+As mentioned above, we are trying to be general and object-oriented,
+at the same time following the API from \ggplot{}, so we use the
+\emph{quick plot} function \qplot{} in \ggplot{} package. And redefine
+this in to a \textbf{S4} generic function.
+
+So now the \qplot{} function could dispatch on different R objects and
+we also provide new \textbf{geom} for each type of object.
+
+In the following section, we will introduce how to use \qplot{} to
+plot different types of data in different ways.
+
+\subsection{For \Robject{data.frame} and \Robject{matrix} object}
+This is a wrapper around the original \qplot{} function. when reading
+in \Robject{data.frame} or \Robject{matrix} object, you can use
+\qplot{} as usual without any change, it essentially just call
+ggplot2::qplot. 
+
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<ggbio-loading, fig = TRUE>>=
+library(ggbio)
+p <- qplot(data = mtcars, mpg, cyl)
+print(p)
+@ %def 
+  \caption{qplot for data.frame}
+  \label{fig:qplot-data.frame}
+\end{figure}
+
+
+
+\subsection{For \Robject{GRanges} object}
+\Robject{GRanges} object is defined in \Rpackage{GenomicRanges}
+package, whic is one of the most important infrastructure to describe
+genomic data along meta data information. It describe genomic data as
+intervals, currently in \R{} we don't have any convenient function to
+visualize interval object in different ways.
+\subsubsection{Sample \Robject{Granges} object}
+Let's first create a sample \Robject{GRanges} object used for
+following examples. This sample data contains 1000 rows, three
+chromosomes, with some meta data, including grouping information and
+pairing information which mimic paired RNA-seq data.
+
+@ 
+<<GRanges-sample>>=
+set.seed(1)
+N <- 1000
+library(GenomicRanges)
+gr <- GRanges(seqnames = 
+              sample(c("chr1", "chr2", "chr3"),
+                     size = N, replace = TRUE),
+              IRanges(
+                      start = sample(1:300, size = N, replace = TRUE),
+                      width = sample(70:75, size = N,replace = TRUE)),
+              strand = sample(c("+", "-", "*"), size = N, 
+                replace = TRUE),
+              value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
+              group = sample(c("Normal", "Tumor"), 
+                size = N, replace = TRUE),
+              pair = sample(letters, size = N, 
+                replace = TRUE))
+head(gr)
+@ %def 
+
+\subsubsection{Supported Geoms}
+For \Robject{GRanges} we support following \emph{geoms}:
+\begin{description}
+\item[full] Show full stacked interval, a set of rectangles. Default.
+\item[segment] Show full stacked interval, a set of segments.
+\item[line] Show line. User need to provide 
+\item[coverage.line] Show coverage by using line.
+\item[coverage.polygon] Show coveraing by using polygon.
+\item[reduce]  Show reduced \Robject{GRanges} object.
+\item[disjoin] Show disjoin \Robject{GRanges} object.
+\item[histogram] Show hisgogram.
+\end{description}
+
+Now you can simply visualize a \Robject{GRanges} object.
+
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<qplot-gr-full, fig = TRUE>>=
+p <- qplot(gr)
+print(p)
+@ %def   
+  \caption{qplot for GRanges as geom full}
+  \label{fig:qplot-gr-full}
+\end{figure}
+
+
+As we could see from Figure \ref{fig:qplot-gr-full}, the default is
+\emph{automatically} facet by existing \textbf{seqnames} in the
+\Robject{GRanges} object. We can use \Rfunarg{nrow} and \Rfunarg{ncol} 
+to control the wrapping. 
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<qplot-gr-full-nrow1, fig = TRUE>>=
+p <- qplot(gr, nrow = 1)
+print(p)
+@ %def   
+  \caption{qplot for GRanges as geom full}
+  \label{fig:qplot-gr-full-nrow1}
+\end{figure}
+
+We we get the \Robject{ggplot} object, we could use all features from
+\ggplot{} package to manupuate this plot. Here we show a simple theme
+change.
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<qplot-gr-full-themebw, fig = TRUE>>=
+class(p)
+p <- p + theme_bw()
+print(p)
+@ %def   
+  \caption{qplot for GRanges as geom full}
+  \label{fig:qplot-gr-full-themebw}
+\end{figure}
+
+or adding a global line for coverage as shown in Figure
+\ref{fig:qplot-gr-cov-line}.
+
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<qplot-gr-cov-line, fig = TRUE>>=
+p <- qplot(gr, nrow = 1, geom = "coverage.p")
+p + geom_hline(yintercept = 40, color = "red", 
+    size = 1)
+@ %def   
+  \caption{qplot for GRanges as geom full}
+  \label{fig:qplot-gr-cov-line}
+\end{figure}
+
+You can also subset by the \Rfunarg{which} argument.
+
+@ 
+<<qplot-gr-subset>>=
+gr.sub <- gr[seqnames(gr) == "chr1"] #or 
+## p <- qplot(gr, seqnames = "chr1", ...) # or
+## p <- qplot(gr, which = GRanges("chr1", IRanges(1e5, 2e5)), ...)
+@ %def 
+
+And let's plot all other geoms together by \Rfunction{grid.arrange} from
+package \Rpackage{gridExtra}
+
+
+<<qplot-gr-all, eval = FALSE >>=
+p1 <- qplot(gr.sub, geom = "full")
+p2 <- qplot(gr.sub, geom = "point", y = value)
+p3 <- qplot(gr.sub, geom = "line", y = value)
+p4 <- qplot(gr.sub, geom = "coverage.line")
+p5 <- qplot(gr.sub, geom = "coverage.polygon")
+p6 <- qplot(gr.sub, geom = "reduce")
+p7 <- qplot(gr.sub, geom = "disjoin")
+p8 <- qplot(gr.sub, geom = "histogram")
+library(gridExtra)
+@ %def   
+\subsubsection{Faceting}
+
+
+\subsection{For \Robject{GRangesList} object}
+\subsection{For \Robject{IRanges} object}
+\subsection{For \Robject{GappedAlignments} object}
+\subsection{For \Robject{BamFile} object}
+\subsection{For \Robject{TranscriptDb} object}
+\subsection{For \Robject{BSgenome} object}
+
+\section{Overview}
+\emph{Bird Eye Overview} is useful to see the overal distribution of
+certain events. For static graphic, we currently only support stacked
+overview as ideogram, or for single chromosome.
+\subsection{Stacked Overview}
+
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<plotOverview-cyto>>=
+data(hg19IdeogramCyto)
+p <- plotOverview(hg19IdeogramCyto, cytoband = TRUE)
+print(p)
+@ %def   
+  \caption{Stacked overview with cytoband}
+  \label{fig:plotOverview-cyto}
+\end{figure}
+
+
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<plotOverview-nocyto>>=
+p <- plotOverview(hg19IdeogramCyto, cytoband = FALSE)
+print(p)
+@ %def   
+  \caption{Stacked overview without cytoband}
+  \label{fig:plotOverview-nocyto}
+\end{figure}
+
+
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<plotSingleChrom>>=
+p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
+print(p)
+@ %def   
+  \caption{Single Chromosome as Ideogram}
+  \label{fig:plotSingleChrom}
+\end{figure}
+
+
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<plotSingleChrom-zoom>>=
+p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1",
+                zoom.region = c(1e8, 1.5e8))
+print(p)
+@ %def   
+  \caption{Single Chromosome as Ideogram with zoomed rectangle}
+  \label{fig:plotSingleChrom-zoom}
+\end{figure}
+
+
+
+
+\subsection{Circular Overview}
+Circular view is inspired by the \software{Circos} project
+\footnote{\url{http://circos.ca/}} which is essentially writen
+\software{Perl}\footnote{\url{http://www.perl.org/}}.\software{Circos}
+visualize data in a circular layout, originally starting from
+visualize the genomic data, then extends to many other fields, turn
+out to be an elegant and useful way to visualize some other
+infomation.
+
+The static version of circular view is not implemented in this pacakge
+yet, but it's defintely in the TODO. For users who are really
+interested in using a circular view in \R{}, we have a highly
+experimental circular view in another package \visnab{}, which is
+interactive visualization toolkit for genomic data.
+\section{Building Tracks for Linear View}
+\section{Question-oriented Specific Graphics}
+\subsection{Fragment Length and Splicing plots}
+
+\subsection{Sequencing Logo}
+To be implemented.
+\subsection{Manhattan Plots for SNP data}
+To be implemented.
+\section{Session Info}
+@ 
+<<sessionInfo>>=
+sessionInfo()
+@ %def 
+
+\end{document}

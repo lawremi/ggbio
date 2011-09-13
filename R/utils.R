@@ -144,7 +144,7 @@ plotOverview <- function(obj, hotRegion, cytobandColor,
   ## obj <- shrinkSeqlevels(obj)
   if(cytoband){
     if(missing(cytobandColor)){
-      cytobandColor <- getOption("visnabBase")$cytobandColor
+      cytobandColor <- getOption("biovizBase")$cytobandColor
       cytobandColor <- unlist(cytobandColor)
     }
     if(!isIdeogram(obj))
@@ -185,10 +185,10 @@ plotOverview <- function(obj, hotRegion, cytobandColor,
                            scale_fill_manual(values = cytobandColor)
    
   }else {
-    if(!isSimpleOverview(obj)){
+    if(!isSimpleIdeogram(obj)){
       message("Reduce to simple genome, ignoring cytoband")
       obj <- sortChr(reduce(obj))
-      if(!isSimpleOverview(obj))
+      if(!isSimpleIdeogram(obj))
         stop("Cannot reduce to simple genome, please check your ideogram")
     }
     df <- as.data.frame(obj)
@@ -211,21 +211,23 @@ plotOverview <- function(obj, hotRegion, cytobandColor,
 }
 
 plotSingleChrom <- function(obj, subchr, zoom.region){
-  if(!missing(subchr))
+  if(!missing(subchr)){
     obj <- obj[seqnames(obj) == subchr]
+    seqlevels(obj) <- sortChr(unique(as.character(seqnames(obj))))
+  }
   if(length(unique(as.character(seqnames(obj))))>1)
     stop("Mulptiple chromosome information found")
   p <- plotOverview(obj, cytoband = TRUE)
   p <- p + xlab("") + opts(legend.position = "none")
   if(!missing(zoom.region)){
-  if(length(zoom.region) != 2)
-    stop("zoom.region must be a numeric vector of length 2")
-  zoom.df <- data.frame(x1 = zoom.region[1],
-                        x2 = zoom.region[2],
-                        seqnames = unique(as.character(seqnames(obj))))
-  p <- p + geom_rect(data = zoom.df, aes(xmin = x1,
-                       xmax = x2, ymin = -1, ymax = 11), color = "red", fill = NA)
-}
+    if(length(zoom.region) != 2)
+      stop("zoom.region must be a numeric vector of length 2")
+    zoom.df <- data.frame(x1 = zoom.region[1],
+                          x2 = zoom.region[2],
+                          seqnames = unique(as.character(seqnames(obj))))
+    p <- p + geom_rect(data = zoom.df, aes(xmin = x1,
+                         xmax = x2, ymin = -1, ymax = 11), color = "red", fill = NA)
+  }
   p
 }
 

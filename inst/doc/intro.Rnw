@@ -308,13 +308,22 @@ library(gridExtra)
 certain events. For static graphic, we currently only support stacked
 overview as ideogram, or for single chromosome.
 \subsection{Stacked Overview}
+Stacked overview is useful to visualzie the annotation across the
+genome, you can use \Rfunction{plotOverview} function to directly plot
+the result from \Rfunction{getIdeogram} for certain species. And you
+could control wether to plot the cytoband or not.
+
+Figure \ref{fig:plotOverview-cyto} shows how to plot stacked overview
+with cytoband. We change the name to make the label more clear.
 
 \begin{figure}[h!t!p]
   \centering
 @ 
-<<plotOverview-cyto>>=
+<<plotOverview-cyto, fig = TRUE>>=
 data(hg19IdeogramCyto)
-p <- plotOverview(hg19IdeogramCyto, cytoband = TRUE)
+## make shorter and clean labels
+ideo.rmChr <- removePrefix(hg19IdeogramCyto, "chr")
+p <- plotOverview(ideo.rmChr, cytoband = TRUE)
 print(p)
 @ %def   
   \caption{Stacked overview with cytoband}
@@ -322,24 +331,71 @@ print(p)
 \end{figure}
 
 
+Clearly, it's not good for visualizing the annotation at the same
+time, so we could plot it without cytoband. This accept a full
+ideogram which will be reduced automatically. You could also just use
+\textbf{hg19Ideogram} dataset.
 \begin{figure}[h!t!p]
   \centering
 @ 
-<<plotOverview-nocyto>>=
-p <- plotOverview(hg19IdeogramCyto, cytoband = FALSE)
+<<plotOverview-nocyto, fig = TRUE>>=
+p <- plotOverview(ideo.rmChr, cytoband = FALSE)
 print(p)
 @ %def   
   \caption{Stacked overview without cytoband}
   \label{fig:plotOverview-nocyto}
 \end{figure}
 
+Then we could simply use \Rfunction{geom\_hotregion} function to read
+in a \Robject{GRanges} object as other geoms(except they read in
+\Robject{data.frame}). And use \textbf{+} to simply add a annotation
+track on top with overview, they will automatically plot on the same
+chromosome and on the same x scale.
+
+Figure \ref{fig:plotOverview-nocyto-darned} shows an example
+of subset of RNA editing set, 
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<plotOverview-nocyto-darned, fig = TRUE>>=
+p <- plotOverview(ideo.rmChr, cytoband = FALSE)
+data(darned_hg19_subset500)
+new.darned <- removePrefix(darned_hg19_subset500, prefix = "chr")
+p <- p + geom_hotregion(new.darned)
+print(p)
+@ %def   
+\caption{Stacked overview without cytoband and with subseted DARNED
+  data on it}
+  \label{fig:plotOverview-nocyto-darned}
+\end{figure}
+
+We can also use \Rfunarg{color} argument to use color to indicate a
+column in the elementMetadata.
 
 \begin{figure}[h!t!p]
   \centering
 @ 
-<<plotSingleChrom>>=
-p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
+<<plotOverview-nocyto-darned, fig = TRUE>>=
+p <- plotOverview(ideo.rmChr, cytoband = FALSE)
+data(darned_hg19_subset500)
+new.darned <- removePrefix(darned_hg19_subset500, prefix = "chr")
+values(new.darned)["isSNP"] <- sapply(as.character(values(new.darned)$snp), nchar)>0
+p <- p + geom_hotregion(new.darned, aes(color = isSNP))
 print(p)
+@ %def   
+\caption{Stacked overview without cytoband and with subseted DARNED
+  data on it}
+  \label{fig:plotOverview-nocyto-darned}
+\end{figure}
+
+
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<plotSingleChrom, fig = TRUE>>=
+vp1 <- viewport(width = 1, height = 0.14)
+p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
+print(p, vp = vp1)
 @ %def   
   \caption{Single Chromosome as Ideogram}
   \label{fig:plotSingleChrom}
@@ -349,10 +405,11 @@ print(p)
 \begin{figure}[h!t!p]
   \centering
 @ 
-<<plotSingleChrom-zoom>>=
+<<plotSingleChrom-zoom, fig = TRUE>>=
+vp2 <- viewport(width = 1, height = 0.14)
 p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1",
                 zoom.region = c(1e8, 1.5e8))
-print(p)
+print(p, vp = vp2)
 @ %def   
   \caption{Single Chromosome as Ideogram with zoomed rectangle}
   \label{fig:plotSingleChrom-zoom}

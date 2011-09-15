@@ -841,7 +841,7 @@ setMethod("qplot", "TranscriptDb", function(data, x, y, which, ...,
     ## drawing
     ## just cds, gaps and utrs
     df <- as.data.frame(gr)
-    df.cds <- df[df$geom == "cds",]
+    df.cds <- df[df$type == "cds",]
     p <- ggplot(df.cds)
     args <- .args[names(.args) != "y"]
     args <- c(args, list(xmin = substitute(start), xmax = substitute(end),
@@ -853,7 +853,7 @@ setMethod("qplot", "TranscriptDb", function(data, x, y, which, ...,
     else
       p <- p + geom_rect(do.call("aes", args))
     ## utrs
-    df.utr <- df[df$geom == "utr",]
+    df.utr <- df[df$type == "utr",]
     args <- .args[names(.args) != "y"]
     args <- c(args, list(xmin = substitute(start), xmax = substitute(end),
                          ymin = substitute(.levels - 0.2),
@@ -863,7 +863,7 @@ setMethod("qplot", "TranscriptDb", function(data, x, y, which, ...,
     else
       p <- p + geom_rect(data = df.utr, do.call("aes", args))
     ## gaps
-    df.gaps <- df[df$geom == "gap",]
+    df.gaps <- df[df$type == "gap",]
     args <- .args[!(names(.args) %in% c("x", "y", "fill"))]
     args <- c(args, list(x = substitute(start), xend = substitute(end),
                          y = substitute(.levels),
@@ -881,7 +881,7 @@ setMethod("qplot", "TranscriptDb", function(data, x, y, which, ...,
     ## drawing
     ## just cds, gaps and utrs
     df <- as.data.frame(gr)
-    df.cds <- df[df$geom == "cds",]
+    df.cds <- df[df$type == "cds",]
     p <- ggplot(df.cds)
     args <- .args[names(.args) != "y"]
     args <- c(args, list(xmin = substitute(start), xmax = substitute(end),
@@ -893,7 +893,7 @@ setMethod("qplot", "TranscriptDb", function(data, x, y, which, ...,
     else
       p <- p + geom_rect(do.call("aes", args))
     ## utrs
-    df.utr <- df[df$geom == "utr",]
+    df.utr <- df[df$type == "utr",]
     args <- .args[names(.args) != "y"]
     args <- c(args, list(xmin = substitute(start), xmax = substitute(end),
                          ymin = substitute(.levels - 0.2),
@@ -903,7 +903,7 @@ setMethod("qplot", "TranscriptDb", function(data, x, y, which, ...,
     else
       p <- p + geom_rect(data = df.utr, do.call("aes", args))
     ## gaps
-    df.gaps <- df[df$geom == "gap",]
+    df.gaps <- df[df$type == "gap",]
     args <- .args[!(names(.args) %in% c("x", "y", "fill"))]
     args <- c(args, list(x = substitute(start), xend = substitute(end),
                          y = substitute(.levels),

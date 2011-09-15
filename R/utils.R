@@ -19,7 +19,10 @@ tracks <- function(..., check.xlim = TRUE,
   if(missing(xlim.fix)){
     lst <- lapply(grobs, function(obj){
       x <- eval(obj$layers[[1]]$mapping$x, obj$data)
-      data.frame(xmin = min(x),xmax = max(x))
+      if(!is.null(x))
+        data.frame(xmin = min(x),xmax = max(x))
+      else
+        data.frame(xmin = min(obj$data$start),xmax = max(obj$data$end))
     })
     res <- do.call("rbind", lst)
     xlim.fix <- c(min(res$xmin), max(res$xmax))

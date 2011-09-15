@@ -644,11 +644,13 @@ setMethod("qplot", "IRanges", function(data, ...,
 ## ======================================================================
 setMethod("qplot", "GappedAlignments", function(data, ...,
                                                 which,
-                                                geom,
+                                                geom = c("gapped.pair",
+                                                  "full"),
                                                 clip = FALSE,
                                                 clip.ratio = 0.001,
                                                 show.junction = FALSE,
                                                 clip.fun){
+  geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
   args <- args[!(names(args) %in% c("geom", "which",
                                     "clip", "clip.ratio",
@@ -657,6 +659,7 @@ setMethod("qplot", "GappedAlignments", function(data, ...,
     gr <- biovizBase:::fetch(data, which)
   else
     gr <- biovizBase:::fetch(data)
+  if(geom == "gapped.pair"){
   gr.junction <- gr[values(gr)$junction == TRUE]
   grl <- split(gr.junction, values(gr.junction)$read.group)
   
@@ -676,6 +679,7 @@ setMethod("qplot", "GappedAlignments", function(data, ...,
   df.read <- as.data.frame(gr.read)
   df.gaps <- as.data.frame(gr.gaps)
   p <- ggplot(df.read)
+  strandColor <- getOption("biovizBase")$strandColor
   if(!("color" %in% names(args))){
     if("fill" %in% names(args))
       args <- c(args, list(color = substitute(fill)))
@@ -697,8 +701,11 @@ setMethod("qplot", "GappedAlignments", function(data, ...,
                        y = substitute(.levels),
                        yend = substitute(.levels)))
   p <- p + geom_segment(data = df.gaps, do.call("aes", args))
-}
-  p
+}}
+  if(geom == "full"){
+    p <- qplot(gr)
+  }
+  p <- p + xlab("Genomic Coordinate")
 })
 
 
@@ -715,6 +722,7 @@ setMethod("qplot", "BamFile", function(data, ..., which,
                                        clip = FALSE,
                                        resize.extra = 10,
                                        geom = c("gapped.pair",
+                                         "full",
                                          "read.summary",
                                          "fragment.length",
                                          "coverage.line",
@@ -730,8 +738,9 @@ setMethod("qplot", "BamFile", function(data, ..., which,
     p <- qplot(ga, ..., resize.extra = resize.extra)
     message("Done")
   }
-  if(geom %in% c("coverage.line", "coverage.polygon")){
-    stop("not implemented yet")
+  if(geom %in% c("coverage.line", "coverage.polygon", "full")){
+    gr <- biovizBase:::fetch(ga)
+    p <- qplot(gr, geom = geom)
   }
   if(geom == "fragment.length"){
     if((missing(model)))

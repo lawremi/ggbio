@@ -509,7 +509,6 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 args <- c(args, list(data = substitute(data),
                                      model = substitute(model),
                                      group.name = substitute(group.name)))
-                ## p <- do.call(plotSpliceSum, args)
                 p <- plotSpliceSum(data, model, group.name = group.name,
                                    color = type, fill = type, size = freq)
               }
@@ -734,7 +733,9 @@ setMethod("qplot", "BamFile", function(data, ..., which,
   bf <- open(data)
   if(geom == "gapped.pair"){
     message("Read GappedAlignments from BamFile...")
-    ga <- readBamGappedAlignments(bf, which = which, use.name = TRUE)
+    ga <- readBamGappedAlignments(bf,
+                                  param = ScanBamParam(which = which),
+                                  use.name = TRUE)
     p <- qplot(ga, ..., resize.extra = resize.extra)
     message("Done")
   }
@@ -750,7 +751,9 @@ setMethod("qplot", "BamFile", function(data, ..., which,
       stop("model must be a GRangs object")
     which <- mds
     model <- mds
-    ga <- readBamGappedAlignments(data, which = which, use.name = TRUE)
+    ga <- readBamGappedAlignments(data,
+                                  param = ScanBamParam(which = which),           
+                                  use.name = TRUE)
     dt <- biovizBase:::fetch(ga)
     s <- opts(axis.text.y = theme_blank(),
               axis.title.y = theme_blank(),
@@ -819,10 +822,12 @@ setMethod("qplot", "character", function(data, x, y, ..., ref, which,
                                            "fragment.length",
                                            "coverage.line",
                                            "coverage.polygon")){
-  if(tools::file_ext(data) == ".bam")
+  geom <- match.arg(geom)
+  if(tools::file_ext(data) == "bam")
     bf <- BamFile(data)
   else
     stop("Please pass a bam file path")
+  args <- as.list(match.call(call = sys.call(sys.parent())))
   qplot(bf,  ..., which = which,
         geom = geom, resize.extra = reszie.extra)
 })

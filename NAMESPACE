@@ -22,7 +22,7 @@ importFrom(IRanges, IRanges,  disjointBins,
 
 importMethodsFrom(IRanges,  split, 
                   unlist,setdiff,
-                  Reduce,
+                  Reduce, range,
                   as.data.frame,
                   length,
                   "[","[<-","[[", "[[<-","$",

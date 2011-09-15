@@ -403,14 +403,20 @@ Supported geoms including
 \item[single] Reduced model
 \end{description}
 
+\begin{figure}[h!t!p]
+  \centering
 @ 
-<<txdb-plot, eval = FALSE>>=
+<<txdb-plot, fig = TRUE>>=
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
 data(genesymbol)
-p <- qplot(txdb, geom = "full", which = genesymbol[1])
-p <- qplot(txdb, geom = "single", which = genesymbol[1])
+p.full <- qplot(txdb, geom = "full", which = genesymbol[1])
+p.single <- qplot(txdb, geom = "single", which = genesymbol[1])
+tracks(p.full, p.single, heights = c(40, 10))
 @ %def 
+  \caption{TranscriptDb visualization. First track showing full model, second track showing reduced one.}
+  \label{fig:txdb}
+\end{figure}
 
 
 \subsection{For \Robject{BSgenome} object}

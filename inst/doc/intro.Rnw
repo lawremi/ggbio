@@ -148,7 +148,7 @@ plot different types of data in different ways.
 This is a wrapper around the original \qplot{} function. when reading
 in \Robject{data.frame} or \Robject{matrix} object, you can use
 \qplot{} as usual without any change, it essentially just call
-ggplot2::qplot. 
+ggplot2::qplot.
 
 \begin{figure}[h!t!p]
   \centering
@@ -170,6 +170,7 @@ package, whic is one of the most important infrastructure to describe
 genomic data along meta data information. It describe genomic data as
 intervals, currently in \R{} we don't have any convenient function to
 visualize interval object in different ways.
+
 \subsubsection{Sample \Robject{Granges} object}
 Let's first create a sample \Robject{GRanges} object used for
 following examples. This sample data contains 1000 rows, three
@@ -283,25 +284,160 @@ package \Rpackage{gridExtra}
 
 
 <<qplot-gr-all, eval = FALSE >>=
-p1 <- qplot(gr.sub, geom = "full")
-p2 <- qplot(gr.sub, geom = "point", y = value)
-p3 <- qplot(gr.sub, geom = "line", y = value)
-p4 <- qplot(gr.sub, geom = "coverage.line")
-p5 <- qplot(gr.sub, geom = "coverage.polygon")
-p6 <- qplot(gr.sub, geom = "reduce")
-p7 <- qplot(gr.sub, geom = "disjoin")
-p8 <- qplot(gr.sub, geom = "histogram")
-library(gridExtra)
+p1 <- qplot(gr.sub, geom = "full") + opts(title = "full")
+p2 <- qplot(gr.sub, geom = "point", y = value) +
+                                  opts(title = "point")
+p3 <- qplot(gr.sub, geom = "line", y = value) +
+                                  opts(title = "line")
+p4 <- qplot(gr.sub, geom = "coverage.line") +
+                                  opts(title = "coverage.line")   
+p5 <- qplot(gr.sub, geom = "coverage.polygon") + 
+                                  opts(title = "coverage.polygon")   
+p6 <- qplot(gr.sub, geom = "reduce") + 
+                                  opts(title = "reduce")   
+p7 <- qplot(gr.sub, geom = "disjoin") +
+                                  opts(title = "disjoin")      
+p8 <- qplot(gr.sub, geom = "histogram") +
+                                  opts(title = "histogram")      
+
+grid.arrange(p1, p2, p3, p4, p5, p6, p7 ,p8, ncol = 2)
 @ %def   
+
 \subsubsection{Faceting}
+Faceting in \ggbio{} is a little differnt from \ggplot{} in several ways
+\begin{itemize}
+\item The faceted column could only be \Rfunction{seqnames} or regions
+  on the genome. So we limited the formula passing to \Rfunarg{facet},
+  e.g something \~ seqnames, is accepted formula, you can change
+  \emph{something} to variable name in the elementMetadata. But you
+  can not change the second part.
+\item Sometime, we need to view different regions, so we also have a
+  \Rfunarg{facet\_gr} argument which accept a \Robject{GRanges}. If
+  this is provided, it will override the default seqnames and use
+  provided region to facet the graphics, this might be useful for
+  different gene centric views.
+\end{itemize}
+
+Figure \ref{fig:facet.group} shows we could only specify the facet row
+to be one the categorical variables in elementMetadata. 
+
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<facet-group, fig = TRUE>>=
+  p <- qplot(gr, facet = group ~ seqnames)
+  print(p)
+@ %def 
+  
+  \caption{Facet by group}
+  \label{fig:facet.group}
+\end{figure}
+
+
+Figure \ref{fig:facet.gr} shows how to facet by \Rfunarg{facet\_gr}
+arguments.
+
+\begin{figure}[h!t!p]
+  \centering
+  
+  @ 
+<<facet-gr, fig = TRUE>>=
+ gr.region <- GRanges(c("chr1", "chr2", "chr3"), 
+  IRanges(c(100, 200, 250), 
+  width = 70))
+  p <- qplot(gr, facet_gr = gr.region, nrow = 1)
+  print(p)  
+@ %def 
+
+  \caption{Facet by regions}
+  \label{fig:facet.gr}
+\end{figure}
+
 
 
 \subsection{For \Robject{GRangesList} object}
+It's just simply internally unlist the \Robject{GRangesList} object
+and treat it as \Robject{GRanges} object.
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<grl-plot, fig = TRUE>>=
+grl <- split(gr, seqnames(gr))
+p <- qplot(grl)
+print(p)
+@ %def 
+  \caption{GRangesList plotting}
+  \label{fig:grl}
+\end{figure}
+
 \subsection{For \Robject{IRanges} object}
+Similar to \qplot{} for \Robject{GRanges}, supported geoms includes, 
+\emph{full, segment, histogram, coverage.line, coverage.polygon, reduce}
+
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<iranges-plot, fig = TRUE>>=
+ir <- ranges(gr[seqnames(gr) == "chr1"])
+p1 <- qplot(ir) + opts(title = "full")
+p2 <- qplot(ir, geom = "segment")+ opts(title = "segment")
+p3 <- qplot(ir, geom = "coverage.line")+ opts(title = "coverage.line")
+p4 <- qplot(ir, geom = "coverage.polygon")+ opts(title = "coverage.polygon")
+p5 <- qplot(ir, geom = "reduce")+ opts(title = "reduce")
+p6 <- qplot(ir, geom = "histogram")+ opts(title = "histogram")
+library(gridExtra)
+grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
+@ %def 
+  \caption{IRanges geoms}
+  \label{fig:iranges-plot}
+\end{figure}
+
 \subsection{For \Robject{GappedAlignments} object}
+need to be completed.
 \subsection{For \Robject{BamFile} object}
+Not completed yet.
 \subsection{For \Robject{TranscriptDb} object}
+Supported geoms including
+\begin{description}
+\item[full] Full model
+\item[single] Reduced model
+\end{description}
+
+@ 
+<<txdb-plot, eval = FALSE>>=
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
+data(genesymbol)
+p <- qplot(txdb, geom = "full", which = genesymbol[1])
+p <- qplot(txdb, geom = "single", which = genesymbol[1])
+@ %def 
+
+
 \subsection{For \Robject{BSgenome} object}
+\begin{description}
+\item[text] Showing nucleotides as text.
+\item[segment] Showing nucleotides as color-coded segment.
+\item[point] Showing nucleotides as color-coded point.
+\item[rectangle] Showing nucleotides as color-coded rectangle.
+\end{description}
+
+\begin{figure}[h!t!p]
+  \centering
+@ 
+<<BSgenome-tracks, fig = TRUE>>=
+library(BSgenome.Hsapiens.UCSC.hg19)
+gr <- GRanges("chr1", IRanges(5e7, 5e7+50))
+p1 <- qplot(Hsapiens, name = gr, geom = "text")
+p2 <- qplot(Hsapiens, name = gr, geom = "point")
+p3 <- qplot(Hsapiens, name = gr, geom = "segment")
+p4 <- qplot(Hsapiens, name = gr, geom = "rectangle")
+tracks(p1, p2, p3, p4)
+@ %def 
+  \caption{BSgenome with four geoms, first one is text, second is point, third one is segment, and fourth one is rectangle}
+  \label{fig:BSgenome}
+\end{figure}
+
+
 
 \section{Overview}
 \emph{Bird Eye Overview} is useful to see the overal distribution of
@@ -314,7 +450,9 @@ the result from \Rfunction{getIdeogram} for certain species. And you
 could control wether to plot the cytoband or not.
 
 Figure \ref{fig:plotOverview-cyto} shows how to plot stacked overview
-with cytoband. We change the name to make the label more clear.
+with cytoband. We change the name to make the label more
+clear. \Rfunction{renameSeqlevels} function from
+\Rpackage{GenomicRanges} is a good choice.
 
 \begin{figure}[h!t!p]
   \centering
@@ -322,8 +460,12 @@ with cytoband. We change the name to make the label more clear.
 <<plotOverview-cyto, fig = TRUE>>=
 data(hg19IdeogramCyto)
 ## make shorter and clean labels
-ideo.rmChr <- removePrefix(hg19IdeogramCyto, "chr")
-p <- plotOverview(ideo.rmChr, cytoband = TRUE)
+old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
+new.chrs <- gsub("chr", "", old.chrs)
+lst <- as.list(new.chrs)
+names(lst) <- old.chrs
+new.ideo <- renameSeqlevels(hg19IdeogramCyto, lst)
+p <- plotOverview(new.ideo, cytoband = TRUE)
 print(p)
 @ %def   
   \caption{Stacked overview with cytoband}
@@ -339,7 +481,7 @@ ideogram which will be reduced automatically. You could also just use
   \centering
 @ 
 <<plotOverview-nocyto, fig = TRUE>>=
-p <- plotOverview(ideo.rmChr, cytoband = FALSE)
+p <- plotOverview(new.ideo, cytoband = FALSE)
 print(p)
 @ %def   
   \caption{Stacked overview without cytoband}
@@ -353,14 +495,18 @@ track on top with overview, they will automatically plot on the same
 chromosome and on the same x scale.
 
 Figure \ref{fig:plotOverview-nocyto-darned} shows an example
-of subset of RNA editing set, 
+of subset of RNA editing set. 
+
+\textbf{NOTE:} user need to make sure the \Rfunction{seqnames} are
+consistency in two datas, otherwise you are going to make weird
+graphics, because they can not be mapped in the right way.
 \begin{figure}[h!t!p]
   \centering
 @ 
 <<plotOverview-nocyto-darned, fig = TRUE>>=
-p <- plotOverview(ideo.rmChr, cytoband = FALSE)
 data(darned_hg19_subset500)
-new.darned <- removePrefix(darned_hg19_subset500, prefix = "chr")
+## rename 
+new.darned <- renameSeqlevels(darned_hg19_subset500, lst)
 p <- p + geom_hotregion(new.darned)
 print(p)
 @ %def   
@@ -372,15 +518,16 @@ print(p)
 We can also use \Rfunarg{color} argument to use color to indicate a
 column in the elementMetadata.
 
+Let's try to use color to indicate which exon region the editing site
+is, \emph{3} means 3' UTR, \emph{5} means 5' UTR, \emph{C} means it's
+\emph{CDS}, and \textbf{NA} indicate missing.
+
 \begin{figure}[h!t!p]
   \centering
 @ 
-<<plotOverview-nocyto-darned, fig = TRUE>>=
-p <- plotOverview(ideo.rmChr, cytoband = FALSE)
-data(darned_hg19_subset500)
-new.darned <- removePrefix(darned_hg19_subset500, prefix = "chr")
-values(new.darned)["isSNP"] <- sapply(as.character(values(new.darned)$snp), nchar)>0
-p <- p + geom_hotregion(new.darned, aes(color = isSNP))
+<<plotOverview-nocyto-darned-exon, fig = TRUE>>=
+p <- plotOverview(new.ideo, cytoband = FALSE)
+p <- p + geom_hotregion(new.darned, aes(color = exReg))
 print(p)
 @ %def   
 \caption{Stacked overview without cytoband and with subseted DARNED
@@ -416,8 +563,6 @@ print(p, vp = vp2)
 \end{figure}
 
 
-
-
 \subsection{Circular Overview}
 Circular view is inspired by the \software{Circos} project
 \footnote{\url{http://circos.ca/}} which is essentially writen
@@ -436,10 +581,14 @@ interactive visualization toolkit for genomic data.
 \section{Question-oriented Specific Graphics}
 \subsection{Fragment Length and Splicing plots}
 
-\subsection{Sequencing Logo}
-To be implemented.
-\subsection{Manhattan Plots for SNP data}
-To be implemented.
+% \subsection{Sequencing Logo}
+% To be implemented.
+% \subsection{Manhattan Plots for SNP data}
+% To be implemented.
+\section{Future Plan}
+\begin{itemize}
+\item Manhattan Plots for SNP data
+\end{itemize}
 \section{Session Info}
 @ 
 <<sessionInfo>>=

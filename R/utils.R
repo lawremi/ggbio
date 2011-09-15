@@ -3,10 +3,8 @@ tracks <- function(..., check.xlim = TRUE,
                    remove.extraXlim = TRUE,
                    legend = FALSE,
                    xlim.fix, ylim.fix){
-  ## sicne this works for GRanges, genomic data
-  ## so just check simple field
-  ## need to check if y is labeld, it need to be labeled
   dots <- list(...)
+  dots <- c(list(ncol = 1), dots)
   params <- c("nrow", "ncol", "widths", "heights", "default.units", 
               "respect", "just")
   layout.call <- intersect(names(dots), params)
@@ -17,9 +15,11 @@ tracks <- function(..., check.xlim = TRUE,
   else not.grobnames <- names(dots) %in% layout.call
 
   grobs <- dots[!not.grobnames]
+  
   if(missing(xlim.fix)){
     lst <- lapply(grobs, function(obj){
-      data.frame(xmin = min(obj$data$start),xmax = max(obj$data$end))
+      x <- eval(obj$layers[[1]]$mapping$x, obj$data)
+      data.frame(xmin = min(x),xmax = max(x))
     })
     res <- do.call("rbind", lst)
     xlim.fix <- c(min(res$xmin), max(res$xmax))
@@ -32,13 +32,6 @@ tracks <- function(..., check.xlim = TRUE,
   ## need fix legend
   if(check.xlim){
     N <- length(grobs)
-    ## leg.lst <- lapply(seq_len(N),
-    ##                   function(i) {
-    ##                       ggplotGrob(grobs[[i]] + opts(keep="legend_box"))
-    ##                   })
-    ##  ## one needs to provide the legend with a well-defined width
-    ## legend=gTree(children=do.call("gList",leg.lst), cl="legendGrob")
-    ## params.layout <- c(params.layout, list(legend = substitute(legend)))
     lst <- lapply(seq_len(N),
                   function(i) {
                     if(legend)
@@ -47,10 +40,18 @@ tracks <- function(..., check.xlim = TRUE,
                       grobs[[i]] <- grobs[[i]] + s +
                         opts(legend.position = "none")
                     if(i %in% 1:(N-1))
-                      grobs[[i]] <- grobs[[i]]+opts(axis.text.x = theme_blank(),
-                                                    axis.title.x=theme_blank(),
-                                                    axis.ticks = theme_blank())
-                    grobs[[i]]
+                      grobs[[i]] <- grobs[[i]] + opts(axis.text.x = theme_blank(),
+                                                    axis.title.x=theme_blank())
+                    if(i == 1){
+                      grobs[[i]] <- grobs[[i]] +
+                        opts(plot.margin = unit(c(1, 1.8, 0, 0), "lines"))
+                    }else{
+                      grobs[[i]] <- grobs[[i]] +
+                        opts(plot.margin = unit(c(0, 1.8, 0, 0), "lines"))
+                    }
+                    grobs[[i]]+ opts(axis.text.y = theme_blank(),
+                                     axis.ticks = theme_blank())
+                    
                   })
     widthDetails.legendGrob <- function(x) unit(10, "cm")    
     ## grid.arrange(lst[[1]],lst[[2]], lst[[3]], legend = legend)
@@ -134,131 +135,21 @@ p
 ##        For "Seqlogo"
 ## ======================================================================
 
-## ======================================================================
-##        For "Overview"
-## ======================================================================
-plotOverview <- function(obj, hotRegion, cytobandColor,
-                         subchr,
-                         cytoband = FALSE){
-  ## make sure the levels are not redundant
-  ## obj <- shrinkSeqlevels(obj)
-  if(cytoband){
-    if(missing(cytobandColor)){
-      cytobandColor <- getOption("biovizBase")$cytobandColor
-      cytobandColor <- unlist(cytobandColor)
-    }
-    if(!isIdeogram(obj))
-        stop("Need cytoband information, please check the getIdeogram function")
-    df <- as.data.frame(obj)
-    df$seqnames <- factor(as.character(df$seqnames),
-                          levels = sortChr(unique(as.character(df$seqnames))))
-    df.rect <- subset(df, gieStain != "acen")
-    df.tri <- subset(df, gieStain == "acen")
-    df.tri.p <- df.tri[substr(df.tri$name, 1, 1) == "p",]
-    df.tri.q <- df.tri[substr(df.tri$name, 1, 1) == "q",]
-    p <- ggplot(df.rect)
-    p <- p + facet_grid(seqnames ~ .) +
-      geom_rect(aes(xmin = start,
-                    ymin = 0,
-                    xmax = end,
-                    ymax = 10,
-                    fill = gieStain),
-                color = "black")
-     p <- p +  geom_polygon(data = df.tri.p, aes(x = c(start, start, end),
-                    y = c(rep(0, length(start)),
-                      rep(10,length(start)),
-                      rep(5,length(start))), fill = gieStain))
-     p <- p +  geom_polygon(data = df.tri.q, aes(x = c(start, end, end),
-                    y = c(rep(5, length(start)),
-                      rep(10,length(start)),
-                      rep(0,length(start))), fill = gieStain))
-    
-     p <- p + geom_polygon(data = df.tri.p, aes(x = c(start, start, end),
-                     y = c(0, 10, 5), fill = gieStain))+
-      geom_polygon(data = df.tri.q, aes(x = c(start, end, end),
-                     y = c(5, 10, 0), fill = gieStain))+
-                    opts(axis.text.y = theme_blank(),
-                         axis.title.y=theme_blank(),
-                         axis.ticks = theme_blank(),
-                         panel.grid.minor = theme_line(colour = NA),
-                         panel.grid.major = theme_line(colour = NA))+
-                           scale_fill_manual(values = cytobandColor)
-   
-  }else {
-    if(!isSimpleIdeogram(obj)){
-      message("Reduce to simple genome, ignoring cytoband")
-      obj <- sortChr(reduce(obj))
-      if(!isSimpleIdeogram(obj))
-        stop("Cannot reduce to simple genome, please check your ideogram")
-    }
-    df <- as.data.frame(obj)
-    df$seqnames <- factor(as.character(df$seqnames),
-                          levels = sortChr(unique(as.character(df$seqnames))))
-    p <- ggplot(df)
-    p <- p + facet_grid(seqnames ~ .) +
-      geom_rect(aes(xmin = start,
-                    ymin = 0,
-                    xmax = end,
-                    ymax = 10), fill = "white", color = "black") +
-                        opts(axis.text.y = theme_blank(),
-                             axis.title.y=theme_blank(),
-                             axis.ticks = theme_blank(),
-                             panel.grid.minor = theme_line(colour = NA),
-                             panel.grid.major = theme_line(colour = NA))
-  }
-  p <- p + xlab("Genomic Coordinates") + ylab("Chromosomes")
-  p
-}
-
-plotSingleChrom <- function(obj, subchr, zoom.region){
-  if(!missing(subchr)){
-    obj <- obj[seqnames(obj) == subchr]
-    seqlevels(obj) <- sortChr(unique(as.character(seqnames(obj))))
-  }
-  if(length(unique(as.character(seqnames(obj))))>1)
-    stop("Mulptiple chromosome information found")
-  p <- plotOverview(obj, cytoband = TRUE)
-  p <- p + xlab("") + opts(legend.position = "none")
-  if(!missing(zoom.region)){
-    if(length(zoom.region) != 2)
-      stop("zoom.region must be a numeric vector of length 2")
-    zoom.df <- data.frame(x1 = zoom.region[1],
-                          x2 = zoom.region[2],
-                          seqnames = unique(as.character(seqnames(obj))))
-    p <- p + geom_rect(data = zoom.df, aes(xmin = x1,
-                         xmax = x2, ymin = -1, ymax = 11), color = "red", fill = NA)
-  }
-  p
-}
-
-geom_hotregion <- function(data,...){
-  args <- as.list(match.call(expand.dots = TRUE)[-1])
-  args <- args[!names(args) %in% "data"]
-  aes.lst <- unlist(lapply(args, function(x) class(eval(x)) == "uneval"))
-  if(length(aes.lst)){
-    idx <- which(aes.lst)
-    aes.lst <- eval(args[[idx]])
-  }else{
-    aes.lst <- list()
-  }
-  args <- c(aes.lst, list(xmin = substitute(start),
-                       xmax = substitute(end),
-                       ymin = 0,
-                       ymax = 10))
-
-  df <- as.data.frame(data)
-  ## this is a hack to make sure geom_rect can show segments too
-  ## need color and fill when it's just segment
-  if(any(c("colour", "fill") %in% names(args))){
-    if(!all(c("colour", "fill") %in% names(args))){
-      idx <- which(c("colour", "fill") %in% names(args))
-      known <- c("colour", "fill")[idx]
-      unknown <- c("colour", "fill")[-idx]
-      args[[unknown]] <- args[[known]]
-    }
-    geom_rect(data = df, do.call(aes, args))
-  }
-  else
-    geom_rect(data = df, do.call(aes, args), color = "black", fill = "black")
-
+rangesCentric <- function(gr, which, id.name){
+  ## first subset, need to give notice
+  gr <- subsetByOverlaps(gr, which)
+  which <- which[order(start(which))]
+  gr <- gr[order(start(gr))]
+  ## which <- subsetByOverlaps(which, gr)
+  ## FIXME: give message here
+  ## need to be exclusive
+  which <- reduce(which)
+  mx <- matchMatrix(findOverlaps(gr, which))
+  values(gr)$.id.name <- NA
+  values(gr)$.id.name[mx[,1]] <- mx[,2]
+  if(!missing(id.name) && (id.name %in% colnames(values(which))))
+    values(gr)$.id.name[mx[,1]] <- values(which)[mx[,2],id.name]
+  values(which)$.id.name <- seq_len(length(which))
+  ## cannot be putted into GRangesList, unequal, should be in a GenomicRangesList
+  list(gr = gr, which = which)
 }

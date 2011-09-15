@@ -5,9 +5,11 @@ Description: ggbio focuses on visualzing genomic data using basic R graphics or 
 Author: Tengfei Yin, Michael Lawrence, Dianne Cook
 Maintainer: Tengfei Yin <yintengfei@gmail.com>
 Depends: methods, biovizBase, ggplot2
-Imports: methods, biovizBase, ggplot2, IRanges, GenomicRanges, GenomicFeatures, Rsamtools, BSgenome
+Imports: methods, biovizBase, ggplot2, IRanges, GenomicRanges, GenomicFeatures, Rsamtools, BSgenome, gridExtra
+Suggests: BSgenome.Hsapiens.UCSC.hg19, TxDb.Hsapiens.UCSC.hg19.knownGene
 License: GPL (>=2)
 LazyLoad: Yes
 Collate: utils.R
 	 qplot-method.R
+	 overview-plot.R
 	 ggbio.R

@@ -1,7 +1,9 @@
 ## ============================================================
 ## Import
 ## ============================================================
+import(ggplot2)
 import(biovizBase)
+importFrom(gridExtra, grid.arrange)
 ## GenomicRanges
 ## IRanges
 importFrom(IRanges, IRanges,  disjointBins,

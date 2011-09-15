@@ -1,0 +1,149 @@
+## ======================================================================
+##        For "Overview"
+## ======================================================================
+
+##' Plot stacked overview for genome with or without cytoband.
+##'
+##' This function requires two column of the \code{gieStain} and
+##' \code{name}. Which you could get from \code{getIdeogram} function
+##' in pacakge \code{biovizBase}.
+##' @title Plot stacked overview for genome
+##' @param obj A \code{GenomicRanges} object, which include extra
+##' information about cytoband.
+##' @param cytoband Logical value. Default is FALSE. If TRUE, plotting
+##' cytoband.
+##' @return A \code{ggplot} object.
+##' @author Tengfei Yin
+plotOverview <- function(obj, 
+                         cytoband = FALSE){
+
+  if(cytoband){
+    cytobandColor <- getOption("biovizBase")$cytobandColor
+    if(!isIdeogram(obj))
+        stop("Need cytoband information, please check the getIdeogram function")
+    df <- as.data.frame(obj)
+    df$seqnames <- factor(as.character(df$seqnames),
+                          levels = sortChr(unique(as.character(df$seqnames))))
+    df.rect <- subset(df, gieStain != "acen")
+    df.tri <- subset(df, gieStain == "acen")
+    df.tri.p <- df.tri[substr(df.tri$name, 1, 1) == "p",]
+    df.tri.q <- df.tri[substr(df.tri$name, 1, 1) == "q",]
+    p <- ggplot(df.rect)
+    p <- p + facet_grid(seqnames ~ .) +
+      geom_rect(aes(xmin = start,
+                    ymin = 0,
+                    xmax = end,
+                    ymax = 10,
+                    fill = gieStain),
+                color = "black")
+     p <- p +  geom_polygon(data = df.tri.p, aes(x = c(start, start, end),
+                    y = c(rep(0, length(start)),
+                      rep(10,length(start)),
+                      rep(5,length(start))), fill = gieStain))
+     p <- p +  geom_polygon(data = df.tri.q, aes(x = c(start, end, end),
+                    y = c(rep(5, length(start)),
+                      rep(10,length(start)),
+                      rep(0,length(start))), fill = gieStain))
+    
+     p <- p + geom_polygon(data = df.tri.p, aes(x = c(start, start, end),
+                     y = c(0, 10, 5), fill = gieStain))+
+      geom_polygon(data = df.tri.q, aes(x = c(start, end, end),
+                     y = c(5, 10, 0), fill = gieStain))+
+                    opts(axis.text.y = theme_blank(),
+                         axis.title.y=theme_blank(),
+                         axis.ticks = theme_blank(),
+                         panel.grid.minor = theme_line(colour = NA),
+                         panel.grid.major = theme_line(colour = NA))+
+                           scale_fill_manual(values = cytobandColor)
+   
+  }else {
+    if(!isSimpleIdeogram(obj)){
+      message("Reduce to simple genome, ignoring cytoband")
+      obj <- sortChr(reduce(obj))
+      if(!isSimpleIdeogram(obj))
+        stop("Cannot reduce to simple genome, please check your ideogram")
+    }
+    df <- as.data.frame(obj)
+    df$seqnames <- factor(as.character(df$seqnames),
+                          levels = sortChr(unique(as.character(df$seqnames))))
+    p <- ggplot(df)
+    p <- p + facet_grid(seqnames ~ .) +
+      geom_rect(aes(xmin = start,
+                    ymin = 0,
+                    xmax = end,
+                    ymax = 10), fill = "white", color = "black") +
+                        opts(axis.text.y = theme_blank(),
+                             axis.title.y=theme_blank(),
+                             axis.ticks = theme_blank(),
+                             panel.grid.minor = theme_line(colour = NA),
+                             panel.grid.major = theme_line(colour = NA))
+  }
+  p <- p + xlab("Genomic Coordinates") + ylab("Chromosomes")
+  p
+}
+
+##' Plot single chromosome with cytoband
+##'
+##' User could provide the whole idegram and use subchr to point to
+##' particular chromosome.
+##' @title Plot single chromosome with cytoband
+##' @param obj A \code{GenomicRanges} object, which include extra
+##' information about cytoband.
+##' @param subchr A sinle character of chromosome names to show.
+##' @param zoom.region A numeric vector of length 2 indicating zoomed
+##' region.
+##' @return A \code{ggplot} object.
+##' @author Tengfei Yin
+plotSingleChrom <- function(obj, subchr, zoom.region){
+  ## do we need subchr here
+  if(!missing(subchr)){
+    obj <- obj[seqnames(obj) == subchr]
+    seqlevels(obj) <- sortChr(unique(as.character(seqnames(obj))))
+  }
+  if(length(unique(as.character(seqnames(obj))))>1)
+    stop("Mulptiple chromosome information found")
+  p <- plotOverview(obj, cytoband = TRUE)
+  p <- p + xlab("") + opts(legend.position = "none")
+  if(!missing(zoom.region)){
+    if(length(zoom.region) != 2)
+      stop("zoom.region must be a numeric vector of length 2")
+    zoom.df <- data.frame(x1 = zoom.region[1],
+                          x2 = zoom.region[2],
+                          seqnames = unique(as.character(seqnames(obj))))
+    p <- p + geom_rect(data = zoom.df, aes(xmin = x1,
+                         xmax = x2, ymin = -1, ymax = 11), color = "red", fill = NA)
+  }
+  p
+}
+
+geom_hotregion <- function(data,...){
+  args <- as.list(match.call(expand.dots = TRUE)[-1])
+  args <- args[!names(args) %in% "data"]
+  aes.lst <- unlist(lapply(args, function(x) class(eval(x)) == "uneval"))
+  if(length(aes.lst)){
+    idx <- which(aes.lst)
+    aes.lst <- eval(args[[idx]])
+  }else{
+    aes.lst <- list()
+  }
+  args <- c(aes.lst, list(xmin = substitute(start),
+                       xmax = substitute(end),
+                       ymin = 0,
+                       ymax = 10))
+
+  df <- as.data.frame(data)
+  ## this is a hack to make sure geom_rect can show segments too
+  ## need color and fill when it's just segment
+  if(any(c("colour", "fill") %in% names(args))){
+    if(!all(c("colour", "fill") %in% names(args))){
+      idx <- which(c("colour", "fill") %in% names(args))
+      known <- c("colour", "fill")[idx]
+      unknown <- c("colour", "fill")[-idx]
+      args[[unknown]] <- args[[known]]
+    }
+    geom_rect(data = df, do.call(aes, args))
+  }
+  else
+    geom_rect(data = df, do.call(aes, args), color = "black", fill = "black")
+
+}

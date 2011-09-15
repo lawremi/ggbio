@@ -393,9 +393,59 @@ grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
 \end{figure}
 
 \subsection{For \Robject{GappedAlignments} object}
-need to be completed.
+Supportd geom includes:
+\begin{description}
+\item[gapped.pair] Consider junction reads information, and assign
+  stepping levels based on that information, could be used to show
+  junction. The \Rfunarg{show.junction} could control show the
+  junction reads or not
+\item[full] Show as the \emph{full} geom like for \Robject{GRanges}
+  object, randomly assign stepping levels.
+\end{description}
+
+
+\begin{figure}[h!p!t]
+  \centering
+@ 
+<<gapped-plot, fig = TRUE>>=
+bamfile <- system.file("extdata", "ex1.bam", package="Rsamtools")
+galn1 <- readBamGappedAlignments(bamfile, use.names = TRUE)
+galn1.seq1 <- galn1[seqnames(galn1) == "seq1"]
+p1 <- qplot(galn1.seq1)
+p2 <- qplot(galn1.seq1, geom = "full")
+grid.arrange(p1, p2, ncol = 1)
+@ %def 
+\caption{GappedAlignments virsualization. The one on the left shows
+  geom ``gapped.pair'', which try to put the one belongs to the same
+  read in the same step level, and make sure nothing falls in between,
+  this is usefull when show.junction = TRUE. The one on the right, is
+  use ``simple'' geom, which just show as formal GRanges.}
+  \label{fig:gapped-ori}
+\end{figure}
+
+\begin{figure}[h!p!t]
+  \centering
+@ 
+<<gapped-plot-zoom, fig = TRUE>>=
+p1 <- p1 + scale_x_continuous(limits = c(500, 800))
+p2 <- p2 + scale_x_continuous(limits = c(500, 800))
+grid.arrange(p1, p2, ncol = 1)
+@ %def 
+  \caption{GappedAlignments virsualization: simple zoom in}
+  \label{fig:gapped-zoom}
+\end{figure}
+
 \subsection{For \Robject{BamFile} object}
-Not completed yet.
+Supported geoms includs:
+\begin{description}
+  \item[gapped.pair] Like for \Robject{GappedAlignments} object.
+  \item[full] Like for \Robject{GappedAlignments} object.
+  \item[fragment.length] \emph{NOTE:} This return a track.
+  \item[coverage.line] like for \Robject{GRanges} object
+  \item[coverage.polygon] like for \Robject{GRanges} object
+  \item[mismatch] TODO.(underlying computation is finished)
+  \item[read.summary] TODO.(underlying computation is finished)
+\end{description}
 \subsection{For \Robject{TranscriptDb} object}
 Supported geoms including
 \begin{description}
@@ -403,7 +453,9 @@ Supported geoms including
 \item[single] Reduced model
 \end{description}
 
-\begin{figure}[h!t!p]
+Figure \ref{fig:txdb} shows two tracks for a \Robject{TranscriptDb} object.
+
+\begin{figure}[h!t!b!p]
   \centering
 @ 
 <<txdb-plot, fig = TRUE>>=
@@ -427,6 +479,8 @@ tracks(p.full, p.single, heights = c(40, 10))
 \item[rectangle] Showing nucleotides as color-coded rectangle.
 \end{description}
 
+Figure \ref{fig:BSgenome} shows four tracks(with four geom) for a
+\Robject{BSgenome} object.
 \begin{figure}[h!t!p]
   \centering
 @ 

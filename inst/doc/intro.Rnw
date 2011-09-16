@@ -209,6 +209,9 @@ For \Robject{GRanges} we support following \emph{geoms}:
 \item[reduce]  Show reduced \Robject{GRanges} object.
 \item[disjoin] Show disjoin \Robject{GRanges} object.
 \item[histogram] Show hisgogram.
+\item[splice] A wrapper around function \Rfunction{plotSpliceSum}, so
+  when you set to \Rfunarg{geom} equals to \emph{splice}, you have to
+  to provide arguments \Rfunarg{model}. 
 \end{description}
 
 Now you can simply visualize a \Robject{GRanges} object.
@@ -408,6 +411,7 @@ Supportd geom includes:
   \centering
 @ 
 <<gapped-plot, fig = TRUE>>=
+library(Rsamtools)
 bamfile <- system.file("extdata", "ex1.bam", package="Rsamtools")
 galn1 <- readBamGappedAlignments(bamfile, use.names = TRUE)
 galn1.seq1 <- galn1[seqnames(galn1) == "seq1"]
@@ -434,6 +438,7 @@ grid.arrange(p1, p2, ncol = 1)
   \caption{GappedAlignments virsualization: simple zoom in}
   \label{fig:gapped-zoom}
 \end{figure}
+
 
 \subsection{For \Robject{BamFile} object}
 Supported geoms includs:
@@ -638,8 +643,37 @@ interested in using a circular view in \R{}, we have a highly
 experimental circular view in another package \visnab{}, which is
 interactive visualization toolkit for genomic data.
 \section{Building Tracks for Linear View}
+In most genome browsers, they all have such a view that including many
+tracks, could be any anntation data along genomic coordinate. So we
+try to provide a convenient constructor for building tracks, which
+here in this package is simply vertically binding of several
+plots. It's essentially a \Rfunction{grid.arrange}. So if users want
+to have more delicate control over their tracks, they need manipulate
+the graphics in \ggplot{} level or grid levels.
+
+\Rfunction{tracks} function has some extra features and limitations
+compare to \Rfunction{grid.arrange}.
+\begin{itemize}
+\item Always sitting on genomic or protein space.
+\item Always using ncol = 1 as default arguments.
+\item For now, since the unbalanced legend and labels in \ggplot{} has
+  been solved (maybe just I haven't found such features). We simply
+  remove legend and y axis labels to make sure all tracks are aligned
+  exactly in the same way.
+\item Remove the x-axis for most track except the last one. 
+\item Does the ajustment of margins for you automatically.
+\item Doesn't like \qplot{}, tracks doesn't return \Robject{ggplot}
+  object. so processing your plot before you pass them to
+  \Rfunction{tracks}.
+\end{itemize}
+
+We have already demonstrate how to use \Rfunction{tracks} in the
+previous sections.
+
 \section{Question-oriented Specific Graphics}
 \subsection{Fragment Length and Splicing plots}
+
+\subsection{Mismatch Summary}
 
 % \subsection{Sequencing Logo}
 % To be implemented.
@@ -647,7 +681,8 @@ interactive visualization toolkit for genomic data.
 % To be implemented.
 \section{Future Plan}
 \begin{itemize}
-\item Manhattan Plots for SNP data
+\item Manhattan Plots for SNP data(can be achieved by facet\_gr for now, but
+  need more delicate control)
 \end{itemize}
 \section{Session Info}
 @ 

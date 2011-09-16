@@ -14,6 +14,20 @@
 ##' cytoband.
 ##' @return A \code{ggplot} object.
 ##' @author Tengfei Yin
+##' @examples
+##' data(hg19IdeogramCyto)
+##' ## make shorter and clean labels
+##' old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
+##' new.chrs <- gsub("chr", "", old.chrs)
+##' lst <- as.list(new.chrs)
+##' names(lst) <- old.chrs
+##' new.ideo <- renameSeqlevels(hg19IdeogramCyto, lst)
+##' ## with cytoband
+##' p <- plotOverview(new.ideo, cytoband = TRUE)
+##' print(p)
+##' ## with nocytoband
+##' p <- plotOverview(new.ideo, cytoband = FALSE)
+##' print(p)
 plotOverview <- function(obj, 
                          cytoband = FALSE){
 
@@ -84,16 +98,21 @@ plotOverview <- function(obj,
 
 ##' Plot single chromosome with cytoband
 ##'
-##' User could provide the whole idegram and use subchr to point to
+##' User could provide the whole ideogram and use subchr to point to
 ##' particular chromosome.
 ##' @title Plot single chromosome with cytoband
 ##' @param obj A \code{GenomicRanges} object, which include extra
 ##' information about cytoband.
-##' @param subchr A sinle character of chromosome names to show.
+##' @param subchr A single character of chromosome names to show.
 ##' @param zoom.region A numeric vector of length 2 indicating zoomed
 ##' region.
 ##' @return A \code{ggplot} object.
 ##' @author Tengfei Yin
+##' @examples
+##' data(hg19IdeogramCyto)
+##' vp1 <- viewport(width = 1, height = 0.14)
+##' p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
+##' print(p, vp = vp1)
 plotSingleChrom <- function(obj, subchr, zoom.region){
   ## do we need subchr here
   if(!missing(subchr)){
@@ -116,6 +135,32 @@ plotSingleChrom <- function(obj, subchr, zoom.region){
   p
 }
 
+##' Adding hotregion which is a \code{GRanges} object for stacked
+##' overview (genome-wide)
+##'
+##' The overplayed region may contain single position which is not
+##' interval, this will be plotted as segments instead of rectangle.
+##' @title Adding hotregion for stacked overview (genome-wide)
+##' @param data A \code{\link{GRanges}} object, which you want to
+##' overlay on the stacked overview.
+##' @param ... Extra parameters passed to geom in
+##' ggplot2. e.g. aes(color = score)
+##' @return A 'Layer'
+##' @author Tengfei Yin
+##' @examples
+##' data(hg19IdeogramCyto)
+##' ## make shorter and clean labels
+##' old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
+##' new.chrs <- gsub("chr", "", old.chrs)
+##' lst <- as.list(new.chrs)
+##' names(lst) <- old.chrs
+##' new.ideo <- renameSeqlevels(hg19IdeogramCyto, lst)
+##' p <- plotOverview(new.ideo, cytoband = FALSE)
+##' data(darned_hg19_subset500)
+##' ## rename 
+##' new.darned <- renameSeqlevels(darned_hg19_subset500, lst)
+##' p <- p + geom_hotregion(new.darned)
+##' print(p)
 geom_hotregion <- function(data,...){
   args <- as.list(match.call(expand.dots = TRUE)[-1])
   args <- args[!names(args) %in% "data"]

@@ -1,76 +1,3 @@
-##' To visualize different objects describing biological data, we
-##' develop this generic function, and developed new types of geoms to
-##' each one. Try to make simple API and following the grammar of
-##' graphics, use higher level graphic package like ggplot2 to produce
-##' high quality graphics.
-##'
-##' \code{qplot} is redefined as generic s4 method inside this package,
-##' user could use \code{qplot} in the way they are familiar with, and
-##' we are also setting limitation inside this package, like
-##'
-##' \itemize{
-##' \item{scales}
-##' {X scales is always genomic coordinates in most cases, x could be
-##' specifed as start/end/midpoint when it's special geoms for
-##' interval data like point/line}
-##' 
-##' \item{colors}{
-##' Try to use default color shcheme defined in biovizBase package
-##' as possible as it can
-##' }
-##' }
-##' @name qplot
-##' @aliases qplot,data.frameORmatrix-method
-##' @aliases qplot,GRanges-method
-##' @aliases qplot,GRangesList-method
-##' @aliases qplot,IRanges-method
-##' @aliases qplot,BSgenome-method
-##' @aliases qplot,GappedAlignments-method
-##' @aliases qplot,BamFile-method
-##' @aliases qplot,character-method
-##' @title Generic plot function for genetic data
-##' @param data A \code{\link{data.frame}}, \code{\link{matrix}},
-##' \code{\link{GRanges}}, \code{\link{BSgenome}},
-##' \code{\link{TranscriptDb}}, \code{\link{GappedAlignments}} object
-##' or any other objects for which a qpot method is defined.
-##' @param x
-##' @param y
-##' @param ... Any other parameters passed to qplot function.
-##' @param geom
-##' \describe{
-##' For \code{\link{GRanges}} object, we support
-##' \itemize{
-##' \item{full}{
-##'   To show stepped full interval data in the \code{\link{GRanges}}
-##' object. The stepping levels are computed essentially based on
-##' the \code{\link{disjointBins}} function in IRanges package. Use
-##' rectangle to represent each interval.
-##' }
-##' \item{segment}{
-##'   Just like geom \code{full}, instead of showing as rectangle, we
-##' show it as segments.
-##' }
-##' \item{disjoin}{
-##' 
-##' }
-##' \item{reduce}{
-##' 
-##' }
-##' \item{point}{
-##' 
-##' }
-##' \item{line}{
-##' 
-##' }
-##' \item{histogram}{
-##' 
-##' }
-##' }
-##' }
-##' @return A \code{ggplot} object.
-##' @docType methods
-##' @rdname qplot-method
-##' @author tengfei
 setGeneric("qplot", function(data, ...) standardGeneric("qplot"))
 ## ======================================================================
 ##        For "Granges"
@@ -85,7 +12,6 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                facet_gr,
                                model,
                                group.name,
-                               fix.ylim = TRUE,
                                legend = TRUE,
                                ignore.strand = TRUE,
                                geom = c("full", "line","point",
@@ -506,11 +432,20 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
               splice = {
                 if(missing(model))
                   stop("model is missing, please specify a canoical model")
+
+                .moved.nm <- c("data", "model", "group.name", "color", "fill",
+                               "size")
+                args <- args[!(names(args) %in% .moved.nm)]
                 args <- c(args, list(data = substitute(data),
                                      model = substitute(model),
-                                     group.name = substitute(group.name)))
-                p <- plotSpliceSum(data, model, group.name = group.name,
-                                   color = type, fill = type, size = freq)
+                                     group.name = substitute(group.name),
+                                     color = substitute(type),
+                                     fill = substitute(type),
+                                     size = substitute(freq)))
+                ## if("show.")
+                ## p <- plotSpliceSum(data, model, group.name = group.name,
+                ##                    color = type, fill = type, size = freq)
+                p <- do.call("plotSpliceSum", args)
               }
               )
   if(!legend)
@@ -645,15 +580,14 @@ setMethod("qplot", "GappedAlignments", function(data, ...,
                                                 which,
                                                 geom = c("gapped.pair",
                                                   "full"),
-                                                clip = FALSE,
-                                                clip.ratio = 0.001,
-                                                show.junction = FALSE,
-                                                clip.fun){
+                                                show.junction = FALSE
+                                                ){
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
-  args <- args[!(names(args) %in% c("geom", "which",
-                                    "clip", "clip.ratio",
-                                    "clip.fun"))]
+  args <- args[!(names(args) %in% c("geom", "which"
+                                    ## "shrink", "shrink.ratio",
+                                    ## "shrink.fun"
+                                    ))]
   if(!missing(which))
     gr <- biovizBase:::fetch(data, which)
   else
@@ -667,14 +601,14 @@ setMethod("qplot", "GappedAlignments", function(data, ...,
                                           values(gr.junction)$read.group)]
   seqs <- unique(as.character(seqnames(gr.junction)))
   gr.gaps <- GRanges(seqs, ir.gaps, .levels = .lvs)
-  if(clip){
-    max.gap <- maxGap(gr.read, clip.ratio)
-    if(missing(clip.fun))
-      clip.fun <- shrinkageFun(gr.gaps, max.gap = max.gap)
-    gr.read <- clip.fun(gr.read)
-    gr.gaps <- clip.fun(gr.gaps)
-  }
-  gr.read <- gr
+  gr.read <- gr  
+  ## if(shrink){
+  ##   max.gap <- maxGap(gr.read, shrink.ratio)
+  ##   if(missing(shrink.fun))
+  ##     shrink.fun <- shrinkageFun(gr.gaps, max.gap = max.gap)
+  ##   gr.read <- shrink.fun(gr.read)
+  ##   gr.gaps <- shrink.fun(gr.gaps)
+  ## }
   df.read <- as.data.frame(gr.read)
   df.gaps <- as.data.frame(gr.gaps)
   p <- ggplot(df.read)
@@ -715,20 +649,17 @@ setMethod("qplot", "GappedAlignments", function(data, ...,
 ## 1. mismatch
 ## 2. simply summary
 setMethod("qplot", "BamFile", function(data, ..., which,
-                                       model,ref,
-                                       clip.fun,
-                                       clip.gap,
-                                       clip = FALSE,
+                                       model,
                                        resize.extra = 10,
                                        geom = c("gapped.pair",
                                          "full",
-                                         "read.summary",
+                                         ## "read.summary",
                                          "fragment.length",
                                          "coverage.line",
                                          "coverage.polygon")){
   
   args <- as.list(match.call(call = sys.call(1)))[-1]
-  args <- args[!(names(args) %in% c("geom", "ref", "which", "heights"))]
+  args <- args[!(names(args) %in% c("geom", "which", "heights"))]
   geom <- match.arg(geom)
   bf <- open(data)
   if(geom == "gapped.pair"){
@@ -759,6 +690,11 @@ setMethod("qplot", "BamFile", function(data, ..., which,
               axis.title.y = theme_blank(),
               axis.ticks = theme_blank())    
     ## now only support which contains one single gene
+    ## if("show.label" %in% names(args))
+    ##   show.label <- args$show.label
+    ## else
+    ##   show.label <- FALSE
+    ## print(show.label)
     p.splice <- qplot(dt, model = model, group.name = "read.group",
                       geom = "splice") + ylab("") +
                         opts(title = "Splice Summary",
@@ -780,23 +716,25 @@ setMethod("qplot", "BamFile", function(data, ..., which,
            plot.margin = unit(c(0,2,0,2), "lines"))+s
     ## fragment based on dt
     names(dt) <- NULL
-    g.gap <- gaps(disjoin(ranges(model)))
-    cut.fun <- shrinkageFun(g.gap, 1L)
-    dt.cut <- cut.fun(dt)
-    getFragLength <- function(data, data.ori, group.name = "qname"){
-      me <- split(data, values(data)[,group.name])
-      ir <- range(ranges(me, ignore.strand = TRUE))
-      me.ori <- split(data.ori, values(data.ori)[,group.name])
-      ir.ori <- range(ranges(me.ori, ignore.strand = TRUE))
-      ir <- unlist(ir)
-      ir.ori <- unlist(ir.ori)
-      gr <- GRanges(unique(as.character(seqnames(data)))[1],
-                    ir.ori)
-      values(gr)$wid <- width(ir)
-      gr
-    }
-    gr <- getFragLength(dt.cut, dt)
-    p.frag <- qplot(gr, y = wid, geom = "point") + ylab("") +
+    ## g.gap <- gaps(disjoin(ranges(model)))
+    ## cut.fun <- shrinkageFun(g.gap, 1L)
+    ## dt.cut <- cut.fun(dt)
+    ## FIXME: need to use 
+    ## getFragLength <- function(data, data.ori, group.name = "qname"){
+    ##   me <- split(data, values(data)[,group.name])
+    ##   ir <- range(ranges(me, ignore.strand = TRUE))
+    ##   me.ori <- split(data.ori, values(data.ori)[,group.name])
+    ##   ir.ori <- range(ranges(me.ori, ignore.strand = TRUE))
+    ##   ir <- unlist(ir)
+    ##   ir.ori <- unlist(ir.ori)
+    ##   gr <- GRanges(unique(as.character(seqnames(data)))[1],
+    ##                 ir.ori)
+    ##   values(gr)$wid <- width(ir)
+    ##   gr
+    ## }
+    ## gr <- getFragLength(dt.cut, dt)
+    gr <- getFragLength(dt, model)
+    p.frag <- qplot(gr, y = .fragLength, geom = "point") + ylab("") +
       opts(title = "Fragment Length",
            plot.title=theme_text(size=10),
            plot.margin = unit(c(0,2,0,2), "lines"))+s
@@ -815,10 +753,11 @@ setMethod("qplot", "BamFile", function(data, ..., which,
 ## ======================================================================
 ##  For "character" need to check if it's path including bamfile or not
 ## ======================================================================
-setMethod("qplot", "character", function(data, x, y, ..., ref, which,
+setMethod("qplot", "character", function(data, x, y, ..., which,
                                          resize.extra = 10,
                                          geom = c("gapped.pair",
-                                           "mismatch",
+                                           ## "mismatch",
+                                           "full",
                                            "fragment.length",
                                            "coverage.line",
                                            "coverage.polygon")){
@@ -839,11 +778,10 @@ setMethod("qplot", "character", function(data, x, y, ..., ref, which,
 setMethod("qplot", "TranscriptDb", function(data, x, y, which, ...,
                                             geom = c(
                                               "full",
-                                              "single"),
-                                            color.def = "black",
-                                            fill.def = "black",
-                                            clip = FALSE,
-                                            clip.fun){
+                                              "single")){
+  ## FIXME: need to be in biovizBase
+  color.def <- "black"
+  fill.def <- "black"
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
   .args <- args[!(names(args) %in% c("geom", "which","data"))]

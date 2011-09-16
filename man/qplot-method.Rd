@@ -23,56 +23,50 @@
 
 \usage{
 ## For object data.frame or matrix
-\S4method{qplot}{data.frameOrmatrix}{qplot(data, ...)}
+\S4method{qplot}{data.frameOrmatrix}(data, ...)
 
 ## For object GRanges
-\S4method{qplot}{GRanges}{qplot(data, x, y,...,
-                               facet_gr, model, group.name,
-                               legend = TRUE, ignore.strand = TRUE,
-                               geom = c("full", "line","point",
-                                 "segment", "histogram",
-                                 "coverage.line", "coverage.polygon",
-                                 "reduce", "disjoin",
-                                 "splice"
-                                 ))}
+\S4method{qplot}{GRanges}(data, x, y,...,
+      facet_gr, model, group.name,
+      legend = TRUE, ignore.strand = TRUE,
+      geom = c("full", "line","point",
+               "segment", "histogram", "reduce", "disjoin",
+               "coverage.line", "coverage.polygon", "splice"))
+
 
 ## For object GRangesList
-\S4method{qplot}{GRangesList}{qplot(data, ....)}
+\S4method{qplot}{GRangesList}(data, ....)
 
 ## For object IRanges
-\S4method{qplot}{IRanges}{(data, ..., legend = TRUE,
-                           geom = c("full", "segment", "histogram",
-                                 "coverage.line", "coverage.polygon",
-                                  "reduce"))}
+\S4method{qplot}{IRanges}(data, ..., legend = TRUE,
+      geom = c("full", "segment", "histogram",
+               "coverage.line", "coverage.polygon", "reduce"))
 
 ## For object GappedAlignments
-\S4method{qplot}{GappedAlignments}{qplot(data, ..., which,
-                                         geom = c("gapped.pair", "full"),
-                                         show.junction = FALSE)}
+\S4method{qplot}{GappedAlignments}(data, ..., which,
+      geom = c("gapped.pair", "full"),
+      show.junction = FALSE)
 
 ## For object BamFile
-\S4method{qplot}{BamFile}{qplot(data, ..., which, model,
-                                resize.extra = 10,
-                                geom = c("gapped.pair", "full",
-                                         "fragment.length",
-                                         "coverage.line",
-                                        "coverage.polygon"))}
+\S4method{qplot}{BamFile}(data, ..., which, model,
+      resize.extra = 10,
+      geom = c("gapped.pair", "full",
+               "fragment.length", "coverage.line",
+               "coverage.polygon"))
 
 ## For object character
-\S4method{qplot}{character}{qplot(data, ..., which, model,
-                                resize.extra = 10,
-                                geom = c("gapped.pair", "full",
-                                         "fragment.length",
-                                         "coverage.line",
-                                        "coverage.polygon"))}
+\S4method{qplot}{character}(data, ..., which, model,
+      resize.extra = 10,
+      geom = c("gapped.pair", "full", "fragment.length",
+               "coverage.line", "coverage.polygon"))
 
 ## For object TranscriptDb
-\S4method{qplot}{TranscriptDb}{qplot(data, x, y, which, ...,
-                                     geom = c("full", "single"))}
+\S4method{qplot}{TranscriptDb}(data, x, y, which, ...,
+      geom = c("full", "single"))
 
 ## For object BSgenome
-\S4method{qplot}{BSgenome}{qplot(data, name, ..., geom = c("text",
-"segment", "point", "rectangle"))}
+\S4method{qplot}{BSgenome}(data, name, ...,
+      geom = c("text", "segment", "point", "rectangle"))
 }
 
 \arguments{
@@ -258,12 +252,12 @@
 Faceting in ggbio package is a little differnt from ggplot2 in several ways
 \itemize{
   \item {}{
-    The faceted column could only be seqnames}or regions
+    The faceted column could only be seqnames or regions
   on the genome. So we limited the formula passing to facet argument,
   e.g something ~ seqnames, is accepted formula, you can change
   "something" to variable name in the elementMetadata. But you
   can not change the second part.
-  }
+   }
   \item{}{
     Sometime, we need to view different regions, so we also have a
     facet_gr argument which accept a \code{GRanges}. If
@@ -273,6 +267,7 @@ Faceting in ggbio package is a little differnt from ggplot2 in several ways
 }
 }
 }
+
 
 \author{Tengfei Yin}
 

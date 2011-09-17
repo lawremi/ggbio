@@ -1,7 +1,8 @@
 \name{qplot}
 
 \alias{qplot}
-\alias{qplot,data.frameORmatrix-method}
+\alias{qplot,data.frame-method}
+\alias{qplot,matrix-method}
 \alias{qplot,GRanges-method}
 \alias{qplot,GRangesList-method}
 \alias{qplot,IRanges-method}
@@ -22,8 +23,11 @@
 }
 
 \usage{
-## For object data.frame or matrix
-\S4method{qplot}{data.frameOrmatrix}(data, ...)
+## For object data.frame
+\S4method{qplot}{data.frame}(data, ...)
+
+## For object matrix
+\S4method{qplot}{matrix}(data, ...)
 
 ## For object GRanges
 \S4method{qplot}{GRanges}(data, x, y,...,
@@ -35,7 +39,7 @@
 
 
 ## For object GRangesList
-\S4method{qplot}{GRangesList}(data, ....)
+\S4method{qplot}{GRangesList}(data, ...)
 
 ## For object IRanges
 \S4method{qplot}{IRanges}(data, ..., legend = TRUE,
@@ -55,7 +59,7 @@
                "coverage.polygon"))
 
 ## For object character
-\S4method{qplot}{character}(data, ..., which, model,
+\S4method{qplot}{character}(data, x, y, ..., which, model,
       resize.extra = 10,
       geom = c("gapped.pair", "full", "fragment.length",
                "coverage.line", "coverage.polygon"))
@@ -101,7 +105,19 @@
     A character with quote, one of the variables in elementMetadata,
     used for grouping the intervals when computing the splice summary.
     e.g. grouping exons into one transcript model by calling
-    \code{group.name = "tx_ed"}
+    \code{group.name = "tx\_ed"}
+  }
+  \item{name}{
+    Passed to \code{getSeq} in BSgenome package.
+    
+    A character vector containing the names of the sequences in
+    'x' where to get the subsequences from, or a GRanges object,
+    or a RangedData object, or a named RangesList object, or a
+    named Ranges object.  The RangesList or Ranges object must be
+    named according to the sequences in 'x' where to get the
+    subsequences from.
+
+    If 'names' is missing, then 'seqnames(x)' is used.
   }
   \item{legend}{
     A logical value indicates whether to show legend or not. Default is
@@ -254,7 +270,7 @@ Faceting in ggbio package is a little differnt from ggplot2 in several ways
   \item {}{
     The faceted column could only be seqnames or regions
   on the genome. So we limited the formula passing to facet argument,
-  e.g something ~ seqnames, is accepted formula, you can change
+  e.g something \~ seqnames, is accepted formula, you can change
   "something" to variable name in the elementMetadata. But you
   can not change the second part.
    }
@@ -289,7 +305,8 @@ gr <- GRanges(seqnames =
                 size = N, replace = TRUE),
               pair = sample(letters, size = N, 
                 replace = TRUE))
-
+## subset
+gr.sub <- gr[seqnames(gr) == "chr1"] #or 
 ## common geom
 p1 <- qplot(gr.sub, geom = "full") + opts(title = "full")
 p2 <- qplot(gr.sub, geom = "point", y = value) +
@@ -306,7 +323,7 @@ p7 <- qplot(gr.sub, geom = "disjoin") +
                                   opts(title = "disjoin")      
 p8 <- qplot(gr.sub, geom = "histogram") +
                                   opts(title = "histogram")      
-
+library(gridExtra)
 grid.arrange(p1, p2, p3, p4, p5, p6, p7 ,p8, ncol = 2)
 
 ## overview

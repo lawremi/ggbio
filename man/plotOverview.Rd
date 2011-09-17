@@ -14,7 +14,9 @@ information about cytoband.}
 \item{cytoband}{Logical value. Default is FALSE. If TRUE, plotting
 cytoband.}
 }
-\examples{data(hg19IdeogramCyto)
+\examples{
+library(GenomicRanges)
+data(hg19IdeogramCyto)
 ## make shorter and clean labels
 old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
 new.chrs <- gsub("chr", "", old.chrs)

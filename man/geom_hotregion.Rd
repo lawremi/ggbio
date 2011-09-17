@@ -14,7 +14,9 @@ overlay on the stacked overview.}
 \item{...}{Extra parameters passed to geom in
 ggplot2. e.g. aes(color = score)}
 }
-\examples{data(hg19IdeogramCyto)
+\examples{
+data(hg19IdeogramCyto)
+library(GenomicRanges)
 ## make shorter and clean labels
 old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
 new.chrs <- gsub("chr", "", old.chrs)

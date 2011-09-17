@@ -7,6 +7,7 @@ Maintainer: Tengfei Yin <yintengfei@gmail.com>
 Depends: methods, biovizBase, ggplot2
 Imports: methods, biovizBase, ggplot2, IRanges, GenomicRanges, GenomicFeatures, Rsamtools, BSgenome, gridExtra
 Suggests: BSgenome.Hsapiens.UCSC.hg19, TxDb.Hsapiens.UCSC.hg19.knownGene
+biocViews: Infrastructure, Visualization, Bioinformatics
 License: GPL (>=2)
 LazyLoad: Yes
 Collate: utils.R

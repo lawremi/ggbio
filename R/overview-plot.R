@@ -15,6 +15,7 @@
 ##' @return A \code{ggplot} object.
 ##' @author Tengfei Yin
 ##' @examples
+##' library(GenomicRanges)
 ##' data(hg19IdeogramCyto)
 ##' ## make shorter and clean labels
 ##' old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
@@ -148,6 +149,7 @@ plotSingleChrom <- function(obj, subchr, zoom.region){
 ##' @return A 'Layer'
 ##' @author Tengfei Yin
 ##' @examples
+##' library(GenomicRanges)
 ##' data(hg19IdeogramCyto)
 ##' ## make shorter and clean labels
 ##' old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))

@@ -2,8 +2,12 @@ setGeneric("qplot", function(data, ...) standardGeneric("qplot"))
 ## ======================================================================
 ##        For "Granges"
 ## ======================================================================
-setClassUnion("data.frameORmatrix", c("data.frame", "matrix"))
-setMethod("qplot", signature(data = "data.frameORmatrix"), function(data, ...){
+setMethod("qplot", signature(data = "data.frame"), function(data, ...){
+  args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
+  do.call(ggplot2::qplot, args)
+})
+
+setMethod("qplot", signature(data = "matrix"), function(data, ...){
   args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
   do.call(ggplot2::qplot, args)
 })
@@ -16,9 +20,8 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                ignore.strand = TRUE,
                                geom = c("full", "line","point",
                                  "segment", "histogram",
+                                 "reduce",  "disjoin",                                 
                                  "coverage.line", "coverage.polygon",
-                                 "reduce", 
-                                 "disjoin",
                                  "splice" # need to be checked
                                  )){
   geom <- match.arg(geom)
@@ -346,7 +349,8 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 args <- args[!(names(args) %in% c("x", "y"))]
                 args <- c(args, list(x = substitute(seqs)))
                 if("binwidth" %in% names(args))
-                  p + geom_histogram(do.call("aes", args), binwidth = args$binwidth)
+                  p + geom_histogram(do.call("aes", args),
+                                     binwidth = args$binwidth)
                 else
                   p + geom_histogram(do.call("aes", args))
               },
@@ -633,12 +637,13 @@ setMethod("qplot", "GappedAlignments", function(data, ...,
   args <- c(args, list(x = substitute(start), xend = substitute(end),
                        y = substitute(.levels),
                        yend = substitute(.levels)))
-  p <- p + geom_segment(data = df.gaps, do.call("aes", args))
+  p <- p + geom_segment(data = df.gaps, do.call("aes", args), color = "red")
 }}
   if(geom == "full"){
     p <- qplot(gr)
   }
-  p <- p + xlab("Genomic Coordinate")
+  p <- p + xlab("Genomic Coordinate") + ylab("")
+  p
 })
 
 
@@ -680,8 +685,9 @@ setMethod("qplot", "BamFile", function(data, ..., which,
     or txdb(TranscriptDb) object")
     if(!is(model, "GRanges"))
       stop("model must be a GRangs object")
-    which <- mds
-    model <- mds
+    ## mds <- model
+    which <- reduce(model)
+    ## model <- model
     ga <- readBamGappedAlignments(data,
                                   param = ScanBamParam(which = which),           
                                   use.name = TRUE)
@@ -708,7 +714,7 @@ setMethod("qplot", "BamFile", function(data, ..., which,
     ## p.ga <- qplot(ga) + ylab("") + opts(title = "Gapped Alignments",
     ##                                     plot.title=theme_text(size=10),
     ##                                     plot.margin = unit(c(0,2,0,0), "lines"))
-    ## ga.r <- as(ga, "GRanges")
+    ## gina.r <- as(ga, "GRanges")
     ga.r <- biovizBase:::fetch(data, raw, which = which)
     p.cov <- qplot(ga.r, geom = "coverage.p") + ylab("") +
       opts(title = "Coverage",
@@ -753,7 +759,8 @@ setMethod("qplot", "BamFile", function(data, ..., which,
 ## ======================================================================
 ##  For "character" need to check if it's path including bamfile or not
 ## ======================================================================
-setMethod("qplot", "character", function(data, x, y, ..., which,
+setMethod("qplot", "character", function(data, x, y, ...,
+                                         which, model,
                                          resize.extra = 10,
                                          geom = c("gapped.pair",
                                            ## "mismatch",
@@ -766,8 +773,8 @@ setMethod("qplot", "character", function(data, x, y, ..., which,
     bf <- BamFile(data)
   else
     stop("Please pass a bam file path")
-  args <- as.list(match.call(call = sys.call(sys.parent())))
-  qplot(bf,  ..., which = which,
+  args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
+  qplot(bf,  ..., which = which, model = model,
         geom = geom, resize.extra = reszie.extra)
 })
 

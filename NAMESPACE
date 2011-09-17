@@ -1,8 +1,8 @@
 ## ============================================================
 ## Import
 ## ============================================================
-import(ggplot2)
-import(biovizBase)
+## import(ggplot2)
+## import(biovizBase)
 importFrom(gridExtra, grid.arrange)
 ## GenomicRanges
 ## IRanges
@@ -41,6 +41,34 @@ importMethodsFrom(GenomicRanges, ranges, "ranges<-",
                   as.data.frame)
 
 importClassesFrom(GenomicRanges, GRanges)
+
+##
+## ## ## Rsamtools
+## importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,
+##            scanBamFlag,
+##            PileupFiles, PileupParam ,
+##            readBamGappedAlignments)
+## importMethodsFrom(Rsamtools, applyPileups)
+importClassesFrom(Rsamtools, BamFile)
+
+## ## ## BSgenome
+importClassesFrom(BSgenome, BSgenome)
+## importMethodsFrom(BSgenome, getSeq)
+
+## ## ## rtracklayer
+## importClassesFrom(rtracklayer, BrowserView)
+## importFrom(rtracklayer, browserSession, genome, "genome<-",
+##            ucscTableQuery,tableNames, "tableName<-", GenomicData, getTable,
+##            "track<-", GRangesForUCSCGenome, browserView,
+##            ucscGenomes)
+
+## ## ## GenomicFeatures
+importClassesFrom(GenomicFeatures,TranscriptDb)
+## importFrom(GenomicFeatures,
+##            transcriptsByOverlaps,
+##            exonsBy,
+##            cdsBy)
+
 
 
 ## ============================================================

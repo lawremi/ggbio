@@ -107,6 +107,7 @@ plotOverview <- function(obj,
 ##' @param subchr A single character of chromosome names to show.
 ##' @param zoom.region A numeric vector of length 2 indicating zoomed
 ##' region.
+##' @param xlabel A logical value. Show the x label or not.
 ##' @return A \code{ggplot} object.
 ##' @author Tengfei Yin
 ##' @examples
@@ -114,11 +115,15 @@ plotOverview <- function(obj,
 ##' vp1 <- viewport(width = 1, height = 0.14)
 ##' p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
 ##' print(p, vp = vp1)
-plotSingleChrom <- function(obj, subchr, zoom.region){
+plotSingleChrom <- function(obj, subchr, zoom.region, xlabel = FALSE){
   ## do we need subchr here
   if(!missing(subchr)){
+    keepSeqlevels(obj, "chr1")
     obj <- obj[seqnames(obj) == subchr]
-    seqlevels(obj) <- sortChr(unique(as.character(seqnames(obj))))
+    obj
+    ## seqlevels(obj) <- sortChr(unique(as.character(seqnames(obj))))
+    seqlevels(obj)
+    names(seqlevels(obj))
   }
   if(length(unique(as.character(seqnames(obj))))>1)
     stop("Mulptiple chromosome information found")
@@ -133,6 +138,9 @@ plotSingleChrom <- function(obj, subchr, zoom.region){
     p <- p + geom_rect(data = zoom.df, aes(xmin = x1,
                          xmax = x2, ymin = -1, ymax = 11), color = "red", fill = NA)
   }
+  if(!xlabel)
+    p <- p + opts(axis.text.x = theme_blank(),
+                  axis.title.x=theme_blank())
   p
 }
 

@@ -18,16 +18,18 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                group.name,
                                legend = TRUE,
                                ignore.strand = TRUE,
+                               show.coverage = TRUE,
                                geom = c("full", "line","point",
                                  "segment", "histogram",
                                  "reduce",  "disjoin",                                 
                                  "coverage.line", "coverage.polygon",
-                                 "splice" # need to be checked
+                                 "splice", # need to be checked,
+                                 "mismatch.summary"
                                  )){
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
   ## args <- as.list(match.call(expand.dots = FALSE)[-1])
-  args.facet <- args[names(args) %in% c("nrow", "ncol", "scales")]
+  args.facet <- args[names(args) %in% c("nrow", "ncol", "scales", "space")]
   args <- args[!(names(args) %in% c("seqname", "geom", 
                                     "data", "legend", "nrow", "ncol"))]
   ## check "x", must be one of "start", "end", "midpoint"
@@ -58,8 +60,15 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
     if(!"facet" %in% names(args)){
       if(length(seqname) > 1){
         ## facet by default is by seqname
+        facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facet)),
+                              TRUE, FALSE)
+        if(facet.logic){
         args.facet <- c(args.facet, list(facets = substitute(~seqnames)))
         facet <- do.call(facet_wrap, args.facet)
+      }else{
+        args.facet <- c(args.facet, list(facets = substitute(.~seqnames)))
+        facet <- do.call(facet_grid, args.facet)
+      }
       }}else{
         ## only allow simple case
         allvars <- all.vars(as.formula(args$facet))
@@ -450,6 +459,14 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 ## p <- plotSpliceSum(data, model, group.name = group.name,
                 ##                    color = type, fill = type, size = freq)
                 p <- do.call("plotSpliceSum", args)
+              },
+              mismatch.summary = {
+                if(!isPileupSum(data))
+                  stop("For geom mismatch summary, data must returned from
+                        pileupGRangesAsVariantTable function. Or is a GRanges
+                        object including arbitrary columns: read, ref, count, depth,
+                        match")
+                p <- plotMismatchSum(data, show.coverage)
               }
               )
   if(!legend)
@@ -655,13 +672,16 @@ setMethod("qplot", "GappedAlignments", function(data, ...,
 ## 2. simply summary
 setMethod("qplot", "BamFile", function(data, ..., which,
                                        model,
+                                       bsgenome,
                                        resize.extra = 10,
+                                       show.coverage = TRUE,
                                        geom = c("gapped.pair",
                                          "full",
                                          ## "read.summary",
                                          "fragment.length",
                                          "coverage.line",
-                                         "coverage.polygon")){
+                                         "coverage.polygon",
+                                         "mismatch.summary")){
   
   args <- as.list(match.call(call = sys.call(1)))[-1]
   args <- args[!(names(args) %in% c("geom", "which", "heights"))]
@@ -678,6 +698,17 @@ setMethod("qplot", "BamFile", function(data, ..., which,
   if(geom %in% c("coverage.line", "coverage.polygon", "full")){
     gr <- biovizBase:::fetch(ga)
     p <- qplot(gr, geom = geom)
+  }
+  if(geom %in% c("mismatch.summary")){
+    if(missing(bsgenome)){
+      stop("For geom mismatch.summary, please provide bsgenome(A BSgenome object)")
+    }else
+    if(!is(bsgenome, "BSgenome")){
+      stop("bsgenome must be A BSgenome object")
+    }
+    pgr <- pileupAsGRanges(bamfile, region = which)
+    pgr.match <- pileupGRangesAsVariantTable(pgr, bsgenome)
+    p <- plotMismatchSum(pgr.match, show.coverage)
   }
   if(geom == "fragment.length"){
     if((missing(model)))
@@ -755,26 +786,30 @@ setMethod("qplot", "BamFile", function(data, ..., which,
   ## list(p.cov = p.cov,
   ##      p.frag = p.frag,
   ##      p.align = p.ga)
+  p
 })
 ## ======================================================================
 ##  For "character" need to check if it's path including bamfile or not
 ## ======================================================================
 setMethod("qplot", "character", function(data, x, y, ...,
                                          which, model,
+                                         bsgenome,
                                          resize.extra = 10,
+                                         show.coverage = TRUE,
                                          geom = c("gapped.pair",
-                                           ## "mismatch",
                                            "full",
                                            "fragment.length",
                                            "coverage.line",
-                                           "coverage.polygon")){
+                                           "coverage.polygon",
+                                           "mismatch.summary")){
   geom <- match.arg(geom)
   if(tools::file_ext(data) == "bam")
     bf <- BamFile(data)
   else
     stop("Please pass a bam file path")
   args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
-  qplot(bf,  ..., which = which, model = model,
+  qplot(bf,  ..., which = which, model = model, bsgenome = bsgenome,
+        show.coverage = show.coverage,
         geom = geom, resize.extra = reszie.extra)
 })
 
@@ -892,7 +927,7 @@ setMethod("qplot", c("BSgenome"), function(data,  name, ...,
   df <- data.frame(x = xs, seqs = seqs)
   geom <- match.arg(geom)
   p <- ggplot(df, ...)
-  baseColor <- getOption("biovizBase")$baseColor
+  baseColor <- getOption("biovizBase")$DNABasesColor
     ## baseColor <- unlist(baseColor)
   p <- switch(geom,
               text = {

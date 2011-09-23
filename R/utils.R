@@ -119,7 +119,54 @@ tracks <- function(..., check.xlim = TRUE,
   invisible(lst)
 }
 
+rangesCentric <- function(gr, which, id.name){
+  ## first subset, need to give notice
+  gr <- subsetByOverlaps(gr, which)
+  which <- which[order(start(which))]
+  gr <- gr[order(start(gr))]
+  ## which <- subsetByOverlaps(which, gr)
+  ## FIXME: give message here
+  ## need to be exclusive
+  which <- reduce(which)
+  mx <- matchMatrix(findOverlaps(gr, which))
+  values(gr)$.id.name <- NA
+  values(gr)$.id.name[mx[,1]] <- mx[,2]
+  if(!missing(id.name) && (id.name %in% colnames(values(which))))
+    values(gr)$.id.name[mx[,1]] <- values(which)[mx[,2],id.name]
+  values(which)$.id.name <- seq_len(length(which))
+  ## cannot be putted into GRangesList, unequal, should be in a GenomicRangesList
+  list(gr = gr, which = which)
+}
 
+getLimits <- function(obj){
+  if(is.null(obj$mapping)){
+    x <- eval(obj$layers[[1]]$mapping$x, obj$data)
+    y <- eval(obj$layers[[1]]$mapping$y, obj$data)  
+  }else{
+    x <- eval(obj$mapping$x, obj$data)
+    y <- eval(obj$mapping$y, obj$data)  
+  }
+  if(is.null(obj$coordinates$limits$x)){
+    if(!is.null(x))
+      limx <- c(min(x), xmax = max(x))
+    else
+      limx <- c(min(obj$data$start), xmax = max(obj$data$end))
+  }else{
+    limx <- obj$coordinates$limits$x
+  }
+
+  if(is.null(obj$coordinates$limits$y)){
+    if(!is.null(y))
+      limy <- c(min(y), xmax = max(y))
+    else
+      limy <- c(min(obj$data$start), xmax = max(obj$data$end))
+  }else{
+    limx <- obj$coordinates$limits$y
+  }
+  names(limx) <- NULL
+  names(limy) <- NULL
+  list(xlim = limx, ylim = limy)
+}
 
 plotSpliceSum <- function(data, model, ..., group.name,
                           show.label = FALSE){
@@ -142,7 +189,6 @@ plotSpliceSum <- function(data, model, ..., group.name,
     values(gps)$type <- "gaps"
     gps
   }
-
   getModelRange <- function(data){
     seqs <- unique(as.character(seqnames(data)))
     ir <- unlist(range(ranges(split(temp.n, values(data)$model.group),
@@ -163,14 +209,10 @@ plotSpliceSum <- function(data, model, ..., group.name,
   if(missing(group.name))
     group.name <- "read.group"
   temp <- spliceSummary(data, model, group.name = group.name)$summary
-  ## browser()
-  ## temp
-  ## temp <- do.call("splice.fun", args.sum)$summary
   temp.n <- addSteppings(temp, group = "model.group")
   temp.gap <- getGap(temp.n)
   temp.gap <- resize(temp.gap, width = width(temp.gap)+2L, fix = "center")
   gr.label <- getModelRange(temp.n)
-  ## draw temp.n first
   p <- ggplot(as.data.frame(temp.n))
   args.rect <- c(args, list(xmin = substitute(start),
                             xmax = substitute(end),
@@ -178,7 +220,6 @@ plotSpliceSum <- function(data, model, ..., group.name,
                             ymax = substitute(.levels + 0.4)))
   args.rect <- args.rect[!(names(args.rect) %in% c("size", "color"))]
   p <- p + geom_rect(do.call("aes", args.rect))
-  ## draw gaps
   args.seg <- c(args, list(x = substitute(start),
                            xend = substitute(end),
                            y = substitute(.levels),
@@ -196,22 +237,127 @@ plotSpliceSum <- function(data, model, ..., group.name,
   p  
 }
 
-rangesCentric <- function(gr, which, id.name){
-  ## first subset, need to give notice
-  gr <- subsetByOverlaps(gr, which)
-  which <- which[order(start(which))]
-  gr <- gr[order(start(gr))]
-  ## which <- subsetByOverlaps(which, gr)
-  ## FIXME: give message here
-  ## need to be exclusive
-  which <- reduce(which)
-  mx <- matchMatrix(findOverlaps(gr, which))
-  values(gr)$.id.name <- NA
-  values(gr)$.id.name[mx[,1]] <- mx[,2]
-  if(!missing(id.name) && (id.name %in% colnames(values(which))))
-    values(gr)$.id.name[mx[,1]] <- values(which)[mx[,2],id.name]
-  values(which)$.id.name <- seq_len(length(which))
-  ## cannot be putted into GRangesList, unequal, should be in a GenomicRangesList
-  list(gr = gr, which = which)
+plotFragLength <- function(data, model){
+    if((missing(model)))
+      stop("Fragment length require a specified model(GRanges)
+    or txdb(TranscriptDb) object")
+    if(!is(model, "GRanges"))
+      stop("model must be a GRangs object")
+    ## mds <- model
+    which <- reduce(model)
+    ## model <- model
+    ga <- readBamGappedAlignments(data,
+                                  param = ScanBamParam(which = which),           
+                                  use.name = TRUE)
+    dt <- biovizBase:::fetch(ga)
+    gr <- getFragLength(dt, model)
+    p <- qplot(gr, y = .fragLength, geom = "point") + ylab("Fragment Length")
+      opts(title = "Fragment Length Estimation")
 }
 
+
+plotFragTracks <- function(){
+  ## Michael's sample case with tracks about
+  ## coverage, GC content, and fragment length.
+  
+}
+
+
+
+isPileupSum <- function(x){
+  is(x, "GRanges") &&
+  c("read", "ref", "count", "depth", "match") %in% colnames(values(x))
+}
+
+plotMismatchSum <- function(obj, show.coverage = TRUE){
+  if(!isPileupSum(data))
+    stop("For geom mismatch summary, data must returned from
+                        pileupGRangesAsVariantTable function. Or is a GRanges
+                        object including arbitrary columns: read, ref, count, depth,
+                        match")
+  df <- as.data.frame(obj)
+  df.unmatch <- df[!df$match, ]
+  addLevels <- function(x){
+    idx <- order(x$start, x$read)
+    ## assumption: on the same chromosome
+    x <- x[idx,]
+    eds <- unlist(by(x$count, x$start, function(x){
+      cumsum(x)
+    }))
+    sts <- unlist(by(x$count, x$start, function(x){
+      N <- length(x)
+      c(0,cumsum(x)[-N])
+    }))
+    x$eds <- eds
+    x$sts <- sts
+    x
+  }
+  df.unmatch <- addLevels(df.unmatch)
+  p <- ggplot(df)
+  if(show.coverage)
+    p <- p + geom_area(aes(x = start, y = depth), fill = I("gray70"), color = I("gray70"))
+  DNABasesColor <- getBioColor("DNA_BASES_N")
+
+  p <- p + geom_segment(data = df.unmatch, aes(x = start, y = sts,
+                          xend = start, yend = eds, color = read))+
+          scale_color_manual(values = DNABasesColor)
+  p <- p + xlab("Genomic Coordinates") + ylab("Counts")
+  p
+}
+
+
+plotManhattan <- function(obj, y, title,
+                          scales = c("free", "fixed"),
+                          space = c("free", "fixed"),
+                          color.type = c("identity", "seqnames", "twocolor"),
+                          two.color = c("#0080FF", "#4CC4FF"),
+                          cutoff = NULL,
+                          cutoff.color = "red",
+                          cutoff.size = 1,
+                          legend = FALSE,
+                          xlab = "Chromosome",
+                          ylab = expression(-log[10](italic(p))),
+                          theme_bw = TRUE){
+
+  scales <- match.arg(scales)
+  space <- match.arg(space)
+  color.type <- match.arg(color.type)
+  if(missing(y))
+    stop("need to provide y, which is -log10(p-value), make sure you")
+  message("make sure y is already -log10(p-value)")
+  if(color.type %in% c("seqnames", "twocolor")){
+    args <- list(data = obj, geom = "point", y = substitute(y), scales = scales,
+                 space = space, color = substitute(seqnames))
+    p <- do.call(qplot, args)
+  }else{
+    args <- list(data = obj, geom = "point", y = substitute(y), scales = scales,
+                 space = space)
+    p <- do.call(qplot, args)
+  }
+  if(theme_bw)
+    p <- p + theme_bw()
+  if(!legend)
+    p <- p + opts(legend.position = "none")
+
+  p <- p + ylab(ylab) +  xlab(xlab)+
+    opts(axis.text.x = theme_blank(),
+         axis.ticks = theme_blank())
+  if(!is.null(cutoff))
+    p <-  p + geom_hline(yintercept = cutoff, color = cutoff.color,
+                         size = cutoff.size)
+  
+  if(color.type == "twocolor"){
+    chrs <- unique(as.character(seqnames(gr.snp)))
+    N <- length(chrs)
+    id1 <- seq(from = 1, by = 2, to = N)
+    id2 <- seq(from = 2, by = 2, to = N)
+    color1 <- two.color[1]
+    color2 <- two.color[2]
+    cols <- c(rep(color1, length(id1)), rep(color2, length(id2)))
+    names(cols) <- c(chrs[id1], chrs[id2])
+    p <- p + scale_color_manual(values = cols)
+  }
+  if(!missing(title))
+    p <- p + opts(title = title)
+  p
+}

@@ -32,23 +32,24 @@ importMethodsFrom(IRanges,  split,
 importClassesFrom(IRanges)
 
 ## ## GenomicRanges
-importFrom(GenomicRanges, "seqnames<-","strand<-", "seqlevels<-",
+importFrom(GenomicRanges, "seqnames<-","strand<-",
+           seqlevels, "seqlevels<-",
            GRanges, GRangesList, Seqinfo, seqlengths, "seqlengths<-")
 importMethodsFrom(GenomicRanges, ranges, "ranges<-",
                   start, end, width, "start<-", "end<-", "width<-",
                   seqnames, strand, seqinfo, show, 
                    "elementMetadata<-", elementMetadata,
-                  as.data.frame)
+                  as.data.frame, keepSeqlevels, renameSeqlevels)
 
 importClassesFrom(GenomicRanges, GRanges)
 
 ##
 ## ## ## Rsamtools
-## importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,
-##            scanBamFlag,
-##            PileupFiles, PileupParam ,
-##            readBamGappedAlignments)
-## importMethodsFrom(Rsamtools, applyPileups)
+importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,
+           scanBamFlag,
+           PileupFiles, PileupParam ,
+           readBamGappedAlignments)
+importMethodsFrom(Rsamtools, applyPileups)
 importClassesFrom(Rsamtools, BamFile)
 
 ## ## ## BSgenome
@@ -74,5 +75,6 @@ importClassesFrom(GenomicFeatures,TranscriptDb)
 ## ============================================================
 ## Export
 ## ============================================================
-exportMethods(qplot)
-export(tracks, plotOverview, plotSingleChrom, geom_hotregion)
+exportMethods(qplot, rescale)
+export(tracks, plotOverview, plotSingleChrom, geom_hotregion,
+       plotMismatchSum, plotManhattan)

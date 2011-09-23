@@ -13,4 +13,5 @@ LazyLoad: Yes
 Collate: utils.R
 	 qplot-method.R
 	 overview-plot.R
+	 rescale-method.R
 	 ggbio.R

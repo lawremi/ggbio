@@ -33,9 +33,11 @@
 \S4method{qplot}{GRanges}(data, x, y,...,
       facet_gr, model, group.name,
       legend = TRUE, ignore.strand = TRUE,
+      show.coverage = TRUE,
       geom = c("full", "line","point",
                "segment", "histogram", "reduce", "disjoin",
-               "coverage.line", "coverage.polygon", "splice"))
+               "coverage.line", "coverage.polygon", "splice",
+               "mismatch.summary"))
 
 
 ## For object GRangesList
@@ -53,16 +55,17 @@
 
 ## For object BamFile
 \S4method{qplot}{BamFile}(data, ..., which, model,
-      resize.extra = 10,
+      bsgenome, resize.extra = 10, show.coverage = TRUE,
       geom = c("gapped.pair", "full",
                "fragment.length", "coverage.line",
-               "coverage.polygon"))
+               "coverage.polygon", "mismatch.summary"))
 
 ## For object character
 \S4method{qplot}{character}(data, x, y, ..., which, model,
-      resize.extra = 10,
+      bsgenome, resize.extra = 10, show.coverage = TRUE,
       geom = c("gapped.pair", "full", "fragment.length",
-               "coverage.line", "coverage.polygon"))
+               "coverage.line", "coverage.polygon",
+               "mismatch.summary"))
 
 ## For object TranscriptDb
 \S4method{qplot}{TranscriptDb}(data, x, y, which, ...,
@@ -132,12 +135,19 @@
     to the \code{\link{ScanBamParam}} function.
   }
   \item{show.junction}{
-    A logical value indicates to show the line between junction reads or
+    A logical value indicates whether to show the line between junction reads or
     not.
+  }
+  \item{show.coverage}{
+    A logical value indicates whether to show coverage or not. This is
+  used for geom "mismatch.summary".
   }
   \item{resize.extra}{
     A numeric value used to add buffer to intervals to compute stepping
     levels on.
+  }
+  \item{bsgenome}{
+    A BSgenome object. Only need for geom "mismatch.summary".
   }
   \item{...}{
     Extra parameters. Usually are those parameters used in qplot to
@@ -249,7 +259,11 @@
   all the reads of the same pair or qname shown in the same level and
   nothing falls in between. Then you can use \code{show.junction}
   arguments show the junction as lines between junction reads if any.
-  }
+}
+\item{mismatch.summary}{
+  Showing color coded mismatched stacked bar to indicate the proportion
+  of mismatching at each position, the reference is set to gray.
+}
   \item{fragment.length}{
     Instead of return a single plot. This geom return tracks including
   gene model, reduced model, splicing summary, fragment length
@@ -331,16 +345,15 @@ data(hg19IdeogramCyto)
 ## make shorter and clean labels
 old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
 new.chrs <- gsub("chr", "", old.chrs)
-lst <- as.list(new.chrs)
-names(lst) <- old.chrs
-new.ideo <- renameSeqlevels(hg19IdeogramCyto, lst)
+names(new.chrs) <- old.chrs
+new.ideo <- renameSeqlevels(hg19IdeogramCyto, new.chrs)
 p <- plotOverview(new.ideo, cytoband = TRUE)
 print(p)
 
 # no cytoband and with extra data
 data(darned_hg19_subset500)
 # rename 
-new.darned <- renameSeqlevels(darned_hg19_subset500, lst)
+new.darned <- renameSeqlevels(darned_hg19_subset500, new.chrs)
 p <- p + geom_hotregion(new.darned)
 print(p)
 

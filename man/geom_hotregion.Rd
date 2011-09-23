@@ -20,13 +20,13 @@ library(GenomicRanges)
 ## make shorter and clean labels
 old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
 new.chrs <- gsub("chr", "", old.chrs)
-lst <- as.list(new.chrs)
-names(lst) <- old.chrs
-new.ideo <- renameSeqlevels(hg19IdeogramCyto, lst)
+names(new.chrs) <- old.chrs
+new.ideo <- renameSeqlevels(hg19IdeogramCyto, new.chrs)
 p <- plotOverview(new.ideo, cytoband = FALSE)
 data(darned_hg19_subset500)
 ## rename 
-new.darned <- renameSeqlevels(darned_hg19_subset500, lst)
+new.darned <- renameSeqlevels(darned_hg19_subset500, new.chrs)
 p <- p + geom_hotregion(new.darned)
-print(p)}
+print(p)
+}
 

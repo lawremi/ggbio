@@ -20,9 +20,8 @@ data(hg19IdeogramCyto)
 ## make shorter and clean labels
 old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
 new.chrs <- gsub("chr", "", old.chrs)
-lst <- as.list(new.chrs)
-names(lst) <- old.chrs
-new.ideo <- renameSeqlevels(hg19IdeogramCyto, lst)
+names(new.chrs) <- old.chrs
+new.ideo <- renameSeqlevels(hg19IdeogramCyto, new.chrs)
 ## with cytoband
 p <- plotOverview(new.ideo, cytoband = TRUE)
 print(p)

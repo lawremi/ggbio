@@ -61,7 +61,7 @@ the same time explore more types of new graphics. For example, we have
 implement \emph{Manhattan plot} for GWAS study, stacked overview for
 exploring distribution of events cross all chromosomes, splicing
 summary for summarizing alternative splice events, etc. It's just a
-start, we hope to provide a static gallary for biologists and analyst,
+start, we hope to provide a static gallery for biologists and analyst,
 and prototyping for interactive graphics project like \visnab{}.
 % DI: Explain what is meant by biological data(Done)
 
@@ -114,9 +114,9 @@ There are very \textbf{important} differences between \ggbio{} and
   coordinates. You can only specify the \emph{x} to
   be \emph{start, end, midpoint} describing interval data with width
   larger than 1. % DI: Maybe explain what you mean by protein space?(done, remove)
-\item Facetting of the graphics, can only be done by \textbf{seqnames}
+\item Faceting of the graphics, can only be done by \textbf{seqnames}
   or region on a chromosome. If \textbf{seqnames} is in the data
-  structure, it automatically is used for facetting.
+  structure, it automatically is used for faceting.
 \end{itemize}
 
 \section{Generic Visualization Method}
@@ -125,7 +125,7 @@ In the spirit of being general and object-oriented, following the
 syntax of \ggplot{}, we redefine the \emph{quick plot} function
 \qplot{} in \ggplot{} package, as a \textbf{S4} generic function. Then
 the \qplot{} function could automatically and appropriately plot
-different R objects. For each pbject type a new \textbf{geom} is
+different R objects. For each object type a new \textbf{geom} is
 defined.
 
 In the following section, we will introduce how to use \qplot{} to
@@ -222,7 +222,7 @@ For \Robject{GRanges} objects we support following \emph{geoms}:
 
 This code generates the default plot of a \Robject{GRanges} object
 (Figure \ref{fig:qplot-gr-full}). It uses the \texttt{full geom}, showing
-the data as stacked intervals, automatically facetted by
+the data as stacked intervals, automatically faceted by
 \textbf{seqnames} (chromosome) and colored by the strand.
 
 % \begin{figure}[h!t!p]
@@ -348,8 +348,8 @@ grid.arrange(p1, p2, p3, p4, p5, p6, p7 ,p8, ncol = 2)
 \subsubsection{Layout}
 Figure \ref{fig:gr-layout-nrow} shows, when you simply facet by
 seqnames as default, your can use \Rfunarg{nrow} and \Rfunarg{ncol} to
-control the layout of the graphic. It ensentially use
-\Rfunction{facet\_wrap} in \ggplot{} automaticaly.
+control the layout of the graphic. It essentially use
+\Rfunction{facet\_wrap} in \ggplot{} automatically.
 
 @ 
 <<qplot-layout-nrow, fig = FALSE, eval = FALSE>>=
@@ -365,12 +365,12 @@ print(p)
 \end{figure}
 
 
-\subsubsection{Facetting}
+\subsubsection{Faceting}
 
 Faceting in \ggbio{} is more restricted than in \ggplot{}:
 
 \begin{itemize} \itemsep 0in
-\item The facetting variable can only be \Rfunction{seqnames} or regions
+\item The faceting variable can only be \Rfunction{seqnames} or regions
   on the genome. So we limited the formula passing to \Rfunarg{facet},
   e.g something \~ seqnames, is accepted formula, you can change
   \emph{something} to variable name in the elementMetadata. But you
@@ -440,7 +440,7 @@ need to be shown on the same level. Then we also have
 \Rfunarg{show.label} to control whether to show the group name or not.
 
 If users want to control the graphic as \Robject{GRanges}, please
-convert it to \Robject{GRanges} first, then ust \qplot{} to visualize
+convert it to \Robject{GRanges} first, then use \qplot{} to visualize
 it.
 
 \subsubsection{Alternative splicing and summary}
@@ -450,7 +450,7 @@ from a \Robject{TransciptDb} object, and using \Rfunarg{freq} argument
 to pass the summary information to the function.
 
 It's convenient to get model from a \Robject{TranscriptDb} object,
-it's already split by transcipt when you specify \Rfunarg{by} equals
+it's already split by transcript when you specify \Rfunarg{by} equals
 \emph{tx}, and this will return a \Robject{GRangesList} object, with
 name of transcript.
 
@@ -517,7 +517,7 @@ dev.off()
 
 
 \subsection{For \Robject{GappedAlignments} object}
-Supportd geom includes:
+Supported geom includes:
 \begin{description} \itemsep 0in
 \item[gapped.pair] Consider junction reads information, and assign
   stepping levels based on that information, could be used to show
@@ -550,10 +550,10 @@ grid.arrange(p1, p2, p3, ncol = 1)
 \begin{figure}[h!p!t]
   \centering
 \includegraphics[width = 0.55\textwidth]{intro-gapped-plot}
-\caption{GappedAlignments virsualization. The one on the left shows
+\caption{GappedAlignments visualization. The one on the left shows
   geom ``gapped.pair'', which try to put the one belongs to the same
   read in the same step level, and make sure nothing falls in between,
-  this is usefull when show.junction = TRUE. The one on the right, is
+  this is useful when show.junction = TRUE. The one on the right, is
   use ``simple'' geom, which just show as formal GRanges.}
   \label{fig:gapped-ori}
 \end{figure}
@@ -573,13 +573,13 @@ print(p1)
 \begin{figure}[h!p!t]
   \centering
 \includegraphics[width = 0.8\textwidth]{intro-gapped-plot-zoom}
-  \caption{GappedAlignments virsualization: simple zoom in}
+  \caption{GappedAlignments visualization: simple zoom in}
   \label{fig:gapped-zoom}
 \end{figure}
 
 
 \subsection{For \Robject{BamFile} object}
-Supported geoms includs:
+Supported geoms includes:
 \begin{description} \itemsep 0in
   \item[gapped.pair] Like for \Robject{GappedAlignments} object.
   \item[full] Like for \Robject{GappedAlignments} object.
@@ -651,22 +651,22 @@ tracks(p1, p2, p3, p4)
 
 \begin{figure}[h!p!t]
   \centering
-\includegraphics[width = 0.6\textwidth]{intro-BSgenome-tracks.png}
+\includegraphics[width = 0.8\textwidth]{intro-BSgenome-tracks.png}
   \caption{BSgenome with four geoms, first one is text, second is point, third one is segment, and fourth one is rectangle}
   \label{fig:BSgenome}
 \end{figure}
 
 
 
-\section{Overview}
-\emph{Bird Eye Overview} is useful to see the overal distribution of
+\section{Overview Plot}
+\emph{Bird Eye Overview} is useful to see the overall distribution of
 certain events. For static graphic, we currently only support stacked
 overview as ideogram, or for single chromosome.
 \subsection{Stacked Overview}
-Stacked overview is useful to visualzie the annotation across the
+Stacked overview is useful to visualize the annotation across the
 genome, you can use \Rfunction{plotOverview} function to directly plot
 the result from \Rfunction{getIdeogram} for certain species. And you
-could control wether to plot the cytoband or not.
+could control whether to plot the cytoband or not.
 
 Figure \ref{fig:plotOverview-cyto} shows how to plot stacked overview
 with cytoband. We change the name to make the label more
@@ -733,7 +733,7 @@ Figure \ref{fig:plotOverview-nocyto-darned} shows an example
 of subset of RNA editing set. 
 
 \textbf{NOTE:} user need to make sure the \Rfunction{seqnames} are
-consistency in two datas, otherwise you are going to make weird
+consistency in two data, otherwise you are going to make weird
 graphics, because they can not be mapped in the right way.
 % \begin{figure}[h!t!p]
 %   \centering
@@ -755,7 +755,7 @@ print(p)
 
 \begin{figure}[h!t!p]
   \centering
-  \includegraphics[width = 0.6\textwidth]{intro-plotOverview-nocyto-darned.png}    
+  \includegraphics[width = 0.7\textwidth]{intro-plotOverview-nocyto-darned.png}    
 \caption{Stacked overview without cytoband and with subseted DARNED
   data on it}
   \label{fig:plotOverview-nocyto-darned}
@@ -784,7 +784,7 @@ print(p)
 
 \begin{figure}[h!t!p]
   \centering
-  \includegraphics[width = 0.6\textwidth]{intro-plotOverview-nocyto-darned-exon.png}      
+  \includegraphics[width = 0.8\textwidth]{intro-plotOverview-nocyto-darned-exon.png}      
 \caption{Stacked overview without cytoband and with subseted DARNED
   data on it}
   \label{fig:plotOverview-nocyto-darned-exon}
@@ -838,21 +838,21 @@ print(p)
 
 \subsection{Circular Overview}
 Circular view is inspired by the \software{Circos} project
-\footnote{\url{http://circos.ca/}} which is essentially writen
+\footnote{\url{http://circos.ca/}} which is essentially written
 \software{Perl}\footnote{\url{http://www.perl.org/}}.\software{Circos}
 visualize data in a circular layout, originally starting from
 visualize the genomic data, then extends to many other fields, turn
 out to be an elegant and useful way to visualize some other
-infomation.
+information.
 
-The static version of circular view is not implemented in this pacakge
-yet, but it's defintely in the TODO. For users who are really
+The static version of circular view is not implemented in this package
+yet, but it's definitely in the TODO. For users who are really
 interested in using a circular view in \R{}, we have a highly
 experimental circular view in another package \visnab{}, which is
 interactive visualization toolkit for genomic data.
 \section{Building Tracks for Linear View}
 In most genome browsers, they all have such a view that including many
-tracks, could be any anntation data along genomic coordinate. So we
+tracks, could be any annotation data along genomic coordinate. So we
 try to provide a convenient constructor for building tracks, which
 here in this package is simply vertically binding of several
 plots. It's essentially a \Rfunction{grid.arrange}. So if users want
@@ -869,7 +869,7 @@ compare to \Rfunction{grid.arrange}.
   remove legend and y axis labels to make sure all tracks are aligned
   exactly in the same way.
 \item Remove the x-axis for most track except the last one. 
-\item Does the ajustment of margins for you automatically.
+\item Does the adjustment of margins for you automatically.
 \item Doesn't like \qplot{}, tracks doesn't return \Robject{ggplot}
   object. so processing your plot before you pass them to
   \Rfunction{tracks}.
@@ -1007,9 +1007,7 @@ grid.arrange(pm1, pm2, pm3, pm4, pm5, ncol = 1)
 <<sessionInfo>>=
 sessionInfo()
 @ %def 
-
 % DI: I think you need to say something about color schemes, choices, and how missings are colored.
-
 % DI: Need to add references, ggplot2 book, .... list of referenced R packages, ...
 % Do oyu need to acknowledge Genentech?
 \end{document}

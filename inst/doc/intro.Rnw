@@ -54,18 +54,30 @@ options(width=72)
 \section{Introduction}
 
 The \R{} package, \ggbio{}, provided a toolkit for visualizing
-biological data, using static \R{} graphics. This package extends the
-\ggplot{} package\footnote{\url{http://had.co.nz/ggplot2/}}, which
-provides elegant static graphics, based on the grammar of
-graphics. The syntax and style of commands follows that of
-\ggplot{}. For those plots which require a low level manipulation on
-graphics some plots are enhanced using \grid{} or \gridExtra{}.
-% DI: Explain what is meant by biological data
+biological data, using static \R{} graphics. We mainly focus on
+visualizing sequencing data, and annotation tracks, but not just
+limited to it. We also try to implement some most used graphics and at
+the same time explore more types of new graphics. For example, we have
+implement \emph{Manhattan plot} for GWAS study, stacked overview for
+exploring distribution of events cross all chromosomes, splicing
+summary for summarizing alternative splice events, etc. It's just a
+start, we hope to provide a static gallary for biologists and analyst,
+and prototyping for interactive graphics project like \visnab{}.
+% DI: Explain what is meant by biological data(Done)
+
+This package extends the \ggplot{}
+package\footnote{\url{http://had.co.nz/ggplot2/}}, which provides
+elegant static graphics, based on the grammar of graphics. The syntax
+and style of commands follows that of \ggplot{}. For those plots which
+require a low level manipulation on graphics some plots are enhanced
+using \grid{} or \gridExtra{}.
+
 
 The goal is to provide high quality graphics for both analysis and
 publication purposes, requiring some rules:
 \begin{itemize} \itemsep 0in
-\item Be general. % DI: explain what you mean here.
+\item Be general. Try to focus on most asked questions and provide
+  most used types of graphics at first. % DI: explain what you mean here.(done)
 \item Be object-oriented, by providing a generic function, eg
   \Robject{qplot}, which automatically can handle and plot different
   \R{} biological data objects in \software{Bioconductor} project.
@@ -99,9 +111,9 @@ There are very \textbf{important} differences between \ggbio{} and
 \ggplot{}:
 \begin{itemize} \itemsep 0in
 \item The horizontal axis in \ggbio{}, for most plots, will be genomic
-  coordinates or protein space. You can only specify the \emph{x} to
+  coordinates. You can only specify the \emph{x} to
   be \emph{start, end, midpoint} describing interval data with width
-  larger than 1. % DI: Maybe explain what you mean by protein space?
+  larger than 1. % DI: Maybe explain what you mean by protein space?(done, remove)
 \item Facetting of the graphics, can only be done by \textbf{seqnames}
   or region on a chromosome. If \textbf{seqnames} is in the data
   structure, it automatically is used for facetting.
@@ -125,11 +137,10 @@ in \Robject{data.frame} or \Robject{matrix} object, you can use
 \qplot{} as usual without any change, it essentially just call
 ggplot2::qplot.
 
-% DI: Put the data(hg19IdeogramCyto) line in the correct place
+% DI: Put the data(hg19IdeogramCyto) line in the correct place(done)
 @ 
 <<loading, eval = FALSE>>=
 library(ggbio)
-data(hg19IdeogramCyto)
 @ %def 
 
 % \begin{figure}[h!t!p]
@@ -156,16 +167,20 @@ print(p)
 \subsection{Plotting \Robject{GRanges} object}
 A \Robject{GRanges} object is defined in \Rpackage{GenomicRanges}
 package. It is one of the most important data structures coding
-genomic information, organizing genomic data as intervals. Currently
-\R{} does not have any convenient functions for visualizing interval
-objects.
+genomic information, organizing genomic data as intervals. Three
+required fields for this object is \Robject{seqnames} for chromosome
+name, \Robject{ranges} for interval position, \Robject{strand} for
+storing direction of strand for particular interval, including
+\textbf{+,-,*}.Currently \R{} does not have any convenient functions
+for visualizing interval objects.
+% DI: Explain what strand is(done)
 
 \subsubsection{Sample \Robject{Granges} object}
 Let's first create a sample \Robject{GRanges} object that can be used
 for following examples. We generate data, mimicking paired RNA-seq
 data, that contains 1000 rows, 3 chromosomes, and meta data of
 grouping and pairing information.
-% DI: Explain what strand is
+
 
 @ 
 <<GRanges-sample, eval = FALSE>>=
@@ -185,7 +200,6 @@ gr <- GRanges(seqnames =
                 size = N, replace = TRUE),
               pair = sample(letters, size = N, 
                 replace = TRUE))
-head(gr)
 @ %def 
 
 \subsubsection{Supported Geoms}
@@ -201,9 +215,9 @@ For \Robject{GRanges} objects we support following \emph{geoms}:
 \item[reduce]  Show reduced \Robject{GRanges} object.
 \item[disjoin] Show disjoint \Robject{GRanges} object.
 \item[histogram] Show histogram.
-\item[splice] A wrapper around function \Rfunction{plotSpliceSum}, so
-  when you set to \Rfunarg{geom} equals to \emph{splice}, you have to
-  to provide arguments \Rfunarg{model}. 
+% \item[splice] A wrapper around function \Rfunction{plotSpliceSum}, so
+%   when you set to \Rfunarg{geom} equals to \emph{splice}, you have to
+%   to provide arguments \Rfunarg{model}. 
 \end{description}
 
 This code generates the default plot of a \Robject{GRanges} object
@@ -216,15 +230,18 @@ the data as stacked intervals, automatically facetted by
 @ 
 <<qplot-gr-full, fig = FALSE, eval = FALSE>>=
 p <- qplot(gr)
-print(p)
 @ %def   
 %   \caption{qplot for GRanges as geom full}
 %   \label{fig:qplot-gr-full}
 % \end{figure}
 \begin{figure}[h!t!p]
   \centering
-\includegraphics[width = 0.8\textwidth]{intro-qplot-gr-full.pdf}
-  \caption{qplot for GRanges as \texttt{geom full}}
+\includegraphics[width = 0.8\textwidth]{intro-qplot-gr-full.png}
+\caption{qplot for GRanges as \texttt{geom full}. We could see the
+  plot is shown in three columns which facet by seqnames, and colored
+  by strand. The small rectangles are those interval data described in
+  our test \Robject{GRanges} object. We can imagine they are short
+  reads on specific region of the genome}
   \label{fig:qplot-gr-full}
 \end{figure}
 
@@ -255,14 +272,12 @@ print(p)
 %change.
 
 In this next display (Figure \ref{fig:qplot-gr-full-themebw}), a
-different theme was used to make the background white, and the facets
-are laid out horizontally.
+different theme was used to make the background white.
 
 % \begin{figure}[h!t!p]
 %   \centering
 @ 
 <<qplot-gr-full-themebw, fig = FALSE, eval = FALSE>>=
-p <- qplot(gr, nrow = 1)
 p <- p + theme_bw()
 print(p)
 @ %def   
@@ -271,8 +286,9 @@ print(p)
 % \end{figure}
 \begin{figure}[h!t!p]
   \centering
-\includegraphics[width = 0.8\textwidth]{intro-qplot-gr-full-themebw}
-  \caption{qplot for GRanges as geom full}
+\includegraphics[width = 0.8\textwidth]{intro-qplot-gr-full-themebw.png}
+\caption{qplot for GRanges as geom full. The theme for this graphic is
+  set to blank}
   \label{fig:qplot-gr-full-themebw}
 \end{figure}
 
@@ -284,8 +300,9 @@ In this next plot, the \texttt{coverage.p geom} is used (Figure
 @ 
 <<qplot-gr-cov-line, fig = FALSE, eval = FALSE>>=
 p <- qplot(gr, nrow = 1, geom = "coverage.p")
-p + geom_hline(yintercept = 40, color = "red", 
+p <- p + geom_hline(yintercept = 40, color = "red", 
     size = 1)
+print(p)
 @ %def   
 %   \caption{qplot for GRanges as geom full}
 %   \label{fig:qplot-gr-cov-line}
@@ -293,19 +310,11 @@ p + geom_hline(yintercept = 40, color = "red",
 
 \begin{figure}[h!t!p]
   \centering
-\includegraphics[width = 0.8\textwidth]{intro-qplot-gr-cov-line}
-  \caption{qplot for GRanges as \texttt{geom full}}
+\includegraphics[width = 0.8\textwidth]{intro-qplot-gr-cov-line.png}
+\caption{qplot for GRanges as \texttt{geom coverage.polygon}, the
+  redline shows the artificial cutoff.}
   \label{fig:qplot-gr-cov-line}
 \end{figure}
-
-You can also subset by the \Rfunarg{which} argument.
-
-@ 
-<<qplot-gr-subset, eval = FALSE>>=
-gr.sub <- gr[seqnames(gr) == "chr1"] #or 
-## p <- qplot(gr, seqnames = "chr1", ...) # or
-## p <- qplot(gr, which = GRanges("chr1", IRanges(1e5, 2e5)), ...)
-@ %def 
 
 And let's plot all other geoms together by \Rfunction{grid.arrange} from
 package \Rpackage{gridExtra} (Figure \ref{fig:all-geom-gr}).
@@ -314,6 +323,7 @@ package \Rpackage{gridExtra} (Figure \ref{fig:all-geom-gr}).
 %   \centering
 @
 <<qplot-gr-all, fig = FALSE, eval = FALSE>>=
+gr.sub <- gr[seqnames(gr) == "chr1"] #or 
 p1 <- qplot(gr.sub, geom = "full") + opts(title = "full")
 p2 <- qplot(gr.sub, geom = "point", y = value) + opts(title = "point")
 p3 <- qplot(gr.sub, geom = "line", y = value) + opts(title = "line")
@@ -330,10 +340,30 @@ grid.arrange(p1, p2, p3, p4, p5, p6, p7 ,p8, ncol = 2)
 % \end{figure}
 \begin{figure}[h!b!t!p]
   \centering
-\includegraphics[width = 0.9\textwidth]{intro-qplot-gr-all}
+\includegraphics[width = 0.7\textwidth]{intro-qplot-gr-all.png}
   \caption{All common geoms(except splice) for GRanges object}
   \label{fig:all-geom-gr}
 \end{figure}
+
+\subsubsection{Layout}
+Figure \ref{fig:gr-layout-nrow} shows, when you simply facet by
+seqnames as default, your can use \Rfunarg{nrow} and \Rfunarg{ncol} to
+control the layout of the graphic. It ensentially use
+\Rfunction{facet\_wrap} in \ggplot{} automaticaly.
+
+@ 
+<<qplot-layout-nrow, fig = FALSE, eval = FALSE>>=
+p <- qplot(gr, ncol = 2)
+print(p)
+@ %def 
+\begin{figure}[h!b!t!p]
+  \centering
+\includegraphics[width = 0.6\textwidth]{gr-nrow1.png}
+  \caption{qplot use layout to control the graphics. Here when users set ncol = 2,
+  it automatically wrap to two column when facet by default seqnames.}
+  \label{fig:gr-layout-nrow}
+\end{figure}
+
 
 \subsubsection{Facetting}
 
@@ -362,13 +392,12 @@ to be one the categorical variables in elementMetadata.
   p <- qplot(gr, facet = group ~ seqnames)
   print(p)
 @ %def 
-  
 %   \caption{Facet by group}
 %   \label{fig:facet.group}
 % \end{figure}
 \begin{figure}[h!t!p]
   \centering
-\includegraphics[width = 0.8\textwidth]{intro-facet-group}
+\includegraphics[width = 0.8\textwidth]{intro-facet-group.png}
   \caption{Facet by group}
   \label{fig:facet.group}
 \end{figure}
@@ -393,32 +422,66 @@ arguments.
 % \end{figure}
 \begin{figure}[h!t!p]
   \centering
-\includegraphics[width = 0.8\textwidth]{intro-facet-gr}
+\includegraphics[width = 0.8\textwidth]{intro-facet-gr.png}
   \caption{Facet by regions}
   \label{fig:facet.gr}
 \end{figure}
 
 \subsection{For \Robject{GRangesList} object}
 It's just simply internally unlist the \Robject{GRangesList} object
-and treat it as \Robject{GRanges} object.
-% \begin{figure}[h!t!p]
-%   \centering
+and treat it as \Robject{GRanges} object. 
+
+Since most time a \Robject{GRangesList} has a native structure to
+describe a genomic model or alternative splicing, we make the default
+automatically adding group information based on the listed data. We
+assume each list contains a single isoform or a single model, so they
+need to be shown on the same level. Then we also have
+\Rfunarg{show.gaps} to control whether to show gaps or not, and
+\Rfunarg{show.label} to control whether to show the group name or not.
+
+If users want to control the graphic as \Robject{GRanges}, please
+convert it to \Robject{GRanges} first, then ust \qplot{} to visualize
+it.
+
+\subsubsection{Alternative splicing and summary}
+Here is a case study, how to use \qplot{} for \Robject{GRangesList} to
+produce a splicing model and show summary on it. In the following data
+from a \Robject{TransciptDb} object, and using \Rfunarg{freq} argument
+to pass the summary information to the function.
+
+It's convenient to get model from a \Robject{TranscriptDb} object,
+it's already split by transcipt when you specify \Rfunarg{by} equals
+\emph{tx}, and this will return a \Robject{GRangesList} object, with
+name of transcript.
+
 @ 
-<<grl-plot, fig = FALSE, eval = FALSE>>=
-grl <- split(gr, seqnames(gr))
-p <- qplot(grl)
-print(p)
+<<splice-grl, fig = FALSE, eval = FALSE>>=
+data(genesymbol)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
+exons <- exonsBy(txdb, by = "tx")
+exons.rbm17 <- subsetByOverlaps(exons, genesymbol["RBM17"])
+nms <- names(exons.rbm17)
+freqs <- c(100, 200, 300)
+names(freqs) <- nms
+p.grl <- qplot(exons.rbm17, freq = freqs)
+p.unlist <- qplot(unlist(exons.rbm17))
+grid.arrange(p.grl, p.unlist, nrow = 2)
 @ %def 
-%   \caption{GRangesList plotting}
-%   \label{fig:grl}
-% \end{figure}
 \begin{figure}[h!t!p]
   \centering
-\includegraphics[width = 0.8\textwidth]{intro-grl-plot}
-  \caption{GRangesList plotting}
-  \label{fig:grl}
+\includegraphics[width = 0.8\textwidth]{splice-two.png}
+\caption{Alternative splicing summary from \Robject{GRangesList}
+  compared to just \Robject{GRanges}. The top panel shows how to
+  visualize alternative splicing with summary. The line width
+  indicates evidence supporting each model. And the bottom plot shows
+  if we simply convert it to \Robject{GRanges}, it's just stepping of
+  intervals without considering any grouping information}
+  \label{fig:facet.gr}
 \end{figure}
 
+In the future, we are going to support more types of graphics to
+visualize alternative splicing. it's an active research field.
 
 \subsection{For \Robject{IRanges} object}
 Similar to \qplot{} for \Robject{GRanges}, supported geoms includes, 
@@ -436,11 +499,22 @@ p3 <- qplot(ir, geom = "coverage.line")+ opts(title = "coverage.line")
 p4 <- qplot(ir, geom = "coverage.polygon")+ opts(title = "coverage.polygon")
 p5 <- qplot(ir, geom = "reduce")+ opts(title = "reduce")
 p6 <- qplot(ir, geom = "histogram")+ opts(title = "histogram")
+png("iranges-plot.png", 600, 800)
 grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
+dev.off()
 @ %def 
 %   \caption{IRanges geoms}
 %   \label{fig:iranges-plot}
 % \end{figure}
+\begin{figure}[h!t!p]
+  \centering
+\includegraphics[width = 0.6\textwidth]{iranges-plot.png}
+\caption{qplot for \Robject{IRanges}. Similar to \Robject{GRanges},
+  but we don't have seqnames information about it}
+  \label{fig:iranges-plot}
+\end{figure}
+
+
 
 \subsection{For \Robject{GappedAlignments} object}
 Supportd geom includes:
@@ -518,8 +592,9 @@ Supported geoms includs:
 \subsection{For \Robject{TranscriptDb} object}
 Supported geoms including
 \begin{description} \itemsep 0in
-\item[full] Full model
-\item[single] Reduced model
+\item[full] Full model, trying to show all 5'-UTR, 3'-UTR, cds and introns in 
+  different transcripts.
+\item[single] Reduced model.
 \end{description}
 
 Figure \ref{fig:txdb} shows two tracks for a \Robject{TranscriptDb} object.
@@ -528,11 +603,10 @@ Figure \ref{fig:txdb} shows two tracks for a \Robject{TranscriptDb} object.
 %   \centering
 @ 
 <<txdb-plot, fig = FALSE, eval = FALSE>>=
-library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
-data(genesymbol)
-p.full <- qplot(txdb, geom = "full", which = genesymbol[1])
-p.single <- qplot(txdb, geom = "single", which = genesymbol[1])
+## exons <- exonsBy(txdb, by = "tx")
+## exons.rbm17 <- subsetByOverlaps(exons, genesymbol["RBM17"])
+p.full <- qplot(txdb, geom = "full", which = genesymbol["RBM17"])
+p.single <- qplot(txdb, geom = "single", which = genesymbol["RBM17"])
 tracks(p.full, p.single, heights = c(40, 10))
 @ %def 
 %   \caption{TranscriptDb visualization. First track showing full model, second track showing reduced one.}
@@ -541,6 +615,13 @@ tracks(p.full, p.single, heights = c(40, 10))
 
 
 \subsection{For \Robject{BSgenome} object}
+Package \Rpackage{BSgenome} provides infrastructure for
+Biostrings-based genome data packages. And users could download many
+full genome as provided by UCSC which stored in Biostrings objects
+from metadata database in Bioconductor project website.
+
+So \qplot{} function for this object tries to:
+
 \begin{description} \itemsep 0in
 \item[text] Showing nucleotides as text.
 \item[segment] Showing nucleotides as color-coded segment.
@@ -556,17 +637,21 @@ Figure \ref{fig:BSgenome} shows four tracks(with four geom) for a
 <<BSgenome-tracks, fig = FALSE, eval = FALSE>>=
 library(BSgenome.Hsapiens.UCSC.hg19)
 gr <- GRanges("chr1", IRanges(5e7, 5e7+50))
-p1 <- qplot(Hsapiens, name = gr, geom = "text")
-p2 <- qplot(Hsapiens, name = gr, geom = "point")
-p3 <- qplot(Hsapiens, name = gr, geom = "segment")
-p4 <- qplot(Hsapiens, name = gr, geom = "rectangle")
+p1 <- qplot(Hsapiens, name = gr, geom = "text") +
+  theme_bw()
+p2 <- qplot(Hsapiens, name = gr, geom = "point") +
+    theme_bw()
+p3 <- qplot(Hsapiens, name = gr, geom = "segment") +
+    theme_bw()
+p4 <- qplot(Hsapiens, name = gr, geom = "rectangle") +
+    theme_bw()
 tracks(p1, p2, p3, p4)
 @ %def 
 %   \caption{BSgenome with four geoms, first one is text, second is point, third one is segment, and fourth one is rectangle
 
 \begin{figure}[h!p!t]
   \centering
-\includegraphics[width = 0.8\textwidth]{intro-BSgenome-tracks}
+\includegraphics[width = 0.6\textwidth]{intro-BSgenome-tracks.png}
   \caption{BSgenome with four geoms, first one is text, second is point, third one is segment, and fourth one is rectangle}
   \label{fig:BSgenome}
 \end{figure}
@@ -592,8 +677,9 @@ clear. \Rfunction{renameSeqlevels} function from
 %   \centering
 @ 
 <<plotOverview-cyto, fig = FALSE, eval = FALSE>>=
+data(hg19IdeogramCyto)
 ## make shorter and clean labels
-appendixold.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
+old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
 new.chrs <- gsub("chr", "", old.chrs)
 ## lst <- as.list(new.chrs)
 names(new.chrs) <- old.chrs
@@ -607,7 +693,7 @@ print(p)
 
 \begin{figure}[h!t!p]
   \centering
-  \includegraphics[width = 0.8\textwidth]{intro-plotOverview-cyto.pdf}
+  \includegraphics[width = 0.6\textwidth]{intro-plotOverview-cyto.png}
   \caption{Stacked overview with cytoband}
   \label{fig:plotOverview-cyto}
 \end{figure}
@@ -632,7 +718,7 @@ print(p)
 
 \begin{figure}[h!t!p]
   \centering
-  \includegraphics[width = 0.8\textwidth]{intro-plotOverview-nocyto.pdf}  
+  \includegraphics[width = 0.6\textwidth]{intro-plotOverview-nocyto.png}  
   \caption{Stacked overview without cytoband}
   \label{fig:plotOverview-nocyto}
 \end{figure}
@@ -655,7 +741,10 @@ graphics, because they can not be mapped in the right way.
 <<plotOverview-nocyto-darned, fig = FALSE, eval = FALSE>>=
 data(darned_hg19_subset500)
 ## rename 
-new.darned <- renameSeqlevels(darned_hg19_subset500, lst)
+old.chrs <- seqnames(seqinfo(darned_hg19_subset500))
+new.chrs <- gsub("chr", "", old.chrs)
+names(new.chrs) <- old.chrs
+new.darned <- renameSeqlevels(darned_hg19_subset500, new.chrs)
 p <- p + geom_hotregion(new.darned)
 print(p)
 @ %def   
@@ -666,7 +755,7 @@ print(p)
 
 \begin{figure}[h!t!p]
   \centering
-  \includegraphics[width = 0.8\textwidth]{intro-plotOverview-nocyto-darned.pdf}    
+  \includegraphics[width = 0.6\textwidth]{intro-plotOverview-nocyto-darned.png}    
 \caption{Stacked overview without cytoband and with subseted DARNED
   data on it}
   \label{fig:plotOverview-nocyto-darned}
@@ -683,6 +772,7 @@ is, \emph{3} means 3' UTR, \emph{5} means 5' UTR, \emph{C} means it's
 %   \centering
 @ 
 <<plotOverview-nocyto-darned-exon, fig = FALSE, eval = FALSE>>=
+
 p <- plotOverview(new.ideo, cytoband = FALSE)
 p <- p + geom_hotregion(new.darned, aes(color = exReg))
 print(p)
@@ -694,7 +784,7 @@ print(p)
 
 \begin{figure}[h!t!p]
   \centering
-  \includegraphics[width = 0.8\textwidth]{intro-plotOverview-nocyto-darned-exon.pdf}      
+  \includegraphics[width = 0.6\textwidth]{intro-plotOverview-nocyto-darned-exon.png}      
 \caption{Stacked overview without cytoband and with subseted DARNED
   data on it}
   \label{fig:plotOverview-nocyto-darned-exon}
@@ -716,11 +806,10 @@ print(p)
 %   \label{fig:plotSingleChrom}
 % \end{figure}
 
-
 \begin{figure}[h!t!p]
   \centering
-  \includegraphics[height = .25in, width = 5in]{intro-plotSingleChrom.pdf}\\
-  \includegraphics[height = .25in, width = 5in]{intro-plotSingleChrom-zoom.pdf}  
+  \includegraphics[height = .26in, width = 5in]{intro-plotSingleChrom.pdf}\\
+  \includegraphics[height = .26in, width = 5in]{intro-plotSingleChrom-zoom.pdf}  
   \caption{Single Chromosome as Ideogram. The top plot shows simple single chromosome,
   and the bottom one shows the one with fixed zoom window.}
   \label{fig:plotSingleChrom}
@@ -790,30 +879,129 @@ We have already demonstrate how to use \Rfunction{tracks} in the
 previous sections.
 
 \section{Question-oriented Specific Graphics}
-\subsection{Fragment Length and Splicing plots}
-
-% \begin{figure}[h!t!p]
-%   \centering                   
+\subsection{Fragment Length}
+To be updated.
 @ 
 <<frag-length, fig = FALSE, eval = FALSE>>=
-## canonical model
-## since we know the gene symbol in the sample bam file is  "RBM17"
 gr.rbm <- genesymbol["RBM17"]
 exs <- exonsByOverlaps(txdb, gr.rbm, colum = "tx_id")
 qplot(BamFile(bamfile), model = exs, geom = "fragment.length", group.name = "tx_id")
 @ %def   
-%   \caption{Fragment Length and splice summary trakcs}
-%   \label{fig:frag}
-% \end{figure}
 
 
 \subsection{Mismatch Summary}
-To be implemented.
-% \subsection{Sequencing Logo}
-% To be implemented.
+For NGS(Next generation sequencing) data, sometimes instead of showing
+all the alignments, we hope to show just summary information for
+particular region. And mismatch summary is one of those interesting
+summaries. 
+
+\Rfunction{plotMismatchSum} shows only mismatched read counts as color
+coded stacked barchart or with coverage as background. We also
+implement this as one geom for certain object, such \Robject{BamFile}
+and \Robject{GRanges}, so you could use \qplot{} for simply generating
+some mismatch summary. When the object is \Robject{GRanges}. we check
+inside the function to see if the \Robject{GRanges} is from
+\Rfunction{pileupGRangesAsVariantTable} or not, or it need to contains
+certain column required for plotting mismatch summary.
+
+@ 
+<<mismatch-plot, fig = FALSE, eval = FALSE>>=
+bamfile <- system.file("extdata", "SRR027894subRBM17.bam", package="biovizBase")
+gr <- GRanges("chr10", IRanges(6134000, 6135000))
+test <- pileupAsGRanges(bamfile, region = gr)
+test.match <- pileupGRangesAsVariantTable(test, Hsapiens)
+## use plotMismatchSum directly
+pmis1 <- plotMismatchSum(test.match, show.coverage = FALSE)
+pmis2 <- plotMismatchSum(test.match, show.coverage = TRUE)
+grid.arrange(pmis1, pmis2, ncol = 1)
+## we can also use generic qplot function
+## use qplot generic function
+p <- qplot(test.match, geom = "mismatch.summary")
+library(Rsamtools)
+## for character
+p <- qplot(bamfile, which = gr, bsgenome = Hsapiens,
+      geom = "mismatch.summary", show.coverage = TRUE)
+## for BamFile
+p <- qplot(BamFile(bamfile), which = gr, bsgenome = Hsapiens,
+      geom = "mismatch.summary", show.coverage = TRUE)
+@ %def 
+
+\begin{figure}[h!t!p]
+  \centering
+  \includegraphics[width = 0.7\textwidth, width = 5in]{mismatch.png}  
+  \caption{Mismatch summary: The top one shows only mismatched counts
+    without showing coverage, and the bottom one shows coverage in
+    gray color as background. For each position, reads that as same as
+    reference will be shown as gray. And we only color the reads that
+    is mismatch from the reference and color-coded by default. }
+  \label{fig:mismatch}
+\end{figure}
+
+
 \subsection{Manhattan Plots for SNP data}
-Manhattan Plots for SNP data(can be achieved by facet\_gr for now, but
-need more delicate control)
+A Manhattan plot is special scatter plot used to visualize data with a
+large number of data points, with a distribute of some higher-magnitude
+values. For example, in the GWAS(genome-wide association studies). Here
+we mainly focus on GWAS Manhattan plots. X-axis is genomic coordinates
+and Y-axis is negative logarithm of the associated P-value for each
+single nucleotide polymorphism. So higher the value, more stronger the
+association they are.
+
+Here we simulate some SNP data, as Figure \ref{fig:manhattan}shows,
+you can plot it in different ways.
+
+Default is assigning color for all chromosomes, and use a free
+space. Users can have more delicate control such as adding title,
+using customized two-color scheme, and adding cut off, removing
+legend.. Please refer to the manual.
+
+@ 
+<<manhattan-plot, fig = FALSE, eval = FALSE>>=
+data(hg19IdeogramCyto)
+data(hg19Ideogram)
+chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
+seqlths <- seqlengths(hg19Ideogram)[chrs]
+set.seed(1)
+nchr <- length(chrs)
+nsnps <- 1000
+gr.snp <- GRanges(rep(chrs,each=nsnps),
+             IRanges(start = do.call(c, lapply(chrs, function(chr){
+               N <- seqlths[chr]
+               runif(nsnps,1,N)
+             })), width = 1),
+             SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
+             pvalue =  -log10(runif(nchr*nsnps))
+             )
+
+## processing the name, to make it shorter
+nms <- seqnames(seqinfo(gr.snp))
+nms.new <- gsub("chr", "", nms)
+names(nms.new) <- nms
+gr.snp <- renameSeqlevels(gr.snp, nms.new)
+## plottting
+pm1 <- plotManhattan(gr.snp, y = pvalue)
+pm2 <- plotManhattan(gr.snp, y = pvalue, color.type = "seqnames")
+pm3 <- plotManhattan(gr.snp, y = pvalue, color.type = "twocolor", title = "SNP",
+                     cutoff = c(4, 5), cutoff.color = "blue", cutoff.size = 1)
+pm4 <- plotManhattan(gr.snp, y = pvalue, color.type = "twocolor", 
+                     two.color = c("black", "gray50"))
+pm5 <- plotManhattan(gr.snp, y = pvalue, scale = "fixed", space = "fixed")
+grid.arrange(pm1, pm2, pm3, pm4, pm5, ncol = 1)
+@ %def 
+
+
+\begin{figure}[h!t!p]
+  \centering
+  \includegraphics[width = 0.7\textwidth, width = 5in]{manhattan.png}  
+  \caption{Manhattan plot for simulated SNP data set. The first row is
+    default.  Second row shows color based on seqnames. Third row
+    shows two colors only, use default color scheme, and adding cutoff
+    at the same time. The fourth row use customized two colors. The
+    fifth row use fixed space which default is adjusted on data
+    range.}
+  \label{fig:manhattan}
+\end{figure}
+
 \section{Session Info}
 @ 
 <<sessionInfo>>=

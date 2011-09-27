@@ -3,6 +3,7 @@
 \alias{qplot}
 \alias{qplot,data.frame-method}
 \alias{qplot,matrix-method}
+\alias{qplot,numeric-method}
 \alias{qplot,GRanges-method}
 \alias{qplot,GRangesList-method}
 \alias{qplot,IRanges-method}
@@ -29,19 +30,25 @@
 ## For object matrix
 \S4method{qplot}{matrix}(data, ...)
 
+## For object numeric
+\S4method{qplot}{numeric}(data, ...)
+
 ## For object GRanges
 \S4method{qplot}{GRanges}(data, x, y,...,
-      facet_gr, model, group.name,
+      facet_gr, 
       legend = TRUE, ignore.strand = TRUE,
       show.coverage = TRUE,
+      show.gaps = FALSE,
+      show.label = FALSE,
       geom = c("full", "line","point",
                "segment", "histogram", "reduce", "disjoin",
-               "coverage.line", "coverage.polygon", "splice",
+               "coverage.line", "coverage.polygon", 
                "mismatch.summary"))
 
 
 ## For object GRangesList
-\S4method{qplot}{GRangesList}(data, ...)
+\S4method{qplot}{GRangesList}(data, ..., freq,
+       show.label = FALSE, show.gaps = TRUE)
 
 ## For object IRanges
 \S4method{qplot}{IRanges}(data, ..., legend = TRUE,
@@ -98,18 +105,18 @@
   }
   \item{facet_gr}{
     A \code{\link{GRanges}} object which contains the regions you want
-  to facet on. 
+  to facet on. 			%
   }
   \item{model}{
     A \code{\link{GRanges}} object which providing a known or customized
     genomic structure or gene model.
   }
-  \item{group.name}{
-    A character with quote, one of the variables in elementMetadata,
-    used for grouping the intervals when computing the splice summary.
-    e.g. grouping exons into one transcript model by calling
-    \code{group.name = "tx\_ed"}
-  }
+  % \item{group.name}{
+  %   A character with quote, one of the variables in elementMetadata,
+  %   used for grouping the intervals when computing the splice summary.
+  %   e.g. grouping exons into one transcript model by calling
+  %   \code{group.name = "tx\_ed"}
+  % }
   \item{name}{
     Passed to \code{getSeq} in BSgenome package.
     
@@ -141,7 +148,21 @@
   \item{show.coverage}{
     A logical value indicates whether to show coverage or not. This is
   used for geom "mismatch.summary".
-  }
+}
+  \item{show.gaps}{
+    A logical value indicates whether to show gaps or not. This is
+  used for geom "full".
+}
+  \item{show.label}{
+    A logical value indicates whether to show labels or not. This is
+  used for geom "full".
+}
+\item{freq}{
+  A numeric vector indicating counts. This used for \code{GRangesList}
+  plot when you try to produce a summary for gene model or alternative
+  splicing, the name of the vector corresponding to the names of the
+  \code{GRangesList}.
+}
   \item{resize.extra}{
     A numeric value used to add buffer to intervals to compute stepping
     levels on.

@@ -77,4 +77,4 @@ importClassesFrom(GenomicFeatures,TranscriptDb)
 ## ============================================================
 exportMethods(qplot, rescale)
 export(tracks, plotOverview, plotSingleChrom, geom_hotregion,
-       plotMismatchSum, plotManhattan)
+       plotMismatchSum, plotManhattan, plotFragLength)

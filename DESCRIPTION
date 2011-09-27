@@ -11,11 +11,11 @@ biocViews: Infrastructure, Visualization, Bioinformatics
 License: GPL (>=2)
 LazyLoad: Yes
 Collate: utils.R
-	 manhattan.R
-	 splice.R
-	 mismatch.R
-	 fraglength.R
-	 tracks.R
+	 manhattan-plot.R
+	 splice-plot.R
+	 mismatch-plot.R
+	 fraglength-plot.R
+	 tracks-plot.R
 	 overview-plot.R	
 	 qplot-method.R
 	 rescale-method.R

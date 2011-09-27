@@ -106,8 +106,8 @@ tracks <- function(..., check.xlim = TRUE,
                       grobs[[i]] <- grobs[[i]] +
                         opts(plot.margin = unit(c(0, 1.8, 0, 0), "lines"))
                     }
-                    grobs[[i]]+ opts(axis.text.y = theme_blank(),
-                                     axis.ticks = theme_blank())
+                      grobs[[i]]+ opts(axis.text.y = theme_blank(),
+                                       axis.ticks = theme_blank())
                     
                   })
     widthDetails.legendGrob <- function(x) unit(10, "cm")    

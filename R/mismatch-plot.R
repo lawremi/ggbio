@@ -1,5 +1,5 @@
 plotMismatchSum <- function(obj, show.coverage = TRUE){
-  if(!isPileupSum(data))
+  if(!isPileupSum(obj))
     stop("For geom mismatch summary, data must returned from
                         pileupGRangesAsVariantTable function. Or is a GRanges
                         object including arbitrary columns: read, ref, count, depth,

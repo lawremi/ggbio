@@ -1,4 +1,4 @@
-plotFragLength <- function(data, model){
+plotFragLength <- function(file, model){
     if((missing(model)))
       stop("Fragment length require a specified model(GRanges)
     or txdb(TranscriptDb) object")
@@ -7,18 +7,20 @@ plotFragLength <- function(data, model){
     ## mds <- model
     which <- reduce(model)
     ## model <- model
-    ga <- readBamGappedAlignments(data,
+    ga <- readBamGappedAlignments(file,
                                   param = ScanBamParam(which = which),           
                                   use.name = TRUE)
     dt <- biovizBase:::fetch(ga)
     gr <- getFragLength(dt, model)
     p <- qplot(gr, y = .fragLength, geom = "point") + ylab("Fragment Length")
       opts(title = "Fragment Length Estimation")
+    p
 }
 
 
-plotFragTracks <- function(){
+plotFragWithGC <- function(file, model){
   ## Michael's sample case with tracks about
   ## coverage, GC content, and fragment length.
+  
   
 }

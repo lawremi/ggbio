@@ -12,18 +12,27 @@ setMethod("qplot", signature(data = "matrix"), function(data, ...){
   do.call(ggplot2::qplot, args)
 })
 
+setMethod("qplot", signature(data = "data.frame"), function(data, ...){
+  args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
+  do.call(ggplot2::qplot, args)
+})
+
+setMethod("qplot", signature(data = "numeric"), function(data, ...){
+  args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
+  do.call(ggplot2::qplot, args)
+})
+
 setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                facet_gr,
-                               model,
-                               group.name,
                                legend = TRUE,
                                ignore.strand = TRUE,
                                show.coverage = TRUE,
+                               show.gaps = FALSE,
+                               show.label = FALSE,
                                geom = c("full", "line","point",
                                  "segment", "histogram",
                                  "reduce",  "disjoin",                                 
                                  "coverage.line", "coverage.polygon",
-                                 "splice", # need to be checked,
                                  "mismatch.summary"
                                  )){
   geom <- match.arg(geom)
@@ -36,10 +45,10 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
   if(!(geom %in% c("full", "reduce", "disjoin", "segment"))){
     if("x" %in% names(args)){
       if(!(deparse(args$x) %in% c("start", "end", "midpoint")))
-        stop("x must be one of start/end/mipoint without quote")
+        stop("x must be one of start/end/midpoint without quote")
     }else{
       args <- c(args, list(x = substitute(midpoint)))
-      message("use start for x as default")
+      message("use midpoint for x as default")
     }}
   ## check y
   if(geom %in% c("point", "line")){
@@ -162,10 +171,33 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                      xmax = substitute(end),
                                      ymin = substitute(.levels - 0.4),
                                      ymax = substitute(.levels + 0.4)))
-                
-                p + geom_rect(do.call("aes", args)) +
-                        scale_color_manual(values = strandColor)+
-                          scale_fill_manual(values = strandColor)
+                gpn <- as.character(args$group)
+                args <- args[names(args) != "group"]
+                if(show.gaps){
+                  gps <- getGap(data, group.name = gpn)
+                  args.gaps <- c(args, list(x = substitute(start),
+                                            xend = substitute(end),
+                                       y = substitute(.levels),
+                                       yend = substitute(.levels)))
+                  p <- p + geom_segment(data = as.data.frame(gps),
+                                        do.call(aes, args.gaps))
+
+                }
+                if(show.label){
+                  label.gr <- getModelRange(data,
+                                             group.name = gpn)
+                  args.label <- c(args, list(x = substitute(start),
+                                       y = substitute(.levels),
+                                       label = substitute(.label)))
+                  args.label <- args.label[names(args.label) != "size"]
+                  p <- p + geom_text(data = as.data.frame(label.gr),
+                                     do.call(aes, args.label),
+                                     hjust = 1)
+                }
+                args.rect <- args[names(args) != "size"]
+                p <- p + geom_rect(do.call("aes", args.rect)) +
+                  scale_color_manual(values = strandColor)+
+                    scale_fill_manual(values = strandColor)
               },
               reduce = {
                 data <- reduce(data, ignore.strand = ignore.strand)
@@ -442,24 +474,6 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 p + geom_polygon(do.call("aes", args))+
                   ylab("coverage")
               },
-              splice = {
-                if(missing(model))
-                  stop("model is missing, please specify a canoical model")
-
-                .moved.nm <- c("data", "model", "group.name", "color", "fill",
-                               "size")
-                args <- args[!(names(args) %in% .moved.nm)]
-                args <- c(args, list(data = substitute(data),
-                                     model = substitute(model),
-                                     group.name = substitute(group.name),
-                                     color = substitute(type),
-                                     fill = substitute(type),
-                                     size = substitute(freq)))
-                ## if("show.")
-                ## p <- plotSpliceSum(data, model, group.name = group.name,
-                ##                    color = type, fill = type, size = freq)
-                p <- do.call("plotSpliceSum", args)
-              },
               mismatch.summary = {
                 if(!isPileupSum(data))
                   stop("For geom mismatch summary, data must returned from
@@ -490,13 +504,34 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
 ##        For "GRangesList"
 ## ======================================================================
 ## FIXME:
-setMethod("qplot", "GRangesList", function(data, ...){
-  qplot(unlist(data), ...)
+setMethod("qplot", "GRangesList", function(data, ..., freq, show.label = FALSE,
+                                           show.gaps = TRUE){
+  args <- list(...)
+  nms <- rep(names(data), elementLengths(data))
+  gr <- unlist(data)
+  values(gr)$.grl.name <- nms
+  if(!missing(freq)){
+    freqs <- rep(freq[names(data)], elementLengths(data))
+    values(gr)$.freq <- freqs
+    args <- c(args, list(data = gr,
+                         group = substitute(.grl.name),
+                         show.label = show.label,
+                         show.gaps = show.gaps,
+                         size = substitute(.freq)))
+  }else{
+    args <- c(args, list(data = gr,
+                         group = substitute(.grl.name),
+                         show.label = show.label,
+                         show.gaps = show.gaps))
+  }
+  do.call(qplot, args)
+  ## qplot(gr, group = .grl.name, ..., show.label = show.label, show.gaps = show.gaps)
 })
 
 ## ======================================================================
 ##        For "IRanges"
 ## ======================================================================
+
 setMethod("qplot", "IRanges", function(data, ...,
                                        legend = TRUE,
                                        geom = c("full", "segment", "histogram",

@@ -1,5 +1,5 @@
-\name{plotManhattan}
-\alias{plotManhattan}
+\name{plotGrandLinear}
+\alias{plotGrandLinear}
 \title{Manhattan for GWAS}
 \description{
 A Manhattan plot is special scatter plot used to visualize data with a
@@ -11,17 +11,18 @@ single nucleotide polymorphism. So higher the value, more stronger the
 association they are.
 }
 \usage{
-plotManhattan(obj, y, title,
-              scales = c("free", "fixed"),
-              space = c("free", "fixed"),
-              color.type = c("identity", "seqnames", "twocolor"),
+plotGrandLinear(obj, y, title, facet,
+              size, shape, color, alpha,
+              ...,
+              geom = c("point", "line"),
+              color.type = c("twocolor", "identity", "seqnames"),
               two.color = c("#0080FF", "#4CC4FF"),
               cutoff = NULL,
               cutoff.color = "red",
               cutoff.size = 1,
               legend = FALSE,
               xlab = "Chromosome",
-              ylab = expression(-log[10](italic(p))),
+              ylab = substitute(y),
               theme_bw = TRUE)
 }
 \arguments{
@@ -38,16 +39,47 @@ plotManhattan(obj, y, title,
   \item{title}{
     Title for the plot, default plot without title.
   }
-  \item{scales}{
-    How to control scale globally. Default is "free", other option
-    including "fixed", Please see details.
+  \item{facet}{
+    A facet formula, when provided, should be in two forms. First one,
+    \code{facet = group ~ seqnames}, where group should be the name you
+    want to facet by rows, if not, use \code{.} instead. this 
+    is faceted by seqnames, the different chromosomes will be in
+    different panel. The second form, \code{facet = group ~ .} will give
+    you a compact grand linear view, seqnames will not be in different
+    panels, this is a better way to plot a overview, e.g. a Manhattan plot.
   }
-  \item{space}{
-    Control space. Default is "free", other option including "fixed",
-    Please see details.
+  \item{size}{
+    Size for point or lines. Could equal a column name or a fixed
+    number. When it's fixed, please use \code{I()} to wrap the value.
   }
+  \item{shape}{
+    Shape for point or lines. Could equal a column name or a fixed
+    number. When it's fixed, please use \code{I()} to wrap the value.
+  }
+  \item{color}{
+    Color for point for lines. Could equal a column name or a fixed
+    character. When it's fixed, please use \code{I()} to wrap the value.
+  }
+  \item{alpha}{
+    Alpha blending. Could equal a column name or a fixed
+    number. When it's fixed, please use \code{I()} to wrap the value.
+  }
+  \item{...}{
+    Extra arguments passed. Will be automatically dispatched to the
+    right place, such as scales, space. When you try to use a faceted
+    seqnames, you need to specify \code{scales = "free"} and \code{space
+      = "free"}, if you want a free scaled x-scale.
+  }
+  \item{geom}{
+    "point"(default) or "line". When it's line, it will make sure the
+    line is not connect cross different chromosomes.
+  }
+  
   \item{color.type}{
-    "identity" use single color for all points; "seqnames" use default
+    "identity" use single color for all points, when it's enabled, you
+    can specify color in the arguments to equal a character or an
+    unevaluated name, when use specific color, try use \code{I}, for
+    instance, color = I("red"); "seqnames" use default
     discrete color scheme for all chromosomes; "twocolor" use two colors
     to represent all the chromosomes, could specify color in the
     two.color argument.
@@ -90,6 +122,7 @@ and values in the data will be the same across all panels
 \examples{
 \dontrun{
 library(GenomicRanges)
+library(ggbio)
 data(hg19IdeogramCyto)
 data(hg19Ideogram)
 chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
@@ -98,14 +131,15 @@ set.seed(1)
 nchr <- length(chrs)
 nsnps <- 1000
 gr.snp <- GRanges(rep(chrs,each=nsnps),
-             IRanges(start = do.call(c, lapply(chrs, function(chr){
-               N <- seqlths[chr]
-               runif(nsnps,1,N)
-             })), width = 1),
-             SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
-             pvalue =  -log10(runif(nchr*nsnps))
-             )
-
+                  IRanges(start = do.call(c, lapply(chrs, function(chr){
+                    N <- seqlths[chr]
+                    runif(nsnps,1,N)
+                  })), width = 1),
+                  SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
+                  pvalue =  -log10(runif(nchr*nsnps)),
+                  group = sample(c("Normal", "Tumor"), size = nchr*nsnps,
+                    replace = TRUE)
+                  )
 ## processing the name
 nms <- seqnames(seqinfo(gr.snp))
 nms.new <- gsub("chr", "", nms)
@@ -113,21 +147,42 @@ names(nms.new) <- nms
 gr.snp <- renameSeqlevels(gr.snp, nms.new)
 
 
-plotManhattan(gr.snp, y = pvalue)
-plotManhattan(gr.snp, y = pvalue, scale = "fixed")
-plotManhattan(gr.snp, y = pvalue, scale = "fixed", space = "fixed")
-plotManhattan(gr.snp, y = pvalue, space = "fixed")
+## compact view
+## no facet by samples, but make sure you want it that way
+## default is two color
+plotGrandLinear(gr.snp, y = pvalue, geom = "point")
+## facet by samples, comparison across groups
+plotGrandLinear(gr.snp, y = pvalue, geom = "point",
+                facet = group ~ .,  color.type = "twocolor")
+## change two color
+plotGrandLinear(gr.snp, y = pvalue, geom = "point",
+                facet = group ~ .,  color.type = "twocolor",
+                two.color = c("red", "blue"))
+## geom line
+plotGrandLinear(gr.snp, y = pvalue,
+                geom = "line", facet = group ~ .)  
 
-plotManhattan(gr.snp, y = pvalue, color.type = "seqnames")
-plotManhattan(gr.snp, y = pvalue, color.type = "twocolor")
-plotManhattan(gr.snp, y = pvalue, color.type = "twocolor", title = "SNP")
 
-plotManhattan(gr.snp, y = pvalue, color.type = "twocolor", title = "SNP",
-              cutoff = c(4, 5, 5.2), cutoff.color = "blue", cutoff.size = 1,
-              legend = TRUE)
 
-plotManhattan(gr.snp, y = pvalue, color.type = "twocolor", 
-              two.color = c("black", "gray50"))
+
+## add size and change color
+plotGrandLinear(gr.snp, y = pvalue, size = pvalue,geom = "point",
+                facet = group ~ .,  color.type = "seqnames")
+
+plotGrandLinear(gr.snp, y = pvalue, size = I(0.05),
+                geom = "point", facet = group ~ .)
+
+plotGrandLinear(gr.snp, y = pvalue, color = group, geom = "point",
+                facet = group ~ .,
+                color.type = "identity")
+
+plotGrandLinear(gr.snp, y = pvalue, color = I("blue"), geom = "point", facet = group ~ .,
+                color.type = "identity")
+
+## facet by seqnames, slower
+plotGrandLinear(gr.snp, y = pvalue,geom = "point", 
+                facet = group ~ seqnames, scales = "free", space = "free")
+
 }
 }
 \author{Tengfei Yin}

@@ -29,7 +29,7 @@ importMethodsFrom(IRanges,  split,
                   "%in%", show, 
                   lapply, sapply)
 
-importClassesFrom(IRanges)
+importClassesFrom(IRanges, Rle, RleList, IRanges)
 
 ## ## GenomicRanges
 importFrom(GenomicRanges, "seqnames<-","strand<-",

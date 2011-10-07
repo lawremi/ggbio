@@ -12,6 +12,8 @@
 \alias{qplot,BamFile-method}
 \alias{qplot,TranscriptDb-method}
 \alias{qplot,character-method}
+\alias{qplot,Rle-method}
+\alias{qplot,RleList-method}
 
 \title{Generic qplot function}
 
@@ -47,7 +49,14 @@
 
 
 ## For object GRangesList
-\S4method{qplot}{GRangesList}(data, ..., freq,
+\S4method{qplot}{GRangesList}(data, ..., freq, show.label = FALSE,
+      show.gaps = TRUE, scale.size = c(5, 17),
+      label.type = c("name", "count"),
+      label.size = 5, label.color = "black")
+
+
+
+(data, ..., freq,
        show.label = FALSE, show.gaps = TRUE)
 
 ## For object IRanges
@@ -81,6 +90,23 @@
 ## For object BSgenome
 \S4method{qplot}{BSgenome}(data, name, ...,
       geom = c("text", "segment", "point", "rectangle"))
+
+## For object Rle
+\S4method{qplot}{Rle}(data, lower, ...,
+      size, shape, color, alpha,
+      xlab = "x", ylab = "y",
+      geom = c("point", "line", "segment"),
+      type = c("raw", "viewMaxs","viewMins",
+               "viewSums", "viewMeans"))
+
+## For object RleList
+\S4method{qplot}{RleList}(data, lower, ...,
+      size, shape, color, alpha,
+      facetByRow = TRUE,
+      xlab = "x", ylab = "y",
+      geom = c("point", "line", "segment"),
+      type = c("raw", "viewMaxs","viewMins",
+               "viewSums", "viewMeans"))
 }
 
 \arguments{
@@ -170,6 +196,40 @@
   \item{bsgenome}{
     A BSgenome object. Only need for geom "mismatch.summary".
   }
+ \item{xlab}{
+    x label.
+  }
+\item{ylab}{
+    y label.
+  }
+\item{facetByRow}{
+    A logical value, default is TRUE ,facet RleList by row. If FALSE,
+   facet by column.
+}
+\item{type}{
+   For Rle/RleList, "raw" plot everything, so be careful, that would be
+  pretty slow if you have too much data. For "viewMins", "viewMaxs",
+  "viewMeans", "viewSums", require extra arguments to slice the
+  object. so users need to at least provide \code{lower}, more details
+  and control please refer the the manual of \code{slice} function in
+  IRanges. For "viewMins", "viewMaxs", we use \code{viewWhichMin} and
+  \code{viewWhichMax} to get x scale, for "viewMeans", "viewSums", we
+  use window midpoint as x.
+}
+\item{scale.size}{
+  A numeric vector of length two specifying the size of point from
+  minimum to maximum.
+}
+\item{label.type}{
+  Either "name" or "count". "name" try to use the name of list to label
+  the model, but "count" use information from freq to label it.
+}
+\item{label.size}{
+  Size of label.
+}
+\item{label.color}{
+  Color of label.
+}
   \item{...}{
     Extra parameters. Usually are those parameters used in qplot to
     control aesthetics or geometries.
@@ -229,6 +289,8 @@
     automatically.
 
     For object \code{BSgenome}, show nucleotides as colored segment.
+
+    For Rle/RleList, show histogram-like segments.
   }
   \item{line}{
     Showing interval as line, the interval data could also be just
@@ -323,6 +385,7 @@ Faceting in ggbio package is a little differnt from ggplot2 in several ways
 \author{Tengfei Yin}
 
 \examples{
+\dontrun{
 ## sample data
 set.seed(1)
 N <- 1000
@@ -378,5 +441,36 @@ new.darned <- renameSeqlevels(darned_hg19_subset500, new.chrs)
 p <- p + geom_hotregion(new.darned)
 print(p)
 
+## For Rle and RleList
+
+library(IRanges)
+library(ggbio)
+set.seed(0)
+lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
+            seq(10, 0.001, length = 500))
+xVector <- rpois(1e4, lambda)
+xRle <- Rle(xVector)
+xRleList <- RleList(xRle, 2L * xRle)
+
+
+qplot(xRle)
+qplot(xRle, geom = "line")
+qplot(xRle, geom = "segment")
+qplot(xRle, type = "viewMaxs", lower = 5)
+qplot(xRle, type = "viewMins", lower = 5)
+qplot(xRle, type = "viewMeans", lower = 5)
+qplot(xRle, type = "viewSums", lower = 5)
+
+qplot(xRleList)
+qplot(xRleList, geom = "segment")
+qplot(xRleList, geom = "line")
+qplot(xRleList, type = "viewMaxs", lower = 5)
+qplot(xRleList, type = "viewMaxs", lower = 5, geom = "line")
+qplot(xRleList, type = "viewSums", lower = 5, geom = "segment",
+      facetByRow = FALSE, color = I("red"), size = I(5))
+qplot(xRle, size = y)
+qplot(xRle, type = "viewSums", lower = 5)
+
 }
 
+}

@@ -39,8 +39,14 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
   args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
   ## args <- as.list(match.call(expand.dots = FALSE)[-1])
   args.facet <- args[names(args) %in% c("nrow", "ncol", "scales", "space")]
-  args <- args[!(names(args) %in% c("seqname", "geom", 
-                                    "data", "legend", "nrow", "ncol"))]
+  args <- args[!(names(args) %in% c( "geom", "data", "legend", "nrow", "ncol",
+                                    "facet_gr", "ignore.strand",
+                                    "show.coverage", "show.gaps", "show.label"))]
+  if("freq" %in% names(args)){
+    freq <- args$freq
+    args <- args[names(args) != "freq"]
+  }
+    
   ## check "x", must be one of "start", "end", "midpoint"
   if(!(geom %in% c("full", "reduce", "disjoin", "segment"))){
     if("x" %in% names(args)){
@@ -97,7 +103,8 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
         args.facet$scales <- "free"
         facet <- do.call(facet_wrap, args.facet)
       }
-  seqlevels(data) <- seqname
+  ## seqlevels(data) <- seqname
+  data <- keepSeqlevels(data, seqname)
   p <- switch(geom,
               line = {
                 if(!missing(facet_gr)){
@@ -122,7 +129,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 p <- ggplot(df)
                 p + geom_point(do.call("aes", args))
               },
-              full = {
+full = {
                 if(!missing(facet_gr)){
                   lst.rc <- rangesCentric(data, facet_gr)
                   data <- lst.rc$gr
@@ -198,7 +205,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 p <- p + geom_rect(do.call("aes", args.rect)) +
                   scale_color_manual(values = strandColor)+
                     scale_fill_manual(values = strandColor)
-              },
+              },              
               reduce = {
                 data <- reduce(data, ignore.strand = ignore.strand)
                 if(!missing(facet_gr)){
@@ -313,7 +320,6 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                   grl <- split(data, seqnames(data))                  
                 }
 
-                
                 ## grl <- split(data, seqnames(data))
                 data <- endoapply(grl,
                                   function(dt){
@@ -341,6 +347,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 df <- as.data.frame(data)
                 df$midpoint <- (df$start+df$end)/2
                 args <- args[!(names(args) %in% c("x", "y"))]
+                
                 if(!("color" %in% names(args))){
                   if("fill" %in% names(args))
                     args <- c(args, list(color = args$fill))
@@ -348,8 +355,41 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                     args <- c(args, list(color = substitute(strand),
                                          fill = substitute(strand)))
                 }
+
+                gpn <- as.character(args$group)
+                args <- args[names(args) != "group"]
+                
                 p <- ggplot(df)
-                args <- c(args, list(x = substitute(start), xend = substitute(end),
+                if(show.gaps){
+                  gps <- getGap(data, group.name = gpn)
+                  args.gaps <- c(args, list(x = substitute(start),
+                                            xend = substitute(end),
+                                       y = substitute(.levels),
+                                       yend = substitute(.levels)))
+                  args.gaps <- args.gaps[names(args.gaps) != "size"]
+                  p <- p + geom_segment(data = as.data.frame(gps),
+                                        do.call(aes, args.gaps))
+                }
+                if(show.label){
+                    label.type <- args$label.type
+                    label.size <- args$label.size
+                    label.color <- args$label.color
+                    label.gr <- getModelRange(data, group.name = gpn)
+                    
+                    if(label.type == "count")
+                      values(label.gr)$.label <-
+                        freq[as.character(values(label.gr)$.label)]
+                    
+                  args.label <- c(args, list(x = substitute((start + end)/2),
+                                       y = substitute(.levels + 0.3),
+                                       label = substitute(.label)))
+                  args.label <- args.label[names(args.label) != "size"]
+                  p <- p + geom_text(data = as.data.frame(label.gr),
+                                     do.call(aes, args.label),
+                                     size = label.size, color = label.color)
+                }
+                args <- c(args, list(x = substitute(start),
+                                     xend = substitute(end),
                                      y = substitute(.levels),
                                      yend = substitute(.levels)))
                 p + geom_segment(do.call("aes", args)) +
@@ -505,8 +545,14 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
 ## ======================================================================
 ## FIXME:
 setMethod("qplot", "GRangesList", function(data, ..., freq, show.label = FALSE,
-                                           show.gaps = TRUE){
+                                           show.gaps = TRUE,
+                                           scale.size = c(5, 17),
+                                           label.type = c("name", "count"),
+                                           label.size = 5,
+                                           label.color = "black"){
+  label.type <- match.arg(label.type)
   args <- list(...)
+  args <- args[names(args) != scale.size]
   nms <- rep(names(data), elementLengths(data))
   gr <- unlist(data)
   values(gr)$.grl.name <- nms
@@ -517,15 +563,26 @@ setMethod("qplot", "GRangesList", function(data, ..., freq, show.label = FALSE,
                          group = substitute(.grl.name),
                          show.label = show.label,
                          show.gaps = show.gaps,
-                         size = substitute(.freq)))
+                         size = substitute(.freq),
+                         label.type = label.type,
+                         label.size = label.size,
+                         label.color = label.color,
+                         freq = freq))
   }else{
     args <- c(args, list(data = gr,
                          group = substitute(.grl.name),
                          show.label = show.label,
-                         show.gaps = show.gaps))
+                         show.gaps = show.gaps,
+                         label.type = label.type,
+                         label.size = label.size,
+                         label.color = label.color,                         
+                         freq = freq))
+
   }
-  do.call(qplot, args)
-  ## qplot(gr, group = .grl.name, ..., show.label = show.label, show.gaps = show.gaps)
+  args <- c(args, list(geom = "segment"))
+  p <- do.call(qplot, args)
+  p <- p + scale_size(to = scale.size)
+  p
 })
 
 ## ======================================================================
@@ -640,23 +697,22 @@ setMethod("qplot", "GappedAlignments", function(data, ...,
                                                 ){
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
-  args <- args[!(names(args) %in% c("geom", "which"
-                                    ## "shrink", "shrink.ratio",
-                                    ## "shrink.fun"
-                                    ))]
+  args <- args[!(names(args) %in% c("geom", "which", "show.junction",
+                                    "show.pair"))]
   if(!missing(which))
     gr <- biovizBase:::fetch(data, which)
   else
     gr <- biovizBase:::fetch(data)
   if(geom == "gapped.pair"){
   gr.junction <- gr[values(gr)$junction == TRUE]
-  grl <- split(gr.junction, values(gr.junction)$read.group)
-  
-  ir.gaps <- unlist(gaps(ranges(grl)))
-  .lvs <- values(gr.junction)$.levels[match(names(ir.gaps),
-                                          values(gr.junction)$read.group)]
-  seqs <- unique(as.character(seqnames(gr.junction)))
-  gr.gaps <- GRanges(seqs, ir.gaps, .levels = .lvs)
+  ## grl <- split(gr.junction, values(gr.junction)$read.group)
+  ## get gaps??
+  ## ir.gaps <- unlist(gaps(ranges(grl)))
+  ## .lvs <- values(gr.junction)$.levels[match(names(ir.gaps),
+  ##                                         values(gr.junction)$read.group)]
+  ## seqs <- unique(as.character(seqnames(gr.junction)))
+  gr.gaps <- getGap(gr.junction, "qname")
+  ## gr.gaps <- GRanges(seqs, ir.gaps, .levels = .lvs)
   gr.read <- gr  
   ## if(shrink){
   ##   max.gap <- maxGap(gr.read, shrink.ratio)
@@ -676,13 +732,13 @@ setMethod("qplot", "GappedAlignments", function(data, ...,
       args <- c(args, list(color = substitute(strand),
                            fill = substitute(strand)))
   }
-
   args <- c(args, list(xmin = substitute(start),
                        xmax = substitute(end),
                        ymin = substitute(.levels - 0.4),
                        ymax = substitute(.levels + 0.4)))
   p <- p + geom_rect(do.call("aes", args))+
-    scale_color_manual(values = strandColor)
+    scale_color_manual(values = strandColor) +
+      scale_fill_manual(values = strandColor)
   ## mapped read
   if(show.junction){
   args <- args[!(names(args) %in% c("x", "y"))]

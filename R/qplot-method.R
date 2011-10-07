@@ -1048,3 +1048,197 @@ setMethod("qplot", c("BSgenome"), function(data,  name, ...,
   p
 })
 
+
+## ======================================================================
+##        For "Rle"
+## ======================================================================
+# geom: line/point
+# simply smoothing
+setMethod("qplot", "Rle", function(data, lower, ...,
+                                   size, shape, color, alpha,
+                                   xlab = "x", ylab = "y",
+                                   geom = c("point", "line", "segment"),
+                                   type = c("raw", "viewMaxs","viewMins",
+                                     "viewSums", "viewMeans")){
+
+
+  geom <- match.arg(geom)
+  type <- match.arg(type)
+  if(type %in% c("viewMaxs", "viewMeans", "viewMins", "viewSums") && missing(lower))
+    stop("please at least specify the value of lower, you could pass
+          extra parameters to slice too")
+
+  ## args
+  args <- as.list(match.call(call = sys.call(sys.parent()))[-1])  
+  args <- args[names(args) %in% c("size", "shape", "color", "alpha", "geom")]
+  if(!"geom" %in% names(args))
+    args$geom <- geom
+  ## args <- c(geom = geom, args)
+  args.dots <- list(...)
+  args.slice <- args.dots[names(args.dots) %in%
+                          c("upper", "includeLower",
+                            "includeUpper", "rangesOnly")]
+  if(!missing(lower))
+    args.slice <- c(list(x = data,
+                         lower = lower), args.slice)
+  df <- switch(type,
+              raw = {
+               x <- 1:length(data)                
+               y <- as.numeric(data)
+               data.frame(x = x, y = y)
+              },
+              viewMaxs = {
+                vs <- do.call(slice, args.slice)
+                x <- viewWhichMaxs(vs)                
+                y <- viewMaxs(vs)
+                data.frame(x = x, y = y)
+              },
+              viewMins = {
+                vs <- do.call(slice, args.slice)
+                x <- viewWhichMins(vs)                
+                y <- viewMins(vs)
+                data.frame(x = x, y = y)
+              },
+              viewSums = {
+                vs <- do.call(slice, args.slice)
+                x <- start(vs) + width(vs)/2
+                y <- viewSums(vs)
+                data.frame(x = x, y = y)                
+              },
+              viewMeans = {
+                vs <- do.call(slice, args.slice) 
+                x <- start(vs) + width(vs)/2
+                y <- viewMeans(vs)
+                data.frame(x = x, y = y)                
+              })
+
+  ## df <- data.frame(x = x, y = y)
+  if(args$geom == "segment")
+    args <- c(list(data = df,
+                   x = substitute(x),
+                   xend = substitute(x),
+                   y = 0,
+                   yend = substitute(y)),
+              args)
+  else
+    args <- c(list(data = df,
+                   x = substitute(x),
+                   y = substitute(y)),
+              args)
+  p <- do.call(ggplot2::qplot, args)
+  p <- p + xlab(xlab) + ylab(ylab)
+  p
+})
+                                     
+
+## ======================================================================
+##        For "RleList"
+## ======================================================================
+## 1. facet by list
+## 2. support as what has been supported in Rle.
+setMethod("qplot", "RleList", function(data, lower, ...,
+                                   size, shape, color, alpha,
+                                       facetByRow = TRUE,
+                                   xlab = "x", ylab = "y",
+                                   geom = c("point", "line", "segment"),
+                                   type = c("raw", "viewMaxs","viewMins",
+                                     "viewSums", "viewMeans")){
+
+   ## browser()
+  geom <- match.arg(geom)
+  type <- match.arg(type)
+  if(type %in% c("viewMaxs", "viewMeans", "viewMins", "viewSums") && missing(lower))
+    stop("please at least specify the value of lower, you could pass
+          extra parameters to slice too")
+
+  ## args
+  args <- as.list(match.call(call = sys.call(sys.parent()))[-1])  
+  args <- args[names(args) %in% c("size", "shape", "color", "alpha", "geom")]
+  if(!"geom" %in% names(args))
+    args$geom <- geom
+  
+  ## args <- c(geom = geom, args)
+  args.dots <- list(...)
+  args.slice <- args.dots[names(args.dots) %in%
+                          c("upper", "includeLower",
+                            "includeUpper", "rangesOnly")]
+  if(!missing(lower))
+    args.slice <- c(list(x = data,
+                         lower = lower), args.slice)
+
+  df <- switch(type,
+              raw = {
+               x <- do.call(c,lapply(elementLengths(data),function(n) 1:n))
+               y <- as.numeric(unlist(data))
+               if(is.null(names(data)))
+                 nms <- rep(1:length(data), times = elementLengths(data))
+               else
+                 nms <- rep(names(data), times = elementLengths(data))
+               data.frame(x = x, y = y, listName = nms)
+              },
+              viewMaxs = {
+                vs <- do.call(slice, args.slice)
+                x <- viewWhichMaxs(vs)
+                y <- viewMaxs(vs)
+               if(is.null(names(x)))
+                 nms <- rep(1:length(x), times = elementLengths(x))
+               else
+                 nms <- rep(names(x), times = elementLengths(x))
+                data.frame(x = unlist(x), y = unlist(y), listName = nms)
+              },
+              viewMins = {
+                vs <- do.call(slice, args.slice)
+                x <- viewWhichMins(vs)                
+                y <- viewMins(vs)
+               if(is.null(names(x)))
+                 nms <- rep(1:length(x), times = elementLengths(x))
+               else
+                 nms <- rep(names(x), times = elementLengths(x))
+                data.frame(x = unlist(x), y = unlist(y), listName = nms)                
+              },
+              viewSums = {
+                vs <- do.call(slice, args.slice)
+                x <- start(vs) + width(vs)/2
+               if(is.null(names(x)))
+                 nms <- rep(1:length(x), times = elementLengths(x))
+               else
+                 nms <- rep(names(x), times = elementLengths(x))
+                y <- viewSums(vs)
+                data.frame(x = unlist(x), y = unlist(y), listName = nms)                
+              },
+              viewMeans = {
+                vs <- do.call(slice, args.slice) 
+                x <- start(vs) + width(vs)/2
+               if(is.null(names(x)))
+                 nms <- rep(1:length(x), times = elementLengths(x))
+               else
+                 nms <- rep(names(x), times = elementLengths(x))
+                y <- viewMeans(vs)
+                data.frame(x = unlist(x), y = unlist(y), listName = nms)                
+              })
+
+  if(facetByRow)
+    facets <- listName ~ .
+  else
+    facets <- . ~ listName
+  rm("x", "y")
+  if(args$geom == "segment")
+    args <- c(list(data = df,
+                   facets = facets,
+                   x = substitute(x),
+                   xend = substitute(x),
+                   y = 0,
+                   yend = substitute(y)),
+              args)
+  else
+    args <- c(list(data = df,
+                   facets = facets,                   
+                   x = substitute(x),
+                   y = substitute(y)),
+              args)
+  
+  p <- do.call(ggplot2::qplot, args)
+  p <- p + xlab(xlab) + ylab(ylab)
+  p
+})
+                                     

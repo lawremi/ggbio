@@ -51,6 +51,7 @@ tracks are aligned exactly based on the same position.}
 \item{ylim}{Limits on y.}
 }
 \examples{
+\dontrun{
 library(BSgenome.Hsapiens.UCSC.hg19)
 gr <- GRanges("chr1", IRanges(5e7, 5e7+50))
 p1 <- qplot(Hsapiens, name = gr, geom = "text")
@@ -58,5 +59,6 @@ p2 <- qplot(Hsapiens, name = gr, geom = "point")
 p3 <- qplot(Hsapiens, name = gr, geom = "segment")
 p4 <- qplot(Hsapiens, name = gr, geom = "rectangle")
 tracks(p1, p2, p3, p4)
+}
 }
 

@@ -13,7 +13,6 @@ tracks <- function(..., check.xlim = TRUE,
   else not.grobnames <- names(dots) %in% layout.call
 
   grobs <- dots[!not.grobnames]
-  
   if(missing(xlim)){
   lst <- lapply(grobs, function(obj){
     res <- getLimits(obj)
@@ -22,9 +21,9 @@ tracks <- function(..., check.xlim = TRUE,
   res <- do.call(rbind, lst)
   xlim <- c(min(res$xmin), max(res$xmax))
   xlim <- scales::expand_range(xlim, mul = 0.05)
-  }else{
-    s <- scale_x_continuous(limits = xlim)    
   }
+  s <- scale_x_continuous(limits = xlim)    
+
   
   if(!missing(ylim))
     s <- scale_y_continuous(limits = ylim)

@@ -12,10 +12,12 @@ License: GPL (>=2)
 LazyLoad: Yes
 Collate: utils.R
 	 plotGrandLinear.R
-	 splice-plot.R
+	 plotGRangesLink.R
 	 mismatch-plot.R
 	 fraglength-plot.R
 	 tracks-plot.R
+	 geom_chevron.R
+	 geom_hotregion.R
 	 overview-plot.R	
 	 qplot-method.R
 	 rescale-method.R

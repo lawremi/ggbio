@@ -14,17 +14,15 @@ tracks <- function(..., check.xlim = TRUE,
 
   grobs <- dots[!not.grobnames]
   if(missing(xlim)){
-  lst <- lapply(grobs, function(obj){
-    res <- getLimits(obj)
-    data.frame(xmin = res$xlim[1], xmax = res$xlim[2])
-  })
-  res <- do.call(rbind, lst)
-  xlim <- c(min(res$xmin), max(res$xmax))
-  xlim <- scales::expand_range(xlim, mul = 0.05)
+    lst <- lapply(grobs, function(obj){
+      res <- getLimits(obj)
+      data.frame(xmin = res$xlim[1], xmax = res$xlim[2])
+    })
+    res <- do.call(rbind, lst)
+    xlim <- c(min(res$xmin), max(res$xmax))
+    xlim <- scales::expand_range(xlim, mul = 0.05)
   }
   s <- scale_x_continuous(limits = xlim)    
-
-  
   if(!missing(ylim))
     s <- scale_y_continuous(limits = ylim)
   ## need fix legend
@@ -32,31 +30,37 @@ tracks <- function(..., check.xlim = TRUE,
     N <- length(grobs)
     lst <- lapply(seq_len(N),
                   function(i) {
-                    if(legend)
-                      grobs[[i]] <- grobs[[i]] + s
-                    else
-                      grobs[[i]] <- grobs[[i]] + s +
-                        opts(legend.position = "none")
+                    ## if(legend)
+                    ##   grobs[[i]] <- grobs[[i]] + s
+                    ## else
+                    ##   grobs[[i]] <- grobs[[i]] + s +
+                    ##     opts(legend.position = "none")
                     if(i %in% 1:(N-1))
                       grobs[[i]] <- grobs[[i]] + opts(axis.text.x = theme_blank(),
-                                                    axis.title.x=theme_blank())
+                                                      axis.title.x=theme_blank())
                     if(i == 1){
                       grobs[[i]] <- grobs[[i]] +
                         opts(plot.margin = unit(c(1, 1.8, 0, 0), "lines"))
                     }else{
-                      grobs[[i]] <- grobs[[i]] +
-                        opts(plot.margin = unit(c(0, 1.8, 0, 0), "lines"))
-                    }
-                      grobs[[i]]+ opts(axis.text.y = theme_blank(),
-                                       axis.ticks = theme_blank())
-                    
+                      grobs[[i]] <- grobs[[i]] +                      
+                      opts(plot.margin = unit(c(0, 1.8, 0, 0), "lines"))
+                     }
+                    grobs[[i]]+ opts(axis.text.y = theme_blank(),
+                                     axis.ticks = theme_blank(),
+                                     ## panel.background=theme_blank(), 
+                                     ## panel.grid.minor=theme_blank(),
+                                     legend.position = "none") + s
                   })
-    widthDetails.legendGrob <- function(x) unit(10, "cm")    
-    ## grid.arrange(lst[[1]],lst[[2]], lst[[3]], legend = legend)
+    ## need to do tricks with legend
+    ## one needs to provide the legend with a well-defined width
+    ## legend=gTree(children=gList(leg), cl="legendGrob")
+    ## widthDetails.legendGrob <- function(x) unit(1, "cm")
+    ## res <- do.call(grid.arrange, c(lst, params.layout,
+    ##                                list(legend = legend)))
     res <- do.call(grid.arrange, c(lst, params.layout))
   }else{
     res <- grid.arrange(...)
   }
-  invisible(lst)
+  res
 }
 

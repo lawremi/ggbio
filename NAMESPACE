@@ -20,7 +20,7 @@ importFrom(IRanges, IRanges,  disjointBins,
            ## runValue, runLength,
            reduce, punion, pgap, gaps)
 
-importMethodsFrom(IRanges,  split, 
+importMethodsFrom(IRanges,  split, unique,
                   unlist,setdiff,
                   Reduce, range,
                   as.data.frame,
@@ -46,7 +46,7 @@ importClassesFrom(GenomicRanges, GRanges)
 ##
 ## ## ## Rsamtools
 importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,
-           scanBamFlag,
+           scanBamFlag,BamFile,
            PileupFiles, PileupParam ,
            readBamGappedAlignments)
 importMethodsFrom(Rsamtools, applyPileups)
@@ -65,10 +65,10 @@ importClassesFrom(BSgenome, BSgenome)
 
 ## ## ## GenomicFeatures
 importClassesFrom(GenomicFeatures,TranscriptDb)
-## importFrom(GenomicFeatures,
-##            transcriptsByOverlaps,
-##            exonsBy,
-##            cdsBy)
+importFrom(GenomicFeatures,
+           transcriptsByOverlaps,
+           exonsBy,
+           cdsBy)
 
 
 
@@ -77,6 +77,8 @@ importClassesFrom(GenomicFeatures,TranscriptDb)
 ## ============================================================
 exportMethods(qplot, rescale)
 export(tracks, plotOverview, plotSingleChrom, geom_hotregion,
-       geom_chevron,
-       plotMismatchSum, plotGrandLinear, plotFragLength,
-       plotGRangesLink)
+       geom_chevron, getLimits
+       ## plotMismatchSum, plotGrandLinear, plotFragLength,
+       ## plotSpliceSum
+       ## plotRangesLinkedToData
+       )

@@ -27,21 +27,17 @@ setMethod("qplot", signature(data = "numeric"), function(data, ...){
 setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                facet_gr,
                                legend = TRUE,
-                               ignore.strand = TRUE,
                                show.coverage = TRUE,
                                show.gaps = FALSE,
                                show.label = FALSE,
                                geom = c("full", "line","point",
-                                 "segment", "histogram",
-                                 "coverage.line", "coverage.polygon",
-                                 "mismatch.summary"
-                                 )){
+                                 "segment", "coverage.line", "coverage.polygon")){
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
   ## args <- as.list(match.call(expand.dots = FALSE)[-1])
   args.facet <- args[names(args) %in% c("nrow", "ncol", "scales", "space")]
   args <- args[!(names(args) %in% c( "geom", "data", "legend", "nrow", "ncol",
-                                    "facet_gr", "ignore.strand",
+                                    "facet_gr", 
                                     "show.coverage", "show.gaps", "show.label"))]
   if("freq" %in% names(args)){
     freq <- args$freq
@@ -60,9 +56,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
   ## check y
   if(geom %in% c("point", "line")){
     if(!("y" %in% names(args))){
-      col.nm <- colnames(values(data))[1]
-      if(length(col.nm))
-      args <- c(args, list(y = as.name(col.nm)))
+      stop("Missing y for geom ", geom)
     }
   }
   ## color
@@ -73,7 +67,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
   seqname <- unique(as.character(seqnames(data)))
   allvars <- NULL
   if(missing(facet_gr)){
-    if(!"facet" %in% names(args)){
+    if(!"facets" %in% names(args)){
       if(length(seqname) > 1){
         ## facet by default is by seqname
         facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facet)),
@@ -87,14 +81,14 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
       }
       }}else{
         ## only allow simple case
-        allvars <- all.vars(as.formula(args$facet))
+        allvars <- all.vars(as.formula(args$facets))
         if(allvars[2] != "seqnames")
           stop("Column of facet formula can only be seqnames, such as . ~ seqnames,
               you can change row varaibles")
-        if(allvars[1] %in% colnames(values(data)) &&
-           !(geom %in% c("histogram",
-                         "coverage.line", "coverage.polygon"))){
-          facet <- do.call(facet_grid, c(args$facet, args.facet))
+        if(allvars[1] %in% colnames(values(data)) 
+           ## !(geom %in% c("coverage.line", "coverage.polygon"))
+           ){
+          facet <- do.call(facet_grid, c(args$facets, args.facet))
         }else{
           args.facet <- c(args.facet, list(facets = substitute(~seqnames)))
           facet <- do.call(facet_wrap, args.facet)
@@ -102,7 +96,12 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
       }}else{
         args.facet <- c(args.facet, list(facets = substitute(~.id.name)))
         args.facet$scales <- "free"
-        facet <- do.call(facet_wrap, args.facet)
+        facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facet)),
+                              TRUE, FALSE)
+        if(facet.logic)
+         facet <- do.call(facet_wrap, args.facet)
+        else
+          facet <- do.call(facet_grid, args.facet)
       }
   ## seqlevels(data) <- seqname
   data <- keepSeqlevels(data, seqname)
@@ -147,7 +146,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                     if(!is.null(allvars) &&
                                        allvars[1] %in% colnames(values(data))){
                                       ndt <- split(dt, values(dt)[,allvars[1]])
-                                      unlist(endoapply(ndt, function(x){
+                                      unlist(endoapply(ndt, function(dt){
                                         if("group" %in% names(args))
                                           dt <- addSteppings(dt,
                                              group.name = as.character(args$group))
@@ -309,45 +308,6 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                   scale_color_manual(values = strandColor) +
                           scale_fill_manual(values = strandColor)                    
               },
-              histogram = {
-                if(!missing(facet_gr)){
-                  lst.rc <- rangesCentric(data, facet_gr)
-                  data <- lst.rc$gr
-                  facet_gr.r <- lst.rc$which
-                  if(args.facet$facets == "~.id.name")
-                    grl <- split(data, values(data)$.id.name)
-                  if(args.facet$facets == "~seqnames")
-                    grl <- split(data, seqnames(data))
-                }else{
-                  grl <- split(data, seqnames(data))                  
-                }
-
-                ## grl <- split(data, seqnames(data))
-                data <- lapply(grl,
-                               function(dt){
-                                 vals <- as.numeric(coverage(ranges(dt)))
-                                 seqs <- seq.int(from = min(start(dt)),
-                                                 length.out = length(vals))
-                                 if(length(unique(values(dt)$.id.name)))
-                                   data.frame(vals = vals, seqs = seqs,
-                                              .id.name = unique(values(dt)$.id.name),
-                                              seqnames =
-                                              as.character(seqnames(dt))[1])
-                                 else
-                                   data.frame(vals = vals, seqs = seqs,
-                                              seqnames =
-                                              as.character(seqnames(dt))[1])
-                               })
-                df <- do.call("rbind", data)
-                p <- ggplot(df)
-                args <- args[!(names(args) %in% c("x", "y"))]
-                args <- c(args, list(x = substitute(seqs)))
-                if("binwidth" %in% names(args))
-                  p + geom_histogram(do.call("aes", args),
-                                     binwidth = args$binwidth)
-                else
-                  p + geom_histogram(do.call("aes", args))
-              },
               coverage.line = {
                 if(!missing(facet_gr)){
                   lst.rc <- rangesCentric(data, facet_gr)
@@ -357,27 +317,50 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                     grl <- split(data, values(data)$.id.name)
                   if(args.facet$facets == "~seqnames")
                     grl <- split(data, seqnames(data))
-                  
                 }else{
                   grl <- split(data, seqnames(data))
                 }
-                ## grl <- split(data, seqnames(data))
-                data <- lapply(grl,
+               data <- lapply(grl,
                                function(dt){
-                                 vals <- as.numeric(coverage(ranges(dt),
+                                    if(!is.null(allvars) &&
+                                   allvars[1] %in% colnames(values(data))){
+                              ndt <- split(dt, values(dt)[,allvars[1]])
+                              lst <-lapply(ndt, function(dt){
+                              vals <- as.numeric(coverage(ranges(dt),
                                                      shift = -min(start(dt))+1))
                                  seqs <- seq.int(from = min(start(dt)),
                                                  length.out = length(vals))
                                  if(length(unique(values(dt)$.id.name)))                
-                                   data.frame(vals = vals, seqs = seqs,
+                                   res <- data.frame(vals = vals, seqs = seqs,
                                               seqnames =
                                               as.character(seqnames(dt))[1],
                                               .id.name = unique(values(dt)$.id.name))
                                  else
-                                   data.frame(vals = vals, seqs = seqs,
+                                   res <- data.frame(vals = vals, seqs = seqs,
                                               seqnames =
-                                              as.character(seqnames(dt))[1])               
+                                              as.character(seqnames(dt))[1])
+                              res[, allvars[1]] <- rep(unique(values(dt)[,allvars[1]]),
+                                                       nrow(res))
+                              res
+                              })
+                              do.call(rbind, lst)
+                            }else{
+                                vals <- as.numeric(coverage(ranges(dt),
+                                                     shift = -min(start(dt))+1))
+                                 seqs <- seq.int(from = min(start(dt)),
+                                                 length.out = length(vals))
+                                 if(length(unique(values(dt)$.id.name)))                
+                                   res <- data.frame(vals = vals, seqs = seqs,
+                                              seqnames =
+                                              as.character(seqnames(dt))[1],
+                                              .id.name = unique(values(dt)$.id.name))
+                                 else
+                                   res <- data.frame(vals = vals, seqs = seqs,
+                                              seqnames =
+                                              as.character(seqnames(dt))[1])
+                              }
                                })
+
                 df <- do.call("rbind", data)
                 p <- ggplot(df)
                 args <- args[!(names(args) %in% c("x", "y"))]
@@ -402,6 +385,10 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 ## grl <- split(data, seqnames(data))
                 data <- lapply(grl,
                                function(dt){
+                                 if(!is.null(allvars) &&
+                                   allvars[1] %in% colnames(values(data))){
+                              ndt <- split(dt, values(dt)[,allvars[1]])
+                              lst <-lapply(ndt, function(dt){
                                  vals <- as.numeric(coverage(ranges(dt),
                                                      shift = -min(start(dt))+1))
                                  seqs <- seq.int(from = min(start(dt)),
@@ -409,15 +396,35 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                  seqs <- c(seqs[1],seqs,tail(seqs, 1))
                                  vals <- c(0, vals, 0)
                                  if(length(unique(values(dt)$.id.name)))
-                                   data.frame(vals = vals, seqs = seqs,
+                                  res <- data.frame(vals = vals, seqs = seqs,
                                               .id.name = unique(values(dt)$.id.name),
                                               seqnames =
                                               as.character(seqnames(dt))[1])
                                  else
-                                   data.frame(vals = vals, seqs = seqs,
+                                   res <- data.frame(vals = vals, seqs = seqs,
                                               seqnames =
                                               as.character(seqnames(dt))[1])
+                        res[, allvars[1]] <- rep(unique(values(dt)[,allvars[1]]),
+                                                       nrow(res))
+                              res                                 
                                })
+                              do.call(rbind, lst)}else{
+                                vals <- as.numeric(coverage(ranges(dt),
+                                                     shift = -min(start(dt))+1))
+                                 seqs <- seq.int(from = min(start(dt)),
+                                                 length.out = length(vals))
+                                 seqs <- c(seqs[1],seqs,tail(seqs, 1))
+                                 vals <- c(0, vals, 0)
+                                 if(length(unique(values(dt)$.id.name)))
+                                  res <- data.frame(vals = vals, seqs = seqs,
+                                              .id.name = unique(values(dt)$.id.name),
+                                              seqnames =
+                                              as.character(seqnames(dt))[1])
+                                 else
+                                   res <- data.frame(vals = vals, seqs = seqs,
+                                              seqnames =
+                                              as.character(seqnames(dt))[1])                                
+                              }})
                 df <- do.call("rbind", data)
                 p <- ggplot(df)
                 ## remove x
@@ -426,14 +433,6 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                      y = substitute(vals)))
                 p + geom_polygon(do.call("aes", args))+
                   ylab("coverage")
-              },
-              mismatch.summary = {
-                if(!isPileupSum(data))
-                  stop("For geom mismatch summary, data must returned from
-                        pileupGRangesAsVariantTable function. Or is a GRanges
-                        object including arbitrary columns: read, ref, count, depth,
-                        match")
-                p <- plotMismatchSum(data, show.coverage)
               }
               )
   if(!legend)
@@ -441,15 +440,6 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
   p <- p + xlab(paste("Genomic Coordinates"))
   if(length(seqname)>1)
     p <- p + facet
-  ## FIXME: make sure ylim is always equal
-  ## if(fix.ylim){
-  ##   nms <- names(p$layers[[1]]$mapping)
-  ##   ## try y first
-  ##   ylim <- range(values(data)[,as.character(p$layers[[1]]$mapping$y)])
-  ##   ##  change to scale later
-  ##   ylim <- c(ylim[1]-diff(ylim)*0.05, ylim[2] + diff(ylim)*0.05)
-  ##   p <- p + scale_y_continuous(limits = ylim)
-  ## }
   p
 })
 
@@ -503,9 +493,8 @@ setMethod("qplot", "GRangesList", function(data, ..., freq, show.label = FALSE,
 
 setMethod("qplot", "IRanges", function(data, ...,
                                        legend = TRUE,
-                                       geom = c("full", "segment", "histogram",
-                                         "coverage.line", "coverage.polygon",
-                                         "reduce")){
+                                       geom = c("full", "segment", 
+                                         "coverage.line", "coverage.polygon")){
   args <- as.list(match.call(call = sys.call(1)))[-1]
   args <- args[!(names(args) %in% c("geom", "geom.engine",
                                     "data",  "legend"))]
@@ -524,22 +513,11 @@ setMethod("qplot", "IRanges", function(data, ...,
                 df$midpoint <- (df$start+df$end)/2
                 df$y <- as.numeric(disjointBins(data))
                 p <- ggplot(df)
-                ## remove y
-                
                 args <- args[names(args) != "y"]
                 args <- c(args, list(xmin = substitute(start),
                                      xmax = substitute(end),
                                      ymin = substitute(y - 0.4),
                                      ymax = substitute(y + 0.4)))
-                p + geom_rect(do.call("aes", args))
-              },
-              reduce = {
-                df <- as.data.frame(reduce(data))
-                df$midpoint <- (df$start+df$end)/2
-                df$y <- as.numeric(disjointBins(reduce(data)))
-                p <- ggplot(df)
-                args <- c(args, list(xmin = substitute(start), xmax = substitute(end),
-                                     ymin = substitute(y - 0.4), ymax = substitute(y + 0.4)))
                 p + geom_rect(do.call("aes", args))
               },
               segment = {
@@ -551,12 +529,6 @@ setMethod("qplot", "IRanges", function(data, ...,
                 args <- c(args, list(x = substitute(start), xend = substitute(end),
                                      y = substitute(y), yend = substitute(y)))
                 p + geom_segment(do.call("aes", args))
-              },
-              histogram = {
-                df <- as.data.frame(data)
-                df$midpoint <- (df$start+df$end)/2
-                p <- ggplot(df)
-                p + geom_histogram(do.call("aes", args))
               },
               coverage.line = {
                 df <- as.data.frame(data)
@@ -674,14 +646,11 @@ setMethod("qplot", "GappedAlignments", function(data, ...,
 ## 1. mismatch
 ## 2. simply summary
 setMethod("qplot", "BamFile", function(data, ..., which,
-                                       model,
                                        bsgenome,
                                        resize.extra = 10,
                                        show.coverage = TRUE,
                                        geom = c("gapped.pair",
                                          "full",
-                                         ## "read.summary",
-                                         "fragment.length",
                                          "coverage.line",
                                          "coverage.polygon",
                                          "mismatch.summary")){
@@ -695,11 +664,19 @@ setMethod("qplot", "BamFile", function(data, ..., which,
     ga <- readBamGappedAlignments(bf,
                                   param = ScanBamParam(which = which),
                                   use.name = TRUE)
-    p <- qplot(ga, ..., resize.extra = resize.extra)
-    message("Done")
+    message("plotting...")
+    args.ga <- args[names(args) %in% "show.junction"]
+    args <- c(args.ga, list(data = ga))
+
+    p <- do.call(qplot, args)
+    ## p <- qplot(ga, ..., resize.extra = resize.extra)
+
   }
   if(geom %in% c("coverage.line", "coverage.polygon", "full")){
-    gr <- biovizBase:::fetch(ga)
+    ga <- readBamGappedAlignments(bf,
+                                  param = ScanBamParam(which = which),
+                                  use.name = TRUE)
+    gr <- biovizBase:::fetch(ga, type = "raw")
     p <- qplot(gr, geom = geom)
   }
   if(geom %in% c("mismatch.summary")){
@@ -713,95 +690,18 @@ setMethod("qplot", "BamFile", function(data, ..., which,
     pgr.match <- pileupGRangesAsVariantTable(pgr, bsgenome)
     p <- plotMismatchSum(pgr.match, show.coverage)
   }
-  if(geom == "fragment.length"){
-    if((missing(model)))
-      stop("Fragment length require a specified model(GRanges)
-    or txdb(TranscriptDb) object")
-    if(!is(model, "GRanges"))
-      stop("model must be a GRangs object")
-    ## mds <- model
-    which <- reduce(model)
-    ## model <- model
-    ga <- readBamGappedAlignments(data,
-                                  param = ScanBamParam(which = which),           
-                                  use.name = TRUE)
-    dt <- biovizBase:::fetch(ga)
-    s <- opts(axis.text.y = theme_blank(),
-              axis.title.y = theme_blank(),
-              axis.ticks = theme_blank())    
-    ## now only support which contains one single gene
-    ## if("show.label" %in% names(args))
-    ##   show.label <- args$show.label
-    ## else
-    ##   show.label <- FALSE
-    ## print(show.label)
-    p.splice <- qplot(dt, model = model, group.name = "read.group",
-                      geom = "splice") + ylab("") +
-                        opts(title = "Splice Summary",
-                             plot.title=theme_text(size=10),
-                             plot.margin = unit(c(0,2,0,2), "lines"))+s
-    ## ## model.all
-    p.exons.r <- qplot(disjoin(ranges(model)))+ylab("")+
-      opts(title = "Reduced Model",
-           plot.title=theme_text(size=10),
-           plot.margin = unit(c(0,2,0,2), "lines")) + xlab("Genomic Coordinate")+s
-    ## p.ga <- qplot(ga) + ylab("") + opts(title = "Gapped Alignments",
-    ##                                     plot.title=theme_text(size=10),
-    ##                                     plot.margin = unit(c(0,2,0,0), "lines"))
-    ## gina.r <- as(ga, "GRanges")
-    ga.r <- biovizBase:::fetch(data, raw, which = which)
-    p.cov <- qplot(ga.r, geom = "coverage.p") + ylab("") +
-      opts(title = "Coverage",
-           plot.title=theme_text(size=10),
-           plot.margin = unit(c(0,2,0,2), "lines"))+s
-    ## fragment based on dt
-    names(dt) <- NULL
-    ## g.gap <- gaps(disjoin(ranges(model)))
-    ## cut.fun <- shrinkageFun(g.gap, 1L)
-    ## dt.cut <- cut.fun(dt)
-    ## FIXME: need to use 
-    ## getFragLength <- function(data, data.ori, group.name = "qname"){
-    ##   me <- split(data, values(data)[,group.name])
-    ##   ir <- range(ranges(me, ignore.strand = TRUE))
-    ##   me.ori <- split(data.ori, values(data.ori)[,group.name])
-    ##   ir.ori <- range(ranges(me.ori, ignore.strand = TRUE))
-    ##   ir <- unlist(ir)
-    ##   ir.ori <- unlist(ir.ori)
-    ##   gr <- GRanges(unique(as.character(seqnames(data)))[1],
-    ##                 ir.ori)
-    ##   values(gr)$wid <- width(ir)
-    ##   gr
-    ## }
-    ## gr <- getFragLength(dt.cut, dt)
-    gr <- getFragLength(dt, model)
-    p.frag <- qplot(gr, y = .fragLength, geom = "point") + ylab("") +
-      opts(title = "Fragment Length",
-           plot.title=theme_text(size=10),
-           plot.margin = unit(c(0,2,0,2), "lines"))+s
-    ## if(missing(heights))
-    ##   heights <- c(30, 30, 30, 30, 30)
-    ## do.call(tracks, c(list(p.cov, p.frag, p.ga, p.splice, p.exons.r),
-    ##                    list(heights = substitute(heights),
-    ##                         ncol = 1)))
-    tracks(p.cov, p.frag, p.splice, p.exons.r,
-           heights = c(30, 30, 20, 15), ncol = 1)
-  }
-  ## list(p.cov = p.cov,
-  ##      p.frag = p.frag,
-  ##      p.align = p.ga)
-  p
+  p + ylab("")
 })
 ## ======================================================================
 ##  For "character" need to check if it's path including bamfile or not
 ## ======================================================================
-setMethod("qplot", "character", function(data, x, y, ...,
-                                         which, model,
+setMethod("qplot", "character", function(data, ...,
+                                         which, 
                                          bsgenome,
                                          resize.extra = 10,
                                          show.coverage = TRUE,
                                          geom = c("gapped.pair",
                                            "full",
-                                           "fragment.length",
                                            "coverage.line",
                                            "coverage.polygon",
                                            "mismatch.summary")){
@@ -810,7 +710,6 @@ setMethod("qplot", "character", function(data, x, y, ...,
     bf <- BamFile(data)
   else
     stop("Please pass a bam file path")
-  args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
   qplot(bf,  ..., which = which, model = model, bsgenome = bsgenome,
         show.coverage = show.coverage,
         geom = geom, resize.extra = reszie.extra)
@@ -820,13 +719,16 @@ setMethod("qplot", "character", function(data, x, y, ...,
 ## ======================================================================
 ##        For "TranscriptDb"(Genomic Structure)
 ## ======================================================================
-setMethod("qplot", "TranscriptDb", function(data, x, y, which, ...,
+setMethod("qplot", "TranscriptDb", function(data, which, ...,
                                             geom = c(
                                               "full",
-                                              "single")){
+                                              "single",
+                                              "tx")){
   ## FIXME: need to be in biovizBase
+  ## colored by strand?
   color.def <- "black"
   fill.def <- "black"
+  ## strandColor <- getBioColor("STRAND")
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
   .args <- args[!(names(args) %in% c("geom", "which","data"))]
@@ -860,15 +762,16 @@ setMethod("qplot", "TranscriptDb", function(data, x, y, which, ...,
     else
       p <- p + geom_rect(data = df.utr, do.call("aes", args))
     ## gaps
-    df.gaps <- df[df$type == "gap",]
+    ## df.gaps <- df[df$type == "gap",]
+    df.gaps <- gr[values(gr)$type == "gap"] 
     args <- .args[!(names(.args) %in% c("x", "y", "fill"))]
-    args <- c(args, list(x = substitute(start), xend = substitute(end),
-                         y = substitute(.levels),
-                         yend = substitute(.levels)))
+    ## args <- c(args, list(x = substitute(start), xend = substitute(end),
+    ##                      y = substitute(.levels),
+    ##                      yend = substitute(.levels)))
     if(!("color" %in% names(args)))
-      p <- p + geom_segment(data = df.gaps, do.call("aes", args), color = color.def)
+      p <- p + geom_chevron(data = df.gaps, do.call("aes", args), color = color.def)
     else
-      p <- p + geom_segment(data = df.gaps, do.call("aes", args))
+      p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
   }
   if(geom == "single"){
     message("Aggregating TranscriptDb...")
@@ -900,15 +803,22 @@ setMethod("qplot", "TranscriptDb", function(data, x, y, which, ...,
     else
       p <- p + geom_rect(data = df.utr, do.call("aes", args))
     ## gaps
-    df.gaps <- df[df$type == "gap",]
+    ## df.gaps <- df[df$type == "gap",]
+    gr.rr <- reduce(ranges(gr[(values(gr)$type %in%  c("utr", "cds"))]))
+    df.gaps <- gaps(gr.rr, start = min(start(gr.rr)), end = max(end(gr.rr)))
+    chrs <- unique(as.character(seqnames(gr)))
+    df.gaps <- GRanges(chrs, df.gaps)
     args <- .args[!(names(.args) %in% c("x", "y", "fill"))]
-    args <- c(args, list(x = substitute(start), xend = substitute(end),
-                         y = substitute(.levels),
-                         yend = substitute(.levels)))
     if(!("color" %in% names(args)))
-      p <- p + geom_segment(data = df.gaps, do.call("aes", args), color = color.def)
+      p <- p + geom_chevron(data = df.gaps, do.call("aes", args), color = color.def)
     else
-      p <- p + geom_segment(data = df.gaps, do.call("aes", args))
+      p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
+  }
+  if(geom == "tx"){
+    exons.tx <- exonsBy(data, by = "tx")
+    exons <- subsetByOverlaps(exons.tx, which)
+    args <- c(.args, list(data = exons))
+    p <- do.call(qplot, args)
   }
   p
 })

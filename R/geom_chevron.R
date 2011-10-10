@@ -6,8 +6,9 @@ geom_chevron <- function(data, ..., group.name, offset = 0.1,
     else
       data <- addSteppings(data)
   }
-  args <- as.list(match.call(expand.dots = TRUE)[-1])
-  args <- args[!names(args) %in% c("data", "offset", "group.name")]
+  ## args <- as.list(match.call(expand.dots = TRUE)[-1])
+  ## args <- args[!names(args) %in% c("data", "offset", "group.name")]
+  args <- list(...)
   aes.lst <- unlist(lapply(args, function(x) class(eval(x)) == "uneval"))
   if(length(aes.lst)){
     idx <- which(aes.lst)

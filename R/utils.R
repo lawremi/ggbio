@@ -58,11 +58,11 @@ getLimits <- function(obj){
   else
     yend <- NULL
 
-  if(length(obj$layer)>1){
-    l.res <- getLimitsFromLayer(obj$layer)
-  }else{
-    l.res <- NULL
-  }
+  ## if(length(obj$layer)>1){
+  l.res <- getLimitsFromLayer(obj)
+  ## }else{
+  ##   l.res <- NULL
+  ## }
   
   list(xlim = c(min(c(l.res$xmin, x, xmin)),
          max(c(l.res$xmax, x, xmax, xend))),
@@ -70,46 +70,53 @@ getLimits <- function(obj){
          max(c(l.res$ymax, y, ymax, yend))))
 }
 
-getLimitsFromLayer <- function(layers){
+getLimitsFromLayer <- function(obj){
+  layers <- obj$layer
   lst <- lapply(layers, function(layer){
-    if(length(layer$data)){
+    if(length(obj$data) | length(layer$data)){
+
+    if(length(layer$data))
+      dt <- layer$data
+    else
+      dt <- obj$data
+      
     if(!is.null(layer$mapping$x))
-      x <- eval(layer$mapping$x, layer$data)
+      x <- eval(layer$mapping$x, dt)
     else
       x <- NULL
     
     if(!is.null(layer$mapping$y))
-      y <- eval(layer$mapping$y, layer$data)
+      y <- eval(layer$mapping$y, dt)
     else
       y <- NULL
     
     if(!is.null(layer$mapping$xmin))
-      xmin <- eval(layer$mapping$xmin, layer$data)
+      xmin <- eval(layer$mapping$xmin, dt)
     else
       xmin <- NULL
     
     if(!is.null(layer$mapping$ymin))
-      ymin <- eval(layer$mapping$ymin, layer$data)
+      ymin <- eval(layer$mapping$ymin, dt)
     else
       ymin <- NULL
     
     if(!is.null(layer$mapping$xmax))
-      xmax <- eval(layer$mapping$xmax, layer$data)
+      xmax <- eval(layer$mapping$xmax, dt)
     else
       xmax <- NULL
     
     if(!is.null(layer$mapping$ymax))
-      ymax <- eval(layer$mapping$ymax, layer$data)
+      ymax <- eval(layer$mapping$ymax, dt)
     else
       ymax <- NULL
     
     if(!is.null(layer$mapping$xend))
-      xend <- eval(layer$mapping$xend, layer$data)
+      xend <- eval(layer$mapping$xend, dt)
     else
       xend <- NULL
     
     if(!is.null(layer$mapping$yend))
-      yend <- eval(layer$mapping$yend, layer$data)
+      yend <- eval(layer$mapping$yend, dt)
     else
       yend <- NULL
     res <- data.frame(xmin = min(c(x, xmin)), xmax = max(c(x, xmax, xend)),
@@ -123,6 +130,38 @@ getLimitsFromLayer <- function(layers){
   res
 }
 
-
+getGap <- function(data, group.name){
+  res <- split(data, values(data)[,group.name])
+  gps.lst <- lapply(res, function(x){
+    gps <- gaps(ranges(x))
+    if(length(gps)){
+      gr <- GRanges(unique(as.character(seqnames(x))), gps)
+      ## wait this request a .levels?
+      values(gr)$.levels <- unique(values(x)$.levels)
+      ## values(gr)$.model.group <- unique(values(x)$.model.group)
+      ## if(".freq" %in% colnames(values(x)))
+      ##   values(gr)$.freq <- unique(values(x)$.freq)
+      gr
+    }else{
+      NULL
+    }
+  })
+  gps <- do.call("c", gps.lst)          #remove NULL
+  gps <- do.call("c", unname(gps))
+  values(gps)$type <- "gaps"
+  gps
+}
+## suppose we have freq?
+getModelRange <- function(data, group.name){
+  seqs <- unique(as.character(seqnames(data)))
+  ir <- unlist(range(ranges(split(data, values(data)[,group.name]),
+                            ignore.strand = TRUE)))
+  ## freqs <- values(data)$freq[match(names(ir), values(data)[,group.name])]
+  .lvs <- values(data)$.levels[match(names(ir), values(data)[,group.name])]
+  ## with levels
+  gr <- GRanges(seqs, ir, .levels = .lvs)
+  values(gr)$.label <- names(gr)
+  gr
+}
 
 

@@ -4,6 +4,7 @@
 \alias{qplot,data.frame-method}
 \alias{qplot,matrix-method}
 \alias{qplot,numeric-method}
+\alias{qplot,integer-method}
 \alias{qplot,GRanges-method}
 \alias{qplot,GRangesList-method}
 \alias{qplot,IRanges-method}
@@ -35,18 +36,18 @@
 ## For object numeric
 \S4method{qplot}{numeric}(data, ...)
 
+## For object numeric
+\S4method{qplot}{integer}(data, ...)
+
 ## For object GRanges
 \S4method{qplot}{GRanges}(data, x, y,...,
-      facet_gr, 
-      legend = TRUE, ignore.strand = TRUE,
+      facet_gr, legend = TRUE,
       show.coverage = TRUE,
       show.gaps = FALSE,
       show.label = FALSE,
       geom = c("full", "line","point",
-               "segment", "histogram", "reduce", "disjoin",
-               "coverage.line", "coverage.polygon", 
-               "mismatch.summary"))
-
+               "segment", 
+               "coverage.line", "coverage.polygon"))
 
 ## For object GRangesList
 \S4method{qplot}{GRangesList}(data, ..., freq, show.label = FALSE,
@@ -54,15 +55,10 @@
       label.type = c("name", "count"),
       label.size = 5, label.color = "black")
 
-
-
-(data, ..., freq,
-       show.label = FALSE, show.gaps = TRUE)
-
 ## For object IRanges
 \S4method{qplot}{IRanges}(data, ..., legend = TRUE,
-      geom = c("full", "segment", "histogram",
-               "coverage.line", "coverage.polygon", "reduce"))
+      geom = c("full", "segment", 
+               "coverage.line", "coverage.polygon"))
 
 ## For object GappedAlignments
 \S4method{qplot}{GappedAlignments}(data, ..., which,
@@ -70,22 +66,22 @@
       show.junction = FALSE)
 
 ## For object BamFile
-\S4method{qplot}{BamFile}(data, ..., which, model,
+\S4method{qplot}{BamFile}(data, ..., which, 
       bsgenome, resize.extra = 10, show.coverage = TRUE,
       geom = c("gapped.pair", "full",
-               "fragment.length", "coverage.line",
+               "coverage.line",
                "coverage.polygon", "mismatch.summary"))
 
 ## For object character
-\S4method{qplot}{character}(data, x, y, ..., which, model,
+\S4method{qplot}{character}(data, ..., which, 
       bsgenome, resize.extra = 10, show.coverage = TRUE,
       geom = c("gapped.pair", "full", "fragment.length",
                "coverage.line", "coverage.polygon",
                "mismatch.summary"))
 
 ## For object TranscriptDb
-\S4method{qplot}{TranscriptDb}(data, x, y, which, ...,
-      geom = c("full", "single"))
+\S4method{qplot}{TranscriptDb}(data, which, ...,
+      geom = c("full", "single", "tx"))
 
 ## For object BSgenome
 \S4method{qplot}{BSgenome}(data, name, ...,
@@ -159,10 +155,7 @@
     A logical value indicates whether to show legend or not. Default is
     \code{TRUE}
   }
-  \item{ignore.strand}{
-    A logical value indicates whether to ignore the strand or
-    not. Usually used in geom \code{reduce} and \code{disjoin}.
-  }
+
   \item{which}{
     A \code{\link{GRanges}} object to subset the result, usually passed
     to the \code{\link{ScanBamParam}} function.
@@ -306,29 +299,11 @@
 
   For object \code{BSgenome}, show nucleotides as colored point.
   }
-  \item{histogram}{
-    Showing interval data as histogram. Other parameters like
-    \code{binwidth} will be passed to qplot function for delicate
-    control. This essential compute the coverage for interval data first
-    then bin the coverage into histogram.
-  }
   \item{coverage.line}{
     Coverage showing as lines for interval data.
   }
   \item{coverage.polygon}{
     Coverage showing as polygon for interval data.
-  }
-  \item{reduce}{
-    Run \code{\link{reduce}} for the interval data first, then show them
-  as rectangle. User could also just reduce the data by themselves and
-  then use \code{qplot} to show as different geom,
-  e.g. segment. \code{ignore.strand} could be provided.
-  }
-  \item{disjoin}{
-    Run \code{\link{disjoin}} for the interval data first, then show them
-  as rectangle. User could also just reduce the data by themselves and
-  then use \code{qplot} to show as different geom,
-  e.g. segment. \code{ignore.strand} could be provided.
   }
   \item{splice}{
     Splicing summary. The size and width of the line and rectangle
@@ -336,6 +311,9 @@
   }
   \item{single}{
     For \code{TranscripDb} object, showing single(reduced) model only.
+  }
+  \item{tx}{
+    For \code{TranscripDb} object, showing transcirpts isoforms.
   }
   \item{gapped.pair}{
     Show \code{GappedAlignments} as special stepping plots, it make sure
@@ -347,11 +325,6 @@
   Showing color coded mismatched stacked bar to indicate the proportion
   of mismatching at each position, the reference is set to gray.
 }
-  \item{fragment.length}{
-    Instead of return a single plot. This geom return tracks including
-  gene model, reduced model, splicing summary, fragment length
-  estimation.
-  }
   \item{text}{
     For object \code{BSgenome}, show nucleotides as colored text.
   }
@@ -386,7 +359,19 @@ Faceting in ggbio package is a little differnt from ggplot2 in several ways
 
 \examples{
 \dontrun{
-## sample data
+library(ggbio)
+
+## overide qplot
+qplot(data = mtcars, mpg, cyl)
+qplot(1:3)
+qplot(volcano)
+qplot(c(1, 2.2, 3.3))
+ggplot2::qplot(1:3)
+ggplot2::qplot(c(1, 2.2, 3.3))
+ggplot2::qplot(volcano)
+
+
+##  GRanges
 set.seed(1)
 N <- 1000
 library(GenomicRanges)
@@ -403,49 +388,85 @@ gr <- GRanges(seqnames =
                 size = N, replace = TRUE),
               pair = sample(letters, size = N, 
                 replace = TRUE))
-## subset
+
+qplot(gr)
+qplot(gr, geom = "full")
+qplot(gr, geom = "segment")
+qplot(gr, geom = "line", y = value)
+qplot(gr, geom = "point", y = value)
+qplot(gr, geom = "coverage.line")
+qplot(gr, geom = "coverage.polygon")
+
 gr.sub <- gr[seqnames(gr) == "chr1"] #or 
-## common geom
 p1 <- qplot(gr.sub, geom = "full") + opts(title = "full")
-p2 <- qplot(gr.sub, geom = "point", y = value) +
-                                  opts(title = "point")
-p3 <- qplot(gr.sub, geom = "line", y = value) +
-                                  opts(title = "line")
-p4 <- qplot(gr.sub, geom = "coverage.line") +
-                                  opts(title = "coverage.line")   
-p5 <- qplot(gr.sub, geom = "coverage.polygon") + 
-                                  opts(title = "coverage.polygon")   
-p6 <- qplot(gr.sub, geom = "reduce") + 
-                                  opts(title = "reduce")   
-p7 <- qplot(gr.sub, geom = "disjoin") +
-                                  opts(title = "disjoin")      
-p8 <- qplot(gr.sub, geom = "histogram") +
-                                  opts(title = "histogram")      
+p2 <- qplot(gr.sub, geom = "point", y = value) + opts(title = "point")
+p3 <- qplot(gr.sub, geom = "line", y = value) + opts(title = "line")
+p4 <- qplot(gr.sub, geom = "coverage.line") + opts(title = "coverage.line")   
+p5 <- qplot(gr.sub, geom = "coverage.polygon") + opts(title = "coverage.polygon")   
 library(gridExtra)
-grid.arrange(p1, p2, p3, p4, p5, p6, p7 ,p8, ncol = 2)
+grid.arrange(p1, p2, p3, p4, p5, ncol = 2)
 
-## overview
-data(hg19IdeogramCyto)
-## make shorter and clean labels
-old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
-new.chrs <- gsub("chr", "", old.chrs)
-names(new.chrs) <- old.chrs
-new.ideo <- renameSeqlevels(hg19IdeogramCyto, new.chrs)
-p <- plotOverview(new.ideo, cytoband = TRUE)
-print(p)
+qplot(gr, ncol = 2)
+## faceting, use facets not facet
+qplot(gr, facets = group ~ seqnames)
+qplot(gr, geom = "segment", facets = group ~ seqnames)
+qplot(gr, geom = "line", y = value, facets = group ~ seqnames)
+qplot(gr, geom = "point", y = value, facets = group ~ seqnames)
+qplot(gr, geom = "coverage.line", facets = group ~ seqnames)
+qplot(gr, geom = "coverage.polygon", facets = group ~ seqnames)
 
-# no cytoband and with extra data
-data(darned_hg19_subset500)
-# rename 
-new.darned <- renameSeqlevels(darned_hg19_subset500, new.chrs)
-p <- p + geom_hotregion(new.darned)
-print(p)
+## facet gr
+gr.region <- GRanges(c("chr1", "chr2", "chr3"), 
+                     IRanges(c(100, 200, 250), 
+                             width = 70))
+## facet_grid
+qplot(gr, facet_gr = gr.region)
+## facet_wrap
+qplot(gr, facet_gr = gr.region, nrow = 2) + 
+  scale_y_continuous(limits = c(0, 90))
 
-## For Rle and RleList
+
+## checvron
+gr <- GRanges("chr1", IRanges(c(100, 200, 300), width = 50))
+p <- qplot(gr)
+gr.gaps <- gaps(gr)[-1]
+values(gr.gaps)$score <- c(1, 100)
+p1 <- p + geom_chevron(gr.gaps)
+p2 <- p + geom_chevron(gr.gaps, aes(size = score), offset = "score",
+                 chevron.height = c(0.1, 0.2))
+p3 <- p + geom_chevron(gr.gaps, offset = -0.1)
+tracks(p1, p2, p3)
+
+## GRangesList
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+data(genesymbol)
+txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
+exons.tx <- exonsBy(txdb, by = "tx")
+exons.rbm17 <- subsetByOverlaps(exons.tx, genesymbol["RBM17"])
+nms <- names(exons.rbm17)
+freqs <- c(100, 200, 300)
+names(freqs) <- nms
+p.splice1 <- qplot(exons.rbm17)
+## when turning on frequency 
+p.splice <- qplot(exons.rbm17, freq = freqs, show.label = TRUE, label.type = "count",
+      scale.size = c(1, 5), label.size = 3)
+p.splice2 <- qplot(exons.rbm17, freq = freqs, show.label = TRUE, offset = 0.05,
+                   label.type = "count")
+print(p.splice1)
+print(p.splice2)
+
+ir <- IRanges(c(10, 20, 30) ,width  = 15)
+qplot(ir)
+ir <- ranges(gr[seqnames(gr) == "chr1"])[1:40]
+p1 <- qplot(ir) + opts(title = "full")
+p2 <- qplot(ir, geom = "segment")+ opts(title = "segment")
+p3 <- qplot(ir, geom = "coverage.line")+ opts(title = "coverage.line")
+p4 <- qplot(ir, geom = "coverage.polygon")+ opts(title = "coverage.polygon")
+library(gridExtra)
+grid.arrange(p1, p2, p3, p4, ncol = 2)
 
 library(IRanges)
-library(ggbio)
-set.seed(0)
+set.seed(1)
 lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
             seq(10, 0.001, length = 500))
 xVector <- rpois(1e4, lambda)
@@ -471,6 +492,7 @@ qplot(xRleList, type = "viewSums", lower = 5, geom = "segment",
 qplot(xRle, size = y)
 qplot(xRle, type = "viewSums", lower = 5)
 
+qplot(xRle, type = "viewSums", lower = 5, size = I(10), color = I("red"),
+      alpha = y)
 }
-
 }

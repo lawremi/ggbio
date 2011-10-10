@@ -6,6 +6,21 @@ plotMismatchSum <- function(obj, show.coverage = TRUE){
                         match")
   df <- as.data.frame(obj)
   df.unmatch <- df[!df$match, ]
+  ## add two end point?
+  pos <- min(df$start):max(df$end)
+  idx <- ! (pos %in% df$start)
+  if(sum(idx)){
+    df.bg <- df[,c("seqnames", "start", "end", "width", "strand", "depth")]
+    df.bg.extra <- data.frame(seqnames = unique(as.character(df.bg$seqnames)),
+                              start = pos[idx],
+                              end = pos[idx],
+                              width = 1,
+                              strand = "*",
+                              depth = 0)
+    df.bg <- rbind(df.bg, df.bg.extra)
+  }else{
+    df.bg <- df
+  }
   addLevels <- function(x){
     idx <- order(x$start, x$read)
     ## assumption: on the same chromosome
@@ -22,11 +37,12 @@ plotMismatchSum <- function(obj, show.coverage = TRUE){
     x
   }
   df.unmatch <- addLevels(df.unmatch)
-  p <- ggplot(df)
+  idx <- order(df.bg$start)
+  df.bg <- df.bg[idx,]
+  p <- ggplot(df.bg)
   if(show.coverage)
     p <- p + geom_area(aes(x = start, y = depth), fill = I("gray70"), color = I("gray70"))
   DNABasesColor <- getBioColor("DNA_BASES_N")
-
   p <- p + geom_segment(data = df.unmatch, aes(x = start, y = sts,
                           xend = start, yend = eds, color = read))+
           scale_color_manual(values = DNABasesColor)

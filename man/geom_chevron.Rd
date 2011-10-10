@@ -40,7 +40,13 @@ geom_chevron(data, ..., group.name, offset = 0.1,
   A 'Layer'.
 }
 \details{
-  This only reading the GRanges object.
+  To draw a normal GRanges as Chevron instead of segments or rectangle
+as shown in previous sections, we need to provide a special geom for
+this purpose. Chevron is popular in gene viewer or genomoe browser,
+when they try to show isoforms or gene model.\code{geom_chevron},
+just like any other \code{geom_*} function in ggplot2, you can pass
+aes() to it to use height of chevron or width
+of chevron to show statistics summary.
 }
 
 \examples{
@@ -50,10 +56,10 @@ gr <- GRanges("chr1", IRanges(c(100, 200, 300), width = 50))
 p <- qplot(gr)
 gr.gaps <- gaps(gr)[-1]
 values(gr.gaps)$score <- c(1, 100)
+p + geom_chevron(gr.gaps)
 p + geom_chevron(gr.gaps, aes(size = score), offset = "score")
 p + geom_chevron(gr.gaps, aes(size = score), offset = "score",
                  chevron.height = c(0.1, 0.2))
-p + geom_chevron(gr.gaps)
 p + geom_chevron(gr.gaps, offset = -0.1)
 }
 }

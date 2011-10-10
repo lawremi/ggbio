@@ -8,9 +8,10 @@ plotGrandLinear <- function(obj, y, title, facet,
                             cutoff.color = "red",
                             cutoff.size = 1,
                             legend = FALSE,
+                            ## axis.text.x.angle = 0,
                             xlab = "Chromosome",
                             ylab = substitute(y),
-##                            expression(-log[10](italic(p))),
+##                           expression(-log[10](italic(p))),
                             theme_bw = TRUE){
 
 
@@ -78,70 +79,12 @@ plotGrandLinear <- function(obj, y, title, facet,
   }
   p <- p +  scale_x_continuous(name = xlab,
                                breaks = ticks,
-                               labels = names(ticks)) 
+                               labels = names(ticks))
+  ## make it default to remove minor grid line
+  p <- p +  opts(panel.background=theme_blank(), 
+                   panel.grid.minor=theme_blank())
+  ## p <- p + opts(axis.text.x =
+  ##               theme_text(angle = axis.text.x.angle, hjust = 0))
   p
 }
-
-transformGRangesToDfWithTicks <- function(gr, fixed.length = NULL){
-  if(is.null(fixed.length)){
-    fixed.length <- getSpaceByData(gr)    
-  }else{
-    if(is.null(names(fixed.length)))
-      stop("Please name your fixed.length with seqnames")
-  }
-  chr.order <- unique(as.character(seqnames(gr)))
-  sft <- getShiftSpace(fixed.length[chr.order])
-  df <- as.data.frame(gr)
-  df$midpoint <- (df$start + df$end)/2
-  ticks.pos <- fixed.length/2
-  ## ticks.pos <- data.frame(pos = ticks.pos, seqnames = )
-  df <- shiftDfBySpace(df, sft)
-  df$seqnames <- factor(as.character(df$seqnames),
-                        levels = chr.order)
-  ticks <- sft[names(ticks.pos)] + ticks.pos
-  list(df = df, ticks = ticks)
-}
-
-## compute default length, data-wide
-getSpaceByData <- function(gr){
-  gr <- gr.snp
-  grl <- split(gr, seqnames(gr))
-  ## ifseqlengths(gr)
-  res <- unlist(width(range(grl)))
-  res
-}
-
-
-
-getSpaceBySeqlengths <- function(gr){
-  res <- seqlengths(gr)
-  if(any(is.na(res))){
-    idx <- is.na(res)
-    res <- getSpaceByData(gr)[names(res[idx])]
-  }
-  res
-}
-
-getShiftSpace <- function(val){
-  N <- length(val)
-  ## avoid integer overflow, covert to numeric
-  res <- c(0, cumsum(as.numeric(val[-N])))
-  res <- res + 1
-  names(res) <- names(val)
-  res
-}
-
-shiftDfBySpace <- function(df, space){
-  ## GRanges need to be coerced to df
-  ## overcome the integer limits of ranges
-  ## make it vectorized
-  chrs <- as.character(df$seqnames)
-  shifts <- space[chrs]
-  df$start <- df$start + shifts
-  df$end <- df$end + shifts
-  if("midpoint" %in% colnames(df))
-    df$midpoint <- df$midpoint + shifts
-  df
-}
-
 

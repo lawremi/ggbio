@@ -4,23 +4,25 @@ setGeneric("qplot", function(data, ...) standardGeneric("qplot"))
 ## ======================================================================
 setMethod("qplot", signature(data = "data.frame"), function(data, ...){
   args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
-  do.call(ggplot2::qplot, args)
+  do.call(ggplot2::qplot, args)  
 })
 
 setMethod("qplot", signature(data = "matrix"), function(data, ...){
-  args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
-  do.call(ggplot2::qplot, args)
+  ggplot2::qplot(data, ...)
 })
 
-setMethod("qplot", signature(data = "data.frame"), function(data, ...){
-  args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
-  do.call(ggplot2::qplot, args)
+setMethod("qplot", signature(data = "integer"), function(data, ...){
+  ggplot2::qplot(data, ...)
 })
 
 setMethod("qplot", signature(data = "numeric"), function(data, ...){
-  args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
-  do.call(ggplot2::qplot, args)
+  ggplot2::qplot(data, ...)
 })
+
+## setMethod("qplot", signature(data = "numeric"), function(data, ...){
+##   args <- as.list(match.call(call = sys.call(sys.parent()))[-1])
+##   do.call(ggplot2::qplot, args)
+## })
 
 setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                facet_gr,
@@ -31,7 +33,6 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                show.label = FALSE,
                                geom = c("full", "line","point",
                                  "segment", "histogram",
-                                 "reduce",  "disjoin",                                 
                                  "coverage.line", "coverage.polygon",
                                  "mismatch.summary"
                                  )){
@@ -47,8 +48,8 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
     args <- args[names(args) != "freq"]
   }
     
-  ## check "x", must be one of "start", "end", "midpoint"
-  if(!(geom %in% c("full", "reduce", "disjoin", "segment"))){
+  ## check "x", must be one of "start", "end", "midpoint"??
+  if(!(geom %in% c("full", "segment"))){
     if("x" %in% names(args)){
       if(!(deparse(args$x) %in% c("start", "end", "midpoint")))
         stop("x must be one of start/end/midpoint without quote")
@@ -91,7 +92,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
           stop("Column of facet formula can only be seqnames, such as . ~ seqnames,
               you can change row varaibles")
         if(allvars[1] %in% colnames(values(data)) &&
-           !(geom %in% c("reduce", "disjoin","histogram",
+           !(geom %in% c("histogram",
                          "coverage.line", "coverage.polygon"))){
           facet <- do.call(facet_grid, c(args$facet, args.facet))
         }else{
@@ -129,7 +130,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 p <- ggplot(df)
                 p + geom_point(do.call("aes", args))
               },
-full = {
+              full = {
                 if(!missing(facet_gr)){
                   lst.rc <- rangesCentric(data, facet_gr)
                   data <- lst.rc$gr
@@ -174,21 +175,24 @@ full = {
                     args <- c(args, list(color = substitute(strand),
                                          fill = substitute(strand)))
                 }
-                args <- c(args, list(xmin = substitute(start),
-                                     xmax = substitute(end),
-                                     ymin = substitute(.levels - 0.4),
-                                     ymax = substitute(.levels + 0.4)))
                 gpn <- as.character(args$group)
                 args <- args[names(args) != "group"]
                 if(show.gaps){
                   gps <- getGap(data, group.name = gpn)
-                  args.gaps <- c(args, list(x = substitute(start),
-                                            xend = substitute(end),
-                                       y = substitute(.levels),
-                                       yend = substitute(.levels)))
-                  p <- p + geom_segment(data = as.data.frame(gps),
-                                        do.call(aes, args.gaps))
-
+                  args.gaps <- args[!names(args) %in% c("x", "y",
+                                                        "xend", "yend",
+                                                        "label.type",
+                                                        "label.size",
+                                                        "label.color",
+                                                        "size")]
+                  args.gaps.extra <- args[names(args) %in%
+                                          c("offset", "chevron.height")]
+                  ## if(!("offset" %in% names(args.gaps.extra)))
+                  ##   args.gaps.extra <- c(args.gaps.extra, list(offset = 0))
+                  aes.lst <- do.call("aes", args.gaps)
+                  gps.lst <- c(list(aes.lst), list(data = gps),
+                               args.gaps.extra)
+                  p <- p + do.call(geom_chevron, gps.lst)
                 }
                 if(show.label){
                   label.gr <- getModelRange(data,
@@ -201,112 +205,15 @@ full = {
                                      do.call(aes, args.label),
                                      hjust = 1)
                 }
+                args <- c(args, list(xmin = substitute(start),
+                                     xmax = substitute(end),
+                                     ymin = substitute(.levels - 0.4),
+                                     ymax = substitute(.levels + 0.4)))
                 args.rect <- args[names(args) != "size"]
                 p <- p + geom_rect(do.call("aes", args.rect)) +
                   scale_color_manual(values = strandColor)+
                     scale_fill_manual(values = strandColor)
               },              
-              reduce = {
-                data <- reduce(data, ignore.strand = ignore.strand)
-                if(!missing(facet_gr)){
-                  lst.rc <- rangesCentric(data, facet_gr)
-                  data <- lst.rc$gr
-                  facet_gr.r <- lst.rc$which
-                  if(args.facet$facets == "~.id.name")
-                    grl <- split(data, values(data)$.id.name)
-                  if(args.facet$facets == "~seqnames")
-                    grl <- split(data, seqnames(data))
-                  
-                }else{
-                  grl <- split(data, seqnames(data))
-                }
-
-                ## grl <- split(data, seqnames(data))
-                data <- endoapply(grl,
-                                  function(dt){
-                                    if(!is.null(allvars) &&
-                                       allvars[1] %in% colnames(values(data))){
-                                      ndt <- split(dt, values(dt)[,allvars[1]])
-                                      unlist(endoapply(ndt, function(dt){
-                                        values(dt)$.levels <-
-                                          as.numeric(disjointBins(ranges(dt)))
-                                        dt
-                                      }))
-                                    }else{
-                                      values(dt)$.levels <-
-                                        as.numeric(disjointBins(ranges(dt)))
-                                      dt
-                                    }})
-
-                data <- unlist(data)
-                df <- as.data.frame(data)
-                p <- ggplot(df)
-                args <- args[!(names(args) %in% c("x", "y"))]
-                if(!("color" %in% names(args))){
-                  if("fill" %in% names(args))
-                    args <- c(args, list(color = args$fill))
-                  else
-                    args <- c(args, list(color = substitute(strand),
-                                         fill = substitute(strand)))
-                }
-                args <- c(args, list(xmin = substitute(start), xmax = substitute(end),
-                                     ymin = substitute(.levels - 0.4),
-                                     ymax = substitute(.levels + 0.4)))
-                p + geom_rect(do.call("aes", args)) +
-                        scale_color_manual(values = strandColor)+
-                          scale_fill_manual(values = strandColor)
-
-              },
-              disjoin = {
-                data <- disjoin(data, ignore.strand = ignore.strand)
-                if(!missing(facet_gr)){
-                  lst.rc <- rangesCentric(data, facet_gr)
-                  data <- lst.rc$gr
-                  facet_gr.r <- lst.rc$which
-                  if(args.facet$facets == "~.id.name")
-                    grl <- split(data, values(data)$.id.name)
-                  if(args.facet$facets == "~seqnames")
-                    grl <- split(data, seqnames(data))
-                }else{
-                  grl <- split(data, seqnames(data))
-                }
-                
-                ## grl <- split(data, seqnames(data))
-                data <- endoapply(grl,
-                                  function(dt){
-                                    if(!is.null(allvars) &&
-                                       allvars[1] %in% colnames(values(data))){
-                                      ndt <- split(dt, values(dt)[,allvars[1]])
-                                      unlist(endoapply(ndt, function(dt){
-                                        values(dt)$.levels <-
-                                          as.numeric(disjointBins(ranges(dt)))
-                                        dt
-                                      }))
-                                    }else{
-                                      values(dt)$.levels <-
-                                        as.numeric(disjointBins(ranges(dt)))
-                                      dt
-                                    }})
-
-                data <- unlist(data)
-                df <- as.data.frame(data)
-                p <- ggplot(df)
-                args <- args[!(names(args) %in% c("x", "y"))]
-                if(!("color" %in% names(args))){
-                  if("fill" %in% names(args))
-                    args <- c(args, list(color = args$fill))
-                  else
-                    args <- c(args, list(color = substitute(strand),
-                                         fill = substitute(strand)))
-                }
-
-                args <- c(args, list(xmin = substitute(start), xmax = substitute(end),
-                                     ymin = substitute(.levels - 0.4),
-                                     ymax = substitute(.levels + 0.4)))
-                p + geom_rect(do.call("aes", args)) +
-                  scale_color_manual(values = strandColor)+
-                          scale_fill_manual(values = strandColor)                    
-              },
               segment = {
                 if(!missing(facet_gr)){
                   lst.rc <- rangesCentric(data, facet_gr)
@@ -347,7 +254,6 @@ full = {
                 df <- as.data.frame(data)
                 df$midpoint <- (df$start+df$end)/2
                 args <- args[!(names(args) %in% c("x", "y"))]
-                
                 if(!("color" %in% names(args))){
                   if("fill" %in% names(args))
                     args <- c(args, list(color = args$fill))
@@ -362,13 +268,20 @@ full = {
                 p <- ggplot(df)
                 if(show.gaps){
                   gps <- getGap(data, group.name = gpn)
-                  args.gaps <- c(args, list(x = substitute(start),
-                                            xend = substitute(end),
-                                       y = substitute(.levels),
-                                       yend = substitute(.levels)))
-                  args.gaps <- args.gaps[names(args.gaps) != "size"]
-                  p <- p + geom_segment(data = as.data.frame(gps),
-                                        do.call(aes, args.gaps))
+                  args.gaps <- args[!names(args) %in% c("x", "y",
+                                                        "xend", "yend",
+                                                        "label.type",
+                                                        "label.size",
+                                                        "label.color",
+                                                        "size")]
+                  args.gaps.extra <- args[names(args) %in%
+                                          c("offset", "chevron.height")]
+                  if(!("offset" %in% names(args.gaps.extra)))
+                    args.gaps.extra <- c(args.gaps.extra, list(offset = 0))
+                  aes.lst <- do.call("aes", args.gaps)
+                  gps.lst <- c(list(aes.lst), list(data = gps),
+                               args.gaps.extra)
+                  p <- p + do.call(geom_chevron, gps.lst)
                 }
                 if(show.label){
                     label.type <- args$label.type
@@ -552,7 +465,7 @@ setMethod("qplot", "GRangesList", function(data, ..., freq, show.label = FALSE,
                                            label.color = "black"){
   label.type <- match.arg(label.type)
   args <- list(...)
-  args <- args[names(args) != scale.size]
+  ## args <- args[names(args) != scale.size]
   nms <- rep(names(data), elementLengths(data))
   gr <- unlist(data)
   values(gr)$.grl.name <- nms
@@ -568,6 +481,7 @@ setMethod("qplot", "GRangesList", function(data, ..., freq, show.label = FALSE,
                          label.size = label.size,
                          label.color = label.color,
                          freq = freq))
+    args <- c(args, list(geom = "segment"))    
   }else{
     args <- c(args, list(data = gr,
                          group = substitute(.grl.name),
@@ -575,13 +489,11 @@ setMethod("qplot", "GRangesList", function(data, ..., freq, show.label = FALSE,
                          show.gaps = show.gaps,
                          label.type = label.type,
                          label.size = label.size,
-                         label.color = label.color,                         
-                         freq = freq))
-
+                         label.color = label.color))                         
+    args <- c(args, list(geom = "full"))
   }
-  args <- c(args, list(geom = "segment"))
   p <- do.call(qplot, args)
-  p <- p + scale_size(to = scale.size)
+  p <- p + scale_size(to = scale.size) + ylab("")
   p
 })
 
@@ -1144,7 +1056,6 @@ setMethod("qplot", "RleList", function(data, lower, ...,
                                    type = c("raw", "viewMaxs","viewMins",
                                      "viewSums", "viewMeans")){
 
-   ## browser()
   geom <- match.arg(geom)
   type <- match.arg(type)
   if(type %in% c("viewMaxs", "viewMeans", "viewMins", "viewSums") && missing(lower))

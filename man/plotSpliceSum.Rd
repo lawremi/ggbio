@@ -9,9 +9,9 @@
 }
 \usage{
 ## For character,GRangesList
-\S4method{plotSpliceSum}{character}{GRangesList}(data, model, ..., weighted = TRUE)
+\S4method{plotSpliceSum}{character,GRangesList}(data, model, ..., weighted = TRUE)
 ## For character,TranscriptDb
-\S4method{plotSpliceSum}{character}{TranscriptDb}(data, model, which,
+\S4method{plotSpliceSum}{character,TranscriptDb}(data, model, which,
       ..., weighted = TRUE)
 }
 \arguments{
@@ -61,6 +61,9 @@ plotSpliceSum(bamfile, exons.rbm17)
 plotSpliceSum(bamfile, exons.rbm17, weighted = FALSE, offset = 0.01)
 plotSpliceSum(bamfile, txdb, which = genesymbol["RBM17"])
 plotSpliceSum(bamfile, txdb, which = genesymbol["RBM17"], offset = 0.01)
+plotSpliceSum(bamfile, txdb, which = genesymbol["RBM17"],
+              show.label = TRUE,
+              label.type = "count")
 }
 }
 \author{Tengfei Yin}

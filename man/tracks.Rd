@@ -1,7 +1,7 @@
 \name{tracks}
 \alias{tracks}
 \title{Tracks for genomic graphics}
-\usage{tracks(..., check.xlim=TRUE, legend=FALSE, xlim, ylim)
+\usage{tracks(..., xlim, ylim)
 }
 \description{In most genome browsers, they all have such a view that including
 many tracks, could be any anntation data along genomic
@@ -37,16 +37,34 @@ Doesn't like \code{qplot}, tracks doesn't return \code{ggplot}
 object. so processing your plot before you pass them to
 \code{tracks}.
 }
-}}
+\item{}{
+  Tracks cannot guarantee all trakcs are aligned well in all the
+  cases sinmly because control of grobs sometimes are tricky and based
+  on what users passed. Like theme change, or uneven labels or legend
+  could affact the alignemnts. Eventhough I tried hard to align them
+  in most cases.
+}
+\item{}{
+When y axis text length are not equal across tracks, it's hard
+  to align. So you will see small wiggles. Even missing y label would
+  affect the accurate alignmetns too.}
+\item{}{So by default, we remove y axis text and legend to make sure
+  they are aligned exactly at the same position. Clearly this is not a
+  good practice.}
+\item{}{
+We will try our best to fix this restriction in the future release. So
+advanced users could use gridExtra package to modify the
+graphics before passing to \code{grid.arrange}.
+}}}
 \seealso{\code{\link{grid.arrange}}}
 \value{return a frame grob; side-effect (plotting) if plot=T.}
 \author{Tengfei Yin}
 \arguments{\item{...}{Plots of class ggplot2, trellis, or grobs, and valid
 arguments to grid.layout.}
-\item{check.xlim}{Default is TRUE, make sure all tracks are on the
-same scale. if FALSE, just like common grid.arrange function.}
-\item{legend}{Default is FALSE, remove legend, this make sure all
-tracks are aligned exactly based on the same position.}
+% \item{check.xlim}{Default is TRUE, make sure all tracks are on the
+% same scale. if FALSE, just like common grid.arrange function.}
+% \item{legend}{Default is FALSE, remove legend, this make sure all
+% tracks are aligned exactly based on the same position.}
 \item{xlim}{Limits on x.}
 \item{ylim}{Limits on y.}
 }

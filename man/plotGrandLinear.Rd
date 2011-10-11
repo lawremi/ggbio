@@ -163,8 +163,6 @@ plotGrandLinear(gr.snp, y = pvalue,
                 geom = "line", facet = group ~ .)  
 
 
-
-
 ## add size and change color
 plotGrandLinear(gr.snp, y = pvalue, size = pvalue,geom = "point",
                 facet = group ~ .,  color.type = "seqnames")

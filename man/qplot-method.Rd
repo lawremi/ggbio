@@ -75,7 +75,7 @@
 ## For object character
 \S4method{qplot}{character}(data, ..., which, 
       bsgenome, resize.extra = 10, show.coverage = TRUE,
-      geom = c("gapped.pair", "full", "fragment.length",
+      geom = c("gapped.pair", "full", 
                "coverage.line", "coverage.polygon",
                "mismatch.summary"))
 
@@ -128,11 +128,28 @@
   \item{facet_gr}{
     A \code{\link{GRanges}} object which contains the regions you want
   to facet on. 			%
+}
+  \item{size}{
+    Size for point or lines. Could equal a column name or a fixed
+    number. When it's fixed, please use \code{I()} to wrap the value.
   }
-  \item{model}{
-    A \code{\link{GRanges}} object which providing a known or customized
-    genomic structure or gene model.
+  \item{shape}{
+    Shape for point or lines. Could equal a column name or a fixed
+    number. When it's fixed, please use \code{I()} to wrap the value.
   }
+  \item{color}{
+    Color for point for lines. Could equal a column name or a fixed
+    character. When it's fixed, please use \code{I()} to wrap the value.
+  }
+  \item{alpha}{
+    Alpha blending. Could equal a column name or a fixed
+    number. When it's fixed, please use \code{I()} to wrap the value.
+  }
+  \item{lower}{
+    When object is Rle/RleList, and use other types of methods which is
+  not "raw", at least a lower parameters which passed to \code{slice}
+  function is required.
+    }
   % \item{group.name}{
   %   A character with quote, one of the variables in elementMetadata,
   %   used for grouping the intervals when computing the splice summary.
@@ -232,9 +249,6 @@
 \value{
   A \code{ggplot} object, so you can use common features from ggplot2
   package to manipulate the plot.
-
-  For fragment.length geom, it's kind of special, it returns tracks not
-  single \code{ggplot} object.
 }
 
 \section{Introduction}{

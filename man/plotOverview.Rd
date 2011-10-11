@@ -27,5 +27,6 @@ p <- plotOverview(new.ideo, cytoband = TRUE)
 print(p)
 ## with nocytoband
 p <- plotOverview(new.ideo, cytoband = FALSE)
-print(p)}
+print(p)
+}
 

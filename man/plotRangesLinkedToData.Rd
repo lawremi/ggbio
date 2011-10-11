@@ -68,9 +68,9 @@ library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 data(genesymbol)
 txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
 model <- exonsBy(txdb, by = "tx")
+model17 <- subsetByOverlaps(model, genesymbol["RBM17"])
 exons <- exons(txdb)
 exon17 <- subsetByOverlaps(exons, genesymbol["RBM17"])
-model17 <- subsetByOverlaps(model, genesymbol["RBM17"])
 ## reduce to make sure there is no overlap
 ## just for example
 exon.new <- reduce(exon17)

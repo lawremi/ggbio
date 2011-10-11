@@ -1151,7 +1151,8 @@ model <- exonsBy(txdb, by = "tx")
 model.new <- subsetByOverlaps(model, genesymbol["RBM17"])
 exons.rbm17 <- subsetByOverlaps(exons(txdb), genesymbol["RBM17"])
 exons.new <- reduce(exons.rbm17)
-
+## the graphic shows here is using different bamfile from the one
+## in ext, it contains more pair-end reads.
 plotFragLength(bamfile, exons.new, geom = c("point","segment"))
 
 

@@ -1126,18 +1126,66 @@ print(p2)
   \label{fig:plotSpliceSum}
 \end{figure}
 
-\subsection{Fragment Length}
+\subsection{Fragment Length for paired-end RNA-seq}
+Here is just a simple example to plot estimated fragment length, the
+algorithm could be various, you could use your own robust way to
+make you own fragment length plot in a similar way.
+
+The idea of graphics is originally from Melanie Huntley and her
+colleges, I can not say for sure it's implemented in exactly the same
+way as she described, because this package is now well tested yet. But
+here is the idea, we collect all paired reads and model, reduce
+model(exons) first, then find common gaps between exons and reads,
+remove common gaps between paired-end reads, and compute the new
+estimated fragment length.
+
+The graphic is implemented in function \Rfunction{plotFragLength},
+which read in a paired-end RNA-seq bam file and give the graphics as
+shown in Figure\ref{fig:fragfull-anno} (with annotations) and
+Figure\ref{fig:fragfull} (without annotation) and
+Figure\ref{fig:shrink-frag} (after shrinking) which is a compact view.
+
 @ 
-<<frag-length, fig = FALSE, eval = FALSE>>=
-exons <- exons(txdb)
-exons.rbm17 <- subsetByOverlaps(exons, genesymbol["RBM17"])
-plotFragLength(bamfile, exons.rbm17[-13])
-gr <- getFragLength(bamfile, exons.rbm17)
-plot(res$pos,res$isize)
-lst <- gr
-## exs <- exonsByOverlaps(txdb, gr.rbm, colum = "tx_id")
-qplot(BamFile(bamfile), model = exs, geom = "fragment.length", group.name = "tx_id")
+<<frag-length, fig = FALSE, eval = FALSE, fig = FALSE>>=
+model <- exonsBy(txdb, by = "tx")
+model.new <- subsetByOverlaps(model, genesymbol["RBM17"])
+exons.rbm17 <- subsetByOverlaps(exons(txdb), genesymbol["RBM17"])
+exons.new <- reduce(exons.rbm17)
+
+plotFragLength(bamfile, exons.new, geom = c("point","segment"))
+
+
+plotFragLength(bamfile, exons.new, geom = c("point","segment"), 
+                     annotation = FALSE)
+
+plotFragLength(bamfile, exons.new, geom = c("point","segment"), 
+                     type = "cut", gap.ratio = 0.001)
 @ %def   
+
+
+\begin{figure}[h!t!p!b]
+  \centering
+  \includegraphics[width = 0.6\textwidth]{fullfrag-anno.png}
+  \caption{Fragment length with annotation. y value of
+    "point" and "line" indicate the estimated fragment length. and if
+    geom is set to "segment", the segment is from the left most position
+    to paired right most position, should be equal to "isize".}
+  \label{fig:fragfull-anno}
+\end{figure}
+
+\begin{figure}[h!t!p!b]
+  \centering
+  \includegraphics[width = 0.6\textwidth]{fullfrag.png}
+  \caption{Fragment length without annotation, but showing y scales.}
+  \label{fig:fragfull}
+\end{figure}
+
+\begin{figure}[h!t!p!b]
+  \centering
+  \includegraphics[width = 0.6\textwidth]{shrink-frag.png}
+  \caption{Fragment length with annotation after shrinking}
+  \label{fig:shrink-frag}
+\end{figure}
 
 \subsection{Mismatch Summary}
 For NGS(Next generation sequencing) data, sometimes instead of showing

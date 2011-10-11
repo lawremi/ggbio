@@ -16,9 +16,6 @@ importFrom(IRanges, IRanges,  disjointBins,
            isTRUEorFALSE, coverage, slice,
            elementLengths,
            cbind, rbind,
-           ## viewWhichMins, viewWhichMaxs,
-           ## viewMins, viewMaxs, viewSums, viewMeans,
-           ## runValue, runLength,
            reduce, punion, pgap, gaps)
 
 importMethodsFrom(IRanges,  split, unique,
@@ -74,7 +71,7 @@ export(tracks, plotOverview, plotSingleChrom, geom_hotregion,
        geom_chevron, 
        plotMismatchSum,
        plotGrandLinear,
-       ##plotFragLength,
+       plotFragLength,
        plotSpliceSum,
        plotRangesLinkedToData
        )

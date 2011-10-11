@@ -1,12 +1,13 @@
 \name{plotFragLength}
 \alias{plotFragLength}
+\alias{plotFragLength,character,GRanges-method}
 \title{Plot estimated fragment length for paired-end RNA-seq data}
 \description{
   Plot estimated fragment length for paired-end RNA-seq data against
   single reduced data model. 
 }
 \usage{
-plotFragLength(data, model,
+\S4method{plotFragLength}{character,GRanges}(data, model,
                gap.ratio = 0.0025,
                geom = c("segment", "point", "line"),
                type = c("normal", "cut"),

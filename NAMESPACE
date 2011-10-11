@@ -66,12 +66,10 @@ importFrom(GenomicFeatures,
 ## ============================================================
 ## Export
 ## ============================================================
-exportMethods(qplot, rescale)
+exportMethods(qplot, rescale, plotFragLength, plotSpliceSum)
 export(tracks, plotOverview, plotSingleChrom, geom_hotregion,
        geom_chevron, 
        plotMismatchSum,
        plotGrandLinear,
-       plotFragLength,
-       plotSpliceSum,
-       plotRangesLinkedToData
-       )
+       plotRangesLinkedToData)
+

@@ -38,7 +38,7 @@
 \newcommand{\qplot}{\Rfunction{qplot}}
 
 \title{An Introduction to \ggbio{}}
-\author{Tengfei Yin}
+\author{Tengfei Yin, Michael Lawrence, Dianne Cook}
 \date{\today}
 
 \begin{document}
@@ -434,7 +434,7 @@ and connected by segments or chevrons.
 To draw a normal GRanges as Chevron instead of segments or rectangle
 as shown in previous sections, we need to provide a special geom for
 this purpose. Chevron is popular in gene viewer or genomoe browser,
-when they try to show isoforms or gene model. More advanced useage is
+when they try to show isoforms or gene model. More advanced usage is
 to use height of chevron or width of chevron to show statistics
 summary. Here we introduce a new function \Rfunction{geom\_chevron},
 just like any other \Rfunction{geom\_*} function in \ggplot{},
@@ -458,7 +458,7 @@ tracks(p1, p2, p3)
 \begin{figure}[h!t!p!b]
   \centering
   \includegraphics[width = 0.7\textwidth]{chevron3.png}
-  \caption{geom chevron. how to use parameters to contrl it.}
+  \caption{geom chevron. how to use parameters to control it.}
   \label{fig:chevron3}
 \end{figure}
 
@@ -467,7 +467,7 @@ tracks(p1, p2, p3)
 \subsubsection{Alternative splicing and summary}
 Here is a case study, how to use \qplot{} for \Robject{GRangesList} to
 produce a splicing model and show summary on it. In the following data
-from a \Robject{TransciptDb} object, and using \Rfunarg{freq} argument
+from a \Robject{TranscriptDb} object, and using \Rfunarg{freq} argument
 to pass the summary information to the function.
 
 It's convenient to get model from a \Robject{TranscriptDb} object,
@@ -546,17 +546,17 @@ based on the \Rfunction{rle} function from the base package. and
 please see manual of \Rpackage{IRanges} for more details.
 
 \qplot{} for \Robject{Rle} and \Robject{RleList} provides smoothing or
-summarization methods for viewing these types of data. We support
+summarizing methods for viewing these types of data. We support
 three geoms \emph{point, line, segment} and five types of smoothing or
-summarization methods,\emph{raw, viewMaxs, viewMins, viewSums,
+summarizing methods,\emph{raw, viewMaxs, viewMins, viewSums,
   viewMeans} the last four methods are also defined in
 \IRanges{}. When you are using \emph{raw}, we just convert it to a
 numeric vector and plot it along x. Make sure it's not a huge vector,
 other wise it's going to be super slow to visualize in \ggplot{}. If
-use the following four method, you could pass extra auguments, such as
+use the following four method, you could pass extra arguments, such as
 \Rfunarg{lower} to control how to smooth the data.
 
-For \Robject{RleList}, it automaticaly facet them by list, controled
+For \Robject{RleList}, it automatically facet them by list, controlled
 by parameters \Rfunarg{facetByRow}, to facet them side by side all on
 different tracks. This could be useful for multiple comparison of
 different samples.
@@ -667,7 +667,7 @@ tracks(p1, p2, p3, p4, p5, p6)
 \begin{figure}[h!t!p!b]
   \centering
   \includegraphics[width = 0.7\textwidth]{bamplot.png}
-  \caption{Tracks of different geom of bam file, in the order of gapped.pair, gapped.pair with junction, full, coverage.line, coverage.polyhon, mismatch.summary.}
+  \caption{Tracks of different geom of bam file, in the order of gapped.pair, gapped.pair with junction, full, coverage.line, coverage.polygon, mismatch.summary.}
   \label{fig:bam-plot}
 \end{figure}
 
@@ -677,7 +677,7 @@ Supported geoms including
 \item[full] Full model, trying to show all 5'-UTR, 3'-UTR, cds and introns in 
   different transcripts.
 \item[single] Reduced model.
-\item[tx] Transcirpts isoforms coposed of exons.
+\item[tx] Transcirpts isoforms composed of exons.
 \end{description}
 Figure \ref{fig:txdb} shows two tracks for a \Robject{TranscriptDb} object.
 
@@ -783,8 +783,6 @@ print(p)
 \end{figure}
 
 
-
-
 Clearly, it's not good for visualizing the annotation at the same
 time, so we could plot it without cytoband. This accept a full
 ideogram which will be reduced automatically. You could also just use
@@ -874,6 +872,11 @@ print(p)
   \label{fig:plotOverview-nocyto-darned-exon}
 \end{figure}
 
+
+\subsection{Single Chromosome Overview}
+Only support cytoband, used for those user who want to embed this as
+one of many tracks. One could draw red rectangle on it which indicate
+the zoomed region.
 % \begin{figure}[h!t!p]
 %   \centering
 @ 
@@ -899,26 +902,109 @@ print(p)
   \label{fig:plotSingleChrom}
 \end{figure}
 
-
-% \begin{figure}[h!t!p]
-%   \centering
 @ 
 <<plotSingleChrom-zoom, fig = FALSE, eval = FALSE>>=
 p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1",
                 zoom.region = c(1e8, 1.5e8))
 print(p)
 @ %def   
-%   \caption{Single Chromosome as Ideogram with zoomed rectangle}
-%   \label{fig:plotSingleChrom-zoom}
-% \end{figure}
 
-% \begin{figure}[h!t!p]
-%   \centering
-%   \includegraphics[width = 0.55\textwidth][height = 1in, width = 5in]{intro-plotSingleChrom-zoom.pdf}
-%   \caption{Single Chromosome as Ideogram with zoomed rectangle}
-%   \label{fig:plotSingleChrom-zoom}
-% \end{figure}
 
+\subsection{Grand Linear View and Manhattan Plots}
+Grand linear view is one of the useful overviews for the whole genome,
+we put chromosomes side by side along x-axis, and make it
+compact. Simply view the statistics across the genome and align
+multiple samples as different tracks.
+
+A Manhattan plot is special case for grand linear view, one kind of
+scatter plot used to visualize data with a large number of data
+points, with a distribute of some higher-magnitude values. For
+example, in the GWAS(genome-wide association studies). Here we mainly
+focus on GWAS Manhattan plots. X-axis is genomic coordinates and
+Y-axis is negative logarithm of the associated P-value for each single
+nucleotide polymorphism. So higher the value, more stronger the
+association they are.
+
+But we support both \emph{point} and \emph{line} geom.
+
+Here we simulate some SNP data, as Figure \ref{fig:manhattan}shows,
+you can plot it in different ways, and use different tricks.
+
+Default is assigning color for all chromosomes, and use a free
+space. Users can have more delicate control such as adding title,
+using customized two-color scheme, and adding cut off, removing
+legend.. Please refer to the manual.
+
+@ 
+<<manhattan-plot, fig = FALSE, eval = FALSE>>=
+data(hg19Ideogram)
+data(hg19Ideogram)
+chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
+seqlths <- seqlengths(hg19Ideogram)[chrs]
+set.seed(1)
+nchr <- length(chrs)
+nsnps <- 1000
+gr.snp <- GRanges(rep(chrs,each=nsnps),
+             IRanges(start = do.call(c, lapply(chrs, function(chr){
+               N <- seqlths[chr]
+               runif(nsnps,1,N)
+             })), width = 1),
+             SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
+             pvalue =  -log10(runif(nchr*nsnps)),
+                  group = sample(c("Normal", "Tumor"), size = nchr*nsnps,
+                    replace = TRUE)
+             )
+
+## processing the name, to make it shorter
+nms <- seqnames(seqinfo(gr.snp))
+nms.new <- gsub("chr", "", nms)
+names(nms.new) <- nms
+gr.snp <- renameSeqlevels(gr.snp, nms.new)
+
+p1 <- plotGrandLinear(gr.snp, y = pvalue, geom = "point")
+p2 <- plotGrandLinear(gr.snp, y = pvalue, geom = "point", color.type = "identity",
+                color = I("black"), size = I(1))
+## remove ticks and laebels
+p3 <- plotGrandLinear(gr.snp, y = pvalue, geom = "point") +
+            opts(axis.text.x = theme_blank(),
+                 axis.ticks=theme_blank())
+
+## how to change labels and rotate it 
+ticks <- biovizBase:::transformGRangesToDfWithTicks(gr.snp)$ticks
+names(ticks) <- paste("chr", names(ticks), sep = "")
+p4 <- plotGrandLinear(gr.snp, y = pvalue, geom = "point") +
+  scale_x_continuous(breaks = ticks, labels = names(ticks))+
+   opts(axis.text.x=theme_text(angle=-90, hjust=0)) 
+grid.arrange(p1, p2, p3, p4, ncol = 1)
+@ %def 
+
+\begin{figure}[h!t!p!b]
+  \centering
+  \includegraphics[width = 0.7\textwidth]{manhattan4.png}
+  \caption{Grand linear view for simulated SNP data. }
+  \label{fig:man4}
+\end{figure}
+
+
+One of the most important features is multiple sample comparison,
+suppose you have extra columns contains categorical data, you can
+facet easily by certain factor as shown if Figure\ref{fig:man-facet}.
+More delicate control like change color, size, alpha blending, please
+refer to the manuals.
+
+@ 
+<<overview-facet, eval = FALSE, figure = FALSE>>=
+p <- plotGrandLinear(gr.snp, y = pvalue, geom = "point",
+                facet = group ~ .,  color.type = "twocolor")
+print(p)
+@ %def 
+
+\begin{figure}[h!t!p!b]
+  \centering
+  \includegraphics[width = 0.7\textwidth]{man-facet.png}
+  \caption{Grand linear view for simulated SNP data. }
+  \label{fig:man-facet}
+\end{figure}
 
 \subsection{Circular Overview}
 Circular view is inspired by the \software{Circos} project
@@ -934,6 +1020,8 @@ yet, but it's definitely in the TODO. For users who are really
 interested in using a circular view in \R{}, we have a highly
 experimental circular view in another package \visnab{}, which is
 interactive visualization toolkit for genomic data.
+
+
 \section{Building Tracks for Linear View}
 In most genome browsers, they all have such a view that including many
 tracks, could be any annotation data along genomic coordinate. So we
@@ -959,54 +1047,76 @@ compare to \Rfunction{grid.arrange}.
   \Rfunction{tracks}.
 \end{itemize}
 
-We have already demonstrate how to use \Rfunction{tracks} in the
-previous sections.
+\textbf{NOTICE:}
+\begin{itemize}
+\item Tracks cannot guarantee all tracks are aligned well in all the
+  cases simply because control of grobs sometimes are tricky and based
+  on what users passed. Like theme change, or uneven labels or legend
+  could affact the alignments. Even though I tried hard to align them
+  in most cases.
+\item When y axis text length are not equal across tracks, it's hard
+  to align. So you will see small wiggles. Even missing y label would
+  affect the accurate alignments too.
+\item So by default, we remove y axis text and legend to make sure
+  they are aligned exactly at the same position. Clearly this is not a
+  good practice.
+\end{itemize}
+
+We will try our best to fix this restriction in the future release. So
+advanced users could use \Rpackage{gridExtra} package to modify the
+graphics before passing to \Rfunction{grid.arrange}.
+@ 
+<<tracks,eval = FALSE>>=
+## As shown in previous sections.
+library(BSgenome.Hsapiens.UCSC.hg19)
+gr <- GRanges("chr1", IRanges(5e7, 5e7+50))
+p1 <- qplot(Hsapiens, name = gr, geom = "text")
+p2 <- qplot(Hsapiens, name = gr, geom = "point")
+p3 <- qplot(Hsapiens, name = gr, geom = "segment")
+p4 <- qplot(Hsapiens, name = gr, geom = "rectangle")
+tracks(p1, p2, p3, p4)
+@ %def 
 
 \section{Question-oriented Specific Graphics}
-In package \ggbio{}, We also make individual graphic for special case instead of 
-using a generic function \qplot{}, when it meets following conditions:
+In package \ggbio{}, We also make individual graphic for special case
+instead of using a generic function \qplot{}, when it meets following
+conditions:
 
 \begin{itemize}
 \item This function doesn't return a ggplot object. Usually
   it's just composed of multiple tracks, has some special control over
   the layout.
   \item The API is too different from \qplot{}.
-  \item The object is not qutie clear, or we don't want it to dispatch
+  \item The object is not quite clear, or we don't want it to dispatch
     on any other objects.
   \item In some cases, we may include one special geom in the qplot
     function for certain graphic.
 \end{itemize}
 
 These kind of graphics may be used widely, so we hope to provides a
-set of utilities to generate those graphcis.
+set of utilities to generate those graphics.
 
 \subsection{Splicing Summary}\label{sec:splice}
 As we introduced before, \qplot{} could plot the \Robject{GRangesList}
 as slicing models, but here we make another function which could read
-RNA-seq bam file directly and summerize the junction read, then plot
+RNA-seq bam file directly and summarize the junction read, then plot
 the result directly as graphic.
 
 Internally we use biovizBase:::spliceSummary for simple counting by
-overlaped junction reads which cover consecutive two exons of each
-model in weigthed or unweighted way, but we encourage users to use
+overlapped junction reads which cover consecutive two exons of each
+model in weighted or unweighted way, but we encourage users to use
 their own robust way to make splicing summary and store it as
 GRangesList, then plot the summary by \Rfunction{qplot} function. Please
 check the previous section.
 
 @ 
 <<plotSpliceSum, eval = FALSE>>=
-bamfile <- system.file("extdata", "SRR027894subRBM17.bam", package="biovizBase")
-library(ggbio)
-library()
-library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
-data(genesymbol)
-exons <- exonsBy(txdb, by = "tx")
-exons.rbm17 <- subsetByOverlaps(exons, genesymbol["RBM17"])
-p <- plotSpliceSum(bamfile, exons.rbm17)
-p <- plotSpliceSum(bamfile, exons.rbm17, weighted = FALSE, offset = 0.01)
-p <- plotSpliceSum(bamfile, txdb, which = genesymbol["RBM17"])
-p <- plotSpliceSum(bamfile, txdb, which = genesymbol["RBM17"], offset = 0.01)
+p1 <- plotSpliceSum(bamfile, exons.rbm17)
+p2 <- plotSpliceSum(bamfile, exons.rbm17, weighted = FALSE, offset = 0.01)
+p3 <- plotSpliceSum(bamfile, txdb, which = genesymbol["RBM17"],
+                   show.label = TRUE,
+                   label.type = "count")
+print(p2)
 @ %def 
 % need a grphic here
 \begin{figure}[h!t!p!b]
@@ -1016,12 +1126,7 @@ p <- plotSpliceSum(bamfile, txdb, which = genesymbol["RBM17"], offset = 0.01)
   \label{fig:plotSpliceSum}
 \end{figure}
 
-
-
-
-
 \subsection{Fragment Length}
-
 @ 
 <<frag-length, fig = FALSE, eval = FALSE>>=
 exons <- exons(txdb)
@@ -1041,7 +1146,7 @@ particular region. And mismatch summary is one of those interesting
 summaries.
 
 \Rfunction{plotMismatchSum} shows only mismatched read counts as color
-coded stacked barchart or with coverage as background. We also
+coded stacked bar chart or with coverage as background. We also
 implement this as one geom for certain object, such \Robject{BamFile}
 and \Robject{GRanges}, so you could use \qplot{} for simply generating
 some mismatch summary. When the object is \Robject{GRanges}. we check
@@ -1082,81 +1187,6 @@ p <- qplot(BamFile(bamfile), which = gr, bsgenome = Hsapiens,
 \end{figure}
 
 
-\subsection{Grand Linear View and Manhattan Plots}
-Grand linear view is one of the useful overviews for the whole genome,
-we put chromosomes side by side along x-axis, and make it
-compact. Simply view the statistics across the geonme and align
-multiple samples as different tracks.
-
-A Manhattan plot is special case for grand linear view, one kind of
-scatter plot used to visualize data with a large number of data
-points, with a distribute of some higher-magnitude values. For
-example, in the GWAS(genome-wide association studies). Here we mainly
-focus on GWAS Manhattan plots. X-axis is genomic coordinates and
-Y-axis is negative logarithm of the associated P-value for each single
-nucleotide polymorphism. So higher the value, more stronger the
-association they are.
-
-But we suport both \emph{point} and \emph{line} geom.
-
-Here we simulate some SNP data, as Figure \ref{fig:manhattan}shows,
-you can plot it in different ways.
-
-Default is assigning color for all chromosomes, and use a free
-space. Users can have more delicate control such as adding title,
-using customized two-color scheme, and adding cut off, removing
-legend.. Please refer to the manual.
-
-@ 
-<<manhattan-plot, fig = FALSE, eval = FALSE>>=
-data(hg19IdeogramCyto)
-data(hg19Ideogram)
-chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
-seqlths <- seqlengths(hg19Ideogram)[chrs]
-set.seed(1)
-nchr <- length(chrs)
-nsnps <- 1000
-gr.snp <- GRanges(rep(chrs,each=nsnps),
-             IRanges(start = do.call(c, lapply(chrs, function(chr){
-               N <- seqlths[chr]
-               runif(nsnps,1,N)
-             })), width = 1),
-             SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
-             pvalue =  -log10(runif(nchr*nsnps)),
-                  group = sample(c("Normal", "Tumor"), size = nchr*nsnps,
-                    replace = TRUE)
-             )
-
-## processing the name, to make it shorter
-nms <- seqnames(seqinfo(gr.snp))
-nms.new <- gsub("chr", "", nms)
-names(nms.new) <- nms
-gr.snp <- renameSeqlevels(gr.snp, nms.new)
-qplot(gr.snp, geom = "point", y = pvalue, scales = "free", space = "free", 
-      facet = group ~ seqnames)
-## plottting
-pm1 <- plotManhattan(gr.snp, y = pvalue)
-pm2 <- plotManhattan(gr.snp, y = pvalue, color.type = "seqnames")
-pm3 <- plotManhattan(gr.snp, y = pvalue, color.type = "twocolor", title = "SNP",
-                     cutoff = c(4, 5), cutoff.color = "blue", cutoff.size = 1)
-pm4 <- plotManhattan(gr.snp, y = pvalue, color.type = "twocolor", 
-                     two.color = c("black", "gray50"))
-pm5 <- plotManhattan(gr.snp, y = pvalue, scale = "fixed", space = "fixed")
-grid.arrange(pm1, pm2, pm3, pm4, pm5, ncol = 1)
-@ %def 
-
-
-\begin{figure}[h!t!p]
-  \centering
-  \includegraphics[width = 0.7\textwidth, width = 5in]{manhattan.png}  
-  \caption{Manhattan plot for simulated SNP data set. The first row is
-    default.  Second row shows color based on seqnames. Third row
-    shows two colors only, use default color scheme, and adding cutoff
-    at the same time. The fourth row use customized two colors. The
-    fifth row use fixed space which default is adjusted on data
-    range.}
-  \label{fig:manhattan}
-\end{figure}
 
 \subsection{Plot Ranges Linked with Data}
 Inspired by some graphics produced in some other packages, for example
@@ -1165,14 +1195,14 @@ models and linked to an even spaced statistics summary. This is useful
 because we always plot everything along the genomic coordinates, but
 genomic features like exons are not evenly distributed, so we could
 actually treat the statistics associated with exons like categorical
-data, and show them as \emph{Paralell Coordinates Plots}. This is one
+data, and show them as \emph{Parallel Coordinates Plots}. This is one
 special layout which represent the data in a nice manner and also keep
-the genomic structure information. With abliity of \Rfunction{tracks},
+the genomic structure information. With ability of \Rfunction{tracks},
 it's possible to generate such type of a graphic along with other
 annotations.
 
 The data we want is a normal \Robject{GRanges} object, and make sure
-the intervals are not overlaped with each other(currently), and you
+the intervals are not overlapped with each other(currently), and you
 may have multiple columns which store the statistics for multiple
 samples. then we produce the graphic we introduced above and users
 could pass other annotation track in the function which will be shown
@@ -1187,23 +1217,66 @@ Here are some examples for function
 \Rfunction{plotRangesLinkedToData}.
 
 @ 
-<<plotRangesLinkedToData, eval = FALSE>>=
-model <- exonsBy(txdb, by = "tx")
+<<plotRangesLinkedToData, eval = FALSE, fig = FALSE>>=
 exons <- exons(txdb)
 exon17 <- subsetByOverlaps(exons, genesymbol["RBM17"])
-model17 <- subsetByOverlaps(model, genesymbol["RBM17"])
 ## reduce to make sure there is no overlap
 ## just for example
 exon.new <- reduce(exon17)
-## suppose
+## simulated data
 values(exon.new)$sample1 <- rnorm(length(exon.new), 10, 3)
 values(exon.new)$sample2 <- rnorm(length(exon.new), 10, 10)
 values(exon.new)$score <- rnorm(length(exon.new))
+p <- qplot(exons.rbm17)
 plotRangesLinkedToData(exon.new, stat.col = c("sample1", "sample2"))
+## show as figure, no annotation
 plotRangesLinkedToData(exon.new, stat.col = 1:2)
+## show as figure, adding annotation
 plotRangesLinkedToData(exon.new, stat.col = 1:2, annotation = list(p))
-
 @ %def 
+
+\begin{figure}[h!t!p!b]
+  \centering
+  \includegraphics[width = 0.6\textwidth]{linked.png}  
+  \caption{Single Granges object for multiple samples}
+  \label{fig:singlelink}
+\end{figure}
+
+Figure \ref{fig:singlelink} shows, A GRanges with two samples as
+column. and Figure \ref{fig:singlelink-anno} show the same graphic
+instead of containing other annotation tracks.
+\begin{figure}[h!t!p!b]
+  \centering
+  \includegraphics[width = 0.6\textwidth]{linked-anno.png}  
+  \caption{Single Granges object for multiple samples with annotation track.}
+  \label{fig:singlelink-anno}
+\end{figure}
+
+\textbf{TODO}
+\begin{itemize}
+\item Due to limitation of tracks, if showing legend and y axis text,
+  can not align them well currently, will find appropriate solution
+  later.
+\end{itemize}
+
+\section{Bugs Report and Features Request}
+
+Latest code are available on github
+\url{https://github.com/tengfei/ggbio}
+
+Please file bug/request on issue page, this is preferred way. or
+email me at yintengfei <at> gmail dot com.
+
+It's a new package and under active development.
+
+Thanks in advance for any feedback.
+\section{Acknowledgement}
+I wish to thank all those who helped me. Without them, I could not
+have started this project.
+\begin{description}
+\item[Genentech]{Sponsorship and valuable feed back and help for this project and my other project.}
+\end{description}
+
 
 
 \section{Session Info}

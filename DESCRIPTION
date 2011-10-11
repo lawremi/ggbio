@@ -1,7 +1,7 @@
 Package: ggbio
-Version: 0.0.7
+Version: 0.9.1
 Title: Static visualization for genomic data.
-Description: ggbio focuses on visualzing genomic data using basic R graphics or grid-based packages, make generic function to works on specific data structure like GRanges object. Providing the ability of summarization and aggregation at the same time visualize them on the genomic scales. 
+Description: ggbio focuses on visualizing genomic data using basic R graphics or grid-based packages, make generic function to works on specific data structure defined in Bioconductor project. At higher levels, we implemented several graphics which could be easily used to produce some diagnostic graphics for next generation sequencing data or some other genomic data, such as grand linear view(Manhattan plot), stacked overview, mismatch pileup summary, fragment length estimation, linked view and splice summary.
 Author: Tengfei Yin, Michael Lawrence, Dianne Cook
 Maintainer: Tengfei Yin <yintengfei@gmail.com>
 Depends: methods, biovizBase, ggplot2

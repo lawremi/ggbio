@@ -47,13 +47,14 @@ plotOverview <- function(obj,
     if(!isSimpleIdeogram(obj)){
       message("Reduce to simple genome, ignoring cytoband")
       ## obj <- sortChr(reduce(obj))
-      obj <- sort(reduce(obj))
+      ## obj <- sort(reduce(obj))
+      obj <- reduce(obj)
       if(!isSimpleIdeogram(obj))
         stop("Cannot reduce to simple genome, please check your ideogram")
     }
     df <- as.data.frame(obj)
-    df$seqnames <- factor(as.character(df$seqnames),
-                          levels = sortChr(unique(as.character(df$seqnames))))
+    ## df$seqnames <- factor(as.character(df$seqnames),
+    ##                       levels = sortChr(unique(as.character(df$seqnames))))
     p <- ggplot(df)
     p <- p + facet_grid(seqnames ~ .) +
       geom_rect(aes(xmin = start,

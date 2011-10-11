@@ -56,11 +56,12 @@ plotRangesLinkedToData <- function(data, stat.col, stat.label, ..., annotation =
                     y = 0,
                     yend = 10)
   p.link <- p.link + geom_segment(do.call(aes, args.link), color = "gray")+
-    opts(#panel.background=theme_blank(), 
-         panel.grid.minor=theme_blank()
+     theme_bw() + 
+       opts(##panel.background=theme_blank(), 
+         panel.grid.minor=theme_blank(),
          ## taxis.text.y = theme_blank(),         
-         ## panel.grid.major = theme_blank()
-         ) + theme_bw() + ylab(" ")
+         panel.grid.major = theme_blank()
+         )  + ylab(" ") 
   ## scale_y_continuous(breaks= 5, labels = 5)            
   
   ## single model

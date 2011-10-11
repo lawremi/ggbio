@@ -4,6 +4,7 @@
 ## import(ggplot2)
 ## import(biovizBase)
 importFrom(gridExtra, grid.arrange)
+import(scales)
 ## GenomicRanges
 ## IRanges
 importFrom(IRanges, IRanges,  disjointBins,
@@ -56,13 +57,6 @@ importClassesFrom(Rsamtools, BamFile)
 importClassesFrom(BSgenome, BSgenome)
 ## importMethodsFrom(BSgenome, getSeq)
 
-## ## ## rtracklayer
-## importClassesFrom(rtracklayer, BrowserView)
-## importFrom(rtracklayer, browserSession, genome, "genome<-",
-##            ucscTableQuery,tableNames, "tableName<-", GenomicData, getTable,
-##            "track<-", GRangesForUCSCGenome, browserView,
-##            ucscGenomes)
-
 ## ## ## GenomicFeatures
 importClassesFrom(GenomicFeatures,TranscriptDb)
 importFrom(GenomicFeatures,
@@ -77,8 +71,10 @@ importFrom(GenomicFeatures,
 ## ============================================================
 exportMethods(qplot, rescale)
 export(tracks, plotOverview, plotSingleChrom, geom_hotregion,
-       geom_chevron, getLimits
-       ## plotMismatchSum, plotGrandLinear, plotFragLength,
-       ## plotSpliceSum
-       ## plotRangesLinkedToData
+       geom_chevron, 
+       plotMismatchSum,
+       plotGrandLinear,
+       ##plotFragLength,
+       plotSpliceSum,
+       plotRangesLinkedToData
        )

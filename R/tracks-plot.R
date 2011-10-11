@@ -1,6 +1,9 @@
-tracks <- function(..., check.xlim = TRUE,
-                   legend = FALSE,
+tracks <- function(...,
+                   ## check.xlim = TRUE,
+                   ## legend = FALSE,-     #
                    xlim, ylim){
+  ## FIXME: later.
+  check.xlim <- TRUE
   dots <- list(...)
   dots <- c(list(ncol = 1), dots)
   params <- c("nrow", "ncol", "widths", "heights", "default.units", 

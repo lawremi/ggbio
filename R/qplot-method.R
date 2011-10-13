@@ -456,7 +456,9 @@ setMethod("qplot", "GRangesList", function(data, ..., freq, show.label = FALSE,
   label.type <- match.arg(label.type)
   args <- list(...)
   ## args <- args[names(args) != scale.size]
-  nms <- rep(names(data), elementLengths(data))
+  if(is.null(names(data)))
+    nm.data <- as.character(seq(length(data)))
+  nms <- rep(nm.data, elementLengths(data))
   gr <- unlist(data)
   values(gr)$.grl.name <- nms
   if(!missing(freq)){

@@ -528,12 +528,12 @@ Please refer to a special graphic in section \ref{sec:splice}.
 Similar to \qplot{} for \Robject{GRanges}, supported geoms includes, 
 \emph{full, segment, coverage.line, coverage.polygon}. 
 
-No facet support, just simply viewing the intervals and coverage.
+No facet support yet, just simply viewing the intervals and coverage.
 % 
-\begin{figure}[h!t!p]
-  \centering
+% \begin{figure}[h!t!p!b]
+%   \centering
 @ 
-<<iranges-plot, fig = TRUE>>=
+<<iranges-plot, eval = FALSE, fig = FALSE>>=
 ir <- ranges(gr[seqnames(gr) == "chr1"])[1:40]
 p1 <- qplot(ir) + opts(title = "full")
 p2 <- qplot(ir, geom = "segment")+ opts(title = "segment")
@@ -544,9 +544,9 @@ grid.arrange(p1, p2, p3, p4, ncol = 2)
 %   \caption{IRanges geoms}
 %   \label{fig:iranges-plot}
 % \end{figure}
-% \begin{figure}[h!t!p]
-%   \centering
-% \includegraphics[width = 0.6\textwidth]{iranges-plot.png}
+\begin{figure}[h!t!p]
+  \centering
+\includegraphics[width = 0.6\textwidth]{intro-iranges-plot.pdf}
 \caption{qplot for \Robject{IRanges}. Similar to \Robject{GRanges},
   but we don't have seqnames information about it}
   \label{fig:iranges-plot}

@@ -483,7 +483,7 @@ it's already split by transcript when you specify \Rfunarg{by} equals
 name of transcript.
 
 @ 
-<<splice-grl>>=
+<<splice-grl, eval = FALSE>>=
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 data(genesymbol)
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
@@ -502,22 +502,22 @@ p.splice2 <- qplot(exons.rbm17, freq = freqs, show.label = TRUE, offset = 0.05,
 
 \begin{figure}[h!t!p]
   \centering
-@ 
-<<splice1, fig = TRUE>>=
-print(p.splice1)
-@ %def 
-% \includegraphics[width = 0.8\textwidth]{splicenofreq.png}
+% @ 
+% <<splice1, fig = TRUE>>=
+% print(p.splice1)
+% @ %def 
+\includegraphics[width = 0.8\textwidth]{splicenofreq.png}
 \caption{Transcripts model of gene RBM17}
   \label{fig:splice1}
 \end{figure}
 
 \begin{figure}[h!t!p]
   \centering
-  @ 
-<<splice2, fig = TRUE>>=
-print(p.splice2)
-@ %def 
-% \includegraphics[width = 0.8\textwidth]{splicefreq.png}
+%   @ 
+% <<splice2, fig = TRUE>>=
+% print(p.splice2)
+% @ %def 
+\includegraphics[width = 0.8\textwidth]{splicefreq.png}
 \caption{Model with frequency indicated}
   \label{fig:splice2}
 \end{figure}
@@ -674,13 +674,9 @@ Supported geoms includes:
     mismatch summary section.
 \end{description}
 
-
-\begin{figure}[h!t!p!b]
-  \centering
-  % \includegraphics[width = 0.7\textwidth]{bamplot.png}
 @ 
-<<bam-plot, fig = TRUE>>=
-library(BSgenome.Hsapiens.UCSC.hg19)
+<<bam-plot, fig = FALSE, eval = FALSE>>=
+
 p1 <- qplot(bamfile, which = genesymbol["RBM17"], geom = "gapped.pair")
 p2 <- qplot(bamfile, which = genesymbol["RBM17"], geom = "gapped.pair",
             show.junction = TRUE) 
@@ -691,6 +687,10 @@ p6 <- qplot(bamfile, which = genesymbol["RBM17"], bsgenome = Hsapiens,
       geom = "mismatch.summary") 
 tracks(p1, p2, p3, p4, p5, p6)
 @ %def 
+
+\begin{figure}[h!t!p!b]
+  \centering
+\includegraphics[width = 0.7\textwidth]{intro-bam-plot.pdf}
   \caption{Tracks of different geom of bam file, in the order of gapped.pair, gapped.pair with junction, full, coverage.line, coverage.polygon, mismatch.summary.}
   \label{fig:bam-plot}
 \end{figure}
@@ -706,18 +706,17 @@ Supported geoms including
 Figure \ref{fig:txdb} shows two tracks for a \Robject{TranscriptDb} object.
 
 
- \begin{figure}[h!t!b!p]
-   \centering
-
 @ 
-<<txdb-plot, fig = TRUE>>=
+<<txdb-plot, fig = FALSE, eval = FALSE>>=
 p.full <- qplot(txdb, geom = "full", which = genesymbol["RBM17"])
 p.single <- qplot(txdb, geom = "single", which = genesymbol["RBM17"])
 p.tx <- qplot(txdb, geom = "tx", which = genesymbol["RBM17"])
 tracks(p.full, p.single, p.tx, heights = c(400, 100, 400))
 @ 
 
-   % \includegraphics[width = 0.8\textwidth]{txdb.png}
+ \begin{figure}[h!t!b!p]
+   \centering
+   \includegraphics[width = 0.8\textwidth]{intro-txdb.pdf}
    \caption{TranscriptDb visualization. First track showing full
      model, second track showing reduced one. and last one show exons
      in isoforms.}
@@ -745,6 +744,7 @@ Figure \ref{fig:BSgenome} shows four tracks(with four geom) for a
   \centering
 @ 
 <<BSgenome-tracks, fig = TRUE>>=
+library(BSgenome.Hsapiens.UCSC.hg19)
 gr <- GRanges("chr1", IRanges(5e7, 5e7+50))
 p1 <- qplot(Hsapiens, name = gr, geom = "text") +
   theme_bw()
@@ -1103,10 +1103,8 @@ GRangesList, then plot the summary by \Rfunction{qplot} function. Please
 check the previous section.
 
 
-\begin{figure}[h!t!p!b]
-  \centering
 @ 
-<<plotSpliceSum, fig = TRUE>>=
+<<plotSpliceSum, fig = FALSE, eval = FALSE>>=
 p1 <- plotSpliceSum(bamfile, exons.rbm17)
 ## all more control
 p2 <- plotSpliceSum(bamfile, exons.rbm17, weighted = FALSE, offset = 0.01)
@@ -1114,9 +1112,12 @@ p3 <- plotSpliceSum(bamfile, txdb, which = genesymbol["RBM17"],
                    show.label = TRUE,
                    label.type = "count")
 print(p1)
+
 @ %def 
+\begin{figure}[h!t!p!b]
+  \centering
 % need a grphic here
-% \includegraphics[width = 0.7\textwidth]{plotSpliceSum.png}  
+\includegraphics[width = 0.7\textwidth]{intro-plotSpliceSum.pdf}  
   \caption{Plot for splicing summary, intervally converted to GRangesList. the height of the rectangle shows the supported evidence.}
   \label{fig:plotSpliceSum}
 \end{figure}
@@ -1265,16 +1266,14 @@ ggplot object.
 Here are some examples for function
 \Rfunction{plotRangesLinkedToData}.
 
-\begin{figure}[h!t!p!b]
-  \centering
-
 @ 
-<<plotRangesLinkedToData, fig = TRUE>>=
+<<plotRangesLinkedToData, fig = FALSE, eval = FALSE>>=
 exons <- exons(txdb)
 exon17 <- subsetByOverlaps(exons, genesymbol["RBM17"])
 ## reduce to make sure there is no overlap
 ## just for example
 exon.new <- reduce(exon17)
+p <- qplot(model.new)
 ## simulated data
 values(exon.new)$sample1 <- rnorm(length(exon.new), 10, 3)
 values(exon.new)$sample2 <- rnorm(length(exon.new), 10, 10)
@@ -1285,21 +1284,23 @@ plotRangesLinkedToData(exon.new, stat.col = c("sample1", "sample2"))
 ## plotRangesLinkedToData(exon.new, stat.col = 1:2)
 ## show as figure, adding annotation
 @ %def 
+
+\begin{figure}[h!t!p!b]
+  \centering
+  \includegraphics[width = 0.6\textwidth]{intro-plotRangesLinkedToData.pdf}
   \caption{Single Granges object for multiple samples}
   \label{fig:singlelink}
 \end{figure}
 
-
+@ 
+<<link2, fig = FALSE, eval = FALSE>>=
+plotRangesLinkedToData(exon.new, stat.col = 1:2, annotation = list(p))
+@ %def 
 
 
 \begin{figure}[h!t!p!b]
   \centering
-@ 
-<<link2, fig = TRUE>=
-plotRangesLinkedToData(exon.new, stat.col = 1:2, annotation = list(p))
-@ %def 
-  % \includegraphics[width = 0.6\textwidth]{linked.png}  
-
+   \includegraphics[width = 0.6\textwidth]{link2.png}  
   \caption{Single Granges object for multiple samples with annotation track.}
   \label{fig:singlelink-anno}
 \end{figure}

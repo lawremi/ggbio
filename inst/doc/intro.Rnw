@@ -904,7 +904,6 @@ p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
 p.zoom <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1",
                 zoom.region = c(1e8, 1.5e8))
 
-tracks(p, p.zoom)
 ## you could also run the following code to make nice adjusted 
 ## overview
 ## vp1 <- viewport(width = 1, height = 0.14)
@@ -917,8 +916,7 @@ tracks(p, p.zoom)
 
 \begin{figure}[h!t!p]
   \centering
-  \includegraphics[height = .26in, width = 5in]{intro-plotSingleChrom.pdf}\\
-  \includegraphics[height = .26in, width = 5in]{intro-plotSingleChrom-zoom.pdf}  
+  \includegraphics[height = .26in, width = 5in]{intro-plotSingleChrom.pdf}
 \caption{Single Chromosome as Ideogram. The top plot shows simple single chromosome,
   and the bottom one shows the one with fixed zoom window.}
   \label{fig:plotSingleChrom}

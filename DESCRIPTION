@@ -1,7 +1,7 @@
 Package: ggbio
 Version: 0.9.1
 Title: Static visualization for genomic data.
-Description: ggbio focuses on visualizing genomic data using basic R graphics or grid-based packages, make generic function to works on specific data structure defined in Bioconductor project. At higher levels, we implemented several graphics which could be easily used to produce some diagnostic graphics for next generation sequencing data or some other genomic data, such as grand linear view(Manhattan plot), stacked overview, mismatch pileup summary, fragment length estimation, linked view and splice summary.
+Description: The ggbio package extends and specializes the grammar of graphics for biological data. The graphics are designed to answer common scientific questions, in particular those often asked of high throughput genomics data. All core Bioconductor data structures are supported, where appropriate. The package supports detailed views of particular genomic regions, as well as genome-wide overviews. Supported overviews include ideograms and grand linear views. High-level plots include sequence fragment length, edge-linked interval to data view, mismatch pileup, and several splicing summaries.
 Author: Tengfei Yin, Michael Lawrence, Dianne Cook
 Maintainer: Tengfei Yin <yintengfei@gmail.com>
 Depends: methods, biovizBase, ggplot2
@@ -11,12 +11,13 @@ biocViews: Infrastructure, Visualization, Bioinformatics
 License: GPL (>=2)
 LazyLoad: Yes
 Collate: utils.R
+	 AllGenerics.R
 	 tracks-plot.R
 	 qplot-method.R
 	 plotGrandLinear.R
 	 plotRangesLinkedToData.R
-	 plotFragLength.R
-	 plotSpliceSum.R
+	 plotFragLength-method.R
+	 plotSpliceSum-method.R
 	 mismatch-plot.R
 	 geom_chevron.R
 	 geom_hotregion.R

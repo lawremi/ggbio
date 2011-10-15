@@ -1,4 +1,4 @@
-setGeneric("plotFragLength", function(data, model, ...) standardGeneric("plotFragLength"))
+## default show y axis of the first track and hide others
 setMethod("plotFragLength", c("character", "GRanges"),
           function(data, model,
                    gap.ratio = 0.0025,
@@ -6,6 +6,8 @@ setMethod("plotFragLength", c("character", "GRanges"),
                    type = c("normal", "cut"),
                    heights = c(400, 100),
                    annotation = TRUE){
+  ## default show it, but only keep first one
+    show.axis.text.y <- FALSE
   ## geom <- match.arg(geom)
   type <- match.arg(type)
   message("Compute fragment length...")
@@ -27,11 +29,19 @@ setMethod("plotFragLength", c("character", "GRanges"),
     gr.fraglength <- gr.res
     model <- cut.fun(model)
   }
+  ## since model is always there
+  ## so make sure it's overlaped
+  gr.fraglength <- keepSeqlevels(gr.fraglength,
+                                 unique(as.character(seqnames(gr.fraglength))))
+  gr.fraglength <- subsetByOverlaps(gr.fraglength, range(model), type = "within")
     if(is(model, "GRanges"))
       model <- GRangesList(model)
     names(model) <- "1"
-    p.exon <- qplot(model) + ylab("") + theme_bw() +opts(panel.grid.minor=theme_blank(),
-                                             panel.grid.major=theme_blank()) 
+    p.exon <- qplot(model) + ylab(" ") + theme_bw() +opts(panel.grid.minor=theme_blank(),
+                                             panel.grid.major=theme_blank())
+                                               ## scale_y_continuous(breaks = c(0),
+                                               ##                   labels = " x")
+                                               ## opts(axis.text.y = theme_blank())
 
     df <- as.data.frame(gr.fraglength)
     p <- ggplot(df)
@@ -58,7 +68,7 @@ setMethod("plotFragLength", c("character", "GRanges"),
     }
     p <- p + ylab("Estimated Fragmeng Length") 
     if(annotation)
-      tracks(p, p.exon, heights = heights)
+      tracks(p, p.exon, heights = heights, show.axis.text.y = show.axis.text.y)
     else{
       p <- p + xlab("Genomic Coordinates")
       p

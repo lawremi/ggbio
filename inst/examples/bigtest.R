@@ -345,17 +345,106 @@ plotRangesLinkedToData(exon.new, stat.col = 1:2)
 plotRangesLinkedToData(exon.new, stat.col = 1:2, annotation = list(p))
 
 ## fragment Length
-
+library(ggbio)
 data(genesymbol)
 bamfile <- system.file("extdata", "SRR027894subRBM17.bam", package="biovizBase")
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
-model <- exonsBy(txdb, by = "tx")
-model.new <- subsetByOverlaps(model, genesymbol["RBM17"])
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+## model <- exonsBy(txdb, by = "tx")
+## model.new <- subsetByOverlaps(model, genesymbol["RBM17"])
 exons.rbm17 <- subsetByOverlaps(exons(txdb), genesymbol["RBM17"])
 exons.new <- reduce(exons.rbm17)
+library(gridExtra)
 plotFragLength(bamfile, exons.new, geom = "line")
 plotFragLength(bamfile, exons.new, geom = c("point","segment"))
 plotFragLength(bamfile, exons.new, geom = c("point","segment"), annotation = FALSE)
 plotFragLength(bamfile, exons.new, geom = c("point","segment"), type = "cut",
                gap.ratio = 0.001)
+
+length(GRangesList(exons.new, exons.new))
+library(ggbio)
+data(genesymbol)
+## M's question, combine a coverage plot with fragment length
+p <- plotFragLength(bamfile, exons.new, geom = c("point","segment"),
+                    annotation = FALSE)
+
+bamfile <- "~/Datas/seqs/rna-seq/genentech/SRC587239.101201_SN152_0410_B_FC810WK_IX_PE.003.s_5.gsnap.merged.concordant_uniq.bam"
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
+exons.rbm17 <- subsetByOverlaps(exons(txdb), genesymbol["RBM17"])
+exons.new <- reduce(exons.rbm17)
+## maybe it's not a best way to get coverage, just example
+## to get a coverage plot
+library(Rsamtools)
+res <- readBamGappedAlignments(bamfile,
+                               param =
+                               ScanBamParam(which = genesymbol["RBM17"], 
+                                 flag = scanBamFlag(isProperPair = TRUE,
+                                   isFirstMateRead = TRUE)))
+gr <- as(res, "GRanges")
+## use coverage geom, need to set theme_bw() to make sure they aligned well
+p.cov <- qplot(gr, geom = "coverage.line") + theme_bw()
+p.frag <- plotFragLength(bamfile, exons.new, geom = c("point","segment"),
+                         annotation = FALSE)
+## p.model <- qplot(exons.new) should support show.gaps/chevron
+## want to show chevron...need a GRangesList to represent model
+
+## need to fix/update this..
+grl <- GRangesList(exons.new)
+names(grl) <- "rbm17" # this is tedious
+p.model <- qplot(grl)
+p.model
+## annotation = FALSE, return a ggplot object, but you need to embed you
+## model track yourself
+## this need some conventient way I guess
+p.frag <- plotFragLength(bamfile, exons.new, geom = c("point","segment"),
+                         annotation = FALSE)
+exons.new
+p.frag + scale_x_continuous(limits = c(61))
+tracks(p.frag, p.model, heights = c(400, 400, 100))
+## compare grid.arrange
+library(gridExtra)
+grid.arrange(p.frag, p.cov, p.model, heights = c(400, 400, 300))
+
+
+
+## for jennifer
+## for now, store whatever information into GRangesList
+## suppose we have exons
+## [1]---[2]---[3]---[4]
+## We have splicing [1]--[2]
+## [2]--[3],..., we put whatever we found as GRangesList, each entry
+## contains one splicing form
+library(GenomicRanges)
+gr <- GRanges("chr1", IRanges(c(1, 20, 50, 60),width = c(5, 10, 6, 7)))
+## values(gr) <- data.frame(pvalue = rnorm(6))
+combs <- combn(1:4,2)
+
+grl <- do.call("GRangesList", apply(combs, 2, function(x){
+  res <- gr[x]
+  values(res) <- data.frame(pvalue = runif(2))
+  res
+}))
+
+values(grl) <- data.frame(counts = sample(1:100, size = 6),
+                                   score  = rnorm(6))
+## so you could work on this grl, which contains 6 conbination of 4 exons
+## use values to get the counts for each case
+grl
+## get first combination
+grl[[1]]  # '[[' return a GRanges
+grl[1] #'[' still a list 
+values(grl[1])$counts # counts for first  combination
+## notice the elementMetadata( or values) is not the same for list and element
+values(grl)
+class(grl[1])
+values(grl[1])
+start(grl)
+end(grl)
+width(grl)
+## this is for GRanges inside the list
+class(grl[[1]])
+values(grl[[1]])
+start(grl[[1]])
+end(grl[[1]])
+width(grl[[1]])

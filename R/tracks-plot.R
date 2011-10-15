@@ -1,6 +1,8 @@
 tracks <- function(...,
+                   show.axis.text.y = FALSE,
+                   show.ticks = FALSE,
                    ## check.xlim = TRUE,
-                   ## legend = FALSE,-     #
+                   legend = FALSE,     #
                    xlim, ylim){
   ## FIXME: later.
   check.xlim <- TRUE
@@ -48,11 +50,13 @@ tracks <- function(...,
                       grobs[[i]] <- grobs[[i]] +                      
                       opts(plot.margin = unit(c(0, 1.8, 0, 0), "lines"))
                      }
-                    grobs[[i]]+ opts(axis.text.y = theme_blank(),
-                                     axis.ticks = theme_blank(),
-                                     ## panel.background=theme_blank(), 
-                                     ## panel.grid.minor=theme_blank(),
-                                     legend.position = "none") + s
+                    if(!show.axis.text.y)
+                      grobs[[i]] <- grobs[[i]] + opts(axis.text.y = theme_blank())
+                    if(!show.ticks)
+                      grobs[[i]] <- grobs[[i]] + opts(axis.ticks = theme_blank())
+                    if(!legend)
+                      grobs[[i]] <- grobs[[i]] + opts(legend.position = "none")
+                    grobs[[i]]
                   })
     ## need to do tricks with legend
     ## one needs to provide the legend with a well-defined width

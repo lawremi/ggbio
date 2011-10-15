@@ -1,4 +1,3 @@
-setGeneric("qplot", function(data, ...) standardGeneric("qplot"))
 ## ======================================================================
 ##        For "Granges"
 ## ======================================================================
@@ -458,6 +457,8 @@ setMethod("qplot", "GRangesList", function(data, ..., freq, show.label = FALSE,
   ## args <- args[names(args) != scale.size]
   if(is.null(names(data)))
     nm.data <- as.character(seq(length(data)))
+  else
+    nm.data <- names(data)
   nms <- rep(nm.data, elementLengths(data))
   gr <- unlist(data)
   values(gr)$.grl.name <- nms

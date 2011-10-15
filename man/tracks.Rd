@@ -1,7 +1,9 @@
 \name{tracks}
 \alias{tracks}
 \title{Tracks for genomic graphics}
-\usage{tracks(..., xlim, ylim)
+\usage{tracks(..., show.axis.text.y = FALSE,
+              show.ticks = FALSE,
+              legend = FALSE, xlim, ylim)
 }
 \description{In most genome browsers, they all have such a view that including
 many tracks, could be any anntation data along genomic
@@ -60,11 +62,15 @@ graphics before passing to \code{grid.arrange}.
 \value{return a frame grob; side-effect (plotting) if plot=T.}
 \author{Tengfei Yin}
 \arguments{\item{...}{Plots of class ggplot2, trellis, or grobs, and valid
-arguments to grid.layout.}
-% \item{check.xlim}{Default is TRUE, make sure all tracks are on the
-% same scale. if FALSE, just like common grid.arrange function.}
-% \item{legend}{Default is FALSE, remove legend, this make sure all
-% tracks are aligned exactly based on the same position.}
+    arguments to grid.layout.}
+  \item{show.axis.text.y}{
+    logical value indicate to show y axis text or not.
+  }
+  \item{show.ticks}{
+    logical value indicate to show ticks or not.
+  }
+\item{legend}{Default is FALSE, remove legend, this make sure all
+ tracks are aligned exactly based on the same position.}
 \item{xlim}{Limits on x.}
 \item{ylim}{Limits on y.}
 }

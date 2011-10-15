@@ -454,7 +454,7 @@ tracks(p1, p2, p3)
 ## GRangesList
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 data(genesymbol)
-txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 exons.tx <- exonsBy(txdb, by = "tx")
 exons.rbm17 <- subsetByOverlaps(exons.tx, genesymbol["RBM17"])
 nms <- names(exons.rbm17)

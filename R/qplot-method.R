@@ -502,13 +502,13 @@ setMethod("qplot", "IRanges", function(data, ...,
   args <- args[!(names(args) %in% c("geom", "geom.engine",
                                     "data",  "legend"))]
   ## check "x", must be one of "start", "end", "midpoint"
-  if("x" %in% names(args) && !missing(x)){
-    if(!(deparse(args$x) %in% c("start", "end", "midpoint")))
-      stop("x must be one of start/end/mipoint without quote")
-  }else{
-    args <- c(args, list(x = substitute(start)))
-    message("use start for x as default")
-  }
+  ## if("x" %in% names(args) && !missing(x)){
+  ##   if(!(deparse(args$x) %in% c("start", "end", "midpoint")))
+  ##     stop("x must be one of start/end/mipoint without quote")
+  ## }else{
+  ##   args <- c(args, list(x = substitute(midpoint)))
+  ##   message("use start for x as default")
+  ## }
   geom <- match.arg(geom)
   p <- switch(geom,
               full = {

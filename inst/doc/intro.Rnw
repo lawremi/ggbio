@@ -708,15 +708,19 @@ Figure \ref{fig:txdb} shows two tracks for a \Robject{TranscriptDb} object.
 
 @ 
 <<txdb-plot, fig = FALSE, eval = FALSE>>=
+library(ggbio)
+data(genesymbol)
+pdf("intro-txdb-plot")
 p.full <- qplot(txdb, geom = "full", which = genesymbol["RBM17"])
 p.single <- qplot(txdb, geom = "single", which = genesymbol["RBM17"])
 p.tx <- qplot(txdb, geom = "tx", which = genesymbol["RBM17"])
 tracks(p.full, p.single, p.tx, heights = c(400, 100, 400))
+dev.off()
 @ 
 
  \begin{figure}[h!t!b!p]
    \centering
-   \includegraphics[width = 0.8\textwidth]{intro-txdb.pdf}
+   \includegraphics[width = 0.8\textwidth]{intro-txdb-plot.pdf}
    \caption{TranscriptDb visualization. First track showing full
      model, second track showing reduced one. and last one show exons
      in isoforms.}

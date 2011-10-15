@@ -1116,12 +1116,11 @@ p3 <- plotSpliceSum(bamfile, txdb, which = genesymbol["RBM17"],
                    show.label = TRUE,
                    label.type = "count")
 print(p1)
-
 @ %def 
 \begin{figure}[h!t!p!b]
   \centering
 % need a grphic here
-\includegraphics[width = 0.7\textwidth]{intro-plotSpliceSum.pdf}  
+  \includegraphics[width = 0.7\textwidth]{intro-plotSpliceSum.pdf}  
   \caption{Plot for splicing summary, intervally converted to GRangesList. the height of the rectangle shows the supported evidence.}
   \label{fig:plotSpliceSum}
 \end{figure}

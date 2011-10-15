@@ -675,22 +675,21 @@ Supported geoms includes:
 \end{description}
 
 @ 
-<<bam-plot, fig = FALSE, eval = FALSE>>=
-
+<<bam-plot, fig = FALSE, eval = FALSE, keep.source = FALSE>>=
 p1 <- qplot(bamfile, which = genesymbol["RBM17"], geom = "gapped.pair")
 p2 <- qplot(bamfile, which = genesymbol["RBM17"], geom = "gapped.pair",
             show.junction = TRUE) 
 p3 <- qplot(bamfile, which = genesymbol["RBM17"], geom = "full")
 p4 <- qplot(bamfile, which = genesymbol["RBM17"], geom = "coverage.line") 
 p5 <- qplot(bamfile, which = genesymbol["RBM17"], geom = "coverage.polygon")
-p6 <- qplot(bamfile, which = genesymbol["RBM17"], bsgenome = Hsapiens,
-      geom = "mismatch.summary") 
-tracks(p1, p2, p3, p4, p5, p6)
+## p6 <- qplot(bamfile, which = genesymbol["RBM17"], bsgenome = Hsapiens,
+##       geom = "mismatch.summary") 
+tracks(p1, p2, p3, p4, p5)
 @ %def 
 
 \begin{figure}[h!t!p!b]
   \centering
-\includegraphics[width = 0.7\textwidth]{intro-bam-plot.pdf}
+\includegraphics[width = 0.7\textwidth]{intro-bam-plot.png}
   \caption{Tracks of different geom of bam file, in the order of gapped.pair, gapped.pair with junction, full, coverage.line, coverage.polygon, mismatch.summary.}
   \label{fig:bam-plot}
 \end{figure}
@@ -983,8 +982,8 @@ gr.snp <- renameSeqlevels(gr.snp, nms.new)
 p1 <- plotGrandLinear(gr.snp, y = pvalue, geom = "point")
 p2 <- plotGrandLinear(gr.snp, y = pvalue, geom = "point", color.type = "identity",
                 color = I("black"), size = I(1))
-## remove ticks and laebels
-p3 <- plotGrandLinear(gr.snp, y = pvalue, geom = "point") +
+## remove ticks and laebels and set cutoff
+p3 <- plotGrandLinear(gr.snp, y = pvalue, geom = "point", cutoff = 4) +
             opts(axis.text.x = theme_blank(),
                  axis.ticks=theme_blank())
 grid.arrange(p1, p2, p3, ncol = 1)

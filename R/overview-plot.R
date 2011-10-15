@@ -9,8 +9,8 @@ plotOverview <- function(obj,
     if(!isIdeogram(obj))
         stop("Need cytoband information, please check the getIdeogram function")
     df <- as.data.frame(obj)
-    df$seqnames <- factor(as.character(df$seqnames),
-                          levels = sort(unique(as.character(df$seqnames))))
+    ## df$seqnames <- factor(as.character(df$seqnames),
+    ##                       levels = sort(unique(as.character(df$seqnames))))
     df.rect <- subset(df, gieStain != "acen")
     df.tri <- subset(df, gieStain == "acen")
     df.tri.p <- df.tri[substr(df.tri$name, 1, 1) == "p",]

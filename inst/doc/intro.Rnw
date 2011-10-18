@@ -94,6 +94,18 @@ publication purposes, requiring some rules:
   graphics.
 \end{itemize}
 
+\section{Data Sets}
+Most data sets used in this packages came from package \biovizBase{},
+\Robject{genesymbol} is a \Robject{GRanges} object which contains all
+the genes position in hg19, its symbol name, and emsembl name. BamFile
+used in these examples is from SRA(Short Read Archive), Accession:
+SRR027894 and subset the gene at chr10:6118023-6137427, which within
+gene RBM17. this sample contains junction reads but not much
+paired-end read, so for fragment length estimation section, please use
+some data that contains paired-end reads, otherwise the function will
+give you some error message. We will come up with a new data set
+later.
+
 \section{Some Details of  \ggplot{}}
 
 Extensive details about \ggplot{} are available in the on-line
@@ -140,6 +152,12 @@ in \Robject{data.frame} or \Robject{matrix} object, you can use
 \qplot{} as usual without any change, it essentially just call
 ggplot2::qplot.
 
+\qplot{} function will return a \Robject{ggplot} object which could be
+printed or shown. And it could also be arranged by function like
+\Rfunction{grid.arrange} in package \Rpackage{gridExtra} and function
+\Rfunction{tracks} in this package. Please read section
+\ref{sec:tracks} to get more details about the arrangement of
+different graphics.
 % DI: Put the data(hg19IdeogramCyto) line in the correct place(done)
 @ 
 <<loading>>=
@@ -1029,7 +1047,7 @@ experimental circular view in another package \visnab{}, which is
 interactive visualization toolkit for genomic data.
 
 
-\section{Building Tracks for Linear View}
+\section{Building Tracks for Linear View}\label{sec:tracks}
 In most genome browsers, they all have such a view that including many
 tracks, could be any annotation data along genomic coordinate. So we
 try to provide a convenient constructor for building tracks, which

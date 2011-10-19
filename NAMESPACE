@@ -1,0 +1,75 @@
+## ============================================================
+## Import
+## ============================================================
+## import(ggplot2)
+## import(biovizBase)
+importFrom(gridExtra, grid.arrange)
+import(scales)
+## GenomicRanges
+## IRanges
+importFrom(IRanges, IRanges,  disjointBins,
+           matchMatrix, findOverlaps, subsetByOverlaps,
+           "elementMetadata", "elementMetadata<-",
+           start, width, end,  resize, 
+           "values", "values<-",
+           ranges, "ranges<-", 
+           isTRUEorFALSE, coverage, slice,
+           elementLengths,
+           cbind, rbind,
+           reduce, punion, pgap, gaps)
+
+importMethodsFrom(IRanges,  split, unique,
+                  unlist,setdiff,
+                  Reduce, range,
+                  as.data.frame,
+                  length,
+                  "[","[<-","[[", "[[<-","$",
+                  "%in%", show, 
+                  lapply, sapply)
+
+importClassesFrom(IRanges, Rle, RleList, IRanges)
+
+## ## GenomicRanges
+importFrom(GenomicRanges, "seqnames<-","strand<-",
+           seqlevels, "seqlevels<-",
+           GRanges, GRangesList, Seqinfo, seqlengths, "seqlengths<-")
+importMethodsFrom(GenomicRanges, ranges, "ranges<-",
+                  start, end, width, "start<-", "end<-", "width<-",
+                  seqnames, strand, seqinfo, show, 
+                   "elementMetadata<-", elementMetadata,
+                  as.data.frame, keepSeqlevels, renameSeqlevels)
+
+importClassesFrom(GenomicRanges, GRanges)
+
+##
+## ## ## Rsamtools
+importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,
+           scanBamFlag,BamFile,
+           PileupFiles, PileupParam ,
+           readBamGappedAlignments)
+importMethodsFrom(Rsamtools, applyPileups)
+importClassesFrom(Rsamtools, BamFile)
+
+## ## ## BSgenome
+importClassesFrom(BSgenome, BSgenome)
+## importMethodsFrom(BSgenome, getSeq)
+
+## ## ## GenomicFeatures
+importClassesFrom(GenomicFeatures,TranscriptDb)
+importFrom(GenomicFeatures,
+           transcriptsByOverlaps,
+           exonsBy,
+           cdsBy)
+
+
+
+## ============================================================
+## Export
+## ============================================================
+exportMethods(qplot, rescale, plotFragLength, plotSpliceSum)
+export(tracks, plotOverview, plotSingleChrom, geom_hotregion,
+       geom_chevron, 
+       plotMismatchSum,
+       plotGrandLinear,
+       plotRangesLinkedToData)
+

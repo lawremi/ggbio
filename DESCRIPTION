@@ -1,0 +1,20 @@
+Package: ggbio
+Version: 0.9.1
+Title: Static visualization for genomic data.
+Description: The ggbio package extends and specializes the grammar of graphics for biological data. The graphics are designed to answer common scientific questions, in particular those often asked of high throughput genomics data. All core Bioconductor data structures are supported, where appropriate. The package supports detailed views of particular genomic regions, as well as genome-wide overviews. Supported overviews include ideograms and grand linear views. High-level plots include sequence fragment length, edge-linked interval to data view, mismatch pileup, and several splicing summaries.
+Author: Tengfei Yin, Dianne Cook, Michael Lawrence
+Maintainer: Tengfei Yin <yintengfei@gmail.com>
+Depends: methods, biovizBase, ggplot2
+Imports: methods, biovizBase, ggplot2, IRanges, GenomicRanges,
+        GenomicFeatures, Rsamtools, BSgenome, gridExtra, scales
+Suggests: BSgenome.Hsapiens.UCSC.hg19,
+        TxDb.Hsapiens.UCSC.hg19.knownGene
+biocViews: Infrastructure, Visualization, Bioinformatics
+License: Artistic-2.0
+LazyLoad: Yes
+Collate: utils.R AllGenerics.R tracks-plot.R qplot-method.R
+        plotGrandLinear.R plotRangesLinkedToData.R
+        plotFragLength-method.R plotSpliceSum-method.R mismatch-plot.R
+        geom_chevron.R geom_hotregion.R overview-plot.R
+        rescale-method.R ggbio.R
+Packaged: 2011-10-15 20:29:42 UTC; tengfei

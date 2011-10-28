@@ -3,6 +3,7 @@
 \title{Tracks for genomic graphics}
 \usage{tracks(..., show.axis.text.y = FALSE,
               show.ticks = FALSE,
+              show.title = TRUE,
               legend = FALSE, xlim, ylim)
 }
 \description{In most genome browsers, they all have such a view that including
@@ -68,6 +69,9 @@ graphics before passing to \code{grid.arrange}.
   }
   \item{show.ticks}{
     logical value indicate to show ticks or not.
+  }
+  \item{show.title}{
+    logical value indicate to show title of tracks or not.
   }
 \item{legend}{Default is FALSE, remove legend, this make sure all
  tracks are aligned exactly based on the same position.}

@@ -1,6 +1,7 @@
 tracks <- function(...,
                    show.axis.text.y = FALSE,
                    show.ticks = FALSE,
+                   show.title = TRUE,
                    ## check.xlim = TRUE,
                    legend = FALSE,     #
                    xlim, ylim){
@@ -40,9 +41,10 @@ tracks <- function(...,
                     ## else
                     ##   grobs[[i]] <- grobs[[i]] + s +
                     ##     opts(legend.position = "none")
+                    if(!show.title)
+                      grobs[[i]] <- grobs[[i]] + opts(axis.title.x=theme_blank())
                     if(i %in% 1:(N-1))
-                      grobs[[i]] <- grobs[[i]] + opts(axis.text.x = theme_blank(),
-                                                      axis.title.x=theme_blank())
+                      grobs[[i]] <- grobs[[i]] + opts(axis.text.x = theme_blank())
                     if(i == 1){
                       grobs[[i]] <- grobs[[i]] +
                         opts(plot.margin = unit(c(1, 1.8, 0, 0), "lines"))

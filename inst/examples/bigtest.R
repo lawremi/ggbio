@@ -45,6 +45,7 @@ p5 <- qplot(gr.sub, geom = "coverage.polygon") + opts(title = "coverage.polygon"
 library(gridExtra)
 grid.arrange(p1, p2, p3, p4, p5, ncol = 2)
 
+library(ggbio)
 qplot(gr, ncol = 2)
 ## faceting, use facets not facet
 qplot(gr, facets = group ~ seqnames)
@@ -53,6 +54,8 @@ qplot(gr, geom = "line", y = value, facets = group ~ seqnames)
 qplot(gr, geom = "point", y = value, facets = group ~ seqnames)
 qplot(gr, geom = "coverage.line", facets = group ~ seqnames)
 qplot(gr, geom = "coverage.polygon", facets = group ~ seqnames)
+
+qplot(gr[seqnames(gr) == "chr1"], facets = group ~ seqnames)
 
 ## facet gr
 gr.region <- GRanges(c("chr1", "chr2", "chr3"), 
@@ -78,15 +81,35 @@ tracks(p1, p2, p3)
 
 ## GRangesList
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-data(genesymbol)
 library(ggbio)
-txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
+data(genesymbol)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 exons.tx <- exonsBy(txdb, by = "tx")
 exons.rbm17 <- subsetByOverlaps(exons.tx, genesymbol["RBM17"])
 nms <- names(exons.rbm17)
 freqs <- c(100, 200, 300)
-names(freqs) <- nms
-p.splice1 <- qplot(exons.rbm17)
+## names(freqs) <- nms
+## p.splice1 <- qplot(exons.rbm17, freq = freqs)
+gr <- unlist(exons.rbm17)
+values(gr)$tx <- rep(names(exons.rbm17), elementLengths(exons.rbm17))
+values(gr)$freq <- rep(freqs, times = elementLengths(exons.rbm17))
+## qplot(gr, fill = freq, group = tx, show.gaps = TRUE, main = "testnfei", ylab = "level",
+##       xlab = "test")
+## fake gr
+gr2 <- gr3 <- gr
+values(gr2)$freq <- rep(c(50, 30, 1000), times = elementLengths(exons.rbm17))
+values(gr3)$freq <- rep(c(10, 3000, 100), times = elementLengths(exons.rbm17))
+grf <- c(gr, gr2, gr3)
+values(grf)$sample <- rep(c("s1", "s2", "s3"), each = length(gr))
+png("~/Desktop/splice.png", 800, 800)
+qplot(grf, fill = freq, group = tx, show.gaps = TRUE, main = "FAKE", ylab = "level",
+      facets = sample ~ seqnames)
+dev.off()
+
+
+
+grf
+p.splice1
 ## when turning on frequency 
 p.splice <- qplot(exons.rbm17, freq = freqs, show.label = TRUE, label.type = "count",
       scale.size = c(1, 5), label.size = 3)

@@ -8,6 +8,7 @@
 \usepackage{hyperref}
 \usepackage{verbatim}
 \usepackage{graphicx}
+\usepackage{longtable}
 
 % \SweaveOpts{width = 2.5, height = 2}
 
@@ -29,6 +30,7 @@
 
 \newcommand{\software}[1]{\textsf{#1}}
 \newcommand{\R}{\software{R}}
+\newcommand{\Bioc}{\software{Bioconductor}}
 \newcommand{\IRanges}{\Rpackage{IRanges}}
 \newcommand{\biovizBase}{\Rpackage{biovizBase}}
 \newcommand{\ggbio}{\Rpackage{ggbio}}
@@ -94,17 +96,108 @@ publication purposes, requiring some rules:
   graphics.
 \end{itemize}
 
-\section{Data Sets}
-Most data sets used in this packages came from package \biovizBase{},
-\Robject{genesymbol} is a \Robject{GRanges} object which contains all
-the genes position in hg19, its symbol name, and emsembl name. BamFile
-used in these examples is from SRA(Short Read Archive), Accession:
-SRR027894 and subset the gene at chr10:6118023-6137427, which within
-gene RBM17. this sample contains junction reads but not much
-paired-end read, so for fragment length estimation section, please use
-some data that contains paired-end reads, otherwise the function will
-give you some error message. We will come up with a new data set
-later.
+\section{Fundamentals}
+In this vignette, we hope to present our case study though real data
+as much as possible, in this section, let's first layout the most
+common extra high-throughput sequencing data and with questions they are
+trying to answer.For next generation sequencing, we generally have
+three types of technologies, DNA-seq, RNA-seq and ChIP-seq. Each of
+them focus on solving different biological questions.
+
+\begin{itemize}
+\item DNA-seq
+  \begin{itemize}
+  \item SNP(Single-nucleotide polymorphism), GWAS, genotyping
+  \item Indels(Insertion and deletion)
+  \item CNV(copy number variation)
+  \item LOH(Loss of heterozygosity)
+  \item SV(Structural Variants):inversion, balanced translocation
+    breakpoints.
+  \end{itemize}
+\item RNA-seq
+  \begin{itemize}
+  \item Transcript structure: splice, gene/exon boundary, novel
+    transcript
+  \item Expression
+  \end{itemize}
+\item Chip-seq
+  \begin{itemize}
+  \item Sequence enrichment, genome-wide mapping of DNA-protein
+    interaction.
+  \end{itemize}
+\end{itemize}
+
+For the sequencing technique we discussed above, raw files are produced
+after each run, and there are lots of intermediate data trough
+different pipeline and software which stored in various data
+format. such as \textbf{FASTQ, SRA, BED, BAM, SAM, GFF, WIG, bigWig,
+  bigBed}. Most genome browser provides specific graphic for each type
+of data format. Instead, method we present here uses a different
+strategy, which leave users to decide how to import and visualize their
+data. Users need to use I/O package in R, like \Rpackage{Rsamtools},
+\Rpackage{rtracklayer} and then store them in different core object or
+data structures which defined inside \Bioc{}. Since each object inside
+\Bioc{} could be mapped to different geoms by \ggbio{}, this leave
+users more flexibility to deal with the visualization of their raw
+data. In other words, it's object-centric or object-oriented
+visualization especially designed for \Bioc{} project.
+
+Here we also layout possible mapping strategies between core data
+structure in \Bioc{} and the question of interest in Table
+\ref{tab:obj}. More details could be found in each subsections.
+
+
+\begin{table}
+  \caption{Mapping between data structure and questions of interests}  
+  \label{tab:obj}
+  \centering
+  \begin{tabular}{|p{3cm}|p{9cm}|}
+\hline
+Class&Question Of interests\\\hline
+\Robject{Ranges}&Simple intervals and segmentation.\\\hline
+\Robject{GRanges}&Short read alignments, ideogram, SNP, indel\\\hline
+\Robject{GRangeList}&gene model, splicing summary\\\hline
+\Robject{Rle}&Coverage\\\hline
+\Robject{RleList}&Coverage with multiple sample comparison\\\hline
+\Robject{BSgenome}&SNP, indels mapping\\\hline
+\Robject{TranscriptDb}&gene structure, know boundary\\\hline
+\Robject{GappedAlignments}&pair-end RNA-seq data mapping, transcript structure\\\hline
+\Robject{BamFile}&Raw NGS data format\\\hline
+\Robject{character}&Parsing from even lower levels\\\hline
+\Robject{GenomicRangesList}&TBD\\\hline
+  \end{tabular}
+\end{table}
+
+A simple example for mapping between data type, data structures and
+visualization geoms, is like, a bam file(data type) could be read by
+I/O package \Rpackage{Rsamtools} and use function
+\Rfunction{readBamGappedAlignments} to import the data and represent
+in a specific data structure, called \Robject{GappedAlignment}, then
+\ggbio{} provides mapping of this data structure to different
+geoms(coverage, junction reads) or even high level graphics to help
+scientists solve certain question. Another instance, we could import
+\textbf{GFF} format and import them as \Robject{GRanges}(\Bioc{} data
+structure) by I/O package \Rpackage{rtracklayer}.  Then plot them as
+annotation tracks by \ggbio{}.
+
+In this way, users are open to their favorite pipelines or data types
+and we only provide flexible mapping between data structure inside
+\Bioc{} and geoms. Even providing more convenient question-oriented
+high levels graphics, which require to add more ``flavors'' to the
+data structures.
+
+The data sets we are going to use for case study in this vignette will
+be pulled from publicly available sources as possible as we can. So
+people could try to reproduce the results by themselves. Two most used
+sources for finding raw NGS data could be \emph{1000 genome
+  project}\footnote{\url{http://www.1000genomes.org/}} and
+\emph{SRA}\footnote{\url{http://www.ncbi.nlm.nih.gov/sra}}. If we
+process the data, we will provide protocol we use associated with the
+data. Some example data are stored in lower-level package
+\biovizBase{}. Such as examples used for GappedAlignments. It's
+accession NO is SRR027894, and it's subset of the gene region, RBM17
+on chromosome 10.
+
 
 \section{Some Details of  \ggplot{}}
 

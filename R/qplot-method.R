@@ -67,7 +67,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
   allvars <- NULL
   if(missing(facet_gr)){
     if(!"facets" %in% names(args)){
-      if(length(seqname) > 1){
+      if(length(seqname)){
         ## facet by default is by seqname
         facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facet)),
                               TRUE, FALSE)
@@ -84,9 +84,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
         if(allvars[2] != "seqnames")
           stop("Column of facet formula can only be seqnames, such as . ~ seqnames,
               you can change row varaibles")
-        if(allvars[1] %in% colnames(values(data)) 
-           ## !(geom %in% c("coverage.line", "coverage.polygon"))
-           ){
+        if(allvars[1] %in% colnames(values(data))){
           facet <- do.call(facet_grid, c(args$facets, args.facet))
         }else{
           args.facet <- c(args.facet, list(facets = substitute(~seqnames)))
@@ -167,11 +165,14 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 p <- ggplot(df)
                 args <- args[!(names(args) %in% c("x", "y"))]
                 if(!("color" %in% names(args))){
-                  if("fill" %in% names(args))
+                  if("fill" %in% names(args)){
                     args <- c(args, list(color = args$fill))
-                  else
+                    isStrand <- FALSE
+                  }else{
                     args <- c(args, list(color = substitute(strand),
                                          fill = substitute(strand)))
+                    isStrand <- TRUE
+                  }
                 }
                 gpn <- as.character(args$group)
                 args <- args[names(args) != "group"]
@@ -182,7 +183,11 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                                         "label.type",
                                                         "label.size",
                                                         "label.color",
-                                                        "size")]
+                                                        "size",
+                                                        "fill",
+                                                        "color",
+                                                        "colour")]
+                  ## temporily disable color/fill
                   args.gaps.extra <- args[names(args) %in%
                                           c("offset", "chevron.height")]
                   ## if(!("offset" %in% names(args.gaps.extra)))
@@ -191,6 +196,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                   gps.lst <- c(list(aes.lst), list(data = gps),
                                args.gaps.extra)
                   p <- p + do.call(geom_chevron, gps.lst)
+                  p
                 }
                 if(show.label){
                   label.gr <- getModelRange(data,
@@ -208,9 +214,11 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                      ymin = substitute(.levels - 0.4),
                                      ymax = substitute(.levels + 0.4)))
                 args.rect <- args[names(args) != "size"]
-                p <- p + geom_rect(do.call("aes", args.rect)) +
-                  scale_color_manual(values = strandColor)+
+                p <- p + geom_rect(do.call("aes", args.rect))
+                if(isStrand)
+                  p <- p + scale_color_manual(values = strandColor)+
                     scale_fill_manual(values = strandColor)
+                p
               },              
               segment = {
                 if(!missing(facet_gr)){
@@ -253,11 +261,14 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 df$midpoint <- (df$start+df$end)/2
                 args <- args[!(names(args) %in% c("x", "y"))]
                 if(!("color" %in% names(args))){
-                  if("fill" %in% names(args))
+                  if("fill" %in% names(args)){
                     args <- c(args, list(color = args$fill))
-                  else
+                    isStrand <- FALSE
+                  }else{
                     args <- c(args, list(color = substitute(strand),
                                          fill = substitute(strand)))
+                    isStrand <- TRUE
+                  }
                 }
 
                 gpn <- as.character(args$group)
@@ -303,9 +314,11 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                                      xend = substitute(end),
                                      y = substitute(.levels),
                                      yend = substitute(.levels)))
-                p + geom_segment(do.call("aes", args)) +
-                  scale_color_manual(values = strandColor) +
-                          scale_fill_manual(values = strandColor)                    
+                p <- p + geom_segment(do.call("aes", args)) 
+                if(isStrand)
+                  p <- p + scale_color_manual(values = strandColor)+
+                    scale_fill_manual(values = strandColor)
+                p
               },
               coverage.line = {
                 if(!missing(facet_gr)){
@@ -436,8 +449,15 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
               )
   if(!legend)
     p <- p + opts(legend.position = "none")
-  p <- p + xlab(paste("Genomic Coordinates"))
-  if(length(seqname)>1)
+  if("xlab" %in% names(args))
+    p <- p + xlab(args$xlab)
+  else
+    p <- p + xlab(paste("Genomic Coordinates"))
+  if("ylab" %in% names(args))
+    p <- p + ylab(args$ylab)
+  if("main" %in% names(args))
+    p <- p + opts(title = args$main)
+  ## if(length(seqname)>= 1)
     p <- p + facet
   p
 })

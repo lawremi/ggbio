@@ -162,6 +162,7 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
                 data <- unlist(data)
                 df <- as.data.frame(data)
                 df$midpoint <- (df$start+df$end)/2
+                ## p <- do.call("ggplot", c(list(data = df),args.ori ))
                 p <- ggplot(df)
                 args <- args[!(names(args) %in% c("x", "y"))]
                 if(!("color" %in% names(args))){
@@ -449,15 +450,16 @@ setMethod("qplot", signature(data = "GRanges"), function(data, x, y,...,
               )
   if(!legend)
     p <- p + opts(legend.position = "none")
+  
   if("xlab" %in% names(args))
-    p <- p + xlab(args$xlab)
+    p <- p + xlab(eval(args$xlab))
   else
     p <- p + xlab(paste("Genomic Coordinates"))
+  
   if("ylab" %in% names(args))
-    p <- p + ylab(args$ylab)
+    p <- p + ylab(eval(args$ylab))
   if("main" %in% names(args))
-    p <- p + opts(title = args$main)
-  ## if(length(seqname)>= 1)
+    p <- p + opts(title = eval(args$main))
     p <- p + facet
   p
 })
@@ -588,7 +590,15 @@ setMethod("qplot", "IRanges", function(data, ...,
               )
   if(!legend)
     p <- p + opts(legend.position = "none")
-  p <- p + xlab("Space")
+  if("xlab" %in% names(args))
+    p <- p + xlab(args$xlab)
+  else
+    p <- p + xlab("Space")
+  if("ylab" %in% names(args))
+    p <- p + ylab(args$ylab)
+  if("main" %in% names(args))
+    p <- p + opts(title = args$main)
+  
   p
 })
 

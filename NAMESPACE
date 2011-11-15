@@ -1,10 +1,12 @@
 ## ============================================================
 ## Import
 ## ============================================================
+import(methods)
 ## import(ggplot2)
 ## import(biovizBase)
 importFrom(gridExtra, grid.arrange)
 import(scales)
+importFrom(BiocGenerics, cbind, rbind, setdiff)
 ## GenomicRanges
 ## IRanges
 importFrom(IRanges, IRanges,  disjointBins,
@@ -15,11 +17,10 @@ importFrom(IRanges, IRanges,  disjointBins,
            ranges, "ranges<-", 
            isTRUEorFALSE, coverage, slice,
            elementLengths,
-           cbind, rbind,
            reduce, punion, pgap, gaps)
 
 importMethodsFrom(IRanges,  split, unique,
-                  unlist,setdiff,
+                  unlist, setdiff,
                   Reduce, range,
                   as.data.frame,
                   length,

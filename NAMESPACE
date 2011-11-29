@@ -6,7 +6,7 @@ import(methods)
 ## import(biovizBase)
 importFrom(gridExtra, grid.arrange)
 import(scales)
-importFrom(BiocGenerics, cbind, rbind, setdiff)
+import(BiocGenerics)
 ## GenomicRanges
 ## IRanges
 importFrom(IRanges, IRanges,  disjointBins,

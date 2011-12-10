@@ -1,4 +1,4 @@
-setGeneric("qplot", function(data, ...) standardGeneric("qplot"))
+setGeneric("autoplot", function(data, ...) standardGeneric("autoplot"))
 
 setGeneric("rescale", function(x, ...) standardGeneric("rescale"))
 

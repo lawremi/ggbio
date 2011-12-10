@@ -1,20 +1,13 @@
-rangesCentric <- function(gr, which, id.name){
-  ## first subset, need to give notice
-  gr <- subsetByOverlaps(gr, which)
-  which <- which[order(start(which))]
-  gr <- gr[order(start(gr))]
-  ## which <- subsetByOverlaps(which, gr)
-  ## FIXME: give message here
-  ## need to be exclusive
-  which <- reduce(which)
-  mx <- matchMatrix(findOverlaps(gr, which))
-  values(gr)$.id.name <- NA
-  values(gr)$.id.name[mx[,1]] <- mx[,2]
-  if(!missing(id.name) && (id.name %in% colnames(values(which))))
-    values(gr)$.id.name[mx[,1]] <- values(which)[mx[,2],id.name]
-  values(which)$.id.name <- seq_len(length(which))
-  ## cannot be putted into GRangesList, unequal, should be in a GenomicRangesList
-  list(gr = gr, which = which)
+newDataAfterFacetByGr <- function(gr, which, id.name){
+  gr <- sort(gr)
+  which <- sort(which)
+  ## suppose which is a GRanges
+  res <- lapply(seq_len(length(which)),function(i){
+    res <- subsetByOverlaps(gr, which[i])
+    values(res)$.bioviz.facetid <- i
+    res
+  })
+  do.call(c, res)
 }
 
 getLimits <- function(obj){
@@ -131,25 +124,37 @@ getLimitsFromLayer <- function(obj){
 }
 
 getGap <- function(data, group.name){
-  res <- split(data, values(data)[,group.name])
-  gps.lst <- lapply(res, function(x){
-    gps <- gaps(ranges(x))
-    if(length(gps)){
-      gr <- GRanges(unique(as.character(seqnames(x))), gps)
-      ## wait this request a .levels?
-      values(gr)$.levels <- unique(values(x)$.levels)
-      ## values(gr)$.model.group <- unique(values(x)$.model.group)
-      ## if(".freq" %in% colnames(values(x)))
-      ##   values(gr)$.freq <- unique(values(x)$.freq)
-      gr
-    }else{
-      NULL
-    }
+  res <- split(data, seqnames(data))
+  grl <- endoapply(res, function(dt){
+    res <- split(dt, values(dt)[,group.name])
+    ## browser()
+    gps.lst <- lapply(res, function(x){
+      if(length(x) > 1){
+        ## if(values(x)$.levels  == 93) browser()
+        gps <- gaps(ranges(x))
+        if(length(gps)){
+          seqs <- unique(as.character(seqnames(x)))
+          ## print(seqs)
+          ir <- gps
+          ## print(ir)
+          ## res
+          gr <- GRanges(seqs, ir)
+          ## tryes <- try(gr <- GRanges(, gps))
+          ## if(inherits(tryes, "try-error")) browser()
+          values(gr)$.levels <- unique(values(x)$.levels)
+          gr
+        }else{
+          NULL
+        }}else{
+          NULL
+        }
+    })
+    gps <- do.call("c", gps.lst)          #remove NULL
+    gps <- do.call("c", unname(gps))
   })
-  gps <- do.call("c", gps.lst)          #remove NULL
-  gps <- do.call("c", unname(gps))
-  values(gps)$type <- "gaps"
-  gps
+  res <- unlist(grl)
+  values(res)$type <- "gaps"
+  res
 }
 ## suppose we have freq?
 getModelRange <- function(data, group.name){
@@ -163,5 +168,6 @@ getModelRange <- function(data, group.name){
   values(gr)$.label <- names(gr)
   gr
 }
+
 
 

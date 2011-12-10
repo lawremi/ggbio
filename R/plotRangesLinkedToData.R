@@ -67,7 +67,7 @@ plotRangesLinkedToData <- function(data, stat.col, stat.label, ..., annotation =
   ## single model
   grl <- GRangesList(data)
   names(grl) <- "1"
-  p.single <- qplot(grl) +  opts(panel.grid.minor=theme_blank()) + ylab(" ")+
+  p.single <- autoplot(grl) +  opts(panel.grid.minor=theme_blank()) + ylab(" ")+
     theme_bw()
 
   if(length(annotation)){

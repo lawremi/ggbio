@@ -1,10 +1,15 @@
 ## ============================================================
 ## Import
 ## ============================================================
-## import(ggplot2)
-## import(biovizBase)
+## ggplot2
+import(ggplot2)
+## BiocGenerics
+importFrom(BiocGenerics, cbind, rbind)
+import(biovizBase)
 importFrom(gridExtra, grid.arrange)
-import(scales)
+importFrom(scales, cscale, dscale)
+## Hmisc
+importFrom(Hmisc, bezier)
 ## GenomicRanges
 ## IRanges
 importFrom(IRanges, IRanges,  disjointBins,
@@ -15,17 +20,16 @@ importFrom(IRanges, IRanges,  disjointBins,
            ranges, "ranges<-", 
            isTRUEorFALSE, coverage, slice,
            elementLengths,
-           cbind, rbind,
            reduce, punion, pgap, gaps)
 
 importMethodsFrom(IRanges,  split, unique,
-                  unlist,setdiff,
+                  setdiff, unlist,
                   Reduce, range,
                   as.data.frame,
-                  length,
+                  length, "%in%",
                   "[","[<-","[[", "[[<-","$",
-                  "%in%", show, 
-                  lapply, sapply)
+                  show,
+                  lapply, sapply, as.list)
 
 importClassesFrom(IRanges, Rle, RleList, IRanges)
 
@@ -39,7 +43,8 @@ importMethodsFrom(GenomicRanges, ranges, "ranges<-",
                    "elementMetadata<-", elementMetadata,
                   as.data.frame, keepSeqlevels, renameSeqlevels)
 
-importClassesFrom(GenomicRanges, GRanges)
+
+importClassesFrom(GenomicRanges, GRanges, GRangesList)
 
 ##
 ## ## ## Rsamtools
@@ -66,7 +71,7 @@ importFrom(GenomicFeatures,
 ## ============================================================
 ## Export
 ## ============================================================
-exportMethods(qplot, rescale, plotFragLength, plotSpliceSum)
+exportMethods(autoplot, rescale, plotFragLength, plotSpliceSum)
 export(tracks, plotOverview, plotSingleChrom, geom_hotregion,
        geom_chevron, 
        plotMismatchSum,

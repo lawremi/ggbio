@@ -36,7 +36,7 @@ plotGrandLinear <- function(obj, y, title, facet,
                  color = substitute(seqnames))
     args.s <- args.dots[names(args.dots) %in% c("size", "color", "alpha", "shape")]
     args <- c(args, args.s)
-    p <- do.call(ggplot2::qplot, args)
+    p <- do.call(qplot, args)
   }else{
     ## change lalter
     ## ggplot2::qplot(data = df, geom = geom, x = midpoint, y = pvalue)
@@ -45,7 +45,7 @@ plotGrandLinear <- function(obj, y, title, facet,
                  x = substitute(midpoint),
                  y = substitute(y))
     args <- c(args, args.s)        
-    p <- do.call(ggplot2::qplot, args)
+    p <- do.call(qplot, args)
   }
   if(theme_bw)
     p <- p + theme_bw()

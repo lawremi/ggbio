@@ -195,8 +195,8 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                                       dt
                                     }})
                 data <- unlist(data)
-                data <- as.data.frame(data)
-                data$midpoint <- (data$start+data$end)/2
+                df <- as.data.frame(data)
+                df$midpoint <- (df$start+df$end)/2
   }
 
 
@@ -240,7 +240,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 p
               },
               alignment = {
-                p <- ggplot(data)
+                p <- ggplot(df)
                 args <- args[!(names(args) %in% c("x", "y"))]
                 if("group" %in% names(args))
                   gpn <- as.character(args$group)
@@ -276,10 +276,13 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                   p <- p + scale_color_manual(values = strandColor)
                 if(isStrand.fill)
                   p <- p + scale_fill_manual(values = strandColor)
+                p <- p + opts(axis.text.y = theme_blank())
+                ## p <- p + scale_y_continuous(breaks = df$.levels,
+                ##                             labels = df$.levels)
                 p
               },
               rectangle = {
-                p <- ggplot(data)
+                p <- ggplot(df)
                 args <- args[!(names(args) %in% c("x", "y"))]
 
 
@@ -298,10 +301,14 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                   p <- p + scale_color_manual(values = strandColor)
                 if(isStrand.fill)
                   p <- p + scale_fill_manual(values = strandColor)
+                ## p <- p + scale_y_continuous(breaks = df$.levels,
+                ##                             labels = df$.levels)
+                p <- p + opts(axis.text.y = theme_blank())                
+                
                 p
               },              
               segment = {
-                p <- ggplot(data)                
+                p <- ggplot(df)                
                 args <- args[!(names(args) %in% c("x", "y"))]
 
                 gpn <- as.character(args$group)
@@ -358,50 +365,34 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
 ##        For "GRangesList"
 ## ======================================================================
 ## FIXME:s
-setMethod("autoplot", "GRangesList", function(data, ..., freq, show.laebl = FALSE,
-                                              show.gaps = TRUE,
-                                              scale.size = c(5, 17),
-                                              label.type = c("name", "count"),
-                                              label.size = 5,
-                                              label.color = "black"){
-  ## use color as default
-  label.type <- match.arg(label.type)
-  args <- list(...)
-  ## args <- args[names(args) != scale.size]
+setMethod("autoplot", "GRangesList", function(data, ...,
+                                              geom = c("alignment", "rectangle")){
+  ## make it easy, remove all the elementadata
+  ## make sure there is no variables of the same name as the elementMetadata
+  ## users could always coerce it to a GRanges
+  geom <- match.arg(geom)
+  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   if(is.null(names(data)))
     nm.data <- as.character(seq(length(data)))
   else
     nm.data <- names(data)
   nms <- rep(nm.data, elementLengths(data))
+  res <- lapply(1:length(data), function(i){
+    vals <- values(data[i])
+    n <- length(data[[i]])
+    do.call("rbind", lapply(1:n, function(i) vals))
+  })
+  res <- do.call("rbind", res)
   gr <- unlist(data)
+  values(gr) <- res
   values(gr)$.grl.name <- nms
-  if(!missing(freq)){
-    freqs <- rep(freq[names(data)], elementLengths(data))
-    values(gr)$.freq <- freqs
-    args <- c(args, list(data = gr,
-                         group = substitute(.grl.name),
-                         show.label = show.label,
-                         show.gaps = show.gaps,
-                         size = substitute(.freq),
-                         label.type = label.type,
-                         label.size = label.size,
-                         label.color = label.color,
-                         freq = freq))
-    args <- c(args, list(geom = "segment"))    
-  }else{
-    args <- c(args, list(data = gr,
-                         group = substitute(.grl.name),
-                         show.label = show.label,
-                         show.gaps = show.gaps,
-                         label.type = label.type,
-                         label.size = label.size,
-                         label.color = label.color))                         
-    args <- c(args, list(geom = "full"))
-  }
+  args <- args[!(names(args) %in% c("data", "group", "geom"))]
+  args <- c(args, list(group = substitute(.grl.name),
+                       data = gr,
+                       geom = geom))
   p <- do.call(autoplot, args)
-  p <- p + scale_size(to = scale.size) + ylab("")
   p
-})
+})          
 
 ## ======================================================================
 ##        For "IRanges"
@@ -489,7 +480,6 @@ setMethod("autoplot", "IRanges", function(data, ...,
     p <- p + ylab(args$ylab)
   if("main" %in% names(args))
     p <- p + opts(title = args$main)
-  
   p
 })
 

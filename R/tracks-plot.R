@@ -3,8 +3,9 @@ tracks <- function(...,
                    show.title = TRUE,
                    theme = NULL,
                    legend = FALSE,     #
-                   xlab,
+                   xlab = NULL,
                    xlim, ylim){
+
   dots <- list(...)
   nrow <- length(dots)
   if(missing(heights))
@@ -32,8 +33,8 @@ tracks <- function(...,
                         ## scale_x_continuous(breaks = NA)+
                           opts(axis.text.x = theme_blank()) + xlab("")
                     }else{
-                        if(!missing(xlab))
-                          grobs[[i] <- grobs[[i]]] + xlab(xlab)
+                      if(!is.null(xlab))
+                        grobs[[i]] <- grobs[[i]] + xlab(xlab)
                     }
                     ## if(i == 1){
                     ##   grobs[[i]] <- grobs[[i]] 

@@ -16,7 +16,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                                   legend = TRUE,
                                   xlab = "Genomic Coordinates", ylab, main,
                                   facets, facet, 
-                                  stat = c("identity", "coverage", "step"),
+                                  stat = c("identity", "coverage", "stepping"),
                                   geom = c("rectangle", "segment","alignment",
                                     "line","point", "polygon"),
                                   coord = "linear"
@@ -357,6 +357,9 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
     p <- p + ylab(ylab)
   if(!missing(main))
     p <- p + opts(title = main)
+  ## is this a good practice
+  if(stat == "stepping" | geom == "alignment")
+    p <- p + scale_y_continuous(breaks = NA)
   p <- p + facet
   p
 })
@@ -364,11 +367,9 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
 ## ======================================================================
 ##        For "GRangesList"
 ## ======================================================================
-## FIXME:s
 setMethod("autoplot", "GRangesList", function(data, ...,
                                               geom = c("alignment", "rectangle")){
   ## make it easy, remove all the elementadata
-  ## make sure there is no variables of the same name as the elementMetadata
   ## users could always coerce it to a GRanges
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
@@ -400,19 +401,16 @@ setMethod("autoplot", "GRangesList", function(data, ...,
 
 setMethod("autoplot", "IRanges", function(data, ...,
                                           legend = TRUE,
-                                          geom = c("full", "segment", 
-                                            "coverage.line", "coverage.polygon")){
+                                          xlab, ylab, main,
+                                          facets, facet, 
+                                          stat = c("identity", "coverage", "step"),
+                                          geom = c("rectangle", "segment","alignment",
+                                            "line","point", "polygon"),
+                                          coord = "linear"){
+
   args <- as.list(match.call(call = sys.call(1)))[-1]
   args <- args[!(names(args) %in% c("geom", "geom.engine",
                                     "data",  "legend"))]
-  ## check "x", must be one of "start", "end", "midpoint"
-  ## if("x" %in% names(args) && !missing(x)){
-  ##   if(!(deparse(args$x) %in% c("start", "end", "midpoint")))
-  ##     stop("x must be one of start/end/mipoint without quote")
-  ## }else{
-  ##   args <- c(args, list(x = substitute(midpoint)))
-  ##   message("use start for x as default")
-  ## }
   geom <- match.arg(geom)
   p <- switch(geom,
               full = {
@@ -472,14 +470,6 @@ setMethod("autoplot", "IRanges", function(data, ...,
               )
   if(!legend)
     p <- p + opts(legend.position = "none")
-  if("xlab" %in% names(args))
-    p <- p + xlab(args$xlab)
-  else
-    p <- p + xlab("Space")
-  if("ylab" %in% names(args))
-    p <- p + ylab(args$ylab)
-  if("main" %in% names(args))
-    p <- p + opts(title = args$main)
   p
 })
 
@@ -503,14 +493,7 @@ setMethod("autoplot", "GappedAlignments", function(data, ...,
     gr <- biovizBase:::fetch(data)
   if(geom == "gapped.pair"){
     gr.junction <- gr[values(gr)$junction == TRUE]
-    ## grl <- split(gr.junction, values(gr.junction)$read.group)
-    ## get gaps??
-    ## ir.gaps <- unlist(gaps(ranges(grl)))
-    ## .lvs <- values(gr.junction)$.levels[match(names(ir.gaps),
-    ##                                         values(gr.junction)$read.group)]
-    ## seqs <- unique(as.character(seqnames(gr.junction)))
     gr.gaps <- getGap(gr.junction, "qname")
-    ## gr.gaps <- GRanges(seqs, ir.gaps, .levels = .lvs)
     gr.read <- gr  
     ## if(shrink){
     ##   max.gap <- maxGap(gr.read, shrink.ratio)

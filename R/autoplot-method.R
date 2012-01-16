@@ -281,9 +281,17 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                   p <- p + scale_color_manual(values = strandColor)
                 if(isStrand.fill)
                   p <- p + scale_fill_manual(values = strandColor)
-                p <- p + opts(axis.text.y = theme_blank())
+                ## p <- p + opts(axis.text.y = theme_blank())
                 ## p <- p + scale_y_continuous(breaks = df$.levels,
                 ##                             labels = df$.levels)
+                .df.lvs <- unique(df$.levels)
+                .df.sub <- df[, c(".levels", gpn)]
+                .df.sub <- .df.sub[!duplicated(.df.sub),]
+                p <- p + scale_y_continuous(breaks = .df.sub$.levels,
+                                            labels = as.character(.df.sub[, gpn]))               
+                ##   p <- p + scale_y_continuous(breaks = .df.sub$.levels,
+                ##                          labels = as.character(.df.sub[, gpn]))               
+                ## }
                 p
               },
               rectangle = {
@@ -308,7 +316,13 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                   p <- p + scale_fill_manual(values = strandColor)
                 ## p <- p + scale_y_continuous(breaks = df$.levels,
                 ##                             labels = df$.levels)
-                p <- p + opts(axis.text.y = theme_blank())                
+                .df.lvs <- unique(df$.levels)
+                .df.sub <- df[, c(".levels", gpn)]
+                .df.sub <- .df.sub[!duplicated(.df.sub),]
+                p <- p + scale_y_continuous(breaks = .df.sub$.levels,
+                                            labels = as.character(.df.sub[, gpn]))               
+                
+                ## p <- p + opts(axis.text.y = theme_blank())                
                 
                 p
               },              
@@ -376,9 +390,8 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
       ylab = ""
   }
   p <- p + ylab(ylab)
-  
-  if(stat == "stepping" | geom == "alignment")
-    p <- p + scale_y_continuous(breaks = NA)
+  ## if(stat == "stepping" | geom == "alignment")
+  ##   p <- p + scale_y_continuous(breaks = NA)
   if(!missing(main))
     p <- p + opts(title = main)
   ## is this a good practice?
@@ -635,7 +648,7 @@ setMethod("autoplot", "character", function(data, ...,
            geom = geom, resize.extra = reszie.extra)
 })
 
-
+## FIX THIS first:
 ## ======================================================================
 ##        For "TranscriptDb"(Genomic Structure)
 ## ======================================================================

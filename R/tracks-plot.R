@@ -3,6 +3,7 @@ tracks <- function(...,
                    show.title = TRUE,
                    theme = NULL,
                    legend = FALSE,     #
+                   xlab,
                    xlim, ylim){
   dots <- list(...)
   nrow <- length(dots)
@@ -30,6 +31,9 @@ tracks <- function(...,
                       grobs[[i]] <- grobs[[i]] + 
                         ## scale_x_continuous(breaks = NA)+
                           opts(axis.text.x = theme_blank()) + xlab("")
+                    }else{
+                        if(!missing(xlab))
+                          grobs[[i] <- grobs[[i]]] + xlab(xlab)
                     }
                     ## if(i == 1){
                     ##   grobs[[i]] <- grobs[[i]] 

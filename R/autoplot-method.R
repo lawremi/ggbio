@@ -14,13 +14,14 @@ formals.facets <- formals.facets[formals.facets != "..."]
 
 setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                                   legend = TRUE,
-                                  xlab = "Genomic Coordinates", ylab, main,
+                                  xlab, ylab, main,
                                   facets, facet, 
                                   stat = c("identity", "coverage", "stepping"),
                                   geom = c("rectangle", "segment","alignment",
                                     "line","point", "polygon"),
                                   coord = "linear"
                                   ){
+  data.back <- data
   formals.cur <- c("data", "stat", "geom", "coord", "facets", "legend",
                    "xlab", "ylab", "main")
   geom <- match.arg(geom)
@@ -135,10 +136,14 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                      if(!is.null(allvars) &&
                         allvars[1] %in% colnames(values(data))){
                        ndt <- split(dt, values(dt)[,allvars[1]])
+                       ## browser()
+
+                       ## coverage(ranges(ndt),shift = as.list(-min(start(ndt))+1))
                        lst <-lapply(ndt, function(dt){
+                         sts <- min(start(dt))
                          vals <- as.numeric(coverage(ranges(dt),
                                                      shift = -min(start(dt))+1))
-                         seqs <- seq.int(from = min(start(dt)),
+                         seqs <- seq.int(from = sts,
                                          length.out = length(vals))
                          if(length(unique(values(dt)$.id.name)))                
                            res <- data.frame(vals = vals, seqs = seqs,
@@ -223,7 +228,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 args <- args[!(names(args) %in% c("x", "y"))]
                 args <- c(args, list(x = substitute(seqs),
                                      y = substitute(vals)))
-                p <- p + geom_line(do.call("aes", args))+ ggplot2::ylab("coverage")
+                p <- p + geom_line(do.call("aes", args))
               }
                 if(stat == "identity"){
                   df$midpoint <- (df$start+df$end)/2
@@ -334,8 +339,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 args <- args[!(names(args) %in% c("x", "y"))]
                 args <- c(args, list(x = substitute(seqs),
                                      y = substitute(vals)))
-                p <- p + geom_polygon(do.call("aes", args))+
-                  ggplot2::ylab("coverage")
+                p <- p + geom_polygon(do.call("aes", args))
                 p
                 
               }
@@ -351,15 +355,33 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
               )
   if(!legend)
     p <- p + opts(legend.position = "none")
-  
+  if(missing(xlab)){
+    chrs <- unique(seqnames(data.back))
+    gms <- genome(data.back)
+    gm <- unique(gms[chrs])
+    if(is.na(gm))
+      gm.tx <- character()
+    else
+      gm.tx <- gm
+    chrs.tx <- paste(chrs, sep = ",")
+    gm.tx <- paste(gm.tx)
+    xlab <- paste(gm.tx,"::",chrs.tx, sep = "")
+  }
     p <- p + xlab(xlab)
-  if(!missing(ylab))
-    p <- p + ylab(ylab)
-  if(!missing(main))
-    p <- p + opts(title = main)
-  ## is this a good practice
+  ## tweak with default y lab
+  if(missing(ylab)){
+    if(stat == "coverage")
+      ylab = "Coverage"
+    if(stat == "stepping" | geom == "alignment")
+      ylab = ""
+  }
+  p <- p + ylab(ylab)
+  
   if(stat == "stepping" | geom == "alignment")
     p <- p + scale_y_continuous(breaks = NA)
+  if(!missing(main))
+    p <- p + opts(title = main)
+  ## is this a good practice?
   p <- p + facet
   p
 })
@@ -367,6 +389,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
 ## ======================================================================
 ##        For "GRangesList"
 ## ======================================================================
+## TODO: with names of transcripts or names of GRangesList
 setMethod("autoplot", "GRangesList", function(data, ...,
                                               geom = c("alignment", "rectangle")){
   ## make it easy, remove all the elementadata

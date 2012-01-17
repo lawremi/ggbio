@@ -1,3 +1,8 @@
+## TODO:
+## 1. GRanges y for rectangle/segment, stat = "identity", y changed for free
+## 2. BSgenome
+## 3. Rle
+## 4. TranscriptDb(remove tx, change name)
 setGeneric("autoplot", function(data, ...) standardGeneric("autoplot"))
 ## auto play need to check arguments and dispatch them to the right
 ## place
@@ -290,8 +295,11 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 .df.lvs <- unique(df$.levels)
                 .df.sub <- df[, c(".levels", gpn)]
                 .df.sub <- .df.sub[!duplicated(.df.sub),]
-                p <- p + scale_y_continuous(breaks = .df.sub$.levels,
-                                            labels = as.character(.df.sub[, gpn]))               
+                if(gpn != ".levels")
+                  p <- p + scale_y_continuous(breaks = .df.sub$.levels,
+                                              labels = as.character(.df.sub[, gpn]))
+                else
+                  p <- p + scale_y_continuous(breaks = NA)
                 ##   p <- p + scale_y_continuous(breaks = .df.sub$.levels,
                 ##                          labels = as.character(.df.sub[, gpn]))               
                 ## }
@@ -322,9 +330,14 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 .df.lvs <- unique(df$.levels)
                 .df.sub <- df[, c(".levels", gpn)]
                 .df.sub <- .df.sub[!duplicated(.df.sub),]
-                p <- p + scale_y_continuous(breaks = .df.sub$.levels,
-                                            labels = as.character(.df.sub[, gpn]))               
+                if(gpn != ".levels")
+                  p <- p + scale_y_continuous(breaks = .df.sub$.levels,
+                                              labels = as.character(.df.sub[, gpn]))
+                else
+                  p <- p + scale_y_continuous(breaks = NA)
                 
+                ## p <- p + scale_y_continuous(breaks = .df.sub$.levels,
+                ##                             labels = as.character(.df.sub[, gpn]))
                 ## p <- p + opts(axis.text.y = theme_blank())                
                 
                 p
@@ -777,45 +790,93 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
 ## ======================================================================
 ##        For "BSgenome"
 ## ======================================================================
-setMethod("autoplot", c("BSgenome"), function(data,  name, ...,
+setMethod("autoplot", c("BSgenome"), function(data,  which, ...,
+                                              xlab, ylab, main,
                                               geom = c("text",
                                                 "segment",
                                                 "point",
                                                 "rectangle")){
-  ## first need to get sequence
-  seqs <- getSeq(data, name, as.character = TRUE)
+  dots <- list(...)
+  if(!"color" %in% names(dots))
+    isDNABaseColor <- TRUE
+  else
+    isDNABaseColor <- FALSE
+  seqs <- getSeq(data, which, as.character = TRUE)
   seqs <- IRanges:::safeExplode(seqs)
-  xs <- seq(start(name), length.out = width(name))
+  xs <- seq(start(which), length.out = width(which))
   df <- data.frame(x = xs, seqs = seqs)
   geom <- match.arg(geom)
-  p <- ggplot(df, ...)
+  ## dots.wocolor <- dots[names(dots) != "color"]
+  ## p <- do.call(ggplot, c(list(data = df), dots.wocolor))
+  p <- ggplot(data = df, ...)
   baseColor <- getOption("biovizBase")$DNABasesColor
-  ## baseColor <- unlist(baseColor)
+  if(!isDNABaseColor)
+    cols <- dots$color
   p <- switch(geom,
               text = {
-                p + geom_text(aes(x = x, y = 0, label = seqs ,color = seqs))+
-                  scale_color_manual(values = baseColor)
+                if(isDNABaseColor)
+                  p + geom_text(aes(x = x, y = 0, label = seqs ,color = seqs))+
+                    scale_color_manual(values = baseColor)
+                else
+                  p + geom_text(aes(x = x, y = 0, label = seqs), color = cols)
+
               },
               segment = {
-                p + geom_segment(aes(x = x, y = -1,
-                                     xend = x, yend = 1,
-                                     color = seqs)) +
-                                       scale_color_manual(values = baseColor)+
-                                         scale_y_continuous(limits = c(-10, 10))
-              },
-              point = {
-                p + geom_point(aes(x = x, y = 0, color = seqs))+
-                  scale_color_manual(values = baseColor)
-              },
-              rectangle = {
-                p + geom_rect(aes(xmin = x, ymin = -1,
-                                  xmax = x+0.9, ymax = 1,
-                                  color = seqs, fill = seqs)) +
-                                    scale_y_continuous(limits = c(-10, 10))+
-                                      scale_color_manual(values = baseColor)+
-                                        scale_fill_manual(values = baseColor)
-              })
-  p <- p + ylab("")
+                if(isDNABaseColor)                
+                  p + geom_segment(aes(x = x, y = -1,
+                                       xend = x, yend = 1,
+                                       color = seqs)) +
+                                         scale_color_manual(values = baseColor)+
+                                           scale_y_continuous(limits = c(-10, 10))
+                else
+                  p + geom_segment(aes(x = x, y = -1,
+                                       xend = x, yend = 1), color = cols)+
+                                   scale_y_continuous(limits = c(-10, 10))
+                                 },
+                point = {
+                  if(isDNABaseColor)                                
+                    p + geom_point(aes(x = x, y = 0, color = seqs))+
+                      scale_color_manual(values = baseColor)
+                  else
+                    p + geom_point(aes(x = x, y = 0), color = cols)
+                  
+                },
+                rectangle = {
+                  if(isDNABaseColor)                                                
+                    p + geom_rect(aes(xmin = x, ymin = -1,
+                                      xmax = x+0.9, ymax = 1,
+                                      color = seqs, fill = seqs)) +
+                                        scale_y_continuous(limits = c(-10, 10))+
+                                          scale_color_manual(values = baseColor)+
+                                            scale_fill_manual(values = baseColor)
+                  else
+                    p + geom_rect(aes(xmin = x, ymin = -1,
+                                      xmax = x+0.9, ymax = 1), color = cols, fill = cols) +
+                                        scale_y_continuous(limits = c(-10, 10))
+
+                })
+  if(missing(xlab)){
+    chrs <- unique(seqnames(which))
+    gms <- genome(data)
+    gm <- unique(gms[chrs])
+    chrs.tx <- paste(chrs, sep = ",")    
+    if(is.na(gm)){
+      xlab <- chrs.tx
+    }else{
+      gm.tx <- paste(gm)
+      xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
+    }
+  }
+    p <- p + xlab(xlab)
+  ## tweak with default y lab
+  if(missing(ylab)){
+      ylab = ""
+  }
+  p <- p + ylab(ylab)
+  ## if(stat == "stepping" | geom == "alignment")
+  p <- p + scale_y_continuous(breaks = NA)
+  if(!missing(main))
+    p <- p + opts(title = main)
   p
 })
 

@@ -23,6 +23,7 @@ Collate: utils.R
 	 geom_chevron.R
 	 geom_hotregion.R
 	 geom_arch.R
+	 layout_circle.R
 	 overview-plot.R	
 	 rescale-method.R
 	 ggbio.R

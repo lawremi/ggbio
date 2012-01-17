@@ -1,6 +1,6 @@
 setGeneric("geom_arch", function(data, ...) standardGeneric("geom_arch"))
 setMethod("geom_arch", "data.frame", function(data, ...,
-                                              n = 25){
+                                              n = 25, max.height = 10){
   args <- list(...)
   aes.lst <- unlist(lapply(args, function(x) class(eval(x)) == "uneval"))
   if(length(aes.lst)){
@@ -29,7 +29,7 @@ setMethod("geom_arch", "data.frame", function(data, ...,
   ##SETS UP DATAFRAME TO KEEP TRACK OF ALL POINTS TO DRAW ALL ARCHES
   apoint<-data.frame()
   jump<-abs(endX-startX)
-  jumpAdj=max(jump)/max(abs(h))
+  jumpAdj <- max(jump)/max(abs(h))
   for(i in 1:length(startX)){
     temp<-data.frame(xx = xx*(abs(startX[i]-endX[i])/2)+(startX[i]+endX[i])/2,
                      yy=yy*h[i]+y[i],

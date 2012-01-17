@@ -174,9 +174,7 @@ segInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
   data <- gr3
   df <- as.data.frame(data)
   lst <- lapply(1:nrow(df), function(i){
-    i <- 1
-    res <- as.data.frame(do.call("cbind", inter.fun(c(df[i,"start"], df[i,"end"]),
-                                                    ))
+    res <- as.data.frame(do.call("cbind", inter.fun(c(df[i,"start"], df[i,"end"]))))
     colnames(res) <- c(".biovizBase.new.x", ".biovizBase.new.y")    
     res$.biovizBase.group <- i
     N <- nrow(res)
@@ -185,7 +183,6 @@ segInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
   })
   res <- do.call("rbind", lst)
 }
-segInter(gr3)
 
 ## for a special GRanges
 linkInter <- function(data, linked.to, space.skip = 0.1, trackWidth = 10, radius = 10,

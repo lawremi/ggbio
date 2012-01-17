@@ -4,7 +4,8 @@
 ## ggplot2
 import(ggplot2)
 ## BiocGenerics
-importFrom(BiocGenerics, cbind, rbind)
+importFrom(BiocGenerics, cbind, rbind, unique,
+           lapply, sapply, setdiff, Reduce)
 import(biovizBase)
 importFrom(gridExtra, grid.arrange)
 importFrom(scales, cscale, dscale)
@@ -22,14 +23,15 @@ importFrom(IRanges, IRanges,  disjointBins,
            elementLengths,
            reduce, punion, pgap, gaps)
 
-importMethodsFrom(IRanges,  split, unique,
-                  setdiff, unlist,
-                  Reduce, range,
+importMethodsFrom(IRanges,  split, 
+                  unlist,
+                  range,
                   as.data.frame,
-                  length, "%in%",
+                  length,
+                  ## "%in%",
                   "[","[<-","[[", "[[<-","$",
                   show,
-                  lapply, sapply, as.list)
+                  as.list)
 
 importClassesFrom(IRanges, Rle, RleList, IRanges)
 

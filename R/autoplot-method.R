@@ -1,6 +1,6 @@
 ## TODO:
 ## 1. GRanges y for rectangle/segment, stat = "identity", y changed for free
-## 2. BSgenome
+## 2. BSgenome(done)
 ## 3. Rle
 ## 4. TranscriptDb(remove tx, change name)
 setGeneric("autoplot", function(data, ...) standardGeneric("autoplot"))
@@ -671,13 +671,12 @@ setMethod("autoplot", "character", function(data, ...,
 setMethod("autoplot", "TranscriptDb", function(data, which, ...,
                                                xlab, ylab, main,                           
                                                geom = c(
-                                                 "full",
-                                                 "dense",
-                                                 "tx")){
+                                                 "gene",
+                                                 "reduced_gene")){
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
   .args <- args[!(names(args) %in% c("geom", "which","data"))]
-  if(geom == "full"){
+  if(geom == "gene"){
     message("Aggregating TranscriptDb...")
     gr <- biovizBase:::fetch(data, which)
     ## gr <- fetch(data, which)
@@ -717,7 +716,7 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
     p <- p + scale_y_continuous(breaks = .df.sub$.levels, labels = .df.sub$tx_id)
     p
   }
-  if(geom == "dense"){
+  if(geom == "reduced_gene"){
     message("Aggregating TranscriptDb...")
     gr <- biovizBase:::fetch(data, which, type = "single")
     ## gr <- fetch(data, which, type = "single")
@@ -752,12 +751,12 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
     p <- p + scale_y_continuous(breaks = .df.lvs, labels = .df.lvs)
     p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
   }
-  if(geom == "tx"){
-    exons.tx <- exonsBy(data, by = "tx")
-    exons <- subsetByOverlaps(exons.tx, which)
-    args <- c(.args, list(data = exons))
-    p <- do.call(autoplot, args)
-  }
+  ## if(geom == "tx"){
+  ##   exons.tx <- exonsBy(data, by = "tx")
+  ##   exons <- subsetByOverlaps(exons.tx, which)
+  ##   args <- c(.args, list(data = exons))
+  ##   p <- do.call(autoplot, args)
+  ## }
   if(missing(xlab)){
     chrs <- unique(seqnames(which))
     gms <- genome(data)
@@ -773,7 +772,6 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
   p <- p + xlab(xlab)
   ## TODO: need to automatically use name as y
   if(missing(ylab)){
-    if(geom != "tx")
       p <- p + ggplot2::ylab("")
   }else{
     p <- p + ylab(ylab)

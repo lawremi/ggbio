@@ -666,8 +666,8 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
   .args <- args[!(names(args) %in% c("geom", "which","data"))]
   if(geom == "full"){
     message("Aggregating TranscriptDb...")
-    ## gr <- biovizBase:::fetch(data, which)
-    gr <- fetch(data, which)
+    gr <- biovizBase:::fetch(data, which)
+    ## gr <- fetch(data, which)
     message("Constructing graphics...")
     values(gr)$.levels <-  as.numeric(values(gr)$tx_id)
     ## drawing
@@ -706,8 +706,8 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
   }
   if(geom == "dense"){
     message("Aggregating TranscriptDb...")
-    ## gr <- biovizBase:::fetch(data, which, type = "single")
-    gr <- fetch(data, which, type = "single")
+    gr <- biovizBase:::fetch(data, which, type = "single")
+    ## gr <- fetch(data, which, type = "single")
     message("Constructing graphics...")
     values(gr)$.levels <-  1
     ## drawing

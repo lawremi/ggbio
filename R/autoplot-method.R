@@ -19,11 +19,14 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                                   stat = c("identity", "coverage", "stepping"),
                                   geom = c("rectangle", "segment","alignment",
                                     "line","point", "polygon"),
-                                  coord = "linear"
+                                  coord = "linear",
+                                  rect.height = 0.4
                                   ){
+  if(rect.height <= 0 | rect.height >= 0.5)
+    stop("rect.height must be a value in (0,0.5)")
   data.back <- data
   formals.cur <- c("data", "stat", "geom", "coord", "facets", "legend",
-                   "xlab", "ylab", "main")
+                   "xlab", "ylab", "main", "rect.height")
   geom <- match.arg(geom)
   stat <- match.arg(stat)
   if(geom %in% c("rectangle", "alignment", "segment")){
@@ -273,8 +276,8 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                   p <- p + do.call(geom_chevron, gps.lst)
                 args <- c(args, list(xmin = substitute(start),
                                      xmax = substitute(end),
-                                     ymin = substitute(.levels - 0.4),
-                                     ymax = substitute(.levels + 0.4)))
+                                     ymin = substitute(.levels - rect.height),
+                                     ymax = substitute(.levels + rect.height)))
                 args.rect <- args[names(args) != "size"]
                 p <- p + geom_rect(do.call("aes", args.rect))
                 if(isStrand.color)
@@ -306,8 +309,8 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 args <- args[names(args) != "group"]
                 args <- c(args, list(xmin = substitute(start),
                                      xmax = substitute(end),
-                                     ymin = substitute(.levels - 0.4),
-                                     ymax = substitute(.levels + 0.4)))
+                                     ymin = substitute(.levels - rect.height),
+                                     ymax = substitute(.levels + rect.height)))
                 args.rect <- args[names(args) != "size"]
                 p <- p + geom_rect(do.call("aes", args.rect))
                 if(isStrand.color)
@@ -369,17 +372,18 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
               )
   if(!legend)
     p <- p + opts(legend.position = "none")
+  
   if(missing(xlab)){
     chrs <- unique(seqnames(data.back))
     gms <- genome(data.back)
     gm <- unique(gms[chrs])
-    if(is.na(gm))
-      gm.tx <- character()
-    else
-      gm.tx <- gm
-    chrs.tx <- paste(chrs, sep = ",")
-    gm.tx <- paste(gm.tx)
-    xlab <- paste(gm.tx,"::",chrs.tx, sep = "")
+    chrs.tx <- paste(chrs, sep = ",")    
+    if(is.na(gm)){
+      xlab <- chrs.tx
+    }else{
+      gm.tx <- paste(gm)
+      xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
+    }
   }
     p <- p + xlab(xlab)
   ## tweak with default y lab
@@ -402,7 +406,6 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
 ## ======================================================================
 ##        For "GRangesList"
 ## ======================================================================
-## TODO: with names of transcripts or names of GRangesList
 setMethod("autoplot", "GRangesList", function(data, ...,
                                               geom = c("alignment", "rectangle")){
   ## make it easy, remove all the elementadata
@@ -653,62 +656,58 @@ setMethod("autoplot", "character", function(data, ...,
 ##        For "TranscriptDb"(Genomic Structure)
 ## ======================================================================
 setMethod("autoplot", "TranscriptDb", function(data, which, ...,
+                                               xlab, ylab, main,                           
                                                geom = c(
                                                  "full",
-                                                 "single",
+                                                 "dense",
                                                  "tx")){
-  ## FIXME: need to be in biovizBase
-  ## colored by strand?
-  color.def <- "black"
-  fill.def <- "black"
-  ## strandColor <- getBioColor("STRAND")
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
   .args <- args[!(names(args) %in% c("geom", "which","data"))]
   if(geom == "full"){
     message("Aggregating TranscriptDb...")
-    gr <- biovizBase:::fetch(data, which)
+    ## gr <- biovizBase:::fetch(data, which)
+    gr <- fetch(data, which)
     message("Constructing graphics...")
     values(gr)$.levels <-  as.numeric(values(gr)$tx_id)
     ## drawing
+    ## hard coded width of rectangle
     ## just cds, gaps and utrs
     df <- as.data.frame(gr)
     df.cds <- df[df$type == "cds",]
     p <- ggplot(df.cds)
     args <- .args[names(.args) != "y"]
-    args <- c(args, list(xmin = substitute(start), xmax = substitute(end),
+    args <- c(args, list(xmin = substitute(start),
+                         xmax = substitute(end),
                          ymin = substitute(.levels - 0.4),
                          ymax = substitute(.levels + 0.4)))
     ## only for rectangle 
-    if(!("color" %in% names(args)))
-      p <- p + geom_rect(do.call("aes", args), color = color.def)
-    else
-      p <- p + geom_rect(do.call("aes", args))
+    ## if(!("color" %in% names(args)))
+    ##   p <- p + geom_rect(do.call("aes", args), color = color.def)
+    ## else
+    p <- p + geom_rect(do.call("aes", args))
     ## utrs
     df.utr <- df[df$type == "utr",]
     args <- .args[names(.args) != "y"]
-    args <- c(args, list(xmin = substitute(start), xmax = substitute(end),
+    args <- c(args, list(xmin = substitute(start),
+                         xmax = substitute(end),
                          ymin = substitute(.levels - 0.2),
                          ymax = substitute(.levels + 0.2)))
-    if(!("color" %in% names(args)))
-      p <- p + geom_rect(data = df.utr, do.call("aes", args), color = color.def)
-    else
-      p <- p + geom_rect(data = df.utr, do.call("aes", args))
+    p <- p + geom_rect(data = df.utr, do.call("aes", args))
     ## gaps
-    ## df.gaps <- df[df$type == "gap",]
     df.gaps <- gr[values(gr)$type == "gap"] 
     args <- .args[!(names(.args) %in% c("x", "y", "fill"))]
-    ## args <- c(args, list(x = substitute(start), xend = substitute(end),
-    ##                      y = substitute(.levels),
-    ##                      yend = substitute(.levels)))
-    if(!("color" %in% names(args)))
-      p <- p + geom_chevron(data = df.gaps, do.call("aes", args), color = color.def)
-    else
-      p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
+    p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
+    .df.lvs <- unique(df$.levels)
+    .df.sub <- df[, c(".levels", "tx_id")]
+    .df.sub <- .df.sub[!duplicated(.df.sub),]
+    p <- p + scale_y_continuous(breaks = .df.sub$.levels, labels = .df.sub$tx_id)
+    p
   }
-  if(geom == "single"){
+  if(geom == "dense"){
     message("Aggregating TranscriptDb...")
-    gr <- biovizBase:::fetch(data, which, geom = geom)
+    ## gr <- biovizBase:::fetch(data, which, type = "single")
+    gr <- fetch(data, which, type = "single")
     message("Constructing graphics...")
     values(gr)$.levels <-  1
     ## drawing
@@ -721,20 +720,14 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
                          ymin = substitute(.levels - 0.4),
                          ymax = substitute(.levels + 0.4)))
     ## only for rectangle 
-    if(!("color" %in% names(args)))
-      p <- p + geom_rect(do.call("aes", args), color = color.def)
-    else
-      p <- p + geom_rect(do.call("aes", args))
+    p <- p + geom_rect(do.call("aes", args))
     ## utrs
     df.utr <- df[df$type == "utr",]
     args <- .args[names(.args) != "y"]
     args <- c(args, list(xmin = substitute(start), xmax = substitute(end),
                          ymin = substitute(.levels - 0.2),
                          ymax = substitute(.levels + 0.2)))
-    if(!("color" %in% names(args)))
-      p <- p + geom_rect(data = df.utr, do.call("aes", args), color = color.def)
-    else
-      p <- p + geom_rect(data = df.utr, do.call("aes", args))
+    p <- p + geom_rect(data = df.utr, do.call("aes", args))
     ## gaps
     ## df.gaps <- df[df$type == "gap",]
     gr.rr <- reduce(ranges(gr[(values(gr)$type %in%  c("utr", "cds"))]))
@@ -742,10 +735,9 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
     chrs <- unique(as.character(seqnames(gr)))
     df.gaps <- GRanges(chrs, df.gaps)
     args <- .args[!(names(.args) %in% c("x", "y", "fill"))]
-    if(!("color" %in% names(args)))
-      p <- p + geom_chevron(data = df.gaps, do.call("aes", args), color = color.def)
-    else
-      p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
+    .df.lvs <- unique(df$.levels)
+    p <- p + scale_y_continuous(breaks = .df.lvs, labels = .df.lvs)
+    p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
   }
   if(geom == "tx"){
     exons.tx <- exonsBy(data, by = "tx")
@@ -753,6 +745,30 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
     args <- c(.args, list(data = exons))
     p <- do.call(autoplot, args)
   }
+  if(missing(xlab)){
+    chrs <- unique(seqnames(which))
+    gms <- genome(data)
+    gm <- unique(gms[chrs])
+    chrs.tx <- paste(chrs, sep = ",")
+    if(is.na(gm)){
+      xlab <- chrs.tx
+    }else{
+      gm.tx <- paste(gm)
+      xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
+    }
+  }
+  p <- p + xlab(xlab)
+  ## TODO: need to automatically use name as y
+  if(missing(ylab)){
+    if(geom != "tx")
+      p <- p + ggplot2::ylab("")
+  }else{
+    p <- p + ylab(ylab)
+  }
+  ## if(stat == "stepping" | geom == "alignment")
+  ##   p <- p + scale_y_continuous(breaks = NA)
+  if(!missing(main))
+    p <- p + opts(title = main)
   p
 })
 

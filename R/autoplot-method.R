@@ -1,5 +1,5 @@
 ## TODO: Priority this week til Wednesday
-## 1. GRanges y for rectangle/segment, stat = "identity", y changed for free
+## 1. GRanges y for rectangle/segment, stat = "identity", y changed for free(done)
 ## 2. BSgenome(done)
 ## 3. Rle(done)
 ## 4. TranscriptDb(remove tx, change name)(done)

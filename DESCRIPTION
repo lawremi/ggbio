@@ -26,4 +26,5 @@ Collate: utils.R
 	 layout_circle.R
 	 overview-plot.R	
 	 rescale-method.R
+	 theme.R
 	 ggbio.R

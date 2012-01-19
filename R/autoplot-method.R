@@ -1,8 +1,10 @@
-## TODO:
+## TODO: Priority this week til Wednesday
 ## 1. GRanges y for rectangle/segment, stat = "identity", y changed for free
 ## 2. BSgenome(done)
-## 3. Rle
-## 4. TranscriptDb(remove tx, change name)
+## 3. Rle(done)
+## 4. TranscriptDb(remove tx, change name)(done)
+## 5. GappedAlignments
+## 6. Bam/BamFile/character
 setGeneric("autoplot", function(data, ...) standardGeneric("autoplot"))
 ## auto play need to check arguments and dispatch them to the right
 ## place
@@ -34,15 +36,21 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                    "xlab", "ylab", "main", "rect.height")
   geom <- match.arg(geom)
   stat <- match.arg(stat)
-  if(geom %in% c("rectangle", "alignment", "segment")){
-    if(stat %in% c("identity", "coverage"))
-      message("stat convert to stepping ")
-    stat <- "stepping"
-  }
+  
 
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   args.facets <- args[names(args) %in% formals.facets]
   args <- args[!(names(args) %in% formals.cur)]
+
+  ## 
+  if(geom %in% c("rectangle", "alignment", "segment" )){
+    if(!("y" %in% names(args))){
+      if(stat %in% c("identity", "coverage"))
+        message("stat convert to stepping ")
+      stat <- "stepping"
+    }
+  }
+
   
   ## check "x", must be one of "start", "end", "midpoint"
   if(!(geom %in% c("alignment", "segment", "rectangle"))){
@@ -212,6 +220,10 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 df$midpoint <- (df$start+df$end)/2
   }
 
+  if(stat == "identity"){
+    df <- as.data.frame(data)
+  }
+
 
   ## color scheme 
   isStrand.color <- FALSE
@@ -225,6 +237,8 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
     if(as.character(args$fill) == "strand")
       isStrand.fill <- TRUE
   }
+
+
 
 
   p <- switch(geom,
@@ -325,8 +339,6 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                   p <- p + scale_color_manual(values = strandColor)
                 if(isStrand.fill)
                   p <- p + scale_fill_manual(values = strandColor)
-                ## p <- p + scale_y_continuous(breaks = df$.levels,
-                ##                             labels = df$.levels)
                 .df.lvs <- unique(df$.levels)
                 .df.sub <- df[, c(".levels", gpn)]
                 .df.sub <- .df.sub[!duplicated(.df.sub),]
@@ -336,24 +348,32 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 else
                   p <- p + scale_y_continuous(breaks = NA)
                 
-                ## p <- p + scale_y_continuous(breaks = .df.sub$.levels,
-                ##                             labels = as.character(.df.sub[, gpn]))
-                ## p <- p + opts(axis.text.y = theme_blank())                
-                
                 p
               },              
               segment = {
-                p <- ggplot(df)                
-                args <- args[!(names(args) %in% c("x", "y"))]
+                p <- ggplot(df)
+                if(stat == "stepping"){
+                  args <- args[!(names(args) %in% c("x", "y"))]
 
-                gpn <- as.character(args$group)
-                args <- args[names(args) != "group"]
-                
+                  gpn <- as.character(args$group)
+                  args <- args[names(args) != "group"]
+                  
 
-                args <- c(args, list(x = substitute(start),
-                                     xend = substitute(end),
-                                     y = substitute(.levels),
-                                     yend = substitute(.levels)))
+                  args <- c(args, list(x = substitute(start),
+                                       xend = substitute(end),
+                                       y = substitute(.levels),
+                                       yend = substitute(.levels)))
+                }else{
+                  args <- args[!(names(args) %in% c("x"))]
+
+                  gpn <- as.character(args$group)
+                  args <- args[names(args) != "group"]
+                  
+
+                  args <- c(args, list(x = substitute(start),
+                                       xend = substitute(end)))
+                  args$yend <- args$y
+                }
                 p <- p + geom_segment(do.call("aes", args)) 
 
                 if(isStrand.color)
@@ -401,12 +421,17 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
     p <- p + xlab(xlab)
   ## tweak with default y lab
   if(missing(ylab)){
+    if(stat != "identity"){
     if(stat == "coverage")
-      ylab = "Coverage"
+      ylab <- "Coverage"
     if(stat == "stepping" | geom == "alignment")
-      ylab = ""
+      ylab <- ""
+    p <- p + ylab(ylab)
   }
-  p <- p + ylab(ylab)
+  }else{
+    p <- p + ylab(ylab)
+  }
+  
   ## if(stat == "stepping" | geom == "alignment")
   ##   p <- p + scale_y_continuous(breaks = NA)
   if(!missing(main))
@@ -882,11 +907,11 @@ setMethod("autoplot", c("BSgenome"), function(data,  which, ...,
 ## ======================================================================
 ##        For "Rle"
 ## ======================================================================
-                                        # geom: line/point
-                                        # simply smoothing
+## geom: ... color = I("red"), doesn't work
 setMethod("autoplot", "Rle", function(data, lower, ...,
-                                      size, shape, color, alpha,
-                                      xlab = "x", ylab = "y",
+                                      xlab = "x", 
+                                      ylab = "y", main,
+                                      color, size, shape, alpha,
                                       geom = c("point", "line", "segment"),
                                       type = c("raw", "viewMaxs","viewMins",
                                         "viewSums", "viewMeans")){
@@ -898,16 +923,13 @@ setMethod("autoplot", "Rle", function(data, lower, ...,
     stop("please at least specify the value of lower, you could pass
           extra parameters to slice too")
 
-  ## args
-  args <- as.list(match.call(call = sys.call(sys.parent()))[-1])  
-  args <- args[names(args) %in% c("size", "shape", "color", "alpha", "geom")]
-  if(!"geom" %in% names(args))
-    args$geom <- geom
-  ## args <- c(geom = geom, args)
-  args.dots <- list(...)
+  args.dots <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   args.slice <- args.dots[names(args.dots) %in%
                           c("upper", "includeLower",
-                            "includeUpper", "rangesOnly")]
+                            "includeUpper", "rangesOnly")] 
+  args <- args.dots[names(args.dots) %in% c("size", "shape", "color", "alpha", "geom")]
+  if(!"geom" %in% names(args))
+    args$geom <- geom  
   if(!missing(lower))
     args.slice <- c(list(x = data,
                          lower = lower), args.slice)
@@ -942,8 +964,7 @@ setMethod("autoplot", "Rle", function(data, lower, ...,
                  data.frame(x = x, y = y)                
                })
 
-  ## df <- data.frame(x = x, y = y)
-  if(args$geom == "segment")
+   if(args$geom == "segment")
     args <- c(list(data = df,
                    x = substitute(x),
                    xend = substitute(x),
@@ -956,7 +977,10 @@ setMethod("autoplot", "Rle", function(data, lower, ...,
                    y = substitute(y)),
               args)
   p <- do.call(qplot, args)
-  p <- p + xlab(xlab) + ylab(ylab)
+  p <- p + xlab(xlab)
+  p <- p + ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main)
   p
 })
 
@@ -967,9 +991,10 @@ setMethod("autoplot", "Rle", function(data, lower, ...,
 ## 1. facet by list
 ## 2. support as what has been supported in Rle.
 setMethod("autoplot", "RleList", function(data, lower, ...,
-                                          size, shape, color, alpha,
+                                      xlab = "x", 
+                                      ylab = "y", main,
+                                          size, shape, color, alpha, 
                                           facetByRow = TRUE,
-                                          xlab = "x", ylab = "y",
                                           geom = c("point", "line", "segment"),
                                           type = c("raw", "viewMaxs","viewMins",
                                             "viewSums", "viewMeans")){
@@ -980,17 +1005,19 @@ setMethod("autoplot", "RleList", function(data, lower, ...,
     stop("please at least specify the value of lower, you could pass
           extra parameters to slice too")
 
-  ## args
-  args <- as.list(match.call(call = sys.call(sys.parent()))[-1])  
+  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])  
   args <- args[names(args) %in% c("size", "shape", "color", "alpha", "geom")]
   if(!"geom" %in% names(args))
     args$geom <- geom
   
   ## args <- c(geom = geom, args)
-  args.dots <- list(...)
-  args.slice <- args.dots[names(args.dots) %in%
+  ## args.dots <- list(...)
+  args.slice <- args[names(args) %in%
                           c("upper", "includeLower",
                             "includeUpper", "rangesOnly")]
+  ## args <- args.dots[!(names(args) %in%
+  ##                         c("upper", "includeLower",
+  ##                           "includeUpper", "rangesOnly"))]
   if(!missing(lower))
     args.slice <- c(list(x = data,
                          lower = lower), args.slice)
@@ -1065,9 +1092,11 @@ setMethod("autoplot", "RleList", function(data, lower, ...,
                    x = substitute(x),
                    y = substitute(y)),
               args)
-  
   p <- do.call(qplot, args)
-  p <- p + xlab(xlab) + ylab(ylab)
+    p <- p + xlab(xlab)
+    p <- p + ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main)
   p
 })
 

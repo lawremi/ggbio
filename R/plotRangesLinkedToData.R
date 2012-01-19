@@ -88,4 +88,4 @@ plotRangesLinkedToData <- function(data, stat.col, stat.label, solid.size = 1.3,
 
 
 
-x
+

@@ -1,10 +1,11 @@
+## 
 tracks <- function(...,
                    heights,
-                   show.title = TRUE,
+                   xlim, ylim,                   
                    theme = NULL,
                    legend = FALSE,     #
                    xlab = NULL,
-                   xlim, ylim){
+                   track.skip = -2.5){
 
   dots <- list(...)
   nrow <- length(dots)
@@ -28,27 +29,24 @@ tracks <- function(...,
                     grobs[[i]] <- grobs[[i]] + s
                     if(!is.null(theme))
                       grobs[[i]] <- grobs[[i]] + theme
+                    ## margin
+                    if(!is.null(track.skip))
+                      if(i < N){
+                        grobs[[i]] <- grobs[[i]] +
+                          opts(plot.margin = unit(c(1, 1, track.skip, 0.5), "lines"))
+                      }
+                    ## xlab
                     if(i %in% 1:(N-1)){
                       grobs[[i]] <- grobs[[i]] + 
-                        ## scale_x_continuous(breaks = NA)+
-                          opts(axis.text.x = theme_blank()) + xlab("")
+                          opts(axis.text.x = theme_blank()) + xlab("") 
                     }else{
                       if(!is.null(xlab))
                         grobs[[i]] <- grobs[[i]] + xlab(xlab)
+                      grobs[[i]] <- grobs[[i]] +
+                        opts(axis.title.x = theme_text(vjust = 0))
+                             ## panel.margin = unit(5, "lines"))
                     }
-                    ## if(i == 1){
-                    ##   grobs[[i]] <- grobs[[i]] 
-                    ##     ## opts(plot.margin = unit(c(1, 1.8, 0, 0), "lines"))
-                    ## }else{
-                    ##   grobs[[i]] <- grobs[[i]]
-                    ##     opts(plot.margin = unit(c(0, 1.8, 0, 0), "lines"))
-                    ##  }
-                    ## if(!show.axis.text.y)
-                    ##   grobs[[i]] <- grobs[[i]] + opts(axis.text.y = theme_blank())
-                    ## if(!show.ticks)
-                    ##   grobs[[i]] <- grobs[[i]] + opts(axis.ticks = theme_blank())
-                    ## if(!legend)
-                    ##   grobs[[i]] <- grobs[[i]] + opts(legend.position = "none")
+                    
                     grobs[[i]] 
                   })
   
@@ -56,3 +54,72 @@ tracks <- function(...,
   res
 }
 
+
+
+## this function is from ggExtra
+## a little tweak to check the axis.text.y.text
+align.plots <- function (..., vertical = TRUE,
+                          heights = unit(rep(1, nrow), "null")) 
+{
+  if (!vertical) stop("only vertical alignment implemented")
+
+    dots0 <- list(...)
+    nrow <- length(dots0)
+
+    legend.pos <- lapply(dots0,
+                       function(x) {
+                         if (is.null(x$options$legend.pos)) "right"
+                         else x$options$legend.pos })
+    dots <- lapply(dots0, ggplotGrob)
+
+    ytitles <- lapply(dots, function(.g){
+      grob.y.text <- getGrob(.g, "axis.title.y.text", grep = TRUE)
+      if(!is.null(grob.y.text))
+        editGrob(grob.y.text, vp = NULL)
+      else
+        zeroGrob()
+    })
+  
+    ylabels <- lapply(dots, function(.g){
+      grob.y.text <- getGrob(.g, "axis.text.y.text", grep = TRUE)
+      if(!is.null(grob.y.text))
+        editGrob(grob.y.text, vp = NULL)
+      else
+        zeroGrob()
+    })
+                      
+    legends <- lapply(dots, function(.g) if (!is.null(.g$children$legends)) 
+        editGrob(.g$children$legends, vp = NULL)
+    else zeroGrob())
+
+    ## get strips
+    strips <- lapply(dots, function(.g) {
+      cc <- .g$children$layout$children
+      vstrips <- cc[grepl("^strip_v",names(cc))]
+      ## assume all strips the same width/height, so just use the first one?
+      if (length(vstrips)>0) 
+        editGrob(vstrips[[1]],vp=NULL)
+      else zeroGrob()
+    })
+    gl <- grid.layout(nrow = length(dots), heights=heights)
+    vp <- viewport(layout = gl)
+    pushViewport(vp)
+    widths.left <- mapply(`+`, e1 = lapply(ytitles, grobWidth), 
+        e2 = lapply(ylabels, grobWidth), SIMPLIFY = FALSE)
+    widths.right <- mapply(function(g,lp,s) {
+      grobWidth(g) + if (lp=="none") unit(0,"lines") else unit(0.5,"lines") + grobWidth(s)
+    },
+                           legends,legend.pos,strips,
+                           SIMPLIFY=FALSE)
+    widths.left.max <- max(do.call(unit.c, widths.left))
+    widths.right.max <- max(do.call(unit.c, widths.right))
+    for (ii in seq_along(dots)) {
+        pushViewport(viewport(layout.pos.row = ii))
+        pushViewport(viewport(x = unit(0, "npc") + widths.left.max - 
+            widths.left[[ii]], width = unit(1, "npc") - widths.left.max + 
+            widths.left[[ii]] - widths.right.max + widths.right[[ii]], 
+            just = "left"))
+        grid.draw(dots[[ii]])
+        upViewport(2)
+    }
+}

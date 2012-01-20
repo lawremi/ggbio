@@ -12,19 +12,19 @@ License: Artistic-2.0
 LazyLoad: Yes
 Collate: utils.R
 	 AllGenerics.R
-	 tracks-plot.R
+	 theme.R	
+	 tracks.R
 	 autoplot-method.R
 	 ggplot-method.R
 	 plotGrandLinear.R
+	 plotStackedOverview.R	
 	 plotRangesLinkedToData.R
 	 plotFragLength-method.R
 	 plotSpliceSum-method.R
-	 mismatch-plot.R
+	 plotMismatchSum.R
 	 geom_chevron.R
-	 geom_hotregion.R
 	 geom_arch.R
 	 layout_circle.R
-	 overview-plot.R	
+	 layout_stacked.R
 	 rescale-method.R
-	 theme.R
 	 ggbio.R

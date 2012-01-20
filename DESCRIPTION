@@ -14,17 +14,16 @@ Collate: utils.R
 	 AllGenerics.R
 	 theme.R	
 	 tracks.R
+	 geom_chevron.R
+	 geom_arch.R
+	 layout_circle.R
+	 layout_stacked.R
 	 autoplot-method.R
-	 ggplot-method.R
 	 plotGrandLinear.R
 	 plotStackedOverview.R	
 	 plotRangesLinkedToData.R
 	 plotFragLength-method.R
 	 plotSpliceSum-method.R
 	 plotMismatchSum.R
-	 geom_chevron.R
-	 geom_arch.R
-	 layout_circle.R
-	 layout_stacked.R
 	 rescale-method.R
 	 ggbio.R

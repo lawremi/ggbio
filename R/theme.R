@@ -63,7 +63,7 @@ theme_null <-   function (base_size = 12, base_family = "")
             class = "options")
 }
 
-theme_alignments <-   function (label = FALSE, base_size = 12, base_family = "") 
+theme_alignment <-   function (label = FALSE, base_size = 12, base_family = "") 
 {
   structure(
             list(

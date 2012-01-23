@@ -48,7 +48,6 @@ importMethodsFrom(GenomicRanges, ranges, "ranges<-",
 
 importClassesFrom(GenomicRanges, GRanges, GRangesList)
 
-##
 ## ## ## Rsamtools
 importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,
            scanBamFlag,BamFile,
@@ -73,10 +72,15 @@ importFrom(GenomicFeatures,
 ## ============================================================
 ## Export
 ## ============================================================
-exportMethods(autoplot, rescale, plotFragLength, plotSpliceSum)
-export(tracks, plotOverview, plotSingleChrom, geom_hotregion,
+exportMethods(autoplot, rescale, plotFragLength, plotSpliceSum, layout_stacked,
+              layout_circle)
+export(tracks,
+       plotStackedOverview,
+       plotSingleChrom,
        geom_chevron, 
        plotMismatchSum,
        plotGrandLinear,
        plotRangesLinkedToData)
+
+export(theme_null, theme_alignment)
 

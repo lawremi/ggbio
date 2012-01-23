@@ -21,7 +21,7 @@ formals.facets <- formals.facets[formals.facets != "..."]
 
 setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                                   legend = TRUE,
-                                  xlab, ylab, main,
+                                  xlab, ylab, main,xlim,
                                   facets, facet, 
                                   stat = c("identity", "coverage", "stepping"),
                                   geom = c("rectangle", "segment","alignment",
@@ -91,10 +91,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
     }}
   ## get the right facets
   if(length(facets)){
-    ## if facets is a GRanges object
-    ## what's .id.name?should I put it here?
     if(is(facets, "GRanges")){
-      ## args.facets <- c(args.facets, list(facets = substitute(~.bioviz.facetid)))
       args.facets$facets <- substitute(~.bioviz.facetid)
       ## ok, default is "free"
       if(!("scales" %in% names(args.facets)))
@@ -122,9 +119,9 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
       if(allvars[1] %in% colnames(values(data))){
         facet <- do.call(facet_grid, c(args$facets, args.facets))
       }else{
-        ## args.facet <- c(args.facet, list(facets = substitute(~seqnames)))
-        args.facets <- c(args.facets, list(facets = substitute(~seqnames)))
-        facet <- do.call(facet_wrap, args.facets)
+        stop(allvars[1]," doesn't exists in data columns")
+        ## args.facets <- c(args.facets, list(facets = substitute(~seqnames)))
+        ## facet <- do.call(facet_wrap, args.facets)
       }
       grl <- split(data, seqnames(data))
     }}else{
@@ -147,20 +144,19 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
         }}
 
   if(stat == "coverage"){
+    if(missing(xlim))
+      xlim <- c(start(range(data.back, ignore.strand = TRUE)),
+                end(range(data.back, ignore.strand = TRUE)))
     data <- lapply(grl,
                    function(dt){
                      if(!is.null(allvars) &&
                         allvars[1] %in% colnames(values(data))){
                        ndt <- split(dt, values(dt)[,allvars[1]])
-                       ## browser()
-
-                       ## coverage(ranges(ndt),shift = as.list(-min(start(ndt))+1))
                        lst <-lapply(ndt, function(dt){
-                         sts <- min(start(dt))
-                         vals <- as.numeric(coverage(ranges(dt),
-                                                     shift = -min(start(dt))+1))
-                         seqs <- seq.int(from = sts,
-                                         length.out = length(vals))
+                         vals <- coverage(dt)
+                         seqs <- xlim[1]:xlim[2]
+                         vals <- vals[[1]][seqs]
+                         vals <- as.numeric(vals)
                          if(length(unique(values(dt)$.id.name)))                
                            res <- data.frame(vals = vals, seqs = seqs,
                                              seqnames =
@@ -176,10 +172,15 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                        })
                        do.call(rbind, lst)
                      }else{
-                       vals <- as.numeric(coverage(ranges(dt),
-                                                   shift = -min(start(dt))+1))
-                       seqs <- seq.int(from = min(start(dt)),
-                                       length.out = length(vals))
+                       ## vals <- as.numeric(coverage(ranges(dt),
+                       ##                             shift = -min(start(dt))+1))
+                         vals <- coverage(dt)
+                         seqs <- xlim[1]:xlim[2]                         
+                         vals <- vals[[1]][seqs]
+                       ## vals <- as.numeric(coverage(dt,
+                       ##                             shift = -min(start(dt))+1))
+                       ## seqs <- seq.int(from = min(start(dt)),
+                       ##                 length.out = length(vals))
                        if(length(unique(values(dt)$.id.name)))                
                          res <- data.frame(vals = vals, seqs = seqs,
                                            seqnames =
@@ -389,7 +390,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 args <- args[!(names(args) %in% c("x", "y"))]
                 args <- c(args, list(x = substitute(seqs),
                                      y = substitute(vals)))
-                p <- p + geom_polygon(do.call("aes", args))
+                p <- p + geom_area(do.call("aes", args))
                 p
                 
               }
@@ -694,10 +695,14 @@ setMethod("autoplot", "character", function(data, ...,
 ##        For "TranscriptDb"(Genomic Structure)
 ## ======================================================================
 setMethod("autoplot", "TranscriptDb", function(data, which, ...,
-                                               xlab, ylab, main,                           
+                                               xlab, ylab, main,
+                                               xlim, ylim, 
                                                geom = c(
                                                  "gene",
                                                  "reduced_gene")){
+  if(missing(xlim))
+    xlim <- c(start(range(which)),
+              end(range(which)))
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
   .args <- args[!(names(args) %in% c("geom", "which","data"))]
@@ -766,22 +771,15 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
                          ymax = substitute(.levels + 0.2)))
     p <- p + geom_rect(data = df.utr, do.call("aes", args))
     ## gaps
-    ## df.gaps <- df[df$type == "gap",]
     gr.rr <- reduce(ranges(gr[(values(gr)$type %in%  c("utr", "cds"))]))
     df.gaps <- gaps(gr.rr, start = min(start(gr.rr)), end = max(end(gr.rr)))
     chrs <- unique(as.character(seqnames(gr)))
     df.gaps <- GRanges(chrs, df.gaps)
     args <- .args[!(names(.args) %in% c("x", "y", "fill"))]
     .df.lvs <- unique(df$.levels)
-    p <- p + scale_y_continuous(breaks = .df.lvs, labels = .df.lvs)
+    p <- p + scale_y_continuous(breaks = NA) + opts(axis.text.y = theme_blank())
     p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
   }
-  ## if(geom == "tx"){
-  ##   exons.tx <- exonsBy(data, by = "tx")
-  ##   exons <- subsetByOverlaps(exons.tx, which)
-  ##   args <- c(.args, list(data = exons))
-  ##   p <- do.call(autoplot, args)
-  ## }
   if(missing(xlab)){
     chrs <- unique(seqnames(which))
     gms <- genome(data)
@@ -795,17 +793,14 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
     }
   }
   p <- p + xlab(xlab)
-  ## TODO: need to automatically use name as y
   if(missing(ylab)){
-      p <- p + ggplot2::ylab("")
+      p <- p + ggplot2::ylab("Transcript")
   }else{
     p <- p + ylab(ylab)
   }
-  ## if(stat == "stepping" | geom == "alignment")
-  ##   p <- p + scale_y_continuous(breaks = NA)
   if(!missing(main))
     p <- p + opts(title = main)
-  p
+  p + scale_x_continuous(limits = xlim)
 })
 
 

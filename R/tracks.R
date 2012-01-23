@@ -5,7 +5,7 @@ tracks <- function(...,
                    theme = NULL,
                    legend = FALSE,     #
                    xlab = NULL,
-                   track.skip = -2.5){
+                   track.skip = -1){
 
   dots <- list(...)
   nrow <- length(dots)

@@ -73,7 +73,7 @@ plotRangesLinkedToData <- function(data, stat.col, stat.label, solid.size = 1.3,
   ## names(grl) <- "1"
   ## p.single <- autoplot(grl) +  opts(panel.grid.minor=theme_blank()) + ylab(" ") +
   ##   theme_bw()
-  p.single <- autoplot(grl) + theme_alignments() + scale_y_continuous(breaks = NA)
+  p.single <- autoplot(grl) + theme_alignment() + scale_y_continuous(breaks = NA)
   if(length(annotation)){
     ## annotation <- lapply(annotation, function(p) p + theme_bw())
     ## tracks(p.stat,p.link,p.single)

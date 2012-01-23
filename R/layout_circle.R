@@ -1,17 +1,120 @@
+## reference:http://groups.google.com/group/ggplot2/browse_thread/thread/72403c6997b79c3b?pli=1
+## "link" and "ribbon" requie a special data structure
+## 1. we could implement it as GRangesList with no direction specification
+## 2. we could use a to.gr as element meta data which is a granges with direction,
+## this is also a GRanges object which is general(implemented this first)
+setGeneric("layout_circle", function(data,...) standardGeneric("layout_circle"))
+setMethod("layout_circle",  "GRanges",
+          function(data, ..., geom = c("point", "line", "link", "ribbon","rect",
+                                       "segment", "rectangle", "hist", "scale","ideogram",
+                                "text"), linked.to,
+                          radius = 10, trackWidth = 5, trackBuffer, circle.skip,
+                          space.skip = 0.1, direction = c("clockwise", "anticlockwise"),
+                          link.fun = function(x, y, n = 30) bezier(x, y, evaluatio = n)){
+  geom <- match.arg(geom)
+  if(geom == "rect")
+    geom <- "rectangle"
+  args <- list(...)
+  aes.lst <- unlist(lapply(args, function(x) class(eval(x)) == "uneval"))
+  if(length(aes.lst)){
+    idx <- which(aes.lst)
+    aes.lst <- eval(args[[idx]])
+  }else{
+    aes.lst <- list()
+  }
+  ## df <- as.data.frame(data)
+  ## y <- eval(aes.lst$y, df)
+  ## first do the transformation
+  obj <- gr2newLinear(data, space.skip)
+  if(geom == "point"){
+    obj <- gr2circle(obj, y = as.character(aes.lst$y), radius= radius, width = trackWidth,
+                     direction = direction)
+    df <- as.data.frame(obj)
+    aes.lst$y <- as.name(".biovizBase.y")
+    aes.lst$x <- as.name(".biovizBase.x")
+    aes <- do.call("aes", aes.lst)
+    p <- geom_point(data = df, aes) 
+  }
+  
+  if(geom == "line"){
+    obj <- gr2circle(obj, y = as.character(aes.lst$y), radius= radius, width = trackWidth,
+                     direction = direction)
+    df <- as.data.frame(obj)
+    aes.lst$y <- as.name(".biovizBase.y")
+    aes.lst$x <- as.name(".biovizBase.x")
+    aes <- do.call("aes", aes.lst)
+    p <- geom_path(data = df, aes) 
+  }
+  if(geom == "segment"){
+    res <- segInter(data, y = as.character(aes.lst$y),
+                    space.skip = space.skip, trackWidth = trackWidth, radius = radius,
+                      direction = direction)
+    df <- as.data.frame(res)
+    aes.lst$y <- as.name(".biovizBase.y")
+    aes.lst$x <- as.name(".biovizBase.x")
+    aes.lst$group <- as.name(".biovizBase.group")    
+    aes <- do.call("aes", aes.lst)
+    p <- geom_path(data = df, aes)
+  }
+  if(geom == "rectangle"){
+    res <- rectInter(data, y = as.character(aes.lst$y),
+                    space.skip = space.skip, trackWidth = trackWidth, radius = radius,
+                    direction = direction)
+    df <- as.data.frame(res)
+    aes.lst$y <- as.name(".biovizBase.y")
+    aes.lst$x <- as.name(".biovizBase.x")
+    aes.lst$group <- as.name(".biovizBase.group")    
+    aes <- do.call("aes", aes.lst)
+    p <- geom_polygon(data = df, aes)
+  }
+  if(geom == "rectangle"){
+    res <- rectInter(data, y = as.character(aes.lst$y),
+                    space.skip = space.skip, trackWidth = trackWidth, radius = radius,
+                    direction = direction)
+    df <- as.data.frame(res)
+    aes.lst$y <- as.name(".biovizBase.y")
+    aes.lst$x <- as.name(".biovizBase.x")
+    aes.lst$group <- as.name(".biovizBase.group")    
+    aes <- do.call("aes", aes.lst)
+    p <- geom_polygon(data = df, aes)
+  }
+
+  if(geom == "link"){
+    res <- linkInter(data, space.skip = space.skip, linked.to = linked.to,
+                     link.fun = link.fun, trackWidth = trackWidth, radius = radius,
+                     direction = direction)
+    aes.lst$y <- as.name("y")
+    aes.lst$x <- as.name("x")
+    aes.lst$group <- as.name(".biovizBase.group")
+    aes <- do.call("aes", aes.lst)
+    p <- geom_path(data = res, aes)
+  }
+  
+  if(geom == "ribbon"){
+    
+  }
+  p
+})
+
+
 ## first got a linear rearrangement, for like, grand linear view
 ## only consider granges here
 ## TODO:
-## ranked by chromosome
-## if seqlengths exists, use that as boundary, if not, data range * 0.05
+## 1. ranked by chromosome
+## 2. if seqlengths exists, use that as boundary, if not, data range * 0.05
+## 3. link
+## 4. rectangle(##)
+## 5. line
+## 6. point
 gr2newLinear <- function(obj, space.skip = 0.1){
   obj <- sort(obj)
-  seqs.l <- seqlengths(obj)  
+  seqs.l <- seqlengths(obj)
   if(all(!is.na(seqs.l))){
     chr.l <- seqs.l
     seqs.suml <- sum(seqs.l)
   }else{
     ## if no seqlengths are found, use obj range
-    chr.l <- max(end(split(obj, seqnames(obj))))
+    chr.l <- max(end(split(obj, as.character(seqnames(obj)))))
     seqs.suml <- sum(chr.l)
   }
   space.skip <- space.skip * seqs.suml
@@ -21,18 +124,15 @@ gr2newLinear <- function(obj, space.skip = 0.1){
   chr.l2 <- c(0, chr.l[-length(chr.l)])
   names(chr.l2) <- names(chr.l)
   sts.new <- start(obj) + skps[as.character(seqnames(obj))] +
-    chr.l2[as.character(seqnames(obj))] 
+    chr.l2[as.character(seqnames(obj))]
   values(obj)$.biovizBase.start <- sts.new
   obj
 }
-
 
 ## then need a transformation to circlular view
 ## data is a GRanges object
 gr2circle <- function(obj, x = ".biovizBase.start", y,
                       radius = 10, width = 10, direction = c("clockwise", "anticlockwise")){
-  ## if(missing(x))
-  ##   stop("x is missing")
   if(missing(y)){
     stop("y is missing")
   }else if(!is.character(y) && !is.numeric(y)){
@@ -60,98 +160,69 @@ gr2circle <- function(obj, x = ".biovizBase.start", y,
   obj
 }
 
-## reference:http://groups.google.com/group/ggplot2/browse_thread/thread/72403c6997b79c3b?pli=1
-
-
-## "link" and "ribbon" requie a special data structure
-## 1. we could implement it as GRangesList with no direction specification
-## 2. we could use a to.gr as element meta data which is a granges with direction,
-## this is also a GRanges object which is general(implemented this first)
-layout_circle <- function(data, ..., geom = c("point", "line", "link", "ribbon",
-                                       "segment", "rect", "hist"), linked.to,
-                          radius = 10, trackWidth = 5, trackBuffer, circle.skip,
-                          space.skip = 0.1, direction = c("clockwise", "anticlockwise"),
-                          link.fun = function(x, y, n = 30) bezier(x, y, evaluatio = n)){
-  geom <- match.arg(geom)
-  args <- list(...)
-  aes.lst <- unlist(lapply(args, function(x) class(eval(x)) == "uneval"))
-  if(length(aes.lst)){
-    idx <- which(aes.lst)
-    aes.lst <- eval(args[[idx]])
-  }else{
-    aes.lst <- list()
-  }
-  ## df <- as.data.frame(data)
-  ## y <- eval(aes.lst$y, df)
-  ## first do the transformation
-  obj <- gr2newLinear(data, space.skip)
-  if("point" %in% geom){
-    obj <- gr2circle(obj, y = as.character(aes.lst$y), radius= radius, width = trackWidth,
-                     direction = direction)
-    df <- as.data.frame(obj)
-    aes.lst$y <- as.name(".biovizBase.y")
-    aes.lst$x <- as.name(".biovizBase.x")
-    aes <- do.call("aes", aes.lst)
-    p <- geom_point(data = df, aes) 
-  }
-  if("line" %in% geom){
-    obj <- gr2circle(obj, y = as.character(aes.lst$y), radius= radius, width = trackWidth,
-                     direction = direction)
-    df <- as.data.frame(obj)
-    aes.lst$y <- as.name(".biovizBase.y")
-    aes.lst$x <- as.name(".biovizBase.x")
-    aes <- do.call("aes", aes.lst)
-    p <- geom_path(data = df, aes) 
-  }
-  if("rect" %in% geom){
-    
-  }
-  ## if("segment" %in% geom){
-    
-  ## }
-  if("link" %in% geom){
-    res <- linkInter(data, space.skip = space.skip, linked.to = linked.to,
-                     link.fun = link.fun, trackWidth = trackWidth, radius = radius,
-                     direction = direction)
-    aes.lst$y <- as.name("y")
-    aes.lst$x <- as.name("x")
-    aes.lst$group <- as.name(".biovizBase.group")
-    aes <- do.call("aes", aes.lst)
-    p <- geom_path(data = res, aes)
-  }
-  if("ribbon" %in% geom){
-    
-  }
-  p
-}
 ## interpolate segment or rectangle
-rectInter <- function(data, space.skip = 0.1, trackWidth = 10, radius = 10,
+## rectangle only use stepping as y
+rectInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
                       direction = direction,
-                      inter.fun = function(x, y, n = 10) approx(x, y, n = 10)){
-  ## do the linear interpolatoin first
-  
-  ## then add new data
-  
-}
+                      inter.fun = function(x, y, n = 4) approx(x, y, n = 4)){
 
-segInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
-                      direction = direction,
-                      inter.fun = function(x, y, n = 10) approx(x, y, n = 10)){
-  ## do the linear interpolatoin first
-  if(missing(y))
-    disjointBins(gr)
-  apropos("disjoint")
-  data <- gr3
+  values(data)$.biovizBase.level <- disjointBins(ranges(data))
   df <- as.data.frame(data)
   lst <- lapply(1:nrow(df), function(i){
-    res <- as.data.frame(do.call("cbind", inter.fun(c(df[i,"start"], df[i,"end"]))))
-    colnames(res) <- c(".biovizBase.new.x", ".biovizBase.new.y")    
+    res.x <- as.integer(inter.fun(c(df[i,"start"], df[i,"end"]), c(0, 0))$x)
+    ## colnames(res) <- c(".biovizBase.new.x", ".biovizBase.new.y")
+    res <- data.frame(.biovizBase.new.x = c(res.x, rev(res.x)))
+    N <- nrow(res)    
     res$.biovizBase.group <- i
-    N <- nrow(res)
-    df.extra <- do.call("rbind", lapply(1:N, function(i) df))
+    res$.biovizBase.level <- c(rep(df[i, ".levels"] - 0.4, N/2), c(df[i, ".levels"] + 0.4, N/2))
+
+    df.extra <- do.call("rbind", lapply(1:N, function(k) df[i,]))
     res <- cbind(res, df.extra)
   })
   res <- do.call("rbind", lst)
+ .y <- ".biovizBase.level"
+  res.gr <- GRanges(res$seqnames, IRanges(start = res$.biovizBase.new.x,
+                                          width = 1),
+                    strand = res$strand)
+  values(res.gr) <- subset(res, select = -c(start, end, width, strand,seqnames))
+  seqlengths(res.gr) <- seqlengths(data)
+  res <- gr2newLinear(res.gr, space.skip)
+  res <- gr2circle(res, y = .y, radius = radius, width = trackWidth,
+                   direction = direction)  
+}
+
+## ok, segment allow user to use a flexible y
+segInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
+                      direction = direction,
+                      inter.fun = function(x, y, n = 3) approx(x, y, n = n)){
+  ## do the linear interpolatoin first
+  if(!length(y)){
+    values(data)$.biovizBase.level <- disjointBins(ranges(data))
+  }
+  df <- as.data.frame(data)
+  lst <- lapply(1:nrow(df), function(i){
+    res.x <- as.integer(inter.fun(c(df[i,"start"], df[i,"end"]), c(0, 0))$x)
+    ## colnames(res) <- c(".biovizBase.new.x", ".biovizBase.new.y")
+    res <- data.frame(.biovizBase.new.x = res.x)
+    res$.biovizBase.group <- i
+    res$.biovizBase.level <- df[i, ".levels"]
+    N <- nrow(res)
+    df.extra <- do.call("rbind", lapply(1:N, function(k) df[i,]))
+    res <- cbind(res, df.extra)
+  })
+  res <- do.call("rbind", lst)
+  if(!length(y))
+    .y <- ".biovizBase.level"
+  else
+    .y <- as.character(y)
+  res.gr <- GRanges(res$seqnames, IRanges(start = res$.biovizBase.new.x,
+                                          width = 1),
+                    strand = res$strand)
+  values(res.gr) <- subset(res, select = -c(start, end, width, strand,seqnames))
+  seqlengths(res.gr) <- seqlengths(data)
+  res <- gr2newLinear(res.gr, space.skip)
+  res <- gr2circle(res, y = .y, radius = radius, width = trackWidth,
+                   direction = direction)
 }
 
 ## for a special GRanges
@@ -194,4 +265,5 @@ linkInter <- function(data, linked.to, space.skip = 0.1, trackWidth = 10, radius
   })
   res <- do.call("rbind", lst)
 }
+
 

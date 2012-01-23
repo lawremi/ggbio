@@ -1,7 +1,7 @@
 ## ======================================================================
 ##        For "Overview"
 ## ======================================================================
-plotOverview <- function(obj, 
+plotStackedOverview <- function(obj, 
                          cytoband = FALSE){
 
   if(cytoband){

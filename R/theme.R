@@ -63,7 +63,9 @@ theme_null <-   function (base_size = 12, base_family = "")
             class = "options")
 }
 
-theme_alignment <-   function (label = FALSE, base_size = 12, base_family = "") 
+## TODO: with axis?
+theme_alignment <-   function (label = FALSE, base_size = 12, base_family = "",
+                               axis = TRUE, border = TRUE, grid = TRUE) 
 {
   structure(
             list(
@@ -82,10 +84,18 @@ theme_alignment <-   function (label = FALSE, base_size = 12, base_family = "")
                  axis.ticks.margin = unit(0.5, "lines"),
 
                  panel.background = theme_blank(),
-                 panel.border = theme_blank(),
-                 panel.grid.major = theme_blank(),
+                 ## panel.background = theme_rect(fill = "white", 
+                 ##   colour = "grey"),
+                 ## panel.border = theme_blank(),
+                 panel.border = {if(border)
+                                   theme_rect(fill = NA, colour = "grey50")
+                                 else
+                                   theme_blank()},
+                 panel.grid.major = {if(grid)
+                                       theme_line(colour = "grey90", size = 0.2)
+                                     else
+                                       theme_blank()},
                  panel.grid.minor = theme_blank(),
-                 
                  panel.margin = unit(0.25, "lines"),
                  
                  strip.background = theme_rect(fill = "grey80", colour = "grey50"), 

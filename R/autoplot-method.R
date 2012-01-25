@@ -5,6 +5,11 @@
 ## 4. TranscriptDb(remove tx, change name)(done)
 ## 5. GappedAlignments
 ## 6. Bam/BamFile/character
+## 7. IRanges
+## 8. factorize statistics out
+## 9. TranscriptDb zoom-in, introns are cut, need to be fixed
+## 10. autoplot,GRanges, geom = "area" is slow
+## 11. autoplot,GRanges, geom = "histogram"
 setGeneric("autoplot", function(data, ...) standardGeneric("autoplot"))
 ## auto play need to check arguments and dispatch them to the right
 ## place
@@ -25,7 +30,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                                   facets, facet, 
                                   stat = c("identity", "coverage", "stepping"),
                                   geom = c("rectangle", "segment","alignment",
-                                    "line","point", "polygon"),
+                                    "line","point", "area", "histogram"),
                                   coord = "linear",
                                   rect.height = 0.4
                                   ){
@@ -42,7 +47,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
   args.facets <- args[names(args) %in% formals.facets]
   args <- args[!(names(args) %in% formals.cur)]
 
-  ## 
+  ## check geom
   if(geom %in% c("rectangle", "alignment", "segment" )){
     if(!("y" %in% names(args))){
       if(stat %in% c("identity", "coverage"))
@@ -51,6 +56,8 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
     }
   }
 
+  if(geom %in% c("histogram", "line", "area"))
+    stat <- "coverage"
   
   ## check "x", must be one of "start", "end", "midpoint"
   if(!(geom %in% c("alignment", "segment", "rectangle"))){
@@ -90,6 +97,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
       facets <- NULL
     }}
   ## get the right facets
+  
   if(length(facets)){
     if(is(facets, "GRanges")){
       args.facets$facets <- substitute(~.bioviz.facetid)
@@ -142,11 +150,12 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
           }
           grl <- split(data, seqnames(data))
         }}
-
   if(stat == "coverage"){
     if(missing(xlim))
-      xlim <- c(start(range(data.back, ignore.strand = TRUE)),
-                end(range(data.back, ignore.strand = TRUE)))
+      ## xlim <- c(start(range(data.back, ignore.strand = TRUE)),
+      ##           end(range(data.back, ignore.strand = TRUE)))
+      xlim <- c(min(start(ranges(data.back))),
+                max(end(ranges(data.back))))
     data <- lapply(grl,
                    function(dt){
                      if(!is.null(allvars) &&
@@ -172,15 +181,10 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                        })
                        do.call(rbind, lst)
                      }else{
-                       ## vals <- as.numeric(coverage(ranges(dt),
-                       ##                             shift = -min(start(dt))+1))
-                         vals <- coverage(dt)
+                         vals <- coverage(keepSeqlevels(dt, unique(as.character(seqnames(dt)))))
                          seqs <- xlim[1]:xlim[2]                         
                          vals <- vals[[1]][seqs]
-                       ## vals <- as.numeric(coverage(dt,
-                       ##                             shift = -min(start(dt))+1))
-                       ## seqs <- seq.int(from = min(start(dt)),
-                       ##                 length.out = length(vals))
+                         vals <- as.numeric(vals)
                        if(length(unique(values(dt)$.id.name)))                
                          res <- data.frame(vals = vals, seqs = seqs,
                                            seqnames =
@@ -224,8 +228,6 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
   if(stat == "identity"){
     df <- as.data.frame(data)
   }
-
-
   ## color scheme 
   isStrand.color <- FALSE
   isStrand.fill <- FALSE
@@ -238,8 +240,6 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
     if(as.character(args$fill) == "strand")
       isStrand.fill <- TRUE
   }
-
-
 
 
   p <- switch(geom,
@@ -260,12 +260,20 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 }
                 p
               },
+              ## point need to be discussed
               point = {
                 df <- as.data.frame(data)
                 df$midpoint <- (df$start+df$end)/2
                 p <- ggplot(df)
                 p <- p + geom_point(do.call("aes", args))
                 p
+              },
+              histogram = {
+                p <- ggplot(df)
+                args <- args[!(names(args) %in% c("x", "y"))]
+                args <- c(args, list(x = substitute(seqs),
+                                     y = substitute(vals)))
+                p <- p + geom_line(do.call("aes", args))
               },
               alignment = {
                 p <- ggplot(df)
@@ -381,11 +389,11 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                   p <- p + scale_color_manual(values = strandColor)
                 p
               },
-              polygon = {
+              area = {
                 df <- as.data.frame(data)
                 if(stat == "coverage"){
                 p <- ggplot(df)
-                ## geom polygon: associated with default stat coverage
+                ## geom area: associated with default stat coverage
                 ## remove x
                 args <- args[!(names(args) %in% c("x", "y"))]
                 args <- c(args, list(x = substitute(seqs),
@@ -399,7 +407,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                   idx <- order(df$seqnames, df$start)
                   df <- df[idx, ]
                   p <- ggplot(df)
-                  p <- p + geom_polygon(do.call("aes", args))
+                  p <- p + geom_area(do.call("aes", args))
                 }
                 p
               }
@@ -483,7 +491,7 @@ setMethod("autoplot", "IRanges", function(data, ...,
                                           facets, facet, 
                                           stat = c("identity", "coverage", "step"),
                                           geom = c("rectangle", "segment","alignment",
-                                            "line","point", "polygon"),
+                                            "line","point", "area"),
                                           coord = "linear"){
 
   args <- as.list(match.call(call = sys.call(1)))[-1]
@@ -528,7 +536,7 @@ setMethod("autoplot", "IRanges", function(data, ...,
                 p + geom_line(do.call("aes", args))+
                   ylab("coverage")
               },
-              coverage.polygon = {
+              coverage.area = {
                 df <- as.data.frame(data)
                 df$midpoint <- (df$start+df$end)/2
                 p <- ggplot(df)
@@ -542,7 +550,7 @@ setMethod("autoplot", "IRanges", function(data, ...,
                 args <- args[!(names(args) %in% c("x", "y"))]
                 args <- c(args, list(x = substitute(seqs),
                                      y = substitute(vals)))
-                p + geom_polygon(do.call("aes", args))+
+                p + geom_area(do.call("aes", args))+
                   ylab("coverage")
               }
               )
@@ -627,7 +635,7 @@ setMethod("autoplot", "BamFile", function(data, ..., which,
                                           geom = c("gapped.pair",
                                             "full",
                                             "coverage.line",
-                                            "coverage.polygon",
+                                            "coverage.area",
                                             "mismatch.summary")){
   
   args <- as.list(match.call(call = sys.call(1)))[-1]
@@ -647,7 +655,7 @@ setMethod("autoplot", "BamFile", function(data, ..., which,
     ## p <- autoplot(ga, ..., resize.extra = resize.extra)
 
   }
-  if(geom %in% c("coverage.line", "coverage.polygon", "full")){
+  if(geom %in% c("coverage.line", "coverage.area", "full")){
     ga <- readBamGappedAlignments(bf,
                                   param = ScanBamParam(which = which),
                                   use.name = TRUE)
@@ -678,7 +686,7 @@ setMethod("autoplot", "character", function(data, ...,
                                             geom = c("gapped.pair",
                                               "full",
                                               "coverage.line",
-                                              "coverage.polygon",
+                                              "coverage.area",
                                               "mismatch.summary")){
   geom <- match.arg(geom)
   if(tools::file_ext(data) == "bam")

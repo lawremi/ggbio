@@ -21,7 +21,7 @@ importFrom(IRanges, IRanges,  disjointBins,
            ranges, "ranges<-", 
            isTRUEorFALSE, coverage, slice,
            elementLengths,
-           reduce, punion, pgap, gaps)
+           reduce, punion, pgap, gaps, "%in%")
 
 importMethodsFrom(IRanges,  split, 
                   unlist,

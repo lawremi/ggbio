@@ -11,10 +11,11 @@ setMethod("geom_arch", "data.frame", function(data, ...,
     aes.lst <- list()
   }
   ## check required argument
-  if(!all(c("x", "xend", "height") %in% names(aes.lst)))
+  if(!all(c("x", "xend") %in% names(aes.lst)))
     stop("x, xend, height are requried in aes(), need to be passed into geom_arch()")
   startX <- eval(aes.lst$x, data)
   endX <- eval(aes.lst$xend, data)
+  if("height" %in% names(aes.lst)){
   if(!is.numeric(aes.lst$height)){
     h <- eval(aes.lst$height, data)
   }else{
@@ -22,6 +23,8 @@ setMethod("geom_arch", "data.frame", function(data, ...,
       h <- rep(aes.lst$height, length(startX))
     else
       stop("unequal length of heights specified")
+  }}else{
+     h <- rep(max.height/2, length(startX))
   }
   if("y" %in% names(aes.lst))
     y <- eval(aes.lst$y, data)
@@ -78,18 +81,30 @@ setMethod("geom_arch", "GRanges", function(data, ..., rect.height = 0.4,
   ## note rect.height = 0.4 is default cross ggbio
   ## need to make sure they are connected by two nearest point of rectangle
   df <- as.data.frame(data)
-  signs <- sign(eval(aes.lst$height, df))
-  df[,as.character(aes.lst$y)] <- df[,as.character(aes.lst$y)] + rect.height * signs
-  aes.lst$x <- as.name(start)
-  aes.lst$xend <- as.name(xend)
-  args.new <- c(list(data = df, n = n,
-                   max.height = max.height), aes.lst)
+  if("height" %in% names(aes.lst))
+    signs <- sign(eval(aes.lst$height, df))
+  else
+    signs <- 1
+  aes.lst$x <- substitute(start)
+  aes.lst$xend <- substitute(end)
+  if("y" %in% names(aes.lst)){
+    y <- eval(aes.lst$y, data)
+    df[,as.character(aes.lst$y)] <- df[,as.character(aes.lst$y)] + rect.height * signs
+  }else{
+    df$.y <- rep(0, nrow(df)) + rect.height * signs
+    aes.lst$y <- substitute(.y)
+  }
+  args.new <- list(data = df, n = n,
+                   max.height = max.height,aes.lst)
   do.call(geom_arch, args.new)
 })
 
 setMethod("geom_arch", "GRangesList", function(data, ..., rect.height = 0.4,
                                               n = 25, max.height = 10
                                               ){
+  ## we require GRangesList elementLengths is always 2 to sepcify two end point now
+  if(!all(elementLengths(data) == 2))
+    stop("Element lengths of the data must be of 2 now.")
   args <- list(...)
   aes.lst <- unlist(lapply(args, function(x) class(eval(x)) == "uneval"))
   if(length(aes.lst)){
@@ -98,19 +113,16 @@ setMethod("geom_arch", "GRangesList", function(data, ..., rect.height = 0.4,
   }else{
     aes.lst <- list()
   }
-  
+  gr <- stack(data)
+  DF <- as.data.frame(values(data))
+  lst <- lapply(seq_len(nrow(DF)),function(i){
+    rbind(DF[i,,drop = FALSE],DF[i,,drop = FALSE])
+  })
+  df <- do.call(rbind,lst)
+  values(gr) <- cbind(as.data.frame(values(gr)), df)
+  args.new <- list(data = gr, n = n,
+                   max.height = max.height,aes.lst)
+  do.call(geom_arch, args.new)  
 })
-
-
-## df <- data.frame(x = seq(1, 100, by = 2),
-##                  y = 1:50,
-##                  xend = seq(1, 100, by = 2) + rnorm(50, 10),
-##                  yend =0 , size = rnorm(50))
-
-## ggplot() + geom_arch(data = df, aes(x = x, xend = xend, height = size, y = y, size = size))
-## ggplot() + geom_arch(data = df, aes(x = x, xend = xend, height = size, size = size))
-## ggplot() + geom_arch(data = df, aes(x = x, xend = xend, size = size))
-
-
 
 

@@ -166,7 +166,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                            seqs <- c(seqs[1], seqs, seqs[length(seqs)])
                            vals <- c(0, vals, 0)
                          }
-                         
+
                          if(length(unique(values(dt)$.id.name)))                
                            res <- data.frame(vals = vals, seqs = seqs,
                                              seqnames =
@@ -382,7 +382,8 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 p
               },
               area = {
-                df <- as.data.frame(data)
+                ## df <- as.data.frame(data)
+                df <- data
                 if(stat == "coverage"){
                   p <- ggplot(df)
                   args <- args[!(names(args) %in% c("x", "y"))]
@@ -698,13 +699,18 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
                                                xlim, ylim, 
                                                geom = c(
                                                  "gene",
-                                                 "reduced_gene")){
+                                                 "reduced_gene"),
+                                               names.expr = expression(paste(tx_name,
+                                                   "(", gene_id,")", sep = ""))){
+  if(missing(which))
+    stop("missing which is not supported yet")
   if(missing(xlim))
     xlim <- c(start(range(which)),
               end(range(which)))
   geom <- match.arg(geom)
-  args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
-  .args <- args[!(names(args) %in% c("geom", "which","data"))]
+  args <- as.list(match.call(call = sys.call(sys.parent(2))))[-1]
+  .args <- args[!(names(args) %in% c("geom", "which","data", "xlim", "ylim", "xlab", "ylab",
+                                     "main", "names.expr"))]
   if(geom == "gene"){
     message("Aggregating TranscriptDb...")
     gr <- biovizBase:::fetch(data, which)
@@ -722,11 +728,8 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
                          xmax = substitute(end),
                          ymin = substitute(.levels - 0.4),
                          ymax = substitute(.levels + 0.4)))
-    ## only for rectangle 
-    ## if(!("color" %in% names(args)))
-    ##   p <- p + geom_rect(do.call("aes", args), color = color.def)
-    ## else
     p <- p + geom_rect(do.call("aes", args))
+    p
     ## utrs
     df.utr <- df[df$type == "utr",]
     args <- .args[names(.args) != "y"]
@@ -740,9 +743,31 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
     args <- .args[!(names(.args) %in% c("x", "y", "fill"))]
     p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
     .df.lvs <- unique(df$.levels)
-    .df.sub <- df[, c(".levels", "tx_id")]
+    .df.sub <- df[, c(".levels", "tx_id", "tx_name", "gene_id")]
     .df.sub <- .df.sub[!duplicated(.df.sub),]
-    p <- p + scale_y_continuous(breaks = .df.sub$.levels, labels = .df.sub$tx_id)
+    .labels <- NA
+    ## names.expr <- substitute(names.expr)
+      if(is.expression(names.expr))
+        .labels <- eval(names.expr, .df.sub)
+      if(is.character(names.expr)){
+        if(length(names.expr) == nrow(.df.sub)){
+          .labels <- names.expr
+        }else{
+          stop("names.expr has unqueal length with alignment stepping levels")
+        }
+      }
+    ## if(is.call(names.expr)){
+    ##   lst <- lapply(seq_len(nrow(.df.sub)),function(i){
+    ##     temp <- do.call(substitute, list(substitute(names.expr, env = parent.frame(2)), 
+    ##                            list(tx_name = as.name(as.character(.df.sub$tx_name[i])),
+    ##                                 tx_id = as.numeric(as.character(.df.sub$tx_id[i])),
+    ##                                gene_id = as.numeric(as.character(.df.sub$gene_id[i])))))
+    ##     deparse(substitute(temp))
+    ##   })
+    ##   .labels <- do.call("c", lst)
+    ## }
+    p <- p + scale_y_continuous(breaks = .df.sub$.levels,
+                                labels = .labels)
     p
   }
   if(geom == "reduced_gene"){

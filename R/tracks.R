@@ -1,4 +1,3 @@
-## 
 tracks <- function(...,
                    heights,
                    xlim, ylim,                   
@@ -18,8 +17,20 @@ tracks <- function(...,
       data.frame(xmin = res$xlim[1], xmax = res$xlim[2])
     })
     res <- do.call(rbind, lst)
+    ## take the smallest range
     xlim <- c(min(res$xmin), max(res$xmax))
     xlim <- scales::expand_range(xlim, mul = 0.05)
+  }else{
+    if(is(xlim, "IRanges")){
+      xlim <- c(start(xlim), end(xlim))
+    }
+    if(is(xlim,"GRanges")){
+      xlim <- c(start(ranges(reduce(xlim, ignore.strand = TRUE))),
+                end(ranges(reduce(xlim, ignore.strand = TRUE))))
+    }
+    if(is.numeric(xlim)){
+      xlim <- range(xlim)
+    }
   }
   ## s <- scale_x_continuous(limits = xlim)
   s <- coord_cartesian(xlim = xlim, wise = TRUE)

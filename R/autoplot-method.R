@@ -1,19 +1,13 @@
 ## TODO: Priority this week til Wednesday
-## 1. GRanges y for rectangle/segment, stat = "identity", y changed for free(done)
-## 2. BSgenome(done)
-## 3. Rle(done)
-## 4. TranscriptDb(remove tx, change name)(done)
 ## 5. GappedAlignments
 ## 6. Bam/BamFile/character
 ## 7. IRanges
 ## 8. factorize statistics out
-## 9. TranscriptDb zoom-in, introns are cut, need to be fixed
 ## 10. autoplot,GRanges, geom = "area" is slow
 ## 11. autoplot,GRanges, geom = "histogram"
 ## 12. autoplot,SummarizedExpriment
+## 13. txdb y label
 setGeneric("autoplot", function(data, ...) standardGeneric("autoplot"))
-## auto play need to check arguments and dispatch them to the right
-## place
 formals.qplot <- names(formals(qplot))
 
 formals.facet_grid <- names(formals(facet_grid))
@@ -31,10 +25,11 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                                   facets, facet, 
                                   stat = c("identity", "coverage", "stepping"),
                                   geom = c("rectangle", "segment","alignment",
-                                    "line","point", "area", "histogram"),
+                                    "line","point", "area"),
                                   coord = "linear",
                                   rect.height = 0.4
                                   ){
+  ## NOTE: geom_area is slow, actually using geom_polygon instead
   if(rect.height <= 0 | rect.height >= 0.5)
     stop("rect.height must be a value in (0,0.5)")
   data.back <- data
@@ -57,7 +52,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
     }
   }
 
-  if(geom %in% c("histogram", "line", "area"))
+  if(geom %in% c("line", "area"))
     stat <- "coverage"
   
   ## check "x", must be one of "start", "end", "midpoint"
@@ -167,6 +162,11 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                          seqs <- xlim[1]:xlim[2]
                          vals <- vals[[1]][seqs]
                          vals <- as.numeric(vals)
+                         if(geom == "area"){
+                           seqs <- c(seqs[1], seqs, seqs[length(seqs)])
+                           vals <- c(0, vals, 0)
+                         }
+                         
                          if(length(unique(values(dt)$.id.name)))                
                            res <- data.frame(vals = vals, seqs = seqs,
                                              seqnames =
@@ -186,6 +186,10 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                          seqs <- xlim[1]:xlim[2]                         
                          vals <- vals[[1]][seqs]
                          vals <- as.numeric(vals)
+                         if(geom == "area"){
+                           seqs <- c(seqs[1], seqs, seqs[length(seqs)])
+                           vals <- c(0, vals, 0)
+                         }
                        if(length(unique(values(dt)$.id.name)))                
                          res <- data.frame(vals = vals, seqs = seqs,
                                            seqnames =
@@ -269,13 +273,6 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 p <- p + geom_point(do.call("aes", args))
                 p
               },
-              histogram = {
-                p <- ggplot(df)
-                args <- args[!(names(args) %in% c("x", "y"))]
-                args <- c(args, list(x = substitute(seqs),
-                                     y = substitute(vals)))
-                p <- p + geom_line(do.call("aes", args))
-              },
               alignment = {
                 p <- ggplot(df)
                 args <- args[!(names(args) %in% c("x", "y"))]
@@ -313,9 +310,6 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                   p <- p + scale_color_manual(values = strandColor)
                 if(isStrand.fill)
                   p <- p + scale_fill_manual(values = strandColor)
-                ## p <- p + opts(axis.text.y = theme_blank())
-                ## p <- p + scale_y_continuous(breaks = df$.levels,
-                ##                             labels = df$.levels)
                 .df.lvs <- unique(df$.levels)
                 .df.sub <- df[, c(".levels", gpn)]
                 .df.sub <- .df.sub[!duplicated(.df.sub),]
@@ -324,9 +318,6 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                                               labels = as.character(.df.sub[, gpn]))
                 else
                   p <- p + scale_y_continuous(breaks = NA)
-                ##   p <- p + scale_y_continuous(breaks = .df.sub$.levels,
-                ##                          labels = as.character(.df.sub[, gpn]))               
-                ## }
                 p
               },
               rectangle = {
@@ -393,21 +384,20 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
               area = {
                 df <- as.data.frame(data)
                 if(stat == "coverage"){
-                p <- ggplot(df)
-                ## geom area: associated with default stat coverage
-                ## remove x
-                args <- args[!(names(args) %in% c("x", "y"))]
-                args <- c(args, list(x = substitute(seqs),
-                                     y = substitute(vals)))
-                p <- p + geom_area(do.call("aes", args))
-                p
-                
-              }
+                  p <- ggplot(df)
+                  args <- args[!(names(args) %in% c("x", "y"))]
+                  args <- c(args, list(x = substitute(seqs),
+                                       y = substitute(vals)))
+                  p <- p + geom_polygon(do.call("aes", args))
+                  p
+                  
+                }
                 if(stat == "identity"){
                   df$midpoint <- (df$start+df$end)/2
                   idx <- order(df$seqnames, df$start)
                   df <- df[idx, ]
                   p <- ggplot(df)
+                  ## TODO:need test on speed
                   p <- p + geom_area(do.call("aes", args))
                 }
                 p
@@ -551,7 +541,7 @@ setMethod("autoplot", "IRanges", function(data, ...,
                 args <- args[!(names(args) %in% c("x", "y"))]
                 args <- c(args, list(x = substitute(seqs),
                                      y = substitute(vals)))
-                p + geom_area(do.call("aes", args))+
+                p + geom_polygon(do.call("aes", args))+
                   ylab("coverage")
               }
               )
@@ -803,7 +793,10 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
   }
   p <- p + xlab(xlab)
   if(missing(ylab)){
-      p <- p + ggplot2::ylab("Transcript")
+    if(geom == "reduced_gene")
+      p <- p + ggplot2::ylab("Reduced Gene Model")
+    if(geom == "gene")
+      p <- p + ggplot2::ylab("Gene Model")
   }else{
     p <- p + ylab(ylab)
   }

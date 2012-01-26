@@ -11,40 +11,31 @@ newDataAfterFacetByGr <- function(gr, which, id.name){
 }
 
 getLimits <- function(obj){
+  x <- y <- xmin <- ymin <- xmax <- ymax <- xend <- yend <- NULL
+  ## x
   if(!is.null(obj$mapping$x) && length(obj$data))
     x <- eval(obj$mapping$x, obj$data)
-  else
-    x <- NULL
-  
+  if(!is.null(obj$mapping$x) && length(obj$data))
+    x <- eval(obj$mapping$x, obj$data)
+  ## y
   if(!is.null(obj$mapping$y) && length(obj$data))
     y <- eval(obj$mapping$y, obj$data)
-  else
-    y <- NULL
   
   if(!is.null(obj$mapping$xmin) && length(obj$data))
     xmin <- eval(obj$mapping$xmin, obj$data)
-  else
-    xmin <- NULL
+
   
   if(!is.null(obj$mapping$ymin) && length(obj$data))
     ymin <- eval(obj$mapping$ymin, obj$data)
-  else
-    ymin <- NULL
   
   if(!is.null(obj$mapping$xmax) && length(obj$data))
     xmax <- eval(obj$mapping$xmax, obj$data)
-  else
-    xmax <- NULL
   
   if(!is.null(obj$mapping$ymax) && length(obj$data))
     ymax <- eval(obj$mapping$ymax, obj$data)
-  else
-    ymax <- NULL
   
   if(!is.null(obj$mapping$xend) && length(obj$data))
     xend <- eval(obj$mapping$xend, obj$data)
-  else
-    xend <- NULL
   
   if(!is.null(obj$mapping$yend) && length(obj$data))
     yend <- eval(obj$mapping$yend, obj$data)
@@ -52,15 +43,23 @@ getLimits <- function(obj){
     yend <- NULL
 
   ## if(length(obj$layer)>1){
+
   l.res <- getLimitsFromLayer(obj)
   ## }else{
   ##   l.res <- NULL
   ## }
+  res <- list(xlim = c(min(c(l.res$xmin, x, xmin)),
+                max(c(l.res$xmax, x, xmax, xend))),
+              ylim = c(min(c(l.res$ymin, y, ymin)),
+                max(c(l.res$ymax, y, ymax, yend))))
+  if(length(obj$coordinates$limits$x) == 2)
+    res$xlim <- obj$coordinates$limits$x
   
-  list(xlim = c(min(c(l.res$xmin, x, xmin)),
-         max(c(l.res$xmax, x, xmax, xend))),
-       ylim = c(min(c(l.res$ymin, y, ymin)),
-         max(c(l.res$ymax, y, ymax, yend))))
+  if(length(obj$coordinates$limits$y) == 2)
+    res$ylim <- obj$coordinates$limits$y
+
+  res
+  
 }
 
 getLimitsFromLayer <- function(obj){

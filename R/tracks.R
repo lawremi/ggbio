@@ -21,7 +21,8 @@ tracks <- function(...,
     xlim <- c(min(res$xmin), max(res$xmax))
     xlim <- scales::expand_range(xlim, mul = 0.05)
   }
-  s <- scale_x_continuous(limits = xlim)    
+  ## s <- scale_x_continuous(limits = xlim)
+  s <- coord_cartesian(xlim = xlim, wise = TRUE)
   ## need fix legend
     N <- length(grobs)
     lst <- lapply(seq_len(N),

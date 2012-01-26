@@ -10,6 +10,7 @@
 ## 9. TranscriptDb zoom-in, introns are cut, need to be fixed
 ## 10. autoplot,GRanges, geom = "area" is slow
 ## 11. autoplot,GRanges, geom = "histogram"
+## 12. autoplot,SummarizedExpriment
 setGeneric("autoplot", function(data, ...) standardGeneric("autoplot"))
 ## auto play need to check arguments and dispatch them to the right
 ## place
@@ -808,7 +809,7 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
   }
   if(!missing(main))
     p <- p + opts(title = main)
-  p + scale_x_continuous(limits = xlim)
+   p + coord_cartesian(xlim = xlim, wise = TRUE)
 })
 
 

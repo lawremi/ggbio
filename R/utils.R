@@ -124,22 +124,15 @@ getLimitsFromLayer <- function(obj){
 
 getGap <- function(data, group.name){
   res <- split(data, seqnames(data))
-  grl <- endoapply(res, function(dt){
+  grl <- lapply(res, function(dt){
     res <- split(dt, values(dt)[,group.name])
-    ## browser()
     gps.lst <- lapply(res, function(x){
       if(length(x) > 1){
-        ## if(values(x)$.levels  == 93) browser()
         gps <- gaps(ranges(x))
         if(length(gps)){
           seqs <- unique(as.character(seqnames(x)))
-          ## print(seqs)
           ir <- gps
-          ## print(ir)
-          ## res
           gr <- GRanges(seqs, ir)
-          ## tryes <- try(gr <- GRanges(, gps))
-          ## if(inherits(tryes, "try-error")) browser()
           values(gr)$.levels <- unique(values(x)$.levels)
           gr
         }else{
@@ -149,12 +142,14 @@ getGap <- function(data, group.name){
         }
     })
     gps <- do.call("c", gps.lst)          #remove NULL
-    gps <- do.call("c", unname(gps))
+    if(!is.null(gps))
+      gps <- do.call("c", unname(gps))
   })
-  res <- unlist(grl)
+  res <- unlist(do.call(GRangesList, do.call(c, grl)))
   values(res)$type <- "gaps"
   res
 }
+
 ## suppose we have freq?
 getModelRange <- function(data, group.name){
   seqs <- unique(as.character(seqnames(data)))

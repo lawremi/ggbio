@@ -148,8 +148,6 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
         }}
   if(stat == "coverage"){
     if(missing(xlim))
-      ## xlim <- c(start(range(data.back, ignore.strand = TRUE)),
-      ##           end(range(data.back, ignore.strand = TRUE)))
       xlim <- c(min(start(ranges(data.back))),
                 max(end(ranges(data.back))))
     data <- lapply(grl,
@@ -229,7 +227,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 df <- as.data.frame(data)
                 df$midpoint <- (df$start+df$end)/2
   }
-
+  data[seqnames(data) == "chr1"]
   if(stat == "identity"){
     df <- as.data.frame(data)
   }
@@ -284,6 +282,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 ## if(show.gaps){
                   ## show.gaps turn on the connectors
                 gps <- suppressWarnings(getGap(data, group.name = gpn))
+                gps <- keepSeqlevels(gps, names(seqlengths(data)))
                 args.gaps <- args[!names(args) %in% c("x", "y",
                                                       "xend", "yend",
                                                       "label.type",

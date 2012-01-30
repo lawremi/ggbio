@@ -59,19 +59,19 @@ getLimits <- function(obj){
     res$ylim <- obj$coordinates$limits$y
 
   res
-  
+
 }
 
 getLimitsFromLayer <- function(obj){
   layers <- obj$layer
   lst <- lapply(layers, function(layer){
     if(length(obj$data) | length(layer$data)){
-
+      
     if(length(layer$data))
       dt <- layer$data
     else
       dt <- obj$data
-      
+    if(!is.null(layer$mapping)){
     if(!is.null(layer$mapping$x))
       x <- eval(layer$mapping$x, dt)
     else
@@ -111,8 +111,14 @@ getLimitsFromLayer <- function(obj){
       yend <- eval(layer$mapping$yend, dt)
     else
       yend <- NULL
-    res <- data.frame(xmin = min(c(x, xmin)), xmax = max(c(x, xmax, xend)),
-               ymin = min(c(y, ymin)), ymax = max(c(y, ymax, yend)))
+    
+    res <- data.frame(xmin = min(c(x, xmin)),
+                      xmax = max(c(x, xmax, xend)),
+                      ymin = min(c(y, ymin)),
+                      ymax = max(c(y, ymax, yend)))
+  }else{
+    res <- NULL
+  }
   }else{
     res <- NULL
   }

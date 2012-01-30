@@ -7,6 +7,7 @@ import(ggplot2)
 importFrom(BiocGenerics, cbind, rbind, unique,
            lapply, sapply, setdiff, Reduce)
 import(biovizBase)
+import(grid)
 importFrom(gridExtra, grid.arrange)
 importFrom(scales, cscale, dscale)
 ## Hmisc

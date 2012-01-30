@@ -2,11 +2,11 @@
 ## 1. tracks margin fix
 ## 2. exons labels for plotRangesLinkedToData
 library(ggbio)
+library(GenomicRanges)
 
 ##  GRanges
 set.seed(1)
 N <- 1000
-library(GenomicRanges)
 
 gr <- GRanges(seqnames = 
               sample(c("chr1", "chr2", "chr3"),
@@ -22,6 +22,7 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
+
 autoplot(gr)
 autoplot(gr, geom = "rectangle")
 autoplot(gr, geom = "segment")
@@ -30,11 +31,24 @@ autoplot(gr, geom = "segment", y = value)
 
 ## alignment is with chevron
 autoplot(gr[1:50], geom = "alignment")
+autoplot(gr[1:50], geom = "rectangle")
+autoplot(gr[1:50], geom = "rectangle", group = pair) #works
+autoplot(gr[1:50], geom = "alignment", group = pair, fill = pair) #werro
+tracks(p1, p2)
+gr[1:50]
+## TODO: fix this
+gr.test <- GRanges("chr1", IRanges(c(1, 9, 20, 50), width = 15), group = c("a", "a", "b","b"))
+autoplot(gr.test, geom = "alignment", group = group)
+autoplot(gr.test, geom = "rectangle", group = group)
+autoplot(gr.test)
+
+autoplot(gr[1:50], geom = "alignment", group = pair) #erro
 autoplot(gr[1:50], geom = "alignment", group = pair) #error
+
 autoplot(gr, geom = "line", y = value)
 autoplot(gr, geom = "point", y = value)
 autoplot(gr, geom = "line", stat = "coverage")
-autoplot(gr, geom = "polygon", stat = "coverage")
+autoplot(gr, geom = "area", stat = "coverage")
 
 
 
@@ -43,7 +57,7 @@ p1 <- autoplot(gr.sub, geom = "rectangle") + opts(title = "full")
 p2 <- autoplot(gr.sub, geom = "point", y = value) + opts(title = "point")
 p3 <- autoplot(gr.sub, geom = "line", y = value) + opts(title = "line")
 p4 <- autoplot(gr.sub, geom = "line", stat = "coverage") + opts(title = "coverage.line")   
-p5 <- autoplot(gr.sub, geom = "polygon", stat = "coverage") + opts(title = "coverage.polygon")   
+p5 <- autoplot(gr.sub, geom = "area", stat = "coverage") + opts(title = "coverage.area")   
 library(gridExtra)
 grid.arrange(p1, p2, p3, p4, p5, ncol = 2)
 
@@ -54,7 +68,7 @@ autoplot(gr, geom = "segment", facets = group ~ seqnames)
 autoplot(gr, geom = "line", y = value, facets = group ~ seqnames)
 autoplot(gr, geom = "point", y = value, facets = group ~ seqnames)
 autoplot(gr, geom = "line", stat = "coverage", facets = group ~ seqnames)
-autoplot(gr, geom = "polygon", stat = "coverage", facets = group ~ seqnames)
+autoplot(gr, geom = "area", stat = "coverage", facets = group ~ seqnames)
 
 autoplot(gr[seqnames(gr) == "chr1"], facets = group ~ seqnames)
 
@@ -81,6 +95,35 @@ p2 <- p + geom_chevron(gr.gaps, aes(size = score), offset = "score",
 p3 <- p + geom_chevron(gr.gaps, offset = -0.1)
 tracks(p1, p2, p3)
 
+## arch
+df <- data.frame(x = seq(1, 100, by = 2),
+                 y = 1:50,
+                 xend = seq(1, 100, by = 2) + rnorm(50, 10),
+                 yend =0 , size = rnorm(50))
+
+ggplot() + geom_arch(data = df, aes(x = x, xend = xend, height = size, y = y, size = size))
+ggplot() + geom_arch(data = df, aes(x = x, xend = xend, height = size, size = size))
+ggplot() + geom_arch(data = df, aes(x = x, xend = xend, size = size))
+
+
+library(GenomicRanges)
+gr <- GRanges("chr1", IRanges(start = seq(1, 100, by = 2),
+                        width = 20), size = rnorm(50))
+
+ggplot() + geom_arch(data = gr, aes(height = size))
+ggplot() + geom_arch(data = gr, aes(size = size))
+ggplot() + geom_arch(data = gr, aes(height = size), rect.height = 5)
+
+
+
+gr1 <- GRanges("chr1", IRanges(c(1, 10), width = 5), value = 1:2)
+gr2 <- GRanges("chr1", IRanges(c(30, 40), width = 5), value = 3:4)
+grl <- GRangesList(gr1, gr2)
+values(grl)$size <- c(5, 10)
+
+ggplot() + geom_arch(data = grl, aes(size = size), rect.height = 5)
+ggplot() + geom_arch(data = grl, aes(height = value, size = size, color = value), rect.height = 5)
+
 ## GRangesList
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 data(genesymbol, package = "biovizBase")
@@ -100,7 +143,7 @@ values(ir)
 p1 <- autoplot(ir) + opts(title = "full")
 p2 <- autoplot(ir, geom = "segment")+ opts(title = "segment")
 p3 <- autoplot(ir, geom = "coverage.line")+ opts(title = "coverage.line")
-p4 <- autoplot(ir, geom = "coverage.polygon")+ opts(title = "coverage.polygon")
+p4 <- autoplot(ir, geom = "coverage.area")+ opts(title = "coverage.area")
 library(gridExtra)
 grid.arrange(p1, p2, p3, p4, ncol = 2)
 
@@ -164,7 +207,7 @@ p2 <- autoplot(bamfile, which = genesymbol["RBM17"], geom = "gapped.pair",
             show.junction = TRUE) 
 p3 <- autoplot(bamfile, which = genesymbol["RBM17"], geom = "full")
 p4 <- autoplot(bamfile, which = genesymbol["RBM17"], geom = "coverage.line") 
-p5 <- autoplot(bamfile, which = genesymbol["RBM17"], geom = "coverage.polygon")
+p5 <- autoplot(bamfile, which = genesymbol["RBM17"], geom = "coverage.area")
 p6 <- autoplot(bamfile, which = genesymbol["RBM17"], bsgenome = Hsapiens,
       geom = "mismatch.summary") 
 tracks(p1, p2, p3, p4, p5, p6)
@@ -196,7 +239,7 @@ tracks(p1, p2, p3, p4)
 
 ## stacked
 library(ggbio)
-data(hg19IdeogramCyto)
+data(hg19IdeogramCyto, package = "biovizBase")
 library(GenomicRanges)
 ## make shorter and clean labels
 old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
@@ -204,10 +247,11 @@ new.chrs <- gsub("chr", "", old.chrs)
 ## lst <- as.list(new.chrs)
 names(new.chrs) <- old.chrs
 new.ideo <- renameSeqlevels(hg19IdeogramCyto, new.chrs)
-p <- plotOverview(new.ideo, cytoband = TRUE)
+p <- plotStackedOverview(new.ideo, cytoband = TRUE)
 print(p)
-
-p <- plotOverview(new.ideo, cytoband = FALSE)
+## fixing order
+new.ideo <- sort(new.ideo)
+p <- plotStackedOverview(new.ideo, cytoband = FALSE)
 print(p)
 
 data(darned_hg19_subset500)
@@ -215,13 +259,15 @@ data(darned_hg19_subset500)
 old.chrs <- seqnames(seqinfo(darned_hg19_subset500))
 new.chrs <- gsub("chr", "", old.chrs)
 names(new.chrs) <- old.chrs
+
 new.darned <- renameSeqlevels(darned_hg19_subset500, new.chrs)
-p <- p + geom_hotregion(new.darned)
-print(p)
+values(new.darned)$value <- rnorm(length(new.darned))
+p + layout_stacked(new.darned)
+p + layout_stacked(new.darned, aes(y = value), geom = "area")
+p + layout_stacked(new.darned, aes(y = value), geom = "line")
 
-
-p <- plotOverview(new.ideo, cytoband = FALSE)
-p <- p + geom_hotregion(new.darned, aes(color = exReg))
+p <- plotStackedOverview(new.ideo, cytoband = FALSE)
+p <- p + layout_stacked(new.darned, aes(color = exReg))
 print(p)
 
 p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
@@ -230,14 +276,20 @@ print(p)
 p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1",
                 zoom.region = c(1e8, 1.5e8))
 print(p)
-
+## ========================================
 ## Grand Linear
-data(hg19Ideogram)
+## ========================================
+library(ggbio)
+data(hg19Ideogram, package = "biovizBase")
+data(hg19IdeogramCyto, package = "biovizBase")
 chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
+
+chrs
 seqlths <- seqlengths(hg19Ideogram)[chrs]
 set.seed(1)
 nchr <- length(chrs)
 nsnps <- 1000
+
 gr.snp <- GRanges(rep(chrs,each=nsnps),
              IRanges(start = do.call(c, lapply(chrs, function(chr){
                N <- seqlths[chr]
@@ -249,11 +301,9 @@ gr.snp <- GRanges(rep(chrs,each=nsnps),
                     replace = TRUE)
              )
 
-## processing the name, to make it shorter
-nms <- seqnames(seqinfo(gr.snp))
-nms.new <- gsub("chr", "", nms)
-names(nms.new) <- nms
-gr.snp <- renameSeqlevels(gr.snp, nms.new)
+## seqlengths(gr.snp) <- rep(1e9, 24)      #
+nms <- paste("chr", c(1:22, "X","Y"), sep = "")
+gr.snp <- keepSeqlevels(gr.snp, nms)
 ## default is two color
 plotGrandLinear(gr.snp, y = pvalue, geom = "point")
 plotGrandLinear(gr.snp, y = pvalue, geom = "point", color.type = "identity",
@@ -273,11 +323,12 @@ plotGrandLinear(gr.snp, y = pvalue, geom = "point") +
 
 ## facet by samples, comparison across groups
 plotGrandLinear(gr.snp, y = pvalue, geom = "point",
-                facet = group ~ .,  color.type = "twocolor")
-
+                facets = group ~ .,  color.type = "twocolor")
+library(biovizBase)
+library(ggplot2)
 ## change two color
 plotGrandLinear(gr.snp, y = pvalue, geom = "point",
-                facet = group ~ .,  color.type = "twocolor",
+                facets = group ~ .,  color.type = "twocolor",
                 two.color = c("red", "blue"))
 ## geom line
 plotGrandLinear(gr.snp, y = pvalue,
@@ -461,6 +512,8 @@ width(grl[[1]])
 ##  circular
 ## it's dangerous that some track with seqlengths, while others doesn't
 library(GenomicRanges)
+library(ggbio)
+
 gr <- GRanges(rep(c("chr1", "chr2", "chr3"), each = 200),
               IRanges(c(sample(size = 200, 1:200, replace = TRUE),
                         sample(size = 200, 1:500, replace = TRUE),
@@ -472,8 +525,11 @@ gr3 <- GRanges(rep(c("chr1", "chr2", "chr3"), each = 200),
               IRanges(c(sample(size = 200, 1:200, replace = TRUE),
                         sample(size = 200, 1:500, replace = TRUE),
                         sample(size = 200, 1:1000, replace = TRUE)), width = 10))
+
 seqlengths(gr3) <- c(210, 510, 1010)
 values(gr3)$size <- rnorm(200 * 3)
+
+data(hg19Ideogram, package = "biovizBase")
 
 library(scales)
 ## make a link
@@ -489,16 +545,26 @@ gr2 <- GRanges(rep(c("chr1", "chr2", "chr3"), each = 100),
                         sample(size = 100, 1:1000, replace = TRUE)), width = 1))
 gr2 <- gr2[sample(1:length(gr2), size = 300)]
 values(gr1)$to.gr <- gr2
-library(ggplot2)
+
 library(Hmisc)
-ggplot() + layout_circle(gr, aes(y = "size", color = seqnames))+ blank_opts()
-ggplot() + layout_circle(gr, aes(y = "size", color = seqnames), geom = "line")+ blank_opts()
+library(ggplot2)
+ggplot() + layout_circle(gr, aes(y = "size", color = seqnames))+ theme_null2()
+ggplot() + layout_circle(gr, aes(y = "size", color = seqnames), geom = "line")+ theme_null2()
 ggplot() + layout_circle(gr, aes(y = "size", color = seqnames), geom = "line",
-                         direction = "anticlockwise")+ blank_opts()
+                         direction = "anticlockwise")+ theme_null2()
 
-ggplot() + layout_circle(gr1, radius = 10, linked.to = "to.gr",geom = "link")+ blank_opts()
 
-ggplot() + layout_circle(gr1, aes(color = size),radius = 10, linked.to = "to.gr",geom = "link")+ blank_opts()
+ggplot() + layout_circle(gr3, geom = "segment")+ theme_null2()
+ggplot() + layout_circle(gr3, geom = "rectangle", aes(fill = "black"))+ theme_null2()
+ggplot() + layout_circle(gr3, aes(y = "size", color = seqnames), geom = "segment")+ theme_null2()
+ggplot() + layout_circle(gr1, radius = 10, linked.to = "to.gr",geom = "link")+ theme_null2()
+
+ggplot() + layout_circle(gr1, aes(color = size),radius = 10, linked.to = "to.gr",geom = "link")+
+  theme_null2()
+
+ggplot() + layout_circle(gr1, aes(color = size, alpha = size),radius = 10, linked.to = "to.gr",geom = "link")+
+  theme_null2()
+
 
   layout_circle(gr, radius = 20, aes(y = "size", color = seqnames), geom = "line")
 
@@ -509,28 +575,118 @@ head(mtcars)
 autoplot(data = mtcars, x = mpg, y = cyl, alpha = qsec)
 
 ## test figures from Michael
+## example(GRanges)
+## autoplot(gr)
 library(ggbio)
 data(cstest, package = "chipseq")
-grs <- GRanges("chr10",IRanges(start = 77873000, end = 77878000))
+library(GenomicRanges)
+## library("org.Mm.eg.db")
+## orgs <- org.Mm.eg.db
+## syms <- genSymbols(orgs)
+## syms
+## from the plot you sent me I got a region overlapped with your plot, it's gene Rrp1
+grs <- GRanges("chr10",IRanges(start = 77863000, end = 77878000))
+## sym.cur <- subsetByOverlaps(syms, grs)
+## sym.cur
 library("TxDb.Mmusculus.UCSC.mm9.knownGene")
 txdb <- TxDb.Mmusculus.UCSC.mm9.knownGene
 test <- exonsBy(txdb, by = "tx")
-test2 <- subsetByOverlaps(test, grs)
-grs2 <- range(unlist(test2))
-grs3 <- resize(grs2, width = width(grs2) + 3000, fix = "end")
-## cstest.sub <- subsetByOverlaps(cstest,grs2)
+## grl.Rrp1 <- subsetByOverlaps(test, sym.cur)
+## grs
 cstest.sub <- endoapply(cstest, function(x){
-  subsetByOverlaps(x, grs3)
+  subsetByOverlaps(x, grs)
 })
 cstest.sub <- keepSeqlevels(cstest.sub, "chr10")
 gr <- unlist(cstest.sub)
-values(gr)$group <- rep(names(cstest.sub), times = elementLengths(cstest.sub))
 gr <- resize(gr, width = 300, fix = "start")
-## p1 <- autoplot(gr, facets = group ~ seqnames, stat = "coverage", geom = "line")
-## p2 <- autoplot(test2)
-## p2 is equal to p3
-p4 <- autoplot(txdb, geom = "gene", which = grs3)
-p5 <- autoplot(txdb, geom = "reduced_gene", which = grs3)
+values(gr)$group <- rep(names(cstest.sub), times = elementLengths(cstest.sub))
+library(ggbio)
+p1 <- autoplot(gr, facets = group ~ seqnames, stat = "coverage", geom = "line")
+p2 <- autoplot(gr, facets = group ~ seqnames, stat = "coverage", geom = "area", fill = group)
+tracks(p1, p2)
+## autoplot(gr, facets = group ~ seqnames, stat = "coverage", geom = "line",
+##          xlim = c(77873000, 77878000))
+## autoplot(gr, facets = group ~ seqnames, stat = "coverage", geom = "area")
+
+p4 <- autoplot(txdb, geom = "gene", which = grs)
+p5 <- autoplot(txdb, geom = "reduced_gene", which = grs, ylab = "")
+p6 <- autoplot(txdb, geom = "gene", which = GRanges("chr10", IRanges(77874000, 77878000)))
+tracks(p4, p6)
+tracks(p1, p5, heights = c(2, 1))
+tracks(p2, p5, heights = c(2, 1))
+png("~/Desktop/ctest3.png", 800, 800)
+tracks(p1 + theme_bw(), p5 + theme_alignment(), heights = c(3, 1))
+dev.off()
+png("~/Desktop/ctest4.png", 800, 800)
+tracks(p2, p5, heights = c(3, 1),xlim = c(77870000, 77878000))
+dev.off()
+p5
+p5 + scale_x_continuous(limits = c(77870000, 77878000))
+p5 + coord_cartesian() + scale_x_continuous(limits = c(77870000, 77878000))
+p5 + xlim(77870000, 77878000)
+p5 + coord_cartesian(xlim=c(77870000, 77878000), wise = TRUE)
+png("~/Desktop/ctest4-zoom.png", 800, 800)
+tracks(p1 + theme_bw(), p5 + theme_alignment(), heights = c(3,1), xlim = c(77870000, 77878000))
+dev.off()
+
+png("~/Desktop/ctest6-zoom.png", 800, 800)
+tracks(p2, p5, heights = c(3,1), xlim = c(77870000, 77878000))
+dev.off()
+
 tracks(p4, p5, theme = theme_bw(), heights = c(2, 1))
 
+p1 <- qplot(data = mtcars, x = mpg, y = cyl)
+p2 <- qplot(data = mtcars, x = mpg, y = cyl, geom = "point")
+tracks(p1, p2)
+ggbio:::align.plots(p1, p2)
+
+x = 1:10000
+y = rnorm(10000)
+df <- data.frame(x = x, y = y)
+qplot(data = df,x = x, y = y, geom = "histogram")
+
+
+"hello" * 4
+library(ggplot2)
+x = 1:1e5
+y = rnorm(length(x))
+qplot(x = x, y = y, geom = "area")
+qplot(x = x, y = y, geom = "polygon")
+## polygon is fast
+
+
+## Michael's code
+library(chipseq)
+data(cstest)
+genome(cstest) <- "mm9" # should already be set on the cstest dataset
+allFragments <- resize(stack(cstest), 120)
+library(ggbio)
+roiGR <- GRanges("chr10", IRanges(77875000, 77876500))
+p1 <- autoplot(subsetByOverlaps(allFragments, roiGR), 
+               facets = sample ~ seqnames,
+               stat = "coverage", geom = "area")
+p1
+library(TxDb.Mmusculus.UCSC.mm9.knownGene)
+## names.expr accept expression now
+p2 <- autoplot(TxDb.Mmusculus.UCSC.mm9.knownGene, ylab = "",
+               which = roiGR, names.expr = expression(paste(gene_id,"::",tx_id,sep = "")))
+p2
+## default name, tx_name(gene_id), and use range of which
+p2 <- autoplot(TxDb.Mmusculus.UCSC.mm9.knownGene, ylab = "",
+               which = roiGR)
+p2
+## NOTE: use widest track as limits if xlim is not specified
+tracks(p1, p2, heights = c(2, 1))
+## now xlim accept IRanges, GRanges, numeric
+tracks(p1, p2, heights = c(2, 1), xlim = roiGR)
+tracks(p1, p2, heights = c(2, 1), xlim = ranges(roiGR))
+tracks(p1, p2, heights = c(2, 1), xlim = c(start(roiGR), end(roiGR)))
+
+## xlim overide which
+p4 <- autoplot(TxDb.Mmusculus.UCSC.mm9.knownGene, ylab = "",
+               which = roiGR, xlim = c(start(roiGR)-1000, end(roiGR)))
+p4
+tracks(p1, p2, heights = c(2, 1))
+## NOTE: theme_alignment cannot remove only y ticks, you could add following code
+p2 + theme_alignment() + scale_y_continuous(breaks = NA)
 

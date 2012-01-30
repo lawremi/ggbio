@@ -4,7 +4,8 @@ tracks <- function(...,
                    theme = NULL,
                    legend = FALSE,     #
                    xlab = NULL,
-                   track.skip = -1){
+                   track.skip = -1,
+                   xlim.change = rep(TRUE, length(list(...)))){
 
   dots <- list(...)
   nrow <- length(dots)
@@ -12,7 +13,7 @@ tracks <- function(...,
     heights <- unit(rep(1, nrow), "null")
   grobs <- dots
   if(missing(xlim)){
-    lst <- lapply(grobs, function(obj){
+    lst <- lapply(grobs[xlim.change], function(obj){
       res <- getLimits(obj)
       data.frame(xmin = res$xlim[1], xmax = res$xlim[2])
     })
@@ -38,7 +39,8 @@ tracks <- function(...,
     N <- length(grobs)
     lst <- lapply(seq_len(N),
                   function(i) {
-                    grobs[[i]] <- grobs[[i]] + s
+                    if(i %in% which(xlim.change))
+                      grobs[[i]] <- grobs[[i]] + s
                     if(!is.null(theme))
                       grobs[[i]] <- grobs[[i]] + theme
                     ## margin
@@ -89,7 +91,7 @@ align.plots <- function (..., vertical = TRUE,
       if(!is.null(grob.y.text))
         editGrob(grob.y.text, vp = NULL)
       else
-        zeroGrob()
+        ggplot2:::zeroGrob()
     })
   
     ylabels <- lapply(dots, function(.g){
@@ -97,12 +99,12 @@ align.plots <- function (..., vertical = TRUE,
       if(!is.null(grob.y.text))
         editGrob(grob.y.text, vp = NULL)
       else
-        zeroGrob()
+        ggplot2:::zeroGrob()
     })
                       
     legends <- lapply(dots, function(.g) if (!is.null(.g$children$legends)) 
         editGrob(.g$children$legends, vp = NULL)
-    else zeroGrob())
+    else ggplot2:::zeroGrob())
 
     ## get strips
     strips <- lapply(dots, function(.g) {
@@ -111,7 +113,7 @@ align.plots <- function (..., vertical = TRUE,
       ## assume all strips the same width/height, so just use the first one?
       if (length(vstrips)>0) 
         editGrob(vstrips[[1]],vp=NULL)
-      else zeroGrob()
+      else ggplot2:::zeroGrob()
     })
     gl <- grid.layout(nrow = length(dots), heights=heights)
     vp <- viewport(layout = gl)

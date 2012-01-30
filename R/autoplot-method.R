@@ -117,15 +117,19 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
       if(!("scales" %in% names(args.facets)))
         args.facets <- c(args.facets, list(scales = "fixed"))
       allvars <- all.vars(as.formula(args.facets$facets))
-      if(allvars[2] != "seqnames")
+      if(allvars[2] == "."){
+        if(length(unique(seqnames(data))) > 1)
+          stop("Column of facet formula can only be seqnames when more than two seqnames
+                in the data")
+      }else{
+        if(allvars[2] != "seqnames")
         stop("Column of facet formula can only be seqnames, such as . ~ seqnames,
               you can change row varaibles")
+      }
       if(allvars[1] %in% colnames(values(data))){
         facet <- do.call(facet_grid, c(args$facets, args.facets))
       }else{
         stop(allvars[1]," doesn't exists in data columns")
-        ## args.facets <- c(args.facets, list(facets = substitute(~seqnames)))
-        ## facet <- do.call(facet_wrap, args.facets)
       }
       grl <- split(data, seqnames(data))
     }}else{
@@ -134,7 +138,6 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
         if(!("scales" %in% names(args.facets)))
           args.facets <- c(args.facets, list(scales = "fixed"))
         if(length(seqname)){
-          ## facet by default is by seqname(a good practice)
           facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facets)),
                                 TRUE, FALSE)
           if(facet.logic){
@@ -155,16 +158,26 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                      if(!is.null(allvars) &&
                         allvars[1] %in% colnames(values(data))){
                        ndt <- split(dt, values(dt)[,allvars[1]])
+                       ## browser()
                        lst <-lapply(ndt, function(dt){
                          vals <- coverage(dt)
-                         seqs <- xlim[1]:xlim[2]
-                         vals <- vals[[1]][seqs]
-                         vals <- as.numeric(vals)
+                         ## need seqlengths
+                         ## if(unique(values(dt)$Sample) == "K562") browser()
+                         if(is.na(seqlengths(dt))){
+                           seqs <- xlim[1]:max(end(dt))
+                           vals <- vals[[1]][seqs]
+                           vals <- as.numeric(vals)                           
+                           vals <- c(vals, rep(0, xlim[2]-max(end(dt))))
+                           seqs <- xlim[1]:xlim[2]
+                         }else{
+                           seqs <- xlim[1]:xlim[2]
+                           vals <- vals[[1]][seqs]
+                           vals <- as.numeric(vals)                           
+                         }
                          if(geom == "area"){
                            seqs <- c(seqs[1], seqs, seqs[length(seqs)])
                            vals <- c(0, vals, 0)
                          }
-
                          if(length(unique(values(dt)$.id.name)))                
                            res <- data.frame(vals = vals, seqs = seqs,
                                              seqnames =
@@ -181,8 +194,18 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                        do.call(rbind, lst)
                      }else{
                          vals <- coverage(keepSeqlevels(dt, unique(as.character(seqnames(dt)))))
-                         seqs <- xlim[1]:xlim[2]                         
-                         vals <- vals[[1]][seqs]
+                         if(is.na(seqlengths(dt))){
+                           seqs <- xlim[1]:max(end(dt))
+                           vals <- vals[[1]][seqs]
+                           vals <- c(vals, rep(0, xlim[2]-max(end(dt))))
+                           seqs <- xlim[1]:xlim[2]
+                         }else{
+                           seqs <- xlim[1]:xlim[2]
+                           vals <- vals[[1]][seqs]
+                         }
+                         
+                         ## seqs <- xlim[1]:xlim[2]                         
+                         ## vals <- vals[[1]][seqs]
                          vals <- as.numeric(vals)
                          if(geom == "area"){
                            seqs <- c(seqs[1], seqs, seqs[length(seqs)])
@@ -199,6 +222,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                                            as.character(seqnames(dt))[1])
                      }
                    })
+
     data <- do.call("rbind", data)
   }
   if(stat == "stepping"){
@@ -227,7 +251,6 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 df <- as.data.frame(data)
                 df$midpoint <- (df$start+df$end)/2
   }
-  data[seqnames(data) == "chr1"]
   if(stat == "identity"){
     df <- as.data.frame(data)
   }
@@ -312,11 +335,11 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
                 .df.lvs <- unique(df$.levels)
                 .df.sub <- df[, c(".levels", gpn)]
                 .df.sub <- .df.sub[!duplicated(.df.sub),]
-                if(gpn != ".levels")
+                ## if(gpn != ".levels")
                   p <- p + scale_y_continuous(breaks = .df.sub$.levels,
                                               labels = as.character(.df.sub[, gpn]))
-                else
-                  p <- p + scale_y_continuous(breaks = NA)
+                ## else
+                ##   p <- p + scale_y_continuous(breaks = NA)
                 p
               },
               rectangle = {
@@ -431,9 +454,7 @@ setMethod("autoplot", signature(data = "GRanges"), function(data, ...,
   }else{
     p <- p + ylab(ylab)
   }
-  
-  ## if(stat == "stepping" | geom == "alignment")
-  ##   p <- p + scale_y_continuous(breaks = NA)
+
   if(!missing(main))
     p <- p + opts(title = main)
   ## is this a good practice?

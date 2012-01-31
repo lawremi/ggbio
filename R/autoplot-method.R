@@ -838,10 +838,11 @@ setMethod("autoplot", "TranscriptDb", function(data, which, ...,
   }
   p <- p + xlab(xlab)
   if(missing(ylab)){
-    if(geom == "reduced_gene")
-      p <- p + ggplot2::ylab("Reduced Gene Model")
-    if(geom == "gene")
-      p <- p + ggplot2::ylab("Gene Model")
+    ## if(geom == "reduced_gene")
+    ##   p <- p + ggplot2::ylab("Reduced Gene Model")
+    ## if(geom == "gene")
+    ##   p <- p + ggplot2::ylab("Gene Model")
+    p <- p + ggplot2::ylab(getYLab(data))
   }else{
     p <- p + ylab(ylab)
   }

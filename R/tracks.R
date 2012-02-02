@@ -75,6 +75,7 @@ tracks <- function(...,
 align.plots <- function (..., vertical = TRUE,
                           heights = unit(rep(1, nrow), "null")) 
 {
+
   if (!vertical) stop("only vertical alignment implemented")
 
     dots0 <- list(...)
@@ -108,23 +109,29 @@ align.plots <- function (..., vertical = TRUE,
 
     ## get strips
     strips <- lapply(dots, function(.g) {
-      cc <- .g$children$layout$children
-      vstrips <- cc[grepl("^strip_v",names(cc))]
+      cc <- .g$children
+      vstrips <- cc[grepl("^strip-right",names(cc))]
       ## assume all strips the same width/height, so just use the first one?
       if (length(vstrips)>0) 
         editGrob(vstrips[[1]],vp=NULL)
       else ggplot2:::zeroGrob()
+
     })
+  
     gl <- grid.layout(nrow = length(dots), heights=heights)
     vp <- viewport(layout = gl)
     pushViewport(vp)
+
     widths.left <- mapply(`+`, e1 = lapply(ytitles, grobWidth), 
         e2 = lapply(ylabels, grobWidth), SIMPLIFY = FALSE)
+
+  
     widths.right <- mapply(function(g,lp,s) {
       grobWidth(g) + if (lp=="none") unit(0,"lines") else unit(0.5,"lines") + grobWidth(s)
     },
                            legends,legend.pos,strips,
                            SIMPLIFY=FALSE)
+
     widths.left.max <- max(do.call(unit.c, widths.left))
     widths.right.max <- max(do.call(unit.c, widths.right))
     for (ii in seq_along(dots)) {

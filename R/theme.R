@@ -1,4 +1,4 @@
-theme_null2<- function(size=12) 
+theme_null<- function(size=12) 
 { 
   o = list(axis.line=theme_blank(), 
     axis.text.x=theme_blank(), 
@@ -31,7 +31,7 @@ theme_null2<- function(size=12)
 
 
 
-theme_null <-   function (base_size = 12, base_family = "") 
+theme_null2 <-   function (base_size = 12, base_family = "") 
 {
   structure(
             list(

@@ -77,14 +77,15 @@ align.plots <- function (..., vertical = TRUE,
 {
 
   if (!vertical) stop("only vertical alignment implemented")
-
     dots0 <- list(...)
-    nrow <- length(dots0)
 
+  browser()
+    nrow <- length(dots0)
     legend.pos <- lapply(dots0,
                        function(x) {
                          if (is.null(x$options$legend.pos)) "right"
                          else x$options$legend.pos })
+str(dots0[2])
     dots <- lapply(dots0, ggplotGrob)
 
     ytitles <- lapply(dots, function(.g){
@@ -107,6 +108,7 @@ align.plots <- function (..., vertical = TRUE,
         editGrob(.g$children$legends, vp = NULL)
     else ggplot2:::zeroGrob())
 
+  grepl("^legend", names(dots[[1]]$children))
     ## get strips
     strips <- lapply(dots, function(.g) {
       cc <- .g$children

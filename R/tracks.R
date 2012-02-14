@@ -72,21 +72,22 @@ tracks <- function(...,
 
 ## this function is from ggExtra
 ## a little tweak to check the axis.text.y.text
+
+##
+## TODO: adust due to left/right legend
 align.plots <- function (..., vertical = TRUE,
                           heights = unit(rep(1, nrow), "null")) 
 {
 
   if (!vertical) stop("only vertical alignment implemented")
     dots0 <- list(...)
-
-  browser()
-    nrow <- length(dots0)
+  nrow <- length(dots0)
+    dots <- lapply(dots0, ggplotGrob)
     legend.pos <- lapply(dots0,
                        function(x) {
                          if (is.null(x$options$legend.pos)) "right"
                          else x$options$legend.pos })
-str(dots0[2])
-    dots <- lapply(dots0, ggplotGrob)
+
 
     ytitles <- lapply(dots, function(.g){
       grob.y.text <- getGrob(.g, "axis.title.y.text", grep = TRUE)
@@ -104,22 +105,33 @@ str(dots0[2])
         ggplot2:::zeroGrob()
     })
                       
-    legends <- lapply(dots, function(.g) if (!is.null(.g$children$legends)) 
-        editGrob(.g$children$legends, vp = NULL)
-    else ggplot2:::zeroGrob())
 
-  grepl("^legend", names(dots[[1]]$children))
-    ## get strips
-    strips <- lapply(dots, function(.g) {
+  legends <- lapply(dots0,function(.g){
+    gt <- ggplot_gtable(ggplot_build(.g))
+    idx <- grep("guide-box", gt$layout$name)
+    l.pos <- ggplot2:::plot_theme(.g)$legend.position
+    ## ggplot_gtable(ggplot_build(dots0[[1]]))$layout
+    if(length(idx)){
+      if(l.pos == "right"){
+        gt$widths[gt$layout[idx,"r"]]
+      }else{
+        warning("only support right legend now")
+        grobWidth(ggplot2:::zeroGrob())
+      }
+      ## editGrob(gt$grobs[[idx]], vp = NULL)
+    }else{
+      grobWidth(ggplot2:::zeroGrob())
+    }
+  })
+
+
+  strips <- lapply(dots, function(.g) {
       cc <- .g$children
       vstrips <- cc[grepl("^strip-right",names(cc))]
-      ## assume all strips the same width/height, so just use the first one?
       if (length(vstrips)>0) 
         editGrob(vstrips[[1]],vp=NULL)
       else ggplot2:::zeroGrob()
-
     })
-  
     gl <- grid.layout(nrow = length(dots), heights=heights)
     vp <- viewport(layout = gl)
     pushViewport(vp)
@@ -127,15 +139,13 @@ str(dots0[2])
     widths.left <- mapply(`+`, e1 = lapply(ytitles, grobWidth), 
         e2 = lapply(ylabels, grobWidth), SIMPLIFY = FALSE)
 
-  
     widths.right <- mapply(function(g,lp,s) {
-      grobWidth(g) + if (lp=="none") unit(0,"lines") else unit(0.5,"lines") + grobWidth(s)
-    },
-                           legends,legend.pos,strips,
-                           SIMPLIFY=FALSE)
-
+      g + grobWidth(s)
+    }, legends,legend.pos,strips,  SIMPLIFY=FALSE)
+  
     widths.left.max <- max(do.call(unit.c, widths.left))
     widths.right.max <- max(do.call(unit.c, widths.right))
+
     for (ii in seq_along(dots)) {
         pushViewport(viewport(layout.pos.row = ii))
         pushViewport(viewport(x = unit(0, "npc") + widths.left.max - 

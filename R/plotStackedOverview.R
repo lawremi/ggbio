@@ -1,9 +1,10 @@
 ## ======================================================================
 ##        For "Overview"
 ## ======================================================================
-plotStackedOverview <- function(obj, 
+plotStackedOverview <- function(obj, xlab, ylab, main, facets = seqnames ~ .,
                          cytoband = FALSE){
 
+  ## args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
   if(cytoband){
     cytobandColor <- getOption("biovizBase")$cytobandColor
     if(!isIdeogram(obj))
@@ -44,19 +45,14 @@ plotStackedOverview <- function(obj,
                            scale_fill_manual(values = cytobandColor)
    
   }else {
-    if(!isSimpleIdeogram(obj)){
-      message("Reduce to simple genome, ignoring cytoband")
-      ## obj <- sortChr(reduce(obj))
-      ## obj <- sort(reduce(obj))
-      obj <- reduce(obj)
-      if(!isSimpleIdeogram(obj))
-        stop("Cannot reduce to simple genome, please check your ideogram")
-    }
-    df <- as.data.frame(obj)
+    ideo.gr <- getIdeoGR(obj)
+    browser()
+    apply(as.data.frame(values(obj)), 2, class)
+    df <- as.data.frame(ideo.gr)
     ## df$seqnames <- factor(as.character(df$seqnames),
     ##                       levels = sortChr(unique(as.character(df$seqnames))))
     p <- ggplot(df)
-    p <- p + facet_grid(seqnames ~ .) +
+    p <- p + facet_grid(facets) +
       geom_rect(aes(xmin = start,
                     ymin = 0,
                     xmax = end,
@@ -67,7 +63,12 @@ plotStackedOverview <- function(obj,
                              panel.grid.minor = theme_line(colour = NA),
                              panel.grid.major = theme_line(colour = NA))
   }
-  p <- p + xlab("Genomic Coordinates") + ylab("Chromosomes")
+  if(!missing(xlab))
+    p <- p + xlab(xlab)
+  if(!missing(ylab))
+    p <- p + ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main)
   p
 }
 
@@ -104,4 +105,5 @@ plotSingleChrom <- function(obj, subchr, zoom.region, xlabel = FALSE,
     p <- p + opts(title = main)
   p
 }
+
 

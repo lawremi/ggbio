@@ -2,6 +2,7 @@
 ## 1. tracks margin fix
 ## 2. exons labels for plotRangesLinkedToData
 library(ggbio)
+library(ggplot2)
 library(GenomicRanges)
 
 ##  GRanges
@@ -21,6 +22,47 @@ gr <- GRanges(seqnames =
                 size = N, replace = TRUE),
               pair = sample(letters, size = N, 
                 replace = TRUE))
+
+## test lower level API
+## stat_identity()
+## transform to a normal data.frame and do it as free
+ggplot() + stat_identity(gr, aes(x = start, y = value), geom = "point")
+ggplot() + stat_identity(gr, aes(x = start, y = value, color = group), geom = "line")
+## stat_stepping()
+ggplot() + stat_stepping(gr)
+ggplot() + stat_stepping(gr, aes(color = strand))
+ggplot() + stat_stepping(gr, aes(color = strand, fill = strand))
+ggplot() + stat_stepping(gr, geom = "segment")
+ggplot() + stat_stepping(gr, aes(color = strand), geom = "segment")
+ggplot() + stat_stepping(gr, aes(group = pair),geom = "alignment")
+ggplot() + stat_stepping(gr, geom = "alignment")
+## stat_coverage
+ggplot() + stat_coverage(gr, geom = "point")
+ggplot() + stat_coverage(gr, geom = "histogram")
+ggplot() + stat_coverage(gr, geom = "area")
+ggplot() + stat_coverage(gr, geom = "smooth")
+ggplot() + stat_coverage(gr, geom = "step")
+## stat_aggregate
+ggplot() + stat_aggregate(gr, window = 30,  y = "value",fill = "gray40", geom = "histogram")
+ggplot() + stat_aggregate(gr, window = 100, fill = "gray40",y = "value",
+                          type = "max", geom = "histogram")
+ggplot() + stat_aggregate(gr, window = 20, y = "value", fill = "gray40", geom = "bar")
+
+ggplot() + stat_aggregate(gr, window = 20, y = "value", fill = "gray40", geom = "point")
+ggplot() + stat_aggregate(gr, window = 20, y = "value", fill = "gray40", geom = "line")
+ggplot() + stat_aggregate(gr, window = 20, y = "value", fill = "gray40", geom = "area")
+
+ggplot() + stat_aggregate(gr, window = 100, aes(y = value), geom = "boxplot")
+
+## geom_chevron
+## geom_arch
+## geom_5poly
+## geom_arrow
+
+## autoplot, GRanges
+
+
+
 
 
 autoplot(gr)
@@ -251,7 +293,7 @@ p <- plotStackedOverview(new.ideo, cytoband = TRUE)
 print(p)
 ## fixing order
 new.ideo <- sort(new.ideo)
-p <- plotStackedOverview(new.ideo, cytoband = FALSE)
+p <- plotStackedOverview(new.ideo, cytoband = FALSE, facets = . ~ seqnames)
 print(p)
 
 data(darned_hg19_subset500)
@@ -548,10 +590,10 @@ values(gr1)$to.gr <- gr2
 
 library(Hmisc)
 library(ggplot2)
-ggplot() + layout_circle(gr, aes(y = "size", color = seqnames))+ theme_null2()
-ggplot() + layout_circle(gr, aes(y = "size", color = seqnames), geom = "line")+ theme_null2()
+ggplot() + layout_circle(gr, aes(y = "size", color = seqnames))+ theme_null()
+ggplot() + layout_circle(gr, aes(y = "size", color = seqnames), geom = "line")+ theme_null()
 ggplot() + layout_circle(gr, aes(y = "size", color = seqnames), geom = "line",
-                         direction = "anticlockwise")+ theme_null2()
+                         direction = "anticlockwise")+ theme_null()
 
 
 ggplot() + layout_circle(gr3, geom = "segment")+ theme_null2()
@@ -665,10 +707,9 @@ roiGR <- GRanges("chr10", IRanges(77875000, 77876500))
 p1 <- autoplot(subsetByOverlaps(allFragments, roiGR), 
                facets = sample ~ seqnames,
                stat = "coverage", geom = "area")
-p1
 library(TxDb.Mmusculus.UCSC.mm9.knownGene)
 ## names.expr accept expression now
-p2 <- autoplot(TxDb.Mmusculus.UCSC.mm9.knownGene, ylab = "",
+p2 <- autoplot(TxDb.Mmusculus.UCSC.mm9.knownGene, 
                which = roiGR, names.expr = expression(paste(gene_id,"::",tx_id,sep = "")))
 p2
 ## default name, tx_name(gene_id), and use range of which
@@ -688,5 +729,249 @@ p4 <- autoplot(TxDb.Mmusculus.UCSC.mm9.knownGene, ylab = "",
 p4
 tracks(p1, p2, heights = c(2, 1))
 ## NOTE: theme_alignment cannot remove only y ticks, you could add following code
-p2 + theme_alignment() + scale_y_continuous(breaks = NA)
+p2 + theme_alignment(label = TRUE, border = TRUE, axis = TRUE, grid = TRUE)
+p2 + theme_alignment(label = TRUE, border = TRUE, axis = TRUE, grid = TRUE)
+p2 + theme_alignment()
 
+
+
+## TODO: facet[[]]
+
+## tracks
+
+library(ggplot2)
+library(gridExtra)
+head(mtcars)
+p1 <- qplot(data = mtcars, x = mpg, y = wt, facets = cyl ~ ., color = cyl)
+p1 <- qplot(data = mtcars, x = mpg, y = wt, facets = cyl ~ .)
+p2 <- qplot(data = mtcars, x = mpg, y = wt)
+align.plots(p1, p2)
+
+
+
+set.seed(1)
+N <- 1000
+
+gr <- GRanges(seqnames = 
+              sample(c("chr1", "chr2", "chr3"),
+                     size = N, replace = TRUE),
+              IRanges(
+                      start = sample(1:300, size = N, replace = TRUE),
+                      width = sample(10:15, size = N,replace = TRUE)),
+              strand = sample(c("+", "-", "*"), size = N, 
+                replace = TRUE),
+              value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
+              group = sample(c("Normal", "Tumor"), 
+                size = N, replace = TRUE),
+              pair = sample(letters, size = N, 
+                replace = TRUE))
+
+N <- 1e3
+
+gr2 <-  GRanges(seqnames = 
+                sample(c("chr1", "chr2", "chr3"),
+                       size = N, replace = TRUE),
+                IRanges(
+                        start = sample(1:300, size = N, replace = TRUE),
+                        width = 1),
+                strand = sample(c("+", "-", "*"), size = N, 
+                  replace = TRUE),
+                value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
+                group = sample(c("Normal", "Tumor"), 
+                  size = N, replace = TRUE),
+                pair = sample(letters, size = N, 
+                  replace = TRUE))
+
+gr3 <- c(gr, gr2)
+seqlengths(gr) <- c(315, 315, 315)
+## rect
+## so, if width = 1, it doesn't work
+ggplot() + layout_circle(data = gr3, aes(fill = value), geom = "rectangle") + theme_null()+
+  opts(aspect.ratio = 1)
+
+ggplot() + layout_circle(data = gr2, aes(fill = value), geom = "rectangle") + theme_null()+
+  opts(aspect.ratio = 1)
+
+ggplot() + layout_circle(data = gr2, geom = "rectangle") + theme_null()+
+  opts(aspect.ratio = 1)
+
+
+## segment
+ggplot() + layout_circle(data = gr, aes(color = value), geom = "segment") + theme_null()+ #
+  opts(aspect.ratio = 1)
+
+## ideogram
+## TODO: rect.inter.n need to automatically figure out the right number
+ggplot() + layout_circle(data = gr,  geom = "ideogram", rect.inter.n = 10) + theme_null()+
+  opts(aspect.ratio = 1)
+## bar
+ggplot() + layout_circle(data = gr2, aes(color = value), geom = "bar") + theme_null()+
+  opts(aspect.ratio = 1)
+
+## scale
+library(ggplot2)
+library(grid)
+p <- qplot(data = mtcars, x = mpg, y = wt, facets = cyl ~ ., color = cyl)
+p2 <- qplot(data = mtcars, x = mpg, y = wt)
+p3 <- qplot(data = mtcars, x = mpg, y = wt, facets = cyl ~ .)
+ggplot_gtable(ggplot_build(p3))
+ggplot_build(p3)
+tracks(p, p2)
+
+
+plot_theme
+
+library(grid)
+v <- viewport()
+obj <- ggplot_gtable(ggplot_build(p))
+names(obj)
+names(obj$grobs)
+obj$widths
+obj$heights
+obj$respect
+
+idx <- grep("guide-box", obj$layout$name)
+
+grobWidth(obj$grobs[[idx]])
+library(Biobase)
+data(sample.ExpressionSet)
+res <- as(sample.ExpressionSet, "data.frame")
+res <- as.data.frame(exprs(sample.ExpressionSet))
+max(res[2, ])
+phenoData(sample.ExpressionSet)@data
+head(exprs(sample.ExpressionSet))
+plotmatrix(as.data.frame(exprs(sample.ExpressionSet)))
+plotMatrix(sample.ExpressionSet)
+es <- sample.ExpressionSet
+head(as.data.frame(exprs(es)))
+ggpcp(mtcars)  + geom_line()
+ggpcp(mtcars, vars=names(mtcars[2:6])) + geom_line()
+ ggpcp(mtcars) + geom_boxplot(aes(group=variable))
+
+res <- transform(sample.ExpressionSet)
+head(res)
+
+transform <- function(object, ...){
+}
+
+
+
+library(reshape2)
+library(ggplot2)
+res.m <- melt(res)
+head(res.m)
+p <- ggplot(nba.m, aes(variable, Name)) + geom_tile(aes(fill = rescale),
+     colour = "white") + scale_fill_gradient(low = "white",
+     high = "steelblue")
+
+res <- transform(es)
+## matrix is slow
+autoplot(es[1:10, 1:10], type = "matrix")
+autoplot(es, type = "parallel")
+autoplot(es, type = "boxplot")
+autoplot(es, type = "heatmap")
+autoplot(es, x = A, template = "none")
+library(ggplot2)
+plotmatrix(as.data.frame(exprs(es)))
+
+head(df.m)
+
+library(affy)
+library(CLL)
+data("CLLbatch")
+data("disease")
+rownames(disease) <- disease$SampleID
+sampleNames(CLLbatch) <- sub("\\.CEL$", "", sampleNames(CLLbatch))
+mt <- match(rownames(disease), sampleNames(CLLbatch))
+vmd <- data.frame(labelDescription = c("Sample ID", "Disease Status"))
+phenoData(CLLbatch) <- new("AnnotatedDataFrame", data = disease[mt,],
+varMetadata = vmd)
+CLLbatch <- CLLbatch[, !is.na(CLLbatch$Disease)]
+
+autoplot(CLLbatch, type = "NUSE")
+autoplot(CLLbatch, type = "RLE")
+## TODO:reorder
+badArray <- match("CLL1", sampleNames(CLLbatch))
+CLLB <- CLLbatch[, -badArray]
+CLLrma <- rma(CLLB)
+
+library(genefilter)
+library("hgu95av2")
+CLLf <- nsFilter(CLLrma, remove.dupEntrez = FALSE, var.cutof = 0.5)$eset
+
+
+library(limma)
+## change to CLLf later
+design <- model.matrix(~ CLLrma$Disease)
+clllim <- lmFit(CLLrma, design)
+clleb <- eBayes(clllim)
+##
+biocLite("CCl4")
+library(CCl4)
+dataPath <- system.file("extdata", package = "CCl4")
+adf <- read.AnnotatedDataFrame("samplesInfo.txt", path = dataPath)
+adf
+targets <- pData(adf)
+targets$FileName <- row.names(targets)
+RG <- read.maimage
+MA <- normalizeWithinArrays(RG, method = "none", bc.method = "none")
+
+biocLite("ALL")
+library(ALL)
+data("ALL")
+ALL
+bcell <- grep("^B", as.character(ALL$BT))
+moltype <- which(as.character(ALL$mol.biol) %in% c("NEG", "BCR/ABL"))
+all_bcrneg <- ALL[, intersect(bcell, moltype)]
+all_bcrneg$mol.biol <- factor(all_bcrneg$mol.biol)
+getMethod("meanSdPlot", "matrix")
+autoplot(all_bcrneg, ranks = FALSE, type = "mean-sd")
+autoplot(all_bcrneg, ranks = TRUE, type = "mean-sd")
+
+sds <- esApply(ALL, 1, sd)
+sel <- (sds > quantile(sds, 0.8))
+allset1 <- all_bcrneg[sel,]
+
+autoplot(allset1, type = "volcano")
+autoplot(allset1, fac = "mol.biol", type = "volcano")
+
+allset1
+plotMA(allset1, array = 2)
+?plotMA
+showMethods("plotMA", "ExpressionSet")
+res <- as.matrix(allset1)
+ncol(res)
+
+
+## geom arrow
+library(ggplot2)
+library(grid)
+df <- data.frame(x = 1:10, y = rnorm(10), value = runif(10))
+library(GenomicRanges)
+gr <- GRanges("chr1", IRanges(start = 1:10, width = 5), value = rnorm(10))
+ggplot() + geom_arrow(data = gr)
+
+
+library(Gviz)
+dat <- sin(seq(pi, 10 * pi, len = 500))
+dTrack.big <- DataTrack(start = seq(1, 1e+05, len = 500),
+                        width = 15, chromosome = "chrX", genome = "hg19",
+                        name = "sinus", data = sin(seq(pi, 5 * pi, len = 500)) *
+                        runif(500, 0.5, 1.5))
+
+
+aggregate(gr, by = IRanges(start = c(1, 5),width = 4), function(x) values(x))
+aggregate(gr, width = 5,  FUN = function(x) values(x))
+df <- data.frame(x = seq(1,100,length = 100), y = rnorm(100))
+df <- data.frame(x = c(1, 5, 6), y = 3:5)
+qplot(data = df, x = x, y = y, geom = "histogram", stat = "identity")
+qplot(data = df, x = x, y = y, geom = "step", direction = "vh")
+gr
+ggplot() + stat_aggregate(gr, window = 30, aes(y = value), fill = "gray40")
+ggplot() + stat_aggregate(gr, window = 30, aes(y = value), fill = "gray40",
+                          type = "max")
+
+
+data <- gr
+data
+window = 4

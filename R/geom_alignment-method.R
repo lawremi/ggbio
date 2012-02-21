@@ -1,6 +1,6 @@
 setGeneric("geom_alignment", function(data, ...) standardGeneric("geom_alignment"))
 
-setMethod("geom_alignment", "GRanges", function(data, data.ori, args,rect.height = 0.4){
+setMethod("geom_alignment", "data.frame", function(data, data.ori, args,rect.height = 0.4){
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   rect.height <- force(rect.height)
@@ -51,3 +51,7 @@ setMethod("geom_alignment", "GRanges", function(data, data.ori, args,rect.height
    p
 })
 
+
+setMethod("geom_alignment", "GRanges", function(data, ...){
+  stat_stepping(data, ..., geom = "alignment")
+})

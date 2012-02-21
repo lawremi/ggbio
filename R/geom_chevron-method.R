@@ -1,4 +1,6 @@
-geom_chevron <- function(data, ..., group.name, offset = 0.1,
+setGeneric("geom_chevron", function(data, ...) starndGeneric("geom_chevron"))
+setMethod("geom_chevron", "GenomicRanges",
+           function(data, ..., group.name, offset = 0.1,
                          chevron.height = c(0.1, 0.8)){
   if(!".levels" %in% colnames(values(data))){
     if(!missing(group.name))
@@ -69,7 +71,7 @@ geom_chevron <- function(data, ..., group.name, offset = 0.1,
                        y = substitute(.levels + y.offset),
                        yend = substitute(.levels + yend.offset)))
   geom_segment(data = df, do.call(aes, args))
-}
+})
 
 ## 
 breakGr <- function(gr){

@@ -13,23 +13,15 @@ setMethod("stat_stepping", "GRanges", function(data, ..., facets = NULL,
   ## args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   args <- args[!names(args) %in% c("data", "facets", "rect.height", "geom")]
-  facet <- .buildFacetsFromArgs(data, args.facets)  
-  grl <- splitByFacets(data, facets)
-  res <- endoapply(grl,
-                      function(dt){
-                        if("group" %in% names(args.aes))
-                          dt <- addSteppings(dt, group.name = as.character(args.aes$group))
-                        else
-                          dt <- addSteppings(dt)
-                        })
-  res <- unlist(res)
-  df <- fortify(data = res)
+  ## facet <- .buildFacetsFromArgs(data, args.facets)  
   p <- switch(geom,
-              rect = .geom_rect(df, args, rect.height, stat = "stepping"),
-              alignment = geom_alignment(df, res, args, rect.height, stat = "stepping"),
-              segment = .geom_segment(df, args, stat = "stepping"))
-
-  p <- c(list(p) , list(facet))
+              rect = geom_rect(data, ..., facets = facets, rect.height = rect.height,
+                stat = "stepping"),
+              alignment = geom_alignment(data, ..., facets = facets, rect.height = rect.height,
+                stat = "stepping"),
+              segment = .geom_segment(data, ..., facets = facets, rect.height = rect.height,
+                stat = "stepping"))
+  ## p <- c(list(p) , list(facet))
   p
   
 })

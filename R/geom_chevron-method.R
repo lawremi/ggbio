@@ -82,14 +82,26 @@ setMethod("geom_chevron", "GenomicRanges",
                                       yend = substitute(.levels + yend.offset)))
               args.res <- c(list(data = df), list(do.call(aes, args)),
                             args.non)
-              p <- do.call(geom_segment, args.res)
+              p <- do.call(ggplot2::geom_segment, args.res)
 
             }
             if(stat == "identity"){
-              aes.lst <- args.aes
-              if(! all(c("x", "xend", "y", "yend") %in% names(aes.lst))){
-                stop("aes(x = , y = , xend = , yend = ) must be provided for stat  'identity', ")
+              if(!"y" %in% names(args.aes)){
+                if(!all(c("y","yend", "x", "xend") %in% names(args.aes))){
+                  stop("aes(x =, xend= , y =, yend= ) is required for stat 'identity',
+              you could also specify aes(y =) only as alternative")
+                }
+              }else{
+                .y <- args.aes$y
+                args.aes$x <- as.name("start")
+                args.aes$xend <- as.name("end")
+                args.aes$y <- substitute(y + offset,
+                                            list(y = .y, offset = as.name("y.offset")))
+                args.aes$yend <- substitute(yend + offset ,
+                                            list(yend = .y, offset = as.name("yend.offset")))
+
               }
+              
               data.new <- breakGr(data)
               names(data.new) <- NULL
               df <- as.data.frame(data.new)
@@ -103,13 +115,13 @@ setMethod("geom_chevron", "GenomicRanges",
                 ydf <- do.call("rbind", lapply(df$.bioviz.chevron, getY))
               }
               df <- cbind(df, ydf)
-              .y <- aes.lst$y
-              .yend <- aes.lst$yend
-              aes.lst$y <- substitute(y + y.offset, list(y = .y))
-              aes.lst$yend <- substitute(yend + yend.offset, list(yend = .yend))
-              args.res <- c(list(data = df), list(do.call(aes, aes.lst)),
+              .y <- args.aes$y
+              .yend <- args.aes$yend
+              args.aes$y <- substitute(y + y.offset, list(y = .y))
+              args.aes$yend <- substitute(yend + yend.offset, list(yend = .yend))
+              args.res <- c(list(data = df), list(do.call(aes, args.aes)),
                             args.non)
-              p <- do.call(geom_segment, args.res)
+              p <- do.call(ggplot2::geom_segment, args.res)
             }
             p <- c(list(p) , list(facet))            
             p

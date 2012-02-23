@@ -128,12 +128,19 @@ getLimitsFromLayer <- function(obj){
   res
 }
 
-getGap <- function(data, group.name){
+getGap <- function(data, group.name, facets = NULL){
+  if(!length(facets))
+    facets <- as.formula(~seqnames)
+  allvars <- all.vars(as.formula(facets))
+  allvars.extra <- allvars[!allvars %in% c(".", "seqnames")]
+
 
   if(!".levels" %in% colnames(values(data)))
     stop(".levels is not in data")
-  res <- split(data, seqnames(data))
-  grl <- lapply(res, function(dt){
+  grl <- splitByFacets(data, facets)  
+  ## res <- split(data, seqnames(data))
+  
+  grl <- lapply(grl, function(dt){
     res <- split(dt, values(dt)[,group.name])
     gps.lst <- lapply(res, function(x){
       if(length(x) > 1){
@@ -143,6 +150,9 @@ getGap <- function(data, group.name){
           ir <- gps
           gr <- GRanges(seqs, ir)
           values(gr)$.levels <- unique(values(x)$.levels)
+          values(gr)[,allvars.extra] <- rep(unique(values(x)[, allvars.extra]),
+                                            length(gr))
+          
           gr
         }else{
           NULL

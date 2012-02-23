@@ -8,15 +8,19 @@ setMethod("stat_coverage", "GRanges", function(data, ..., xlim, facets = NULL,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-
+  ## args.facets <- args.facets[names(args.facets) != "facets"]
   args.non <- args.non[!names(args.non) %in% c("data", "facets")]
-  facet <- .buildFacetsFromArgs(args.facets, facets)  
+  facet <- .buildFacetsFromArgs(data, args.facets)
   grl <- splitByFacets(data, facets)
+
 
   if(missing(xlim))
     xlim <- c(min(start(ranges(data))),
               max(end(ranges(data))))
-  
+  if(!length(facets))
+    facets <- as.formula(~seqnames)
+  allvars <- all.vars(as.formula(facets))
+  allvars.extra <- allvars[!allvars %in% c(".", "seqnames")]
   lst <- lapply(grl, function(dt){
     vals <- coverage(keepSeqlevels(dt, unique(as.character(seqnames(dt)))))
     if(any(is.na(seqlengths(dt)))){
@@ -34,6 +38,7 @@ setMethod("stat_coverage", "GRanges", function(data, ..., xlim, facets = NULL,
       seqs <- c(seqs[1], seqs, seqs[length(seqs)])
       vals <- c(0, vals, 0)
     }
+
     if(length(unique(values(dt)$.id.name)))                
       res <- data.frame(vals = vals, seqs = seqs,
                         seqnames =
@@ -43,6 +48,8 @@ setMethod("stat_coverage", "GRanges", function(data, ..., xlim, facets = NULL,
       res <- data.frame(vals = vals, seqs = seqs,
                         seqnames =
                         as.character(seqnames(dt))[1])
+    res[,allvars.extra] <- rep(unique(values(dt)[, allvars.extra]),
+                               nrow(res))
     res
   })
 

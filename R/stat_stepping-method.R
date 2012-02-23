@@ -13,7 +13,7 @@ setMethod("stat_stepping", "GRanges", function(data, ..., facets = NULL,
   ## args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   args <- args[!names(args) %in% c("data", "facets", "rect.height", "geom")]
-  facet <- .buildFacetsFromArgs(args.facets, facets)  
+  facet <- .buildFacetsFromArgs(data, args.facets)  
   grl <- splitByFacets(data, facets)
   res <- endoapply(grl,
                       function(dt){
@@ -25,8 +25,8 @@ setMethod("stat_stepping", "GRanges", function(data, ..., facets = NULL,
   res <- unlist(res)
   df <- fortify(data = res)
   p <- switch(geom,
-              rect = .geom_rect(df, args, rect.height),
-              alignment = geom_alignment(df, res, args, rect.height),
+              rect = .geom_rect(df, args, rect.height, stat = "stepping"),
+              alignment = geom_alignment(df, res, args, rect.height, stat = "stepping"),
               segment = .geom_segment(df, args, stat = "stepping"))
 
   p <- c(list(p) , list(facet))

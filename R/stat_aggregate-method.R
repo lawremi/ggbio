@@ -16,7 +16,7 @@ setMethod("stat_aggregate", "GenomicRanges", function(data, by, FUN, start = NUL
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
 
   args.non <- args.non[!names(args.non) %in% c("data", "facets", "y", "x")]
-  facet <- .buildFacetsFromArgs(args.facets, facets)
+  facet <- .buildFacetsFromArgs(data, args.facets)
   grl <- splitByFacets(data, facets)
 
   args.extra <- args[!names(args) %in% c("start", "by", "FUN",

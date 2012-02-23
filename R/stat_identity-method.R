@@ -4,7 +4,13 @@ setMethod("stat_identity", "data.frame", function(data, ...){
 })
 
 setMethod("stat_identity", "GRanges", function(data, ...){
-  data <- fortify(data = data)
-  ggplot2::stat_identity(data = data, ...)
+  dots <- list(...)
+  geom <- dots$geom
+  gr.geoms <- c("chevron", "arrow", "5poly", "arch")
+  if(!geom %in% gr.geoms){
+    data <- fortify(data = data)
+    p <- ggplot2::stat_identity(data = data, ...)
+  }
+  p
 })
 

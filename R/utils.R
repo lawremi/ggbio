@@ -169,7 +169,7 @@ getGap <- function(data, group.name, facets = NULL){
   })
   res <- unlist(do.call(GRangesList, do.call(c, grl)))
   values(res)$type <- "gaps"
-  res
+  res <- resize(res, width = width(res) + 2, fix = "center")
 }
 
 ## suppose we have freq?

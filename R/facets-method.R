@@ -8,7 +8,7 @@ setMethod("splitByFacets", c("GRanges", "formula"), function(object, facets){
   if(allvars[1] == "."){
     res <- split(object, seqnames(object))
   }else{
-    fts <- interaction(values(object)[,allvars[1]],as.character(seqnames(object)))
+    fts <- interaction(as.character(values(object)[,allvars[1]]),as.character(seqnames(object)))
     res <- split(object, fts)    
   }}
   if(length(allvars) == 1)
@@ -37,8 +37,19 @@ setMethod("splitByFacets", c("GRanges", "NULL"), function(object, facets){
 })
 
 
+isFacetByOnlySeq <- function(facets){
+  allvars <- all.vars(as.formula(facets))
+  allvars <- allvars[!allvars %in% c(".", "seqnames")]
+  if(!length(allvars))
+    TRUE
+  else
+    FALSE
+}
+
+
 ## need to consider a length 1 facets formula
 .buildFacetsFromArgs <- function(object, args){
+  isOneSeq <- length(unique(as.character(seqnames(object)))) == 1
   args.facets <- args
   facets <- args$facets
   if(length(facets)){
@@ -60,6 +71,9 @@ setMethod("splitByFacets", c("GRanges", "NULL"), function(object, facets){
       if(!("scales" %in% names(args.facets)))
         args.facets <- c(args.facets, list(scales = "fixed"))
       allvars <- all.vars(as.formula(args.facets$facets))
+      if(isOneSeq & isFacetByOnlySeq(args.facets$facets)){
+        facet <- NULL
+      }else{
       facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facets)),
                             TRUE, FALSE)
       if(facet.logic){
@@ -68,10 +82,15 @@ setMethod("splitByFacets", c("GRanges", "NULL"), function(object, facets){
         facet <- do.call(facet_grid, args.facets)
       }
       facet <- do.call(facet_grid, args.facets)
+    }
     }}else{
       if(!("scales" %in% names(args.facets)))
         args.facets <- c(args.facets, list(scales = "fixed"))
-        args.facets$facets <- substitute(~seqnames)      
+      args.facets$facets <- substitute(~seqnames)
+      allvars <- all.vars(as.formula(args.facets$facets))      
+      if(isOneSeq & isFacetByOnlySeq(args.facets$facets)){
+        facet <- NULL
+      }else{
         facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facets)),
                               TRUE, FALSE)
         if(facet.logic){
@@ -79,6 +98,7 @@ setMethod("splitByFacets", c("GRanges", "NULL"), function(object, facets){
         }else{
           facet <- do.call(facet_grid, args.facets)
         }
+      }
     }
   facet
 }
@@ -91,8 +111,9 @@ setMethod("splitByFacets", c("GRanges", "NULL"), function(object, facets){
       stop("Column of facets formula can only be seqnames, such as . ~ seqnames, in default restrict mode, you can only change row varaibles")
   }
   if(length(allvars) > 1){
-    if(allvars[2] != "seqnames")
+    if(allvars[2] != "seqnames" & allvars[2] != "."){
       stop("Column of facets formula can only be seqnames, such as . ~ seqnames, in default restrict mode, you can only change row varaibles")
+    }
     if(allvars[1] != "."){
       if(!allvars[1] %in% colnames(values(object)))
         stop(allvars[1]," doesn't exists in data columns")

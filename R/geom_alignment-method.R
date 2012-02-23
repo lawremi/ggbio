@@ -82,7 +82,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                                                   "color",
                                                   "colour")]
 
-    args.gaps.extra <- args[names(args) %in%
+    args.gaps.extra <- args.non[names(args.non) %in%
                             c("offset", "chevron.height")]
     args.gaps$y <- as.name(".levels")
     aes.lst <- do.call("aes", args.gaps)
@@ -105,7 +105,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
       p <- c(p , list(scale_y_continuous(breaks = .df.sub$.levels,
                                          labels = as.character(.df.sub[, gpn]))))
     else
-      p <- c(p, list(scale_y_continuous(breaks = NA)))
+      p <- c(p, list(scale_y_continuous(breaks = NULL)))
   }
   
   if(stat == "identity"){

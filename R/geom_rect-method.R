@@ -12,7 +12,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  args <- args[!names(args) %in% c("data", "facets", "rect.height", "geom", "stat")]
+  args.non <- args.non[!names(args.non) %in% c("data", "facets", "rect.height", "geom", "stat")]
   facet <- .buildFacetsFromArgs(data, args.facets)
   
   stat <- match.arg(stat)
@@ -55,11 +55,13 @@ setMethod("geom_rect", "GRanges", function(data,...,
     .df.lvs <- unique(df$.levels)
     .df.sub <- df[, c(".levels", gpn)]
     .df.sub <- .df.sub[!duplicated(.df.sub),]
-    if(gpn != ".levels")
+    ## FIXME:
+    if(gpn != ".levels"){
       p <- c(p , list(scale_y_continuous(breaks = .df.sub$.levels,
                                          labels = as.character(.df.sub[, gpn]))))
-    else
-      p <- c(p, list(scale_y_continuous(breaks = NA)))
+    } else{
+      p <- c(p, list(scale_y_continuous(breaks = NULL)))
+    }
   }
   
   if(stat == "identity"){

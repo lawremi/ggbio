@@ -12,7 +12,7 @@ setMethod("geom_segment", "GRanges", function(data,...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  args.non <- args.non[!names(args) %in% c("data", "facets", "rect.height", "geom", "stat")]
+  args.non <- args.non[!names(args.non) %in% c("data", "facets", "rect.height", "geom", "stat")]
   facet <- .buildFacetsFromArgs(data, args.facets)
   
   stat <- match.arg(stat)
@@ -59,7 +59,7 @@ setMethod("geom_segment", "GRanges", function(data,...,
       p <- c(p , list(scale_y_continuous(breaks = .df.sub$.levels,
                                          labels = as.character(.df.sub[, gpn]))))
     else
-      p <- c(p, list(scale_y_continuous(breaks = NA)))
+      p <- c(p, list(scale_y_continuous(breaks = NULL)))
   }
   
   if(stat == "identity"){

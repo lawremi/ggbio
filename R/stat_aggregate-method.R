@@ -6,15 +6,26 @@ setMethod("stat_aggregate", "GenomicRanges", function(data, by, FUN, start = NUL
                                                       window = NULL, facets = NULL, 
                                                       type = c("mean", "median","max",
                                                         "min", "sum", "count", "identity"),
-                                                      geom){
+                                                      geom = NULL){
 
 
+
+
+  if(is.null(geom))
+    geom <- "histogram"
+
+  if(all(is.null(c(start, end, width, window))))
+    window <- as.integer(width(range(ranges(data)))/20)
 
   args <- as.list(match.call(call = sys.call(sys.parent(2))))[-1]
+  args$geom <- geom  
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
 
+  if(!("scales" %in% names(args.facets)))
+    args.facets$scales <- "free_x"
+  
   args.non <- args.non[!names(args.non) %in% c("data", "facets", "y", "x")]
   facet <- .buildFacetsFromArgs(data, args.facets)
   grl <- splitByFacets(data, facets)
@@ -24,8 +35,10 @@ setMethod("stat_aggregate", "GenomicRanges", function(data, by, FUN, start = NUL
                                         "simplify", "type", "geom", "window")]
 
   type <- match.arg(type)
+
   if(geom %in% c("boxplot"))
     type <- "identity"
+
   if(missing(FUN)){
     if(!(type %in% c("count", "identity")) & is.null(y))
       stop("need to provide y value for type ", type)
@@ -72,14 +85,14 @@ setMethod("stat_aggregate", "GenomicRanges", function(data, by, FUN, start = NUL
   }else{
     .FUN <- FUN
   }
-
+  
   lst <- lapply(grl, function(dt){
     if(!is.null(window)){
         snm <- unique(seqnames(dt))
         seqs <- seq(from = min(start(dt)), to = max(start(dt)), by = window)
-        ## seqs <- seqs[-length(seqs)]
         .by <- IRanges(start = seqs,
                        width = window)
+        .by
       if(!geom %in% c("boxplot")){
         res <- aggregate(dt, by = .by, FUN = .FUN)
         df <- as.data.frame(.by)
@@ -113,25 +126,25 @@ setMethod("stat_aggregate", "GenomicRanges", function(data, by, FUN, start = NUL
   })
 
   res <- do.call(rbind, lst)
-
-
-  if(!geom %in% c("boxplot")){
+  head(res)
+  if(!geom %in% c("boxplot", "histogram", "bar")){
     args.aes$x <- substitute(.mid)
     args.aes$y <- substitute(.value)
   }else{
     args.aes$x <- substitute(as.factor(.mid))
+    if(geom == "boxplot"){
     if(!"y" %in% names(args.aes))
       stop("for geom boxplot, y must be provied in aes()")
+  }else{
+    args.aes$y <- substitute(.value)
   }
-  
-    
-  aes <- do.call(aes, args.aes)
+  }
+  aes.res <- do.call(ggplot2::aes, args.aes)
   args.res <- c(list(data = res),
-                list(aes),
+                list(aes.res),
                 args.non)
-
   if(!geom %in% c("boxplot")){
-    p <- do.call(stat_identity, args.res)
+    p <- do.call(ggplot2::stat_identity, args.res)
    }else{
      args.res <- args.res[!names(args.res) %in% "geom"]
      p <- do.call(stat_boxplot, args.res)

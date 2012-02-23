@@ -1,5 +1,3 @@
-## setGeneric("autoplot", function(data, ...) standardGeneric("autoplot"))
-
 setGeneric("rescale", function(x, ...) standardGeneric("rescale"))
 
 setGeneric("plotFragLength", function(data, model, ...)

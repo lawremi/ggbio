@@ -10,9 +10,6 @@ setMethod("geom_arch", "data.frame", function(data, ...,
   args.non <- args.non[!names(args.non) %in% c("data", "n",
                                                "stat", "max.height")]
 
-  ## args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  ## facet <- .buildFacetsFromArgs(data, args.facets)
-
   
   ## check required argument
   if(!all(c("x", "xend") %in% names(args.aes)))
@@ -28,7 +25,7 @@ setMethod("geom_arch", "data.frame", function(data, ...,
     else
       stop("unequal length of heights specified")
   }}else{
-     h <- rep(max.height/2, length(startX))
+     h <- rep(max.height, length(startX))
   }
   if("y" %in% names(args.aes))
     y <- eval(args.aes$y, data)
@@ -82,7 +79,7 @@ setMethod("geom_arch", "GRanges", function(data, ..., rect.height = 0.4,
   args.non <- args.non[!names(args.non) %in% c("data")] 
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(data, args.facets)
-  
+
   ## note rect.height = 0.4 is default cross ggbio
   ## need to make sure they are connected by two nearest point of rectangle
   df <- as.data.frame(data)
@@ -93,46 +90,47 @@ setMethod("geom_arch", "GRanges", function(data, ..., rect.height = 0.4,
   args.aes$x <- substitute(start)
   args.aes$xend <- substitute(end)
   if("y" %in% names(args.aes)){
-    y <- eval(args.aes$y, data)
+    y <- eval(args.aes$y, df)
     df[,as.character(args.aes$y)] <- df[,as.character(args.aes$y)] + rect.height * signs
   }else{
     df$.y <- rep(0, nrow(df)) + rect.height * signs
     args.aes$y <- substitute(.y)
   }
-  args.res <- c(list(data = df,
-                     rect.height = rect.height,
-                     n = n,
-                     max.height = max.height),list(do.call(aes,args.aes)), args.non)
+
+
+  args.res <- c(list(data = df),
+                args.non,
+                list(do.call(aes, args.aes)))
   p <- do.call(geom_arch, args.res)
   p <- c(list(p) , list(facet))            
   p
 })
 
-setMethod("geom_arch", "GRangesList", function(data, ..., rect.height = 0.4,
-                                              n = 25, max.height = 10
-                                              ){
+## setMethod("geom_arch", "GRangesList", function(data, ..., rect.height = 0.4,
+##                                               n = 25, max.height = 10
+##                                               ){
 
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  args.aes <- parseArgsForAes(args)
-  args.non <- parseArgsForNonAes(args)
-  args.non <- args.non[!names(args.non) %in% c("data", "n", "rect.height",
-                                               "stat")]            
-  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  facet <- .buildFacetsFromArgs(data, args.facets)
+##   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+##   args.aes <- parseArgsForAes(args)
+##   args.non <- parseArgsForNonAes(args)
+##   args.non <- args.non[!names(args.non) %in% c("data", "n", "rect.height",
+##                                                "stat")]            
+##   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
+##   facet <- .buildFacetsFromArgs(data, args.facets)
   
-  ## we require GRangesList elementLengths is always 2 to sepcify two end point now
-  if(!all(elementLengths(data) == 2))
-    stop("Element lengths of the data must be of 2 now.")
-  gr <- stack(data)
-  DF <- as.data.frame(values(data))
-  lst <- lapply(seq_len(nrow(DF)),function(i){
-    rbind(DF[i,,drop = FALSE],DF[i,,drop = FALSE])
-  })
-  df <- do.call(rbind,lst)
-  values(gr) <- cbind(as.data.frame(values(gr)), df)
-  args.new <- list(data = gr, n = n,
-                   max.height = max.height,args.aes)
-  do.call(geom_arch, args.new)  
-})
+##   ## we require GRangesList elementLengths is always 2 to sepcify two end point now
+##   if(!all(elementLengths(data) == 2))
+##     stop("Element lengths of the data must be of 2 now.")
+##   gr <- stack(data)
+##   DF <- as.data.frame(values(data))
+##   lst <- lapply(seq_len(nrow(DF)),function(i){
+##     rbind(DF[i,,drop = FALSE],DF[i,,drop = FALSE])
+##   })
+##   df <- do.call(rbind,lst)
+##   values(gr) <- cbind(as.data.frame(values(gr)), df)
+##   args.new <- list(data = gr, n = n,
+##                    max.height = max.height, list(do.call(args.aes)))
+##   do.call(geom_arch, args.new)  
+## })
 
 

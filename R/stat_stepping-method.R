@@ -5,23 +5,20 @@ setMethod("stat_stepping", "GRanges", function(data, ..., facets = NULL,
                                                geom = c("rect",
                                                  "alignment", "segment")){
 
-  if(rect.height <= 0 | rect.height >= 0.5)
-    stop("rect.height must be a value in (0,0.5)")
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  args.aes <- parseArgsForAes(args)
-  ## args.non <- parseArgsForNonAes(args)
-  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  args <- args[!names(args) %in% c("data", "facets", "rect.height", "geom")]
-  ## facet <- .buildFacetsFromArgs(data, args.facets)  
+  args$stat <- "stepping"
+  ## p <- switch(geom,
+  ##             rect = geom_rect(data, ..., facets = facets, rect.height = rect.height,
+  ##               stat = "stepping"),
+  ##             alignment = geom_alignment(data, ..., facets = facets, rect.height = rect.height,
+  ##               stat = "stepping"),
+  ##             segment = .geom_segment(data, ..., facets = facets, rect.height = rect.height,
+  ##               stat = "stepping"))
   p <- switch(geom,
-              rect = geom_rect(data, ..., facets = facets, rect.height = rect.height,
-                stat = "stepping"),
-              alignment = geom_alignment(data, ..., facets = facets, rect.height = rect.height,
-                stat = "stepping"),
-              segment = .geom_segment(data, ..., facets = facets, rect.height = rect.height,
-                stat = "stepping"))
-  ## p <- c(list(p) , list(facet))
+              rect = do.call(geom_rect, args),
+              alignment = do.call(geom_alignment, args),
+              segment = do.call(geom_segment, args))
   p
   
 })

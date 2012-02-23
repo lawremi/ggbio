@@ -1,4 +1,4 @@
-setGeneric("geom_5poly", function(data, ...) starndGeneric("geom_chevron"))
+setGeneric("geom_5poly", function(data, ...) standardGeneric("geom_5poly"))
 setMethod("geom_5poly", "GenomicRanges", function(data, ...,
                                                   facets = NULL,
                                                   stat = c("stepping", "identity"),

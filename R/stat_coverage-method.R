@@ -1,10 +1,13 @@
 setGeneric("stat_coverage", function(data, ...) standardGeneric("stat_coverage"))
 
 setMethod("stat_coverage", "GRanges", function(data, ..., xlim, facets = NULL, 
-                                               geom){
+                                               geom = NULL){
 
 
+  if(is.null(geom))
+    geom <- "area"
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args$geom <- geom  
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
@@ -66,7 +69,5 @@ setMethod("stat_coverage", "GRanges", function(data, ..., xlim, facets = NULL,
   p <- c(list(p) , list(facet))
   p
 })
-
-
 
 

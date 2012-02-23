@@ -16,36 +16,69 @@ formals.facet_grid <- getFormalNames(facet_grid)
 formals.facet_wrap <- getFormalNames(facet_wrap)
 formals.facets <- union(formals.facet_grid, formals.facet_wrap)
 
+getGeomFun <- function(geom){
+  match.fun(paste("geom_", geom, sep = ""))
+}
+getStatFun <- function(stat){
+  match.fun(paste("stat_", stat, sep = ""))
+}
+getDrawFunFromGeomStat <- function(geom, stat){
+  ## how about allways start from geom??
+  if(!is.null(stat)){
+    .fun <- getStatFun(stat)      
+  }else{
+    .fun <- getGeomFun(geom)
+  }
+  .fun
+}
+
 
 ## ======================================================================
 ##        For "Granges"
 ## ======================================================================
 
 setMethod("autoplot", "GRanges", function(object, ...,
-                                  legend = TRUE,
-                                  xlab, ylab, main,xlim,
-                                  facets = NULL, 
-                                  stat = c("identity", "coverage", "stepping"),
-                                  geom = c("rect", "segment","alignment",
-                                    "line","point", "area"),
-                                  coord = "linear",
-                                  rect.height = 0.4,
-                                  layout = c("linear", "stacked", )
-                                  ){
-  ## NOTE: geom_area is slow, actually using geom_polygon instead
-  if(rect.height <= 0 | rect.height >= 0.5)
-    stop("rect.height must be a value in (0,0.5)")
-  ## make a copy
-  object.back <- object
-  formals.cur <- c("object", "stat", "geom", "coord", "facets", "legend",
-                   "xlab", "ylab", "main", "rect.height")
+                                          xlab, ylab, main,
+                                          legend = TRUE,
+                                          ## stat = c("identity", "coverage",
+                                          ##   "stepping", "aggregate"),
+                                          ## geom = c("rect", "segment","alignment",
+                                          ##   "line","point", "area"),
+                                          geom = NULL,
+                                          stat = NULL,
+                                          layout = c("linear", "stacked", "circle")
+                                          ){
+  formals.cur <- c("object", "stat", "geom", "legend",
+                   "xlab", "ylab", "main")
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  args.facets <- args[names(args) %in% formals.facets]
+  ## args.facets <- args[names(args) %in% formals.facets]
   args <- args[!(names(args) %in% formals.cur)]
+  args$data <- object
 
+
+  .ggbio.geom <- c("rect", "chevron", "alignment", "5poly", "arrow", "segment")
+  .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate")
+
+  ## ------------------------------
+  ## geom/stat check
+  ## ------------------------------
+  if(is.null(stat)){
+    if(is.null(geom)){
+      geom <- .ggbio.geom[1]
+    }
+  }else{
+      if(!is.null(geom)){
+        args$geom <- geom
+      }
+  }
+
+
+  ## ------------------------------
+  ##   get the right function
+  ## ------------------------------
   
-  geom <- match.arg(geom)
-  stat <- match.arg(stat)
+  .fun <- getDrawFunFromGeomStat(geom, stat)
+  p <- list(do.call(.fun, args))
   ## ------------------------------
   ## layout check
   ## ------------------------------
@@ -53,100 +86,38 @@ setMethod("autoplot", "GRanges", function(object, ...,
   ## since some of the geom or stat are not fully supported by all layout
 
   if(layout == "linear"){
-  ## check geom
-  if(geom %in% c("rect", "alignment", "segment" )){
-    if(!("y" %in% names(args))){
-      if(stat %in% c("identity", "coverage"))
-        message("stat convert to stepping ")
-      stat <- "stepping"
+    if(!legend)
+      p <- c(p, list(opts(legend.position = "none")))
+    
+    if(missing(xlab)){
+      chrs <- unique(seqnames(object))
+      gms <- genome(object)
+      gm <- unique(gms[chrs])
+      chrs.tx <- paste(chrs, sep = ",")    
+      if(is.na(gm)){
+        xlab <- chrs.tx
+      }else{
+        gm.tx <- paste(gm)
+        xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
+      }
     }
-  }
-  if(geom %in% c("line", "area"))
-    stat <- "coverage"
+    p <- c(p, list(xlab(xlab)))
+    ## tweak with default y lab
+    if(!missing(ylab))
+      p <- c(p,list(ylab(ylab)))
 
-  if(!(geom %in% c("alignment", "segment", "rect"))){
-    if("x" %in% names(args)){
-      if(!(deparse(args$x) %in% c("start", "end", "midpoint")))
-        stop("x must be one of start/end/midpoint without quote")
-    }else{
-      args <- c(args, list(x = substitute(midpoint)))
-      message("use midpoint for x as default")
-    }}
+    if(!missing(main))
+      p <- c(p, list(opts(title = main)))
 
-  
-  ## check y
-  if(geom %in% c("point", "line") & stat == "identity"){
-    if(!("y" %in% names(args))){
-      stop("Missing y for geom ", geom)
-    }
-  }
-  
-  ## color
-  ## question: arbitrary color??
-  ## I guess it's a no
-
-  
-  ## check seqname
-  seqname <- unique(as.character(seqnames(object)))
-  object <- keepSeqlevels(object, seqname)
-  
-  ## start to deal with facet...
-  allvars <- NULL
-  grl <- NULL
-
-  ## ## alias?probaly no!
-  ## if(missing(facets)){
-  ##     facets <- NULL
-  ## }
-  ## get the right facets
-  facet <- .biuldFacetsFromArgs(args.facets, facets)
-  
-  if(stat == "identity"){
-    df <- as.data.frame(object)
-  }
-  
-  if(!legend)
-    p <- p + opts(legend.position = "none")
-  
-  if(missing(xlab)){
-    chrs <- unique(seqnames(object.back))
-    gms <- genome(object.back)
-    gm <- unique(gms[chrs])
-    chrs.tx <- paste(chrs, sep = ",")    
-    if(is.na(gm)){
-      xlab <- chrs.tx
-    }else{
-      gm.tx <- paste(gm)
-      xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
-    }
-  }
-  p <- p + xlab(xlab)
-  ## tweak with default y lab
-  if(missing(ylab)){
-    if(stat != "identity"){
-      if(stat == "coverage")
-        ylab <- "Coverage"
-      if(stat == "stepping" | geom == "alignment")
-        ylab <- ""
-      p <- p + ylab(ylab)
-    }
-  }else{
-    p <- p + ylab(ylab)
-  }
-
-  if(!missing(main))
-    p <- p + opts(title = main)
-  ## is this a good practice?
-  if(!is.null(facet))
-    p <- p + facet
-}
+}  
   if(layout == "karyogram"){
     stop("layout karyogram is not implemented")
   }
+  
   if(layout == "circle"){
     stop("layout circle is not implemented")
   }
-  p
+  ggplot() + p
 })
 
 
@@ -154,31 +125,31 @@ setMethod("autoplot", "GRanges", function(object, ...,
 ## ======================================================================
 ##        For "GRangesList"
 ## ======================================================================
-setMethod("autoplot", "GRangesList", function(object, ...,
-                                              geom = c("alignment", "rect")){
-  ## make it easy, remove all the elementadata
-  ## users could always coerce it to a GRanges
-  geom <- match.arg(geom)
+flatGrl <- function(object, indName = ".grl.name"){
+  idx <- togroup(object)
+  indName <- ".grl.name"
+  gr <- stack(object, indName)
+  values(gr) <-   cbind(values(gr), values(object)[idx,,drop = FALSE])
+  gr
+}
+
+setMethod("autoplot", "GRangesList", function(object, ..., indName = ".grl.name",
+                                              geom = NULL, stat = NULL){
+  
+  ## geom <- match.arg(geom)
+  if(is.null(geom) & is.null(stat))
+    geom <- "alignment"
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  if(is.null(names(object)))
-    nm.object <- as.character(seq(length(object)))
-  else
-    nm.object <- names(object)
-  nms <- rep(nm.object, elementLengths(object))
-  res <- lapply(1:length(object), function(i){
-    vals <- values(object[i])
-    n <- length(object[[i]])
-    do.call("rbind", lapply(1:n, function(i) vals))
-  })
-  res <- do.call("rbind", res)
-  gr <- unlist(object)
-  values(gr) <- res
-  values(gr)$.grl.name <- nms
-  args <- args[!(names(args) %in% c("object", "group", "geom"))]
-  args <- c(args, list(group = substitute(.grl.name),
-                       data = gr,
-                       geom = geom))
-  p <- do.call(autoplot, args)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  args.non <- args.non[!names(args.non) %in% c("object", "indName")]
+  args.non$geom <- geom
+  gr <- flatGrl(object, indName)
+  ## default or not?
+  ## args.aes$group <- substitute(.grl.name)
+  aes.res <- do.call(aes, args.aes)
+  args.res <- c(args.non, list(aes.res), list(object = gr))
+  p <- do.call(autoplot, args.res)
   p
 })          
 
@@ -456,15 +427,15 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
     .df.sub <- .df.sub[!duplicated(.df.sub),]
     .labels <- NA
     ## names.expr <- substitute(names.expr)
-      if(is.expression(names.expr))
-        .labels <- eval(names.expr, .df.sub)
-      if(is.character(names.expr)){
-        if(length(names.expr) == nrow(.df.sub)){
-          .labels <- names.expr
-        }else{
-          stop("names.expr has unqueal length with alignment stepping levels")
-        }
+    if(is.expression(names.expr))
+      .labels <- eval(names.expr, .df.sub)
+    if(is.character(names.expr)){
+      if(length(names.expr) == nrow(.df.sub)){
+        .labels <- names.expr
+      }else{
+        stop("names.expr has unqueal length with alignment stepping levels")
       }
+    }
     ## if(is.call(names.expr)){
     ##   lst <- lapply(seq_len(nrow(.df.sub)),function(i){
     ##     temp <- do.call(substitute, list(substitute(names.expr, env = parent.frame(2)), 
@@ -537,7 +508,7 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
   }
   if(!missing(main))
     p <- p + opts(title = main)
-   p + coord_cartesian(xlim = xlim, wise = TRUE)
+  p + coord_cartesian(xlim = xlim, wise = TRUE)
 })
 
 
@@ -586,30 +557,30 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                 else
                   p + geom_segment(aes(x = x, y = -1,
                                        xend = x, yend = 1), color = cols)+
-                                   scale_y_continuous(limits = c(-10, 10))
-                                 },
-                point = {
-                  if(isDNABaseColor)                                
-                    p + geom_point(aes(x = x, y = 0, color = seqs))+
-                      scale_color_manual(values = baseColor)
-                  else
-                    p + geom_point(aes(x = x, y = 0), color = cols)
-                  
-                },
-                rect = {
-                  if(isDNABaseColor)                                                
-                    p + geom_rect(aes(xmin = x, ymin = -1,
-                                      xmax = x+0.9, ymax = 1,
-                                      color = seqs, fill = seqs)) +
-                                        scale_y_continuous(limits = c(-10, 10))+
-                                          scale_color_manual(values = baseColor)+
-                                            scale_fill_manual(values = baseColor)
-                  else
-                    p + geom_rect(aes(xmin = x, ymin = -1,
-                                      xmax = x+0.9, ymax = 1), color = cols, fill = cols) +
-                                        scale_y_continuous(limits = c(-10, 10))
+                                         scale_y_continuous(limits = c(-10, 10))
+              },
+              point = {
+                if(isDNABaseColor)                                
+                  p + geom_point(aes(x = x, y = 0, color = seqs))+
+                    scale_color_manual(values = baseColor)
+                else
+                  p + geom_point(aes(x = x, y = 0), color = cols)
+                
+              },
+              rect = {
+                if(isDNABaseColor)                                                
+                  p + geom_rect(aes(xmin = x, ymin = -1,
+                                    xmax = x+0.9, ymax = 1,
+                                    color = seqs, fill = seqs)) +
+                                      scale_y_continuous(limits = c(-10, 10))+
+                                        scale_color_manual(values = baseColor)+
+                                          scale_fill_manual(values = baseColor)
+                else
+                  p + geom_rect(aes(xmin = x, ymin = -1,
+                                    xmax = x+0.9, ymax = 1), color = cols, fill = cols) +
+                                      scale_y_continuous(limits = c(-10, 10))
 
-                })
+              })
   if(missing(xlab)){
     chrs <- unique(seqnames(which))
     gms <- genome(object)
@@ -622,10 +593,10 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
       xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
     }
   }
-    p <- p + xlab(xlab)
+  p <- p + xlab(xlab)
   ## tweak with default y lab
   if(missing(ylab)){
-      ylab = ""
+    ylab = ""
   }
   p <- p + ylab(ylab)
   ## if(stat == "stepping" | geom == "alignment")
@@ -696,7 +667,7 @@ setMethod("autoplot", "Rle", function(object, lower, ...,
                  data.frame(x = x, y = y)                
                })
 
-   if(args$geom == "segment")
+  if(args$geom == "segment")
     args <- c(list(data = df,
                    x = substitute(x),
                    xend = substitute(x),
@@ -723,8 +694,8 @@ setMethod("autoplot", "Rle", function(object, lower, ...,
 ## 1. facet by list
 ## 2. support as what has been supported in Rle.
 setMethod("autoplot", "RleList", function(object, lower, ...,
-                                      xlab = "x", 
-                                      ylab = "y", main,
+                                          xlab = "x", 
+                                          ylab = "y", main,
                                           size, shape, color, alpha, 
                                           facetByRow = TRUE,
                                           geom = c("point", "line", "segment"),
@@ -745,8 +716,8 @@ setMethod("autoplot", "RleList", function(object, lower, ...,
   ## args <- c(geom = geom, args)
   ## args.dots <- list(...)
   args.slice <- args[names(args) %in%
-                          c("upper", "includeLower",
-                            "includeUpper", "rangesOnly")]
+                     c("upper", "includeLower",
+                       "includeUpper", "rangesOnly")]
   ## args <- args.dots[!(names(args) %in%
   ##                         c("upper", "includeLower",
   ##                           "includeUpper", "rangesOnly"))]
@@ -825,8 +796,8 @@ setMethod("autoplot", "RleList", function(object, lower, ...,
                    y = substitute(y)),
               args)
   p <- do.call(qplot, args)
-    p <- p + xlab(xlab)
-    p <- p + ylab(ylab)
+  p <- p + xlab(xlab)
+  p <- p + ylab(ylab)
   if(!missing(main))
     p <- p + opts(title = main)
   p
@@ -908,7 +879,7 @@ autoplot <- function(object, ..., type = c("none", "heatmap",
     tt <- rowttests(object, args$fac)
     p <- qplot(tt$dm, -log10(tt$p.value), geom = "point") +
       xlab(expression(mean~log[2]~fold~change)) +
-      ylab(expression(-log[10](p)))
+        ylab(expression(-log[10](p)))
 
   }
   if(type == "none"){

@@ -81,7 +81,10 @@ exportMethods(autoplot, rescale)
 exportMethods(geom_chevron,
               geom_arch,
               geom_alignment,
-              geom_arrow)
+              geom_arrow,
+              geom_5poly,
+              geom_rect,
+              geom_segment)
 
 ## stat
 exportMethods(stat_aggregate,

@@ -75,7 +75,7 @@ importFrom(GenomicFeatures,
 ## ============================================================
 ## Export
 ## ============================================================
-exportMethods(autoplot, rescale)
+exportMethods(autoplot, rescale, fortify)
 
 ## geom
 exportMethods(geom_chevron,

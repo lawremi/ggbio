@@ -2,13 +2,14 @@
 ## 1. tracks margin fix
 ## 2. exons labels for plotRangesLinkedToData
 library(ggbio)
-library(ggplot2)
 library(GenomicRanges)
-
 ##  GRanges
 set.seed(1)
 N <- 1000
 
+## ======================================================================
+##  simmulated GRanges
+## ======================================================================
 gr <- GRanges(seqnames = 
               sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),
@@ -18,34 +19,61 @@ gr <- GRanges(seqnames =
               strand = sample(c("+", "-", "*"), size = N, 
                 replace = TRUE),
               value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
-              group = sample(c("Normal", "Tumor"), 
+              sample = sample(c("Normal", "Tumor"), 
                 size = N, replace = TRUE),
               pair = sample(letters, size = N, 
                 replace = TRUE))
-
+idx <- sample(1:length(gr), size = 200)
+## ======================================================================
+##      LOWER  LEVEL API(test)
+## ======================================================================
+## TODO
+## facets == GRanges
 ## test lower level API
 ## stat_identity()
+
 ## transform to a normal data.frame and do it as free
 ggplot() + stat_identity(gr, aes(x = start, y = value), geom = "point")
-ggplot() + stat_identity(gr, aes(x = start, y = value, color = group), geom = "line")
+## yes, geom: alignment, rect, 
+ggplot() + stat_identity(gr, aes(xmin = start, xmax = end,
+                                 ymin = value - 0.5, ymax = value + 0.5),
+                          geom = "rect")
+ggplot() + stat_identity(gr, aes(x = start, y = value),  geom = "line")
+ggplot() + stat_identity(gr, aes(x = start + width/2, y = value),  geom = "line")
+ggplot() + stat_identity(gr, aes(x = midpoint, y = value),  geom = "line")
 ## stat_stepping()
 ggplot() + stat_stepping(gr)
 ggplot() + stat_stepping(gr, aes(color = strand))
 ggplot() + stat_stepping(gr, aes(color = strand, fill = strand))
 ggplot() + stat_stepping(gr, geom = "segment")
+
 ggplot() + stat_stepping(gr, aes(color = strand), geom = "segment")
 ggplot() + stat_stepping(gr, aes(group = pair),geom = "alignment")
 ggplot() + stat_stepping(gr, geom = "alignment")
+
+ggplot() + stat_stepping(gr, facets = sample ~ seqnames)
 ## stat_coverage
 ggplot() + stat_coverage(gr, geom = "point")
 ggplot() + stat_coverage(gr, geom = "histogram")
 ggplot() + stat_coverage(gr, geom = "area")
 ggplot() + stat_coverage(gr, geom = "smooth")
 ggplot() + stat_coverage(gr, geom = "step")
+
+ggplot() + stat_coverage(gr, geom = "point", facets = NULL)
+ggplot() + stat_coverage(gr, geom = "point", facets = sample ~ seqnames)
+ggplot() + stat_coverage(gr, geom = "point", facets =  ~ seqnames)
+ggplot() + stat_coverage(gr, geom = "point", facets =  . ~ seqnames)
+
+
 ## stat_aggregate
+## 36,37 doesn't work
+ggplot() + stat_aggregate(gr, y = "value",fill = "gray40")
 ggplot() + stat_aggregate(gr, window = 30,  y = "value",fill = "gray40", geom = "histogram")
 ggplot() + stat_aggregate(gr, window = 100, fill = "gray40",y = "value",
                           type = "max", geom = "histogram")
+ggplot() + stat_aggregate(gr, window = 100, fill = "gray40",y = "value",
+                          type = "max", geom = "bar")
+
 ggplot() + stat_aggregate(gr, window = 20, y = "value", fill = "gray40", geom = "bar")
 
 ggplot() + stat_aggregate(gr, window = 20, y = "value", fill = "gray40", geom = "point")
@@ -54,43 +82,214 @@ ggplot() + stat_aggregate(gr, window = 20, y = "value", fill = "gray40", geom = 
 
 ggplot() + stat_aggregate(gr, window = 100, aes(y = value), geom = "boxplot")
 
+## debug
+ggplot() + stat_aggregate(gr, window = 100, aes(y = value),
+                          geom = "boxplot", facets =  sample ~ seqnames)
+
+
 ## geom_chevron
+
+ggplot() + geom_chevron(gr[idx])
+ggplot() + geom_chevron(gr[idx], facets = sample ~ seqnames)
+ggplot() + geom_chevron(gr[idx], offset = 0) #just segment
+ggplot() + geom_chevron(gr[idx], offset = 0, color = "red") #just segment
+ggplot() + geom_chevron(gr[idx], stat = "identity",
+                        aes(x = start, xend = end, y = value, yend = value))
 ## geom_arch
-## geom_5poly
+ggplot() + geom_arch(gr[idx])
+ggplot() + geom_arch(gr[idx], max.height = 100)
+ggplot() + geom_arch(gr[idx], max.height = 100, aes(height = value))
+ggplot() + geom_arch(gr[idx], max.height = 100, aes(y = value)) #base
+
+ggplot() + geom_arch(gr[idx], facets = sample ~ seqnames)
+ggplot() + geom_arch(gr[idx], aes(height = value))
+ggplot() + geom_arch(gr[idx], aes(height = value, size = value), alpha = 0.3)
+
+
 ## geom_arrow
-
-## autoplot, GRanges
-
-
+library(grid)
+ggplot() + geom_arrow(gr[idx])
 
 
+ggplot() + geom_arrow(gr[idx], facets = sample ~ seqnames, color = "red")
 
+ggplot() + geom_arrow(gr[idx], stat = "identity", aes(x = start, y = value,
+                                        xend = end, yend = value))
+ggplot() + geom_arrow(gr[idx], facets = sample ~ seqnames, color = "red",
+                      aes(x = start, y = value, xend = end, yend = value),
+                      stat = "identity")
+
+## geom_5poly
+
+ggplot() + geom_5poly(gr[idx])
+
+
+ggplot() + geom_5poly(gr[idx], facets = sample ~ seqnames, fill = "red")
+
+ggplot() + geom_5poly(gr[idx], stat = "identity", aes(y = value))
+
+ggplot() + geom_5poly(gr[idx], facets = sample ~ seqnames, fill = "red",
+                      aes(x = start, y = value, xend = end, yend = value),
+                      stat = "identity",  rect.height = 0.2)
+
+## geom_rect
+ggplot() + geom_rect(gr)
+ggplot() + geom_rect(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
+
+ggplot() + geom_rect(gr, stat = "identity", aes(y = value))
+ggplot() + geom_rect(gr, facets = sample ~ seqnames, aes(y = value,color = strand, fill = strand),
+                     stat = "identity")
+
+## geom_segment
+ggplot() + geom_segment(gr)
+ggplot() + geom_segment(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
+
+ggplot() + geom_segment(gr, stat = "identity", aes(y = value))
+ggplot() + geom_segment(gr, facets = sample ~ seqnames,
+                        aes(y = value,color = strand, fill = strand),
+                     stat = "identity")
+
+
+## geom_chevron
+ggplot() + geom_chevron(gr)
+##  check later
+ggplot() + geom_chevron(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
+
+ggplot() + geom_chevron(gr, stat = "identity", aes(y = value))
+ggplot() + geom_chevron(gr, facets = sample ~ seqnames,
+                        aes(y = value,color = strand, fill = strand),
+                     stat = "identity")
+
+## geom_alignment
+ggplot() + geom_alignment(gr[idx])
+ggplot() + geom_alignment(gr[idx], main.geom = "5poly")
+ggplot() + geom_alignment(gr[idx], main.geom = "5poly", gap.geom = "arrow")
+
+ggplot() + geom_alignment(gr[idx], facets = sample ~ seqnames, aes(color = strand, fill = strand))
+
+## ======================================================================
+##           HIGHER LEVEL API
+## ======================================================================
+
+## ----------------------------------------------------------------------
+##        autoplot, GRanges
+## ----------------------------------------------------------------------
 autoplot(gr)
-autoplot(gr, geom = "rectangle")
-autoplot(gr, geom = "segment")
+autoplot(gr, fill = "red")
+autoplot(gr, aes(fill = value))
+autoplot(gr, facets = sample ~ seqnames)
+autoplot(gr, geom = "chevron", facets = sample ~ seqnames)
 
-autoplot(gr, geom = "segment", y = value)
 
-## alignment is with chevron
-autoplot(gr[1:50], geom = "alignment")
-autoplot(gr[1:50], geom = "rectangle")
-autoplot(gr[1:50], geom = "rectangle", group = pair) #works
-autoplot(gr[1:50], geom = "alignment", group = pair, fill = pair) #werro
-tracks(p1, p2)
-gr[1:50]
-## TODO: fix this
-gr.test <- GRanges("chr1", IRanges(c(1, 9, 20, 50), width = 15), group = c("a", "a", "b","b"))
-autoplot(gr.test, geom = "alignment", group = group)
-autoplot(gr.test, geom = "rectangle", group = group)
-autoplot(gr.test)
+autoplot(gr[idx], geom = "5poly", facets = sample ~ seqnames)
+autoplot(gr[idx], geom = "arrow", facets = sample ~ seqnames)
+autoplot(gr, geom = "segment", facets = sample ~ seqnames)
+autoplot(gr[idx], geom = "alignment", facets = sample ~ seqnames)
 
-autoplot(gr[1:50], geom = "alignment", group = pair) #erro
-autoplot(gr[1:50], geom = "alignment", group = pair) #error
+autoplot(gr, stat = "coverage", facets = sample ~ seqnames)
+autoplot(gr, stat = "coverage", facets = sample ~ seqnames, geom = "point")
 
-autoplot(gr, geom = "line", y = value)
-autoplot(gr, geom = "point", y = value)
-autoplot(gr, geom = "line", stat = "coverage")
-autoplot(gr, geom = "area", stat = "coverage")
+autoplot(gr[idx], stat = "stepping", facets = sample ~ seqnames)
+autoplot(gr, stat = "aggregate", y = "value")
+autoplot(gr, stat = "aggregate", aes(y = value), geom = "boxplot")
+autoplot(gr, stat = "aggregate", aes(y = value), geom = "boxplot", facets = sample ~ seqnames)
+## FIXME: aggregate error
+autoplot(gr, stat = "aggregate", y = "value", facets = sample ~ seqnames, window = 2)
+autoplot(gr[idx], stat = "aggregate", y = "value", facets = sample ~ seqnames, window = 10)
+autoplot(gr[idx], stat = "aggregate", y = "value", facets = sample ~ seqnames, window = 30,
+         geom = "histogram")
+
+
+
+## ----------------------------------------------------------------------
+##        autoplot, GRangesList
+## ----------------------------------------------------------------------
+require(ggbio)
+require(GenomicRanges)
+set.seed(1)
+s1 <- c(1, 1000, 1500)
+w1 <- c(600, 300, 100)
+## canonical
+gr.c <- GRanges("chr1", IRanges(s1, width = w1),
+                strand = c("+", "+", "-"))
+## gaps how to represent?
+gaps1 <- gaps2 <- GRanges("chr1", gaps(ranges(gr.c), start = min(start(gr.c)),
+                       end = max(end(gr.c))))
+values(gaps1)$size <- c(100, 200)
+values(gaps2)$size <- c(10, 1000)
+gr.g <- GRangesList(r1 = gaps1,
+                    r2 = gaps2)
+
+## sample reads
+
+flatGrl <- function(object, indName = ".grl.name"){
+  idx <- togroup(object)
+  indName <- ".grl.name"
+  gr <- stack(object, indName)
+  values(gr) <-   cbind(values(gr), values(object)[idx,,drop = FALSE])
+  gr
+}
+
+N.r <- 1000
+p.r1 <- c(0.45, 0.45, 0.1)
+p.r2 <- c(0.45, 0.1, 0.45)
+w.r1 <- 65 + sample(-10:10, size = N.r, replace = TRUE)
+w.r2 <- 65 + sample(-10:10, size = N.r, replace = TRUE)
+s.r1 <- sample(c(1:600, 1000:1299, 1500:1599),
+              prob = rep(p.r1, w1),
+              replace = TRUE, size = N.r)
+
+s.r2 <- sample(c(1:600, 1000:1299, 1500:1599),
+              prob = rep(p.r2, w1),
+              replace = TRUE, size = N.r)
+grl.r <- GRangesList(r1 = GRanges("chr1", IRanges(s.r1, width = w.r1)),
+                     r2 = GRanges("chr1", IRanges(s.r2, width = w.r2)))
+
+
+## plotting
+p1 <- autoplot(gr.g, geom = "arch", aes(size = size), color = "steelblue",
+               max.height = 200, ylab = "coverage") +
+  stat_coverage(flatGrl(grl.r), facets = .grl.name ~ .)
+p2 <- autoplot(gr.c, geom = "alignment", main.geom = "5poly", ylab = "")
+pdf("~/Desktop/splice.pdf", 10, 5)
+tracks(p1, p2, heights = c(3, 1))
+dev.off()
+
+p1 <- autoplot(gr.g, geom = "arch", aes(size = size), color = "steelblue",
+               max.height = 200, ylab = "coverage") +
+  stat_coverage(flatGrl(grl.r), fill = "grey50",facets = .grl.name ~ .) + theme_bw()
+p2 <- autoplot(gr.c, geom = "alignment", fill = "gray50", ylab = "")+
+  theme_alignment(border = FALSE)
+pdf("~/Desktop/splice2.pdf", 10, 5)
+tracks(p1, p2 , heights = c(3, 1))
+dev.off()
+
+
+## FIXME: fix the overlaped label, need to make it strict
+gr1 <- GRanges("chr1", IRanges(s1, width = e1), value = 1:2)
+gr2 <- GRanges("chr1", IRanges(c(30, 40), width = 5), value = 3:4)
+grl <- GRangesList(gr1, gr2)
+autoplot(grl, aes(fill = size))
+autoplot(grl, aes(fill = size))
+autoplot(grl, aes(size = size), geom = "arch")
+
+
+## **********************************************************************
+## tengfei is up to here.
+## **********************************************************************
+## autoplot, TranscriptDb
+
+ggplot() + geom_arch(data = grl, aes(size = size), rect.height = 5)
+ggplot() + geom_arch(data = grl, aes(height = value, size = size, color = value), rect.height = 5)
+
+## before 7 am
+## layout for autoplot
+## karyogram
+## linear
+
+## stat_gene(geom = c("gene", "reduced")), TranscriptDb
+## stat_mismatch
+
 
 
 
@@ -106,13 +305,13 @@ grid.arrange(p1, p2, p3, p4, p5, ncol = 2)
 autoplot(gr, ncol = 2)
 ## faceting, use facets not facet
 autoplot(gr, facets = group ~ seqnames)
-autoplot(gr, geom = "segment", facets = group ~ seqnames)
-autoplot(gr, geom = "line", y = value, facets = group ~ seqnames)
-autoplot(gr, geom = "point", y = value, facets = group ~ seqnames)
-autoplot(gr, geom = "line", stat = "coverage", facets = group ~ seqnames)
-autoplot(gr, geom = "area", stat = "coverage", facets = group ~ seqnames)
+autoplot(gr, geom = "segment", facets = sample ~ seqnames)
+autoplot(gr, geom = "line", y = value, facets = sample ~ seqnames)
+autoplot(gr, geom = "point", y = value, facets = sample ~ seqnames)
+autoplot(gr, geom = "line", stat = "coverage", facets = sample ~ seqnames)
+autoplot(gr, geom = "area", stat = "coverage", facets = sample ~ seqnames)
 
-autoplot(gr[seqnames(gr) == "chr1"], facets = group ~ seqnames)
+autoplot(gr[seqnames(gr) == "chr1"], facets = sample ~ seqnames)
 
 ## facet gr
 gr.region <- GRanges(c("chr1", "chr2", "chr3"), 
@@ -339,7 +538,7 @@ gr.snp <- GRanges(rep(chrs,each=nsnps),
              })), width = 1),
              SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
              pvalue =  -log10(runif(nchr*nsnps)),
-                  group = sample(c("Normal", "Tumor"), size = nchr*nsnps,
+                  sample = sample(c("Normal", "Tumor"), size = nchr*nsnps,
                     replace = TRUE)
              )
 
@@ -365,38 +564,38 @@ plotGrandLinear(gr.snp, y = pvalue, geom = "point") +
 
 ## facet by samples, comparison across groups
 plotGrandLinear(gr.snp, y = pvalue, geom = "point",
-                facets = group ~ .,  color.type = "twocolor")
+                facets = sample ~ .,  color.type = "twocolor")
 library(biovizBase)
 library(ggplot2)
 ## change two color
 plotGrandLinear(gr.snp, y = pvalue, geom = "point",
-                facets = group ~ .,  color.type = "twocolor",
+                facets = sample ~ .,  color.type = "twocolor",
                 two.color = c("red", "blue"))
 ## geom line
 plotGrandLinear(gr.snp, y = pvalue,
-                geom = "line", facet = group ~ .)  
+                geom = "line", facet = sample ~ .)  
 
 
 
 
 ## add size and change color
 plotGrandLinear(gr.snp, y = pvalue, size = pvalue,geom = "point",
-                facet = group ~ .,  color.type = "seqnames")
+                facet = sample ~ .,  color.type = "seqnames")
 
 plotGrandLinear(gr.snp, y = pvalue, size = I(0.05),
-                geom = "point", facet = group ~ .)
+                geom = "point", facet = sample ~ .)
 
-plotGrandLinear(gr.snp, y = pvalue, color = group, geom = "point",
-                facet = group ~ .,
+plotGrandLinear(gr.snp, y = pvalue, color = sample, geom = "point",
+                facet = sample ~ .,
                 color.type = "identity")
 
-plotGrandLinear(gr.snp, y = pvalue, color = I("blue"), geom = "point", facet = group ~ .,
+plotGrandLinear(gr.snp, y = pvalue, color = I("blue"), geom = "point", facet = sample ~ .,
                 color.type = "identity")
 
 
 ## facet by seqnames, slower
 plotGrandLinear(gr.snp, y = pvalue,geom = "point", 
-                facet = group ~ seqnames, scales = "free", space = "free")
+                facet = sample ~ seqnames, scales = "free", space = "free")
 
 
 ## splicesum
@@ -641,10 +840,10 @@ cstest.sub <- endoapply(cstest, function(x){
 cstest.sub <- keepSeqlevels(cstest.sub, "chr10")
 gr <- unlist(cstest.sub)
 gr <- resize(gr, width = 300, fix = "start")
-values(gr)$group <- rep(names(cstest.sub), times = elementLengths(cstest.sub))
+values(gr)$sample <- rep(names(cstest.sub), times = elementLengths(cstest.sub))
 library(ggbio)
-p1 <- autoplot(gr, facets = group ~ seqnames, stat = "coverage", geom = "line")
-p2 <- autoplot(gr, facets = group ~ seqnames, stat = "coverage", geom = "area", fill = group)
+p1 <- autoplot(gr, facets = sample ~ seqnames, stat = "coverage", geom = "line")
+p2 <- autoplot(gr, facets = sample ~ seqnames, stat = "coverage", geom = "area", fill = sample)
 tracks(p1, p2)
 ## autoplot(gr, facets = group ~ seqnames, stat = "coverage", geom = "line",
 ##          xlim = c(77873000, 77878000))
@@ -761,7 +960,7 @@ gr <- GRanges(seqnames =
               strand = sample(c("+", "-", "*"), size = N, 
                 replace = TRUE),
               value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
-              group = sample(c("Normal", "Tumor"), 
+              sample = sample(c("Normal", "Tumor"), 
                 size = N, replace = TRUE),
               pair = sample(letters, size = N, 
                 replace = TRUE))
@@ -777,7 +976,7 @@ gr2 <-  GRanges(seqnames =
                 strand = sample(c("+", "-", "*"), size = N, 
                   replace = TRUE),
                 value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
-                group = sample(c("Normal", "Tumor"), 
+                sample = sample(c("Normal", "Tumor"), 
                   size = N, replace = TRUE),
                 pair = sample(letters, size = N, 
                   replace = TRUE))

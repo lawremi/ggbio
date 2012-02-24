@@ -29,22 +29,30 @@ setMethod("stat_table", "GenomicRanges", function(data, ..., geom = NULL,
   ## ------------------------------
   if(is.null(stat) & is.null(geom)){
     stat <- "identity"
+    geom <- "rect"
     args.non$stat <- stat
     .fun <- geom_rect
   }else{
     .fun <- getDrawFunFromGeomStat(geom, stat)
+    if(!is.null(geom)){
     if(geom != "arch"){
     if(is.null(stat)){
       args.non$stat <- stat <- "identity"
     }else{
       args.non$geom <- geom
-    }}
+    }}}
   }
   ## ------------------------------
   ##   get the right function
   ## ------------------------------
-  if(!"y" %in% names(args.aes) & geom != "arch")
+  if(!"y" %in% names(args.aes)){
+    if(is.null(geom)){
     args.aes$y <- as.name("score")
+  }else{
+    if(geom != "arch")
+      args.aes$y <- as.name("score")      
+  }
+  }
   aes.res <- do.call(aes, args.aes)
   args.res <- c(args.non, list(aes.res))
   p <- do.call(.fun, args.res)

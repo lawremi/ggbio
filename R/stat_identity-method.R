@@ -10,7 +10,8 @@ setMethod("stat_identity", "GRanges", function(data, ..., geom = NULL){
     geom <- "segment"
   if(!geom %in% gr.geoms){
     data <- fortify(data = data)
-    p <- ggplot2::stat_identity(data = data, ...)
+    args$data <- data
+    p <- do.call(ggplot2::stat_identity, args)
   }else{
     .geom.fun <- getGeomFun(geom)
     args$stat <- "identity"

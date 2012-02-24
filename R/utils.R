@@ -716,3 +716,27 @@ subsetArgsByFormals <- function(args, ..., move.dots = TRUE){
   res <- args[names(args) %in% .formals]
   res
 }
+
+getGeomFun <- function(geom){
+  match.fun(paste("geom_", geom, sep = ""))
+}
+getStatFun <- function(stat){
+  match.fun(paste("stat_", stat, sep = ""))
+}
+getDrawFunFromGeomStat <- function(geom, stat){
+  ## how about allways start from geom??
+  if(!is.null(stat)){
+    .fun <- getStatFun(stat)      
+  }else{
+    .fun <- getGeomFun(geom)
+  }
+  .fun
+}
+
+flatGrl <- function(object, indName = ".grl.name"){
+  idx <- togroup(object)
+  indName <- ".grl.name"
+  gr <- stack(object, indName)
+  values(gr) <-   cbind(values(gr), values(object)[idx,,drop = FALSE])
+  gr
+}

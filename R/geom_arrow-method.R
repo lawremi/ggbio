@@ -5,7 +5,8 @@ setMethod("geom_arrow", "GenomicRanges", function(data, ...,
                                                   length = unit(0.15, "cm"),
                                                   type = "open", 
                                                   stat = c("stepping", "identity"),
-                                                  facets = NULL, arrow.rate = 0.05){
+                                                  facets = NULL, arrow.rate = 0.05,
+                                                  group.selfish = TRUE){
 
 
   ## remove width = 1
@@ -30,7 +31,8 @@ setMethod("geom_arrow", "GenomicRanges", function(data, ...,
       res <- endoapply(grl,
                        function(dt){
                          if("group" %in% names(args.aes))
-                           dt <- addSteppings(dt, group.name = as.character(args.aes$group))
+                           dt <- addSteppings(dt, group.name = as.character(args.aes$group),
+                                              group.selfish = group.selfish)
                          else
                            dt <- addSteppings(dt)
                        })

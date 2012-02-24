@@ -16,21 +16,6 @@ formals.facet_grid <- getFormalNames(facet_grid)
 formals.facet_wrap <- getFormalNames(facet_wrap)
 formals.facets <- union(formals.facet_grid, formals.facet_wrap)
 
-getGeomFun <- function(geom){
-  match.fun(paste("geom_", geom, sep = ""))
-}
-getStatFun <- function(stat){
-  match.fun(paste("stat_", stat, sep = ""))
-}
-getDrawFunFromGeomStat <- function(geom, stat){
-  ## how about allways start from geom??
-  if(!is.null(stat)){
-    .fun <- getStatFun(stat)      
-  }else{
-    .fun <- getGeomFun(geom)
-  }
-  .fun
-}
 
 
 ## ======================================================================
@@ -40,10 +25,6 @@ getDrawFunFromGeomStat <- function(geom, stat){
 setMethod("autoplot", "GRanges", function(object, ...,
                                           xlab, ylab, main,
                                           legend = TRUE,
-                                          ## stat = c("identity", "coverage",
-                                          ##   "stepping", "aggregate"),
-                                          ## geom = c("rect", "segment","alignment",
-                                          ##   "line","point", "area"),
                                           geom = NULL,
                                           stat = NULL,
                                           layout = c("linear", "stacked", "circle")
@@ -57,7 +38,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
 
 
   .ggbio.geom <- c("rect", "chevron", "alignment", "5poly", "arrow", "segment")
-  .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate")
+  .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate", "table")
 
   ## ------------------------------
   ## geom/stat check
@@ -71,8 +52,6 @@ setMethod("autoplot", "GRanges", function(object, ...,
         args$geom <- geom
       }
   }
-
-
   ## ------------------------------
   ##   get the right function
   ## ------------------------------
@@ -125,37 +104,64 @@ setMethod("autoplot", "GRanges", function(object, ...,
 ## ======================================================================
 ##        For "GRangesList"
 ## ======================================================================
-flatGrl <- function(object, indName = ".grl.name"){
-  idx <- togroup(object)
-  indName <- ".grl.name"
-  gr <- stack(object, indName)
-  values(gr) <-   cbind(values(gr), values(object)[idx,,drop = FALSE])
-  gr
-}
+setMethod("autoplot", "GRangesList", function(object, ...,
+                                              xlab, ylab, main,
+                                              indName = ".grl.name",
+                                              geom = NULL, stat = NULL,
+                                              type = c("none", "sashimi"),
+                                              coverage.col = "gray50",
+                                              coverage.fill = coverage.col,
+                                              group.selfish = FALSE,
+                                              arch.offset = 1.3){
 
-setMethod("autoplot", "GRangesList", function(object, ..., indName = ".grl.name",
-                                              geom = NULL, stat = NULL){
-  
-  ## geom <- match.arg(geom)
-  if(is.null(geom) & is.null(stat))
-    geom <- "alignment"
+  type <- match.arg(type)
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.non <- args.non[!names(args.non) %in% c("object", "indName")]
-  args.non$geom <- geom
-  gr <- flatGrl(object, indName)
-  ## default or not?
-  ## args.aes$group <- substitute(.grl.name)
-  aes.res <- do.call(aes, args.aes)
-  args.res <- c(args.non, list(aes.res), list(object = gr))
-  p <- do.call(autoplot, args.res)
+  if(!"group.selfish" %in% names(args.non))
+    args.non$group.selfish <- group.selfish
+  if(type == "none")  {
+    ## geom <- match.arg(geom)
+    if(is.null(geom) & is.null(stat))
+      geom <- "alignment"
+    args.non$geom <- geom
+    gr <- flatGrl(object, indName)
+    ## default or not?
+    ## args.aes$group <- substitute(.grl.name)
+    if(!"group" %in% names(args.aes))
+      args.aes$group <- substitute(.grl.name)
+    aes.res <- do.call(aes, args.aes)
+    args.res <- c(args.non, list(aes.res), list(object = gr))
+    p <- do.call(autoplot, args.res)
+  }
+  if(type == "sashimi"){
+    gps <- psetdiff(unlist(range(object), use.names=FALSE), object)
+    ## coverage
+    gr <- flatGrl(object, indName)
+    max.h <- max(coverage(gr)) * arch.offset
+    gps.gr <- unlist(gps)
+    if(!"color" %in% names(args.non))
+      args.non$color <- "steelblue"
+    p <- ggplot() +
+      do.call(stat_table, c(list(data = gps.gr, geom = "arch", max.height = max.h),
+                                 list(aes(size = score)),args.non)) +
+      do.call(stat_coverage, c(list(data = gr),
+                               list(fill = coverage.fill, color = coverage.col)))
+  }
+  if(!missing(xlab))
+    p <- p + xlab(xlab)
+  if(!missing(ylab))
+    p <- p + ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main)
   p
 })          
 
 ## ======================================================================
 ##        For "IRanges"
 ## ======================================================================
+
 
 setMethod("autoplot", "IRanges", function(object, ...,
                                           legend = TRUE,
@@ -377,138 +383,20 @@ setMethod("autoplot", "character", function(object, ...,
 setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                xlab, ylab, main,
                                                xlim, ylim, 
-                                               geom = c(
-                                                 "gene",
-                                                 "reduced_gene"),
+                                               geom = c("gene", "reduced_gene"),
                                                names.expr = expression(paste(tx_name,
                                                    "(", gene_id,")", sep = ""))){
-  if(missing(which))
-    stop("missing which is not supported yet")
-  if(missing(xlim))
-    xlim <- c(start(range(which)),
-              end(range(which)))
-  geom <- match.arg(geom)
-  args <- as.list(match.call(call = sys.call(sys.parent(2))))[-1]
-  .args <- args[!(names(args) %in% c("geom", "which","object", "xlim", "ylim", "xlab", "ylab",
-                                     "main", "names.expr"))]
-  if(geom == "gene"){
-    message("Aggregating TranscriptDb...")
-    gr <- biovizBase:::fetch(object, which)
-    ## gr <- fetch(object, which)
-    message("Constructing graphics...")
-    values(gr)$.levels <-  as.numeric(values(gr)$tx_id)
-    ## drawing
-    ## hard coded width of rect
-    ## just cds, gaps and utrs
-    df <- as.data.frame(gr)
-    df.cds <- df[df$type == "cds",]
-    p <- ggplot(df.cds)
-    args <- .args[names(.args) != "y"]
-    args <- c(args, list(xmin = substitute(start),
-                         xmax = substitute(end),
-                         ymin = substitute(.levels - 0.4),
-                         ymax = substitute(.levels + 0.4)))
-    p <- p + geom_rect(do.call("aes", args))
-    p
-    ## utrs
-    df.utr <- df[df$type == "utr",]
-    args <- .args[names(.args) != "y"]
-    args <- c(args, list(xmin = substitute(start),
-                         xmax = substitute(end),
-                         ymin = substitute(.levels - 0.2),
-                         ymax = substitute(.levels + 0.2)))
-    p <- p + geom_rect(data = df.utr, do.call("aes", args))
-    ## gaps
-    df.gaps <- gr[values(gr)$type == "gap"] 
-    args <- .args[!(names(.args) %in% c("x", "y", "fill"))]
-    p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
-    .df.lvs <- unique(df$.levels)
-    .df.sub <- df[, c(".levels", "tx_id", "tx_name", "gene_id")]
-    .df.sub <- .df.sub[!duplicated(.df.sub),]
-    .labels <- NA
-    ## names.expr <- substitute(names.expr)
-    if(is.expression(names.expr))
-      .labels <- eval(names.expr, .df.sub)
-    if(is.character(names.expr)){
-      if(length(names.expr) == nrow(.df.sub)){
-        .labels <- names.expr
-      }else{
-        stop("names.expr has unqueal length with alignment stepping levels")
-      }
-    }
-    ## if(is.call(names.expr)){
-    ##   lst <- lapply(seq_len(nrow(.df.sub)),function(i){
-    ##     temp <- do.call(substitute, list(substitute(names.expr, env = parent.frame(2)), 
-    ##                            list(tx_name = as.name(as.character(.df.sub$tx_name[i])),
-    ##                                 tx_id = as.numeric(as.character(.df.sub$tx_id[i])),
-    ##                                gene_id = as.numeric(as.character(.df.sub$gene_id[i])))))
-    ##     deparse(substitute(temp))
-    ##   })
-    ##   .labels <- do.call("c", lst)
-    ## }
-    p <- p + scale_y_continuous(breaks = .df.sub$.levels,
-                                labels = .labels)
-    p
-  }
-  if(geom == "reduced_gene"){
-    message("Aggregating TranscriptDb...")
-    gr <- biovizBase:::fetch(object, which, type = "single")
-    ## gr <- fetch(object, which, type = "single")
-    message("Constructing graphics...")
-    values(gr)$.levels <-  1
-    ## drawing
-    ## just cds, gaps and utrs
-    df <- as.data.frame(gr)
-    df.cds <- df[df$type == "cds",]
-    p <- ggplot(df.cds)
-    args <- .args[names(.args) != "y"]
-    args <- c(args, list(xmin = substitute(start), xmax = substitute(end),
-                         ymin = substitute(.levels - 0.4),
-                         ymax = substitute(.levels + 0.4)))
-    ## only for rect 
-    p <- p + geom_rect(do.call("aes", args))
-    ## utrs
-    df.utr <- df[df$type == "utr",]
-    args <- .args[names(.args) != "y"]
-    args <- c(args, list(xmin = substitute(start), xmax = substitute(end),
-                         ymin = substitute(.levels - 0.2),
-                         ymax = substitute(.levels + 0.2)))
-    p <- p + geom_rect(data = df.utr, do.call("aes", args))
-    ## gaps
-    gr.rr <- reduce(ranges(gr[(values(gr)$type %in%  c("utr", "cds"))]))
-    df.gaps <- gaps(gr.rr, start = min(start(gr.rr)), end = max(end(gr.rr)))
-    chrs <- unique(as.character(seqnames(gr)))
-    df.gaps <- GRanges(chrs, df.gaps)
-    args <- .args[!(names(.args) %in% c("x", "y", "fill"))]
-    .df.lvs <- unique(df$.levels)
-    p <- p + scale_y_continuous(breaks = NA) + opts(axis.text.y = theme_blank())
-    p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
-  }
-  if(missing(xlab)){
-    chrs <- unique(seqnames(which))
-    gms <- genome(object)
-    gm <- unique(gms[chrs])
-    chrs.tx <- paste(chrs, sep = ",")
-    if(is.na(gm)){
-      xlab <- chrs.tx
-    }else{
-      gm.tx <- paste(gm)
-      xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
-    }
-  }
-  p <- p + xlab(xlab)
-  if(missing(ylab)){
-    ## if(geom == "reduced_gene")
-    ##   p <- p + ggplot2::ylab("Reduced Gene Model")
-    ## if(geom == "gene")
-    ##   p <- p + ggplot2::ylab("Gene Model")
-    p <- p + ggplot2::ylab(getYLab(object))
-  }else{
+  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- args[!names(args) %in% c("object", "xlab", "ylab", "main")]
+  args$data <- object
+  p <- ggplot() + do.call(stat_gene, args)
+  if(!missing(xlab))
+    p <- p + xlab(xlab)
+  if(!missing(ylab))
     p <- p + ylab(ylab)
-  }
   if(!missing(main))
     p <- p + opts(title = main)
-  p + coord_cartesian(xlim = xlim, wise = TRUE)
+  p
 })
 
 

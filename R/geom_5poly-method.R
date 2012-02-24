@@ -3,7 +3,8 @@ setMethod("geom_5poly", "GenomicRanges", function(data, ...,
                                                   facets = NULL,
                                                   stat = c("stepping", "identity"),
                                                   rect.height = 0.4,
-                                                  arrow.head = 0.06){
+                                                  arrow.head = 0.06,
+                                                  group.selfish = TRUE){
   stat <- match.arg(stat)
   ## shape <- match.arg(shape)
   
@@ -20,7 +21,8 @@ setMethod("geom_5poly", "GenomicRanges", function(data, ...,
       res <- endoapply(grl,
                        function(dt){
                          if("group" %in% names(args.aes))
-                           dt <- addSteppings(dt, group.name = as.character(args.aes$group))
+                           dt <- addSteppings(dt, group.name = as.character(args.aes$group),
+                                              group.selfish = group.selfish)
                          else
                            dt <- addSteppings(dt)
                        })

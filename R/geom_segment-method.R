@@ -6,7 +6,8 @@ setMethod("geom_segment", "data.frame", function(data, ...){
 setMethod("geom_segment", "GRanges", function(data,...,
                                            facets = NULL,
                                            stat = c("stepping", "identity"),
-                                           rect.height = 0.4){
+                                           rect.height = 0.4,
+                                           group.selfish = TRUE){
 
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   args.aes <- parseArgsForAes(args)
@@ -27,7 +28,8 @@ setMethod("geom_segment", "GRanges", function(data,...,
     res <- endoapply(grl,
                      function(dt){
                        if("group" %in% names(args.aes))
-                         dt <- addSteppings(dt, group.name = as.character(args.aes$group))
+                         dt <- addSteppings(dt, group.name = as.character(args.aes$group),
+                                            group.selfish = group.selfish)
                        else
                          dt <- addSteppings(dt)
                      })
@@ -54,8 +56,8 @@ setMethod("geom_segment", "GRanges", function(data,...,
     p <- .changeStrandColor(p, args.aes)
     .df.lvs <- unique(df$.levels)
     .df.sub <- df[, c(".levels", gpn)]
-    .df.sub <- .df.sub[!duplicated(.df.sub),]
-    if(gpn != ".levels")
+    .df.sub <- .df.sub[!duplicated(.df.sub$.levels),]
+    if(gpn != ".levels" & group.selfish)
       p <- c(p , list(scale_y_continuous(breaks = .df.sub$.levels,
                                          labels = as.character(.df.sub[, gpn]))))
     else

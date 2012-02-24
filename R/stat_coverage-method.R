@@ -16,7 +16,6 @@ setMethod("stat_coverage", "GRanges", function(data, ..., xlim, facets = NULL,
   facet <- .buildFacetsFromArgs(data, args.facets)
   grl <- splitByFacets(data, facets)
 
-
   if(missing(xlim))
     xlim <- c(min(start(ranges(data))),
               max(end(ranges(data))))

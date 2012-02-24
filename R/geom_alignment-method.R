@@ -6,7 +6,8 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                                                    stat = c("stepping", "identity"),
                                                    main.geom = c("rect", "5poly"),
                                                    gap.geom = c("chevron", "arrow", "segment"),
-                                                   rect.height = 0.4){
+                                                   rect.height = 0.4,
+                                                group.selfish = TRUE){
 
 
   stat <- match.arg(stat)
@@ -55,7 +56,8 @@ setMethod("geom_alignment", "GRanges", function(data,...,
     res <- endoapply(grl,
                      function(dt){
                        if("group" %in% names(args.aes))
-                         dt <- addSteppings(dt, group.name = as.character(args.aes$group))
+                         dt <- addSteppings(dt, group.name = as.character(args.aes$group),
+                                            group.selfish = group.selfish)
                        else
                          dt <- addSteppings(dt)
                      })
@@ -100,8 +102,8 @@ setMethod("geom_alignment", "GRanges", function(data,...,
     p <- .changeStrandColor(p, args.aes)
     .df.lvs <- unique(df$.levels)
     .df.sub <- df[, c(".levels", gpn)]
-    .df.sub <- .df.sub[!duplicated(.df.sub),]
-    if(gpn != ".levels")
+    .df.sub <- .df.sub[!duplicated(.df.sub$.levels),]
+    if(gpn != ".levels" & group.selfish)
       p <- c(p , list(scale_y_continuous(breaks = .df.sub$.levels,
                                          labels = as.character(.df.sub[, gpn]))))
     else
@@ -111,7 +113,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
   if(stat == "identity"){
    stop("stat identity is nor supported for geom alignment") 
   }
-    p <- c(list(p) , list(facet))  
+    p <- c(list(p) , list(ylab("")), list(facet))  
   p
 })
 

@@ -8,6 +8,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                                                    gap.geom = c("chevron", "arrow", "segment"),
                                                    rect.height = 0.4,
                                                 group.selfish = TRUE){
+   
 
 
   stat <- match.arg(stat)
@@ -41,11 +42,11 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                     arrow = {
                       geom_arrow
                     },
+
                     segment = {
                       geom_segment
                     }
                     )
-
   if(stat == "stepping"){
     args.aes <- args.aes[!(names(args.aes) %in% c("xmin", "xmax", "ymin", "ymax", "data"))]
     args.non <- args.non[!(names(args.non) %in% c("xmin", "xmin", "ymin", "ymax", "data"))]
@@ -55,11 +56,17 @@ setMethod("geom_alignment", "GRanges", function(data,...,
     grl <- splitByFacets(data, facets)
     res <- endoapply(grl,
                      function(dt){
-                       if("group" %in% names(args.aes))
-                         dt <- addSteppings(dt, group.name = as.character(args.aes$group),
-                                            group.selfish = group.selfish)
-                       else
+                       if("group" %in% names(args.aes)){
+dt <- addSteppings(dt, group.name = as.character(args.aes$group),              
+                                           group.selfish = group.selfish)
+                       ## tryres <- try(dt <- addSteppings(dt,
+           ##                                  group.name = as.character(args.aes$group),
+                         ##                    group.selfish = group.selfish))
+                         ## if(inherits(tryres, "try-error")) browser()
+                         ## dt
+                       }else{
                          dt <- addSteppings(dt)
+                       }
                      })
     res <- unlist(res)
     df <- fortify(data = res)

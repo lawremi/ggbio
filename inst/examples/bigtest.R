@@ -41,6 +41,9 @@ ggplot() + stat_identity(gr, aes(xmin = start, xmax = end,
 ggplot() + stat_identity(gr, aes(x = start, y = value),  geom = "line")
 ggplot() + stat_identity(gr, aes(x = start + width/2, y = value),  geom = "line")
 ggplot() + stat_identity(gr, aes(x = midpoint, y = value),  geom = "line")
+## identity for ggbio geom
+ggplot() + stat_identity(gr, aes(y = value), geom = "rect")
+ggplot() + stat_identity(gr, aes(y = value), geom = "segment")
 ## stat_stepping()
 ggplot() + stat_stepping(gr)
 ggplot() + stat_stepping(gr, aes(color = strand))
@@ -87,6 +90,25 @@ ggplot() + stat_aggregate(gr, window = 100, aes(y = value),
                           geom = "boxplot", facets =  sample ~ seqnames)
 
 
+## stat_gene, Transcriptdb
+## TODO
+require(ggbio)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+data(genesymbol, package = "biovizBase")
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+
+ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], fill = "black")
+ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "reduced_gene")
+gr2 <- resize(genesymbol["RBM17"], width(genesymbol["RBM17"])-10000)
+ggplot() + stat_gene(txdb, which = gr2)
+## stat_table, GRanges
+ggplot() + stat_table(gr)
+ggplot() + stat_table(gr, rect.height = 0.1, geom = "rect")
+ggplot() + stat_table(gr, rect.height = 0.1, geom = "5poly")
+## fix this could be just aes(y = ..score..)
+## Maybe confused about stat
+ggplot() + stat_table(gr, stat  = "aggregate", y = "score")
+ggplot() + stat_table(gr, stat  = "identity", aes(x = midpoint, y = score), geom = "point")
 ## geom_chevron
 
 ggplot() + geom_chevron(gr[idx])
@@ -109,10 +131,7 @@ ggplot() + geom_arch(gr[idx], aes(height = value, size = value), alpha = 0.3)
 ## geom_arrow
 library(grid)
 ggplot() + geom_arrow(gr[idx])
-
-
 ggplot() + geom_arrow(gr[idx], facets = sample ~ seqnames, color = "red")
-
 ggplot() + geom_arrow(gr[idx], stat = "identity", aes(x = start, y = value,
                                         xend = end, yend = value))
 ggplot() + geom_arrow(gr[idx], facets = sample ~ seqnames, color = "red",
@@ -120,14 +139,9 @@ ggplot() + geom_arrow(gr[idx], facets = sample ~ seqnames, color = "red",
                       stat = "identity")
 
 ## geom_5poly
-
 ggplot() + geom_5poly(gr[idx])
-
-
 ggplot() + geom_5poly(gr[idx], facets = sample ~ seqnames, fill = "red")
-
 ggplot() + geom_5poly(gr[idx], stat = "identity", aes(y = value))
-
 ggplot() + geom_5poly(gr[idx], facets = sample ~ seqnames, fill = "red",
                       aes(x = start, y = value, xend = end, yend = value),
                       stat = "identity",  rect.height = 0.2)
@@ -135,7 +149,6 @@ ggplot() + geom_5poly(gr[idx], facets = sample ~ seqnames, fill = "red",
 ## geom_rect
 ggplot() + geom_rect(gr)
 ggplot() + geom_rect(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
-
 ggplot() + geom_rect(gr, stat = "identity", aes(y = value))
 ggplot() + geom_rect(gr, facets = sample ~ seqnames, aes(y = value,color = strand, fill = strand),
                      stat = "identity")
@@ -162,7 +175,10 @@ ggplot() + geom_chevron(gr, facets = sample ~ seqnames,
 
 ## geom_alignment
 ggplot() + geom_alignment(gr[idx])
+ggplot() + geom_alignment(gr[idx], aes(group  = pair))
+ggplot() + geom_alignment(gr[idx], aes(group  = pair), group.selfish = FALSE)
 ggplot() + geom_alignment(gr[idx], main.geom = "5poly")
+ggplot() + geom_alignment(gr[idx], main.geom = "5poly", aes(group  = pair))
 ggplot() + geom_alignment(gr[idx], main.geom = "5poly", gap.geom = "arrow")
 
 ggplot() + geom_alignment(gr[idx], facets = sample ~ seqnames, aes(color = strand, fill = strand))
@@ -183,11 +199,19 @@ autoplot(gr, geom = "chevron", facets = sample ~ seqnames)
 
 autoplot(gr[idx], geom = "5poly", facets = sample ~ seqnames)
 autoplot(gr[idx], geom = "arrow", facets = sample ~ seqnames)
+
 autoplot(gr, geom = "segment", facets = sample ~ seqnames)
+
 autoplot(gr[idx], geom = "alignment", facets = sample ~ seqnames)
+autoplot(gr[idx], geom = "alignment", aes(group = pair))
+autoplot(gr[idx], geom = "alignment", aes(group = pair), group.selfish = FALSE)
 
 autoplot(gr, stat = "coverage", facets = sample ~ seqnames)
 autoplot(gr, stat = "coverage", facets = sample ~ seqnames, geom = "point")
+
+autoplot(gr, stat = "table")
+autoplot(gr, stat = "table", rect.height = 0.2)
+autoplot(gr, stat = "table", rect.height = 0.2, fill = "red")
 
 autoplot(gr[idx], stat = "stepping", facets = sample ~ seqnames)
 autoplot(gr, stat = "aggregate", y = "value")
@@ -198,7 +222,6 @@ autoplot(gr, stat = "aggregate", y = "value", facets = sample ~ seqnames, window
 autoplot(gr[idx], stat = "aggregate", y = "value", facets = sample ~ seqnames, window = 10)
 autoplot(gr[idx], stat = "aggregate", y = "value", facets = sample ~ seqnames, window = 30,
          geom = "histogram")
-
 
 
 ## ----------------------------------------------------------------------
@@ -221,10 +244,10 @@ gr.g <- GRangesList(r1 = gaps1,
                     r2 = gaps2)
 
 ## sample reads
-
+## this is faceted by samples, might not be a general case
+## see next example below
 flatGrl <- function(object, indName = ".grl.name"){
   idx <- togroup(object)
-  indName <- ".grl.name"
   gr <- stack(object, indName)
   values(gr) <-   cbind(values(gr), values(object)[idx,,drop = FALSE])
   gr
@@ -246,6 +269,8 @@ grl.r <- GRangesList(r1 = GRanges("chr1", IRanges(s.r1, width = w.r1)),
                      r2 = GRanges("chr1", IRanges(s.r2, width = w.r2)))
 
 
+
+
 ## plotting
 p1 <- autoplot(gr.g, geom = "arch", aes(size = size), color = "steelblue",
                max.height = 200, ylab = "coverage") +
@@ -263,21 +288,78 @@ p2 <- autoplot(gr.c, geom = "alignment", fill = "gray50", ylab = "")+
 pdf("~/Desktop/splice2.pdf", 10, 5)
 tracks(p1, p2 , heights = c(3, 1))
 dev.off()
+## plot GRangesList, a more general approach
+grs <- flatGrl(grl.r, "sample")
+## group them make them looks like gaps
+
+idx <- findOverlaps(grs, reduce(grs))@subjectHits
+values(grs)$group.hits <- idx
+Ngaps <- 300
+idx <- sample(1:N.r, size = Ngaps, replace = FALSE)
+.g <- c(1, 2,3 )
+values(grs)$.id <- 1:length(grs)
+values(grs)$group <- seq(300, by = 1, length = length(grs))
+.i <- 0
+for(id in idx){
+  .i <- .i + 1
+  cur.id <- values(grs[id])$.id
+  hits.cur <- values(grs)[id, "group.hits"]
+  next.hits <- setdiff(.g, hits.cur)[sample(1:2, size = 1)]
+  next.gr <- grs[values(grs)$group.hits == next.hits]
+  idx2 <- sample(1:length(next.gr), size = 1)
+  next.id <- values(next.gr[idx2])$.id
+  values(grs)$group[c(cur.id, next.id)] <- .i
+}
+
+grl <- split(grs, values(grs)$group)
+
+## ggplot() + stat_table(unlist(gps), geom = "arch")
+
+## defaul is alignment, slow
+autoplot(grl[idx])
+autoplot(grl[idx], group.selfish = TRUE)
+autoplot(grl[idx], group.selfish = TRUE) + scale_y_continuous(breaks = NULL)
+## rect/segment is fast
+autoplot(grl[idx], geom = "segment")         #no groupping
+autoplot(grl[idx], geom = "segment", group.selfish = TRUE)         #no groupping
+autoplot(grl[idx], geom = "rect")
+autoplot(grl, type = "sashimi")
+autoplot(grl, type = "sashimi", coverage.col = "white", coverage.fill = "black",
+         color = "red", arch.offset = 2, xlab = "Genomic Coordinates",
+         ylab = "coverage", main = "hello world")
 
 
-## FIXME: fix the overlaped label, need to make it strict
-gr1 <- GRanges("chr1", IRanges(s1, width = e1), value = 1:2)
-gr2 <- GRanges("chr1", IRanges(c(30, 40), width = 5), value = 3:4)
-grl <- GRangesList(gr1, gr2)
-autoplot(grl, aes(fill = size))
-autoplot(grl, aes(fill = size))
-autoplot(grl, aes(size = size), geom = "arch")
+values(gr.c)$value <- 100
+p <- autoplot(grl, type = "sashimi")
+p + geom_rect(data = gr.c, stat = "identity", aes(y = value), rect.height = 10)
+p + geom_5poly(data = gr.c, stat = "identity", aes(y = value), rect.height = 10)
+
+## equals to lower level: more delicate control
+gps <- unlist(psetdiff(unlist(range(grl), use.names=FALSE), grl))
+ggplot() + stat_table(gps, geom = "arch", aes(size = score), alpha = 0.5,
+                      color = "steelblue", max.height = 300) +
+  stat_coverage(unlist(grl), color = "green", fill = "red")
+
+
+## ## FIXME: fix the overlaped label, need to make it strict
+## gr1 <- GRanges("chr1", IRanges(s1, width = e1), value = 1:2)
+## gr2 <- GRanges("chr1", IRanges(c(30, 40), width = 5), value = 3:4)
+## grl <- GRangesList(gr1, gr2)
+## autoplot(grl, aes(fill = size))
+## autoplot(grl, aes(fill = size))
+## autoplot(grl, aes(size = size), geom = "arch")
+
+## ----------------------------------------------------------------------
+##        autoplot, TranscriptDb
+## ----------------------------------------------------------------------
+autoplot(txdb, which = genesymbol["RBM17"])
+autoplot(txdb, which = genesymbol["RBM17"], geom = "reduced_gene")
 
 
 ## **********************************************************************
 ## tengfei is up to here.
 ## **********************************************************************
-## autoplot, TranscriptDb
+
 
 ggplot() + geom_arch(data = grl, aes(size = size), rect.height = 5)
 ggplot() + geom_arch(data = grl, aes(height = value, size = size, color = value), rect.height = 5)
@@ -289,8 +371,6 @@ ggplot() + geom_arch(data = grl, aes(height = value, size = size, color = value)
 
 ## stat_gene(geom = c("gene", "reduced")), TranscriptDb
 ## stat_mismatch
-
-
 
 
 gr.sub <- gr[seqnames(gr) == "chr1"] #or 

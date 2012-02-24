@@ -12,7 +12,7 @@ if (!require('devtools'))
   install.packages('devtools')  # needs Curl for RCurl
 library(devtools)
 pkgs <- list(hadley = c("ggplot2"), 
-             tengfei = c("ggbio"))
+             tengfei = c("ggbio", "biovizBase"))
 for (repo in names(pkgs)) {
   for (pkg in pkgs[[repo]]) install_github(pkg, repo)
 }

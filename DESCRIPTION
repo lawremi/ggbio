@@ -33,6 +33,8 @@ Collate: utils.R
 	 stat_identity-method.R 	
 	 stat_mismatch-method.R 	
 	 stat_stepping-method.R 	
+	 stat_gene-method.R 	
+	 stat_table-method.R 	
 	 autoplot-method.R
 	 plotGrandLinear.R
 	 plotStackedOverview.R	

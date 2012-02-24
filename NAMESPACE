@@ -23,11 +23,11 @@ importFrom(IRanges, IRanges,  disjointBins,
            "values", "values<-",
            ranges, "ranges<-", 
            isTRUEorFALSE, coverage, slice,
-           elementLengths,
+           elementLengths, 
            reduce, punion, pgap, gaps, "%in%")
 
 importMethodsFrom(IRanges,  split, 
-                  unlist,
+                  unlist, psetdiff,
                   range,
                   as.data.frame,
                   length,
@@ -91,7 +91,9 @@ exportMethods(stat_aggregate,
               stat_coverage,
               stat_identity,	
               ## stat_mismatch, 	
-              stat_stepping)
+              stat_stepping,
+              stat_gene,
+              stat_table)
 
 ## layout
 exportMethods(layout_karyogram,

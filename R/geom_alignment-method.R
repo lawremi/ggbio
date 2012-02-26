@@ -4,7 +4,7 @@ setGeneric("geom_alignment", function(data, ...) standardGeneric("geom_alignment
 setMethod("geom_alignment", "GRanges", function(data,...,
                                                 facets = NULL,
                                                    stat = c("stepping", "identity"),
-                                                   main.geom = c("rect", "5poly"),
+                                                   main.geom = c("rect", "arrowrect"),
                                                    gap.geom = c("chevron", "arrow", "segment"),
                                                    rect.height = 0.4,
                                                 group.selfish = TRUE){
@@ -31,8 +31,8 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                      rect = {
                        geom_rect
                      },
-                     "5poly" = {
-                       geom_5poly
+                     "arrowrect" = {
+                       geom_arrowrect
                      })
   
   gap.fun <- switch(gap.geom,

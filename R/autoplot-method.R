@@ -37,7 +37,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
   args$data <- object
 
 
-  .ggbio.geom <- c("rect", "chevron", "alignment", "5poly", "arrow", "segment")
+  .ggbio.geom <- c("rect", "chevron", "alignment", "arrowrect", "arrow", "segment")
   .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate", "table")
 
   ## ------------------------------
@@ -133,7 +133,9 @@ setMethod("autoplot", "GRangesList", function(object, ...,
       args.aes$group <- substitute(.grl.name)
     aes.res <- do.call(aes, args.aes)
     args.res <- c(args.non, list(aes.res), list(object = gr))
+    ## args.res <- args.res[names(args.res) != "group.selfish"]
     p <- do.call(autoplot, args.res)
+    p
   }
   if(type == "sashimi"){
     gps <- psetdiff(unlist(range(object), use.names=FALSE), object)

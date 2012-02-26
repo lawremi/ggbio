@@ -5,7 +5,7 @@ setMethod("stat_identity", "data.frame", function(data, ...){
 
 setMethod("stat_identity", "GRanges", function(data, ..., geom = NULL){
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  gr.geoms <- c("chevron", "arrow", "5poly", "segment", "rect", "alignment")
+  gr.geoms <- c("chevron", "arrow", "arrowrect", "segment", "rect", "alignment")
   if(is.null(geom))
     geom <- "segment"
   if(!geom %in% gr.geoms){

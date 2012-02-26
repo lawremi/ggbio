@@ -22,7 +22,7 @@ Collate: utils.R
          geom_alignment-method.R 
 	 geom_arch-method.R
 	 geom_arrow-method.R
-	 geom_5poly-method.R
+	 geom_arrowrect-method.R
 	 geom_rect-method.R
 	 geom_segment-method.R
 	 layout_circle-method.R

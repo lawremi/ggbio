@@ -20,7 +20,7 @@ setMethod("stat_table", "GenomicRanges", function(data, ..., geom = NULL,
   seqinfo(gr) <- seqinfo(data)
   args.non$data <- gr
   
-  .ggbio.geom <- c("rect", "chevron", "alignment", "5poly", "arrow", "segment", "arch")
+  .ggbio.geom <- c("rect", "chevron", "alignment", "arrowrect", "arrow", "segment", "arch")
   .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate")
 
   ## if(is.null(stat)){

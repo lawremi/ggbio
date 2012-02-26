@@ -4,11 +4,8 @@ setMethod("stat_table", "GenomicRanges", function(data, ..., geom = NULL,
                                                   stat = NULL){
 
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  ## args.facets <- args[names(args) %in% formals.facets]
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  ## args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  ## args.facets <- args.facets[names(args.facets) != "facets"]
   args.non <- args.non[!names(args.non) %in% c("data", "facets", "geom", "stat")]
   
   tab <- table(paste(seqnames(data), start(data), end(data), strand(data), sep = ":"))
@@ -29,10 +26,12 @@ setMethod("stat_table", "GenomicRanges", function(data, ..., geom = NULL,
   ## geom/stat check
   ## ------------------------------
   if(is.null(stat) & is.null(geom)){
-    stat <- "identity"
-    geom <- "rect"
+    stat <- "steppingg"
+    args.non$geom <- "segment"
     args.non$stat <- stat
-    .fun <- geom_rect
+    if(!"color" %in% names(args.aes))
+      args.aes$color <- as.name("score")
+    .fun <- stat_stepping
   }else{
     .fun <- getDrawFunFromGeomStat(geom, stat)
     if(!is.null(geom)){
@@ -46,14 +45,14 @@ setMethod("stat_table", "GenomicRanges", function(data, ..., geom = NULL,
   ## ------------------------------
   ##   get the right function
   ## ------------------------------
-  if(!"y" %in% names(args.aes)){
-    if(is.null(geom)){
-    args.aes$y <- as.name("score")
-  }else{
-    if(geom != "arch")
-      args.aes$y <- as.name("score")      
-  }
-  }
+  ## if(!"y" %in% names(args.aes)){
+  ##   if(is.null(geom)){
+  ##     args.aes$y <- as.name("score")
+  ## }else{
+  ##   if(geom != "arch")
+  ##     args.aes$y <- as.name("score")      
+  ## }
+  ## }
   aes.res <- do.call(aes, args.aes)
   args.res <- c(args.non, list(aes.res))
   p <- do.call(.fun, args.res)

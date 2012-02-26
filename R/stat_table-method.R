@@ -15,7 +15,8 @@ setMethod("stat_table", "GenomicRanges", function(data, ..., geom = NULL,
   key_mat <- matrix(unlist(strsplit(names(tab), ":", fixed=TRUE)), 4)
   gr <- GRanges(key_mat[1,],
                 IRanges(as.integer(key_mat[2,]), as.integer(key_mat[3,])),
-                key_mat[4,], score = as.integer(tab))
+                key_mat[4,], score = as.integer(tab),
+                seqlengths = seqlengths(data))
   seqinfo(gr) <- seqinfo(data)
   args.non$data <- gr
   

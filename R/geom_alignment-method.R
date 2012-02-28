@@ -57,15 +57,10 @@ setMethod("geom_alignment", "GRanges", function(data,...,
     res <- endoapply(grl,
                      function(dt){
                        if("group" %in% names(args.aes)){
-dt <- addSteppings(dt, group.name = as.character(args.aes$group),              
+dt <- addStepping(dt, group.name = as.character(args.aes$group),              
                                            group.selfish = group.selfish)
-                       ## tryres <- try(dt <- addSteppings(dt,
-           ##                                  group.name = as.character(args.aes$group),
-                         ##                    group.selfish = group.selfish))
-                         ## if(inherits(tryres, "try-error")) browser()
-                         ## dt
                        }else{
-                         dt <- addSteppings(dt)
+                         dt <- addStepping(dt)
                        }
                      })
     res <- unlist(res)
@@ -74,7 +69,7 @@ dt <- addSteppings(dt, group.name = as.character(args.aes$group),
     if("group" %in% names(args.aes))
       gpn <- as.character(args.aes$group)
     else
-      gpn <- ".levels"
+      gpn <- "stepping"
     
     args.aes <- args.aes[names(args.aes) != "group"]
     ## plot gaps
@@ -93,13 +88,13 @@ dt <- addSteppings(dt, group.name = as.character(args.aes$group),
 
     args.gaps.extra <- args.non[names(args.non) %in%
                             c("offset", "chevron.height")]
-    args.gaps$y <- as.name(".levels")
+    args.gaps$y <- as.name("stepping")
     aes.lst <- do.call("aes", args.gaps)
     gps.lst <- c(list(aes.lst), list(data = gps, stat = "identity"),
                  args.gaps.extra)
     p <- list(do.call(gap.fun, gps.lst))
     ## plot main
-    args.aes$y <- as.name(".levels")
+    args.aes$y <- as.name("stepping")
     args.aes <- args.aes[names(args.aes) != "size"]
     args.non$stat = "identity"
     aes <- do.call(ggplot2::aes, args.aes)
@@ -107,11 +102,11 @@ dt <- addSteppings(dt, group.name = as.character(args.aes$group),
                   args.non)
     p <- c(p, list(do.call(main.fun,args.res)))
     p <- .changeStrandColor(p, args.aes)
-    .df.lvs <- unique(df$.levels)
-    .df.sub <- df[, c(".levels", gpn)]
-    .df.sub <- .df.sub[!duplicated(.df.sub$.levels),]
-    if(gpn != ".levels" & group.selfish)
-      p <- c(p , list(scale_y_continuous(breaks = .df.sub$.levels,
+    .df.lvs <- unique(df$stepping)
+    .df.sub <- df[, c("stepping", gpn)]
+    .df.sub <- .df.sub[!duplicated(.df.sub$stepping),]
+    if(gpn != "stepping" & group.selfish)
+      p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
                                          labels = as.character(.df.sub[, gpn]))))
     else
       p <- c(p, list(scale_y_continuous(breaks = NULL)))

@@ -1,6 +1,7 @@
 setGeneric("stat_table", function(data, ...) standardGeneric("stat_table"))
 
 setMethod("stat_table", "GenomicRanges", function(data, ..., geom = NULL,
+                                                  xlab, ylab, main,
                                                   stat = NULL){
 
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
@@ -42,19 +43,47 @@ setMethod("stat_table", "GenomicRanges", function(data, ..., geom = NULL,
       args.non$geom <- geom
     }}}
   }
-  ## ------------------------------
-  ##   get the right function
-  ## ------------------------------
-  ## if(!"y" %in% names(args.aes)){
-  ##   if(is.null(geom)){
-  ##     args.aes$y <- as.name("score")
-  ## }else{
-  ##   if(geom != "arch")
-  ##     args.aes$y <- as.name("score")      
-  ## }
-  ## }
   aes.res <- do.call(aes, args.aes)
   args.res <- c(args.non, list(aes.res))
   p <- do.call(.fun, args.res)
+  
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
+  
+ p  
 })  
 
+
+setMethod("stat_table", "GRangesList", function(data, ..., 
+                                                xlab, ylab, main,
+                                                facets = NULL, 
+                                               geom = NULL){
+  
+  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  aes.res <- do.call(aes, args.aes)
+  gr <- flatGrl(data)
+  args.non$data <- gr
+  p <- do.call(stat_table, c(list(aes.res), args.non))
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  else
+    p <- c(p, list(ggplot2::ylab("Score")))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
+  
+  p
+})

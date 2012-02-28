@@ -28,10 +28,10 @@ setMethod("geom_segment", "GRanges", function(data,...,
     res <- endoapply(grl,
                      function(dt){
                        if("group" %in% names(args.aes))
-                         dt <- addSteppings(dt, group.name = as.character(args.aes$group),
+                         dt <- addStepping(dt, group.name = as.character(args.aes$group),
                                             group.selfish = group.selfish)
                        else
-                         dt <- addSteppings(dt)
+                         dt <- addStepping(dt)
                      })
     res <- unlist(res)
     df <- fortify(data = res)
@@ -41,12 +41,12 @@ setMethod("geom_segment", "GRanges", function(data,...,
     if("group" %in% names(args.aes))
       gpn <- as.character(args.aes$group)
     else
-      gpn <- ".levels"
+      gpn <- "stepping"
     args.aes <- args.aes[names(args.aes) != "group"]
     args.aes <- c(args.aes, list(x = substitute(start),
                                  xend = substitute(end),
-                                 y = substitute(.levels),
-                                 yend = substitute(.levels)))
+                                 y = substitute(stepping),
+                                 yend = substitute(stepping)))
 
     args.aes <- args.aes[names(args.aes) != "size"]
     aes.res <- do.call(aes, args.aes)
@@ -54,11 +54,11 @@ setMethod("geom_segment", "GRanges", function(data,...,
                   args.non)
     p <- list(do.call(ggplot2::geom_segment,args.res))
     p <- .changeStrandColor(p, args.aes)
-    .df.lvs <- unique(df$.levels)
-    .df.sub <- df[, c(".levels", gpn)]
-    .df.sub <- .df.sub[!duplicated(.df.sub$.levels),]
-    if(gpn != ".levels" & group.selfish)
-      p <- c(p , list(scale_y_continuous(breaks = .df.sub$.levels,
+    .df.lvs <- unique(df$stepping)
+    .df.sub <- df[, c("stepping", gpn)]
+    .df.sub <- .df.sub[!duplicated(.df.sub$stepping),]
+    if(gpn != "stepping" & group.selfish)
+      p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
                                          labels = as.character(.df.sub[, gpn]))))
     else
       p <- c(p, list(scale_y_continuous(breaks = NULL)))

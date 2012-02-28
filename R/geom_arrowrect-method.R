@@ -21,13 +21,13 @@ setMethod("geom_arrowrect", "GenomicRanges", function(data, ...,
       res <- endoapply(grl,
                        function(dt){
                          if("group" %in% names(args.aes))
-                           dt <- addSteppings(dt, group.name = as.character(args.aes$group),
+                           dt <- addStepping(dt, group.name = as.character(args.aes$group),
                                               group.selfish = group.selfish)
                          else
-                           dt <- addSteppings(dt)
+                           dt <- addStepping(dt)
                        })
       res <- unlist(res)
-      df <- breakGrTo5polyDf(res, y = ".levels", rect.height = rect.height,
+      df <- breakGrTo5polyDf(res, y = "stepping", rect.height = rect.height,
                              arrow.head = arrow.head)
       args.aes$x <- as.name(".temp.x")
       args.aes$y <- as.name(".temp.y")

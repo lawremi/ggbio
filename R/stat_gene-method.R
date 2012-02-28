@@ -34,7 +34,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
     gr <- biovizBase:::fetch(object, which)
     ## gr <- fetch(object, which)
     message("Constructing graphics...")
-    values(gr)$.levels <-  as.numeric(values(gr)$tx_id)
+    values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
     ## drawing
     ## hard coded width of rect
     ## just cds, gaps and utrs
@@ -44,8 +44,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
     args.cds <- args.aes[names(args.aes) != "y"]
     args.cds <- c(args.cds, list(xmin = substitute(start),
                          xmax = substitute(end),
-                         ymin = substitute(.levels - 0.4),
-                         ymax = substitute(.levels + 0.4)))
+                         ymin = substitute(stepping - 0.4),
+                         ymax = substitute(stepping + 0.4)))
     aes.res <- do.call(aes, args.cds)
     args.cds.res <- c(list(data = df.cds),
                       list(aes.res),
@@ -56,8 +56,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
     args.utr <- args.aes[names(args.aes) != "y"]
     args.utr <- c(args.utr, list(xmin = substitute(start),
                          xmax = substitute(end),
-                         ymin = substitute(.levels - 0.2),
-                         ymax = substitute(.levels + 0.2)))
+                         ymin = substitute(stepping - 0.2),
+                         ymax = substitute(stepping + 0.2)))
     aes.res <- do.call(aes, args.utr)
     args.utr.res <- c(list(data = df.utr),
                       list(aes.res),
@@ -73,8 +73,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
                        args.non)
      p <- c(p , list(do.call(geom_chevron, args.gaps.res)))
     ## p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
-    .df.lvs <- unique(df$.levels)
-    .df.sub <- df[, c(".levels", "tx_id", "tx_name", "gene_id")]
+    .df.lvs <- unique(df$stepping)
+    .df.sub <- df[, c("stepping", "tx_id", "tx_name", "gene_id")]
     .df.sub <- .df.sub[!duplicated(.df.sub),]
     .labels <- NA
     ## names.expr <- substitute(names.expr)
@@ -97,7 +97,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
     ##   })
     ##   .labels <- do.call("c", lst)
     ## }
-    p <- c(p , list(scale_y_continuous(breaks = .df.sub$.levels,
+    p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
                                 labels = .labels)))
     p
   }
@@ -106,7 +106,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
     gr <- biovizBase:::fetch(object, which, type = "single")
     ## gr <- fetch(object, which, type = "single")
     message("Constructing graphics...")
-    values(gr)$.levels <-  1
+    values(gr)$stepping <-  1
     ## drawing
     ## just cds, gaps and utrs
     df <- as.data.frame(gr)
@@ -114,8 +114,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
     ## p <- ggplot(df.cds)
     args.aes <- args.aes[names(args.aes) != "y"]
     args.aes <- c(args.aes, list(xmin = substitute(start), xmax = substitute(end),
-                         ymin = substitute(.levels - 0.4),
-                         ymax = substitute(.levels + 0.4)))
+                         ymin = substitute(stepping - 0.4),
+                         ymax = substitute(stepping + 0.4)))
     ## only for rect
     aes.res <- do.call(aes, args.aes)
     args.res <- c(list(data = df.cds),
@@ -127,8 +127,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
     args.utr <- args.aes[names(args.aes) != "y"]
     args.utr <- c(args.utr, list(xmin = substitute(start),
                          xmax = substitute(end),
-                         ymin = substitute(.levels - 0.2),
-                         ymax = substitute(.levels + 0.2)))
+                         ymin = substitute(stepping - 0.2),
+                         ymax = substitute(stepping + 0.2)))
     aes.res <- do.call(aes, args.utr)
     args.utr.res <- c(list(data = df.utr),
                       list(aes.res),
@@ -140,7 +140,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
     chrs <- unique(as.character(seqnames(gr)))
     df.gaps <- GRanges(chrs, df.gaps)
     args.aes <- args.aes[!(names(args.aes) %in% c("x", "y", "fill"))]
-    .df.lvs <- unique(df$.levels)
+    .df.lvs <- unique(df$stepping)
     aes.res <- do.call(aes, args.aes)
     args.res <- c(list(data = df.gaps),
                   list(aes.res),

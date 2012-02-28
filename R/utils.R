@@ -135,8 +135,8 @@ getGap <- function(data, group.name, facets = NULL){
   allvars.extra <- allvars[!allvars %in% c(".", "seqnames")]
 
 
-  if(!".levels" %in% colnames(values(data)))
-    stop(".levels is not in data")
+  if(!"stepping" %in% colnames(values(data)))
+    stop("stepping is not in data")
   grl <- splitByFacets(data, facets)  
   ## res <- split(data, seqnames(data))
   
@@ -149,7 +149,7 @@ getGap <- function(data, group.name, facets = NULL){
           seqs <- unique(as.character(seqnames(x)))
           ir <- gps
           gr <- GRanges(seqs, ir)
-          values(gr)$.levels <- unique(values(x)$.levels)
+          values(gr)$stepping <- unique(values(x)$stepping)
           values(gr)[,allvars.extra] <- rep(unique(values(x)[, allvars.extra]),
                                             length(gr))
           
@@ -178,9 +178,9 @@ getModelRange <- function(data, group.name){
   ir <- unlist(range(ranges(split(data, values(data)[,group.name]),
                             ignore.strand = TRUE)))
   ## freqs <- values(data)$freq[match(names(ir), values(data)[,group.name])]
-  .lvs <- values(data)$.levels[match(names(ir), values(data)[,group.name])]
+  .lvs <- values(data)$stepping[match(names(ir), values(data)[,group.name])]
   ## with levels
-  gr <- GRanges(seqs, ir, .levels = .lvs)
+  gr <- GRanges(seqs, ir, stepping = .lvs)
   values(gr)$.label <- names(gr)
   gr
 }
@@ -297,12 +297,12 @@ data.back <- data
     }
     if(!all(check.integer(temp.y)))
       stop("geom(bar) require specified 'y', must be integer which indicates the levels")
-    values(data)$.levels <- temp.y
+    values(data)$stepping <- temp.y
   }else{
-      values(data)$.levels <- disjointBins(data)
+      values(data)$stepping <- disjointBins(data)
   }
   ## if(!length(y)){  
-  ##   values(data)$.levels <- disjointBins(data)
+  ##   values(data)$stepping <- disjointBins(data)
   ## }
   df <- as.data.frame(data)
   lst <- lapply(1:nrow(df), function(i){
@@ -315,8 +315,8 @@ data.back <- data
     N <- nrow(res)
     res$.biovizBase.group <- i
     ## if(!length(y)){      
-    res$.biovizBase.level <- c(rep(df[i, ".levels"] - 0.4, N/2),
-                               rep(df[i, ".levels"] + 0.4, N/2))
+    res$.biovizBase.level <- c(rep(df[i, "stepping"] - 0.4, N/2),
+                               rep(df[i, "stepping"] + 0.4, N/2))
   ## }
     df.extra <- do.call("rbind", lapply(1:N, function(k) df[i,]))
     res <- cbind(res, df.extra)
@@ -353,9 +353,9 @@ barInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
     temp.y <- values(data)[,as.character(y)]
     if(!all(check.integer(temp.y)))
       stop("geom(bar) require specified 'y', must be integer which indicates the levels")
-    values(y)$.levels <- temp.y
+    values(y)$stepping <- temp.y
   }else{
-      values(data)$.levels <- disjointBins(data)
+      values(data)$stepping <- disjointBins(data)
   }
   df <- as.data.frame(data)
   lst <- lapply(1:nrow(df), function(i){
@@ -363,8 +363,8 @@ barInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
     res <- data.frame(.biovizBase.new.x = res.x)
     N <- nrow(res)
     res$.biovizBase.group <- i
-    res$.biovizBase.level <- c(df[i, ".levels"] - 0.4,
-                               df[i, ".levels"] + 0.4)
+    res$.biovizBase.level <- c(df[i, "stepping"] - 0.4,
+                               df[i, "stepping"] + 0.4)
     df.extra <- rbind(df[i, ], df[i, ])
     res <- cbind(res, df.extra)
     res
@@ -388,7 +388,7 @@ segInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
   ## do the linear interpolatoin first
   inter.fun <- function(x, y) approx(x, y, n = n)  
   if(!length(y)){
-    values(data)$.levels <- disjointBins(ranges(data))
+    values(data)$stepping <- disjointBins(ranges(data))
   }
   df <- as.data.frame(data)
   lst <- lapply(1:nrow(df), function(i){
@@ -396,7 +396,7 @@ segInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
     res <- data.frame(.biovizBase.new.x = res.x)
     res$.biovizBase.group <- i
     if(!length(y)){          
-    res$.biovizBase.level <- df[i, ".levels"]
+    res$.biovizBase.level <- df[i, "stepping"]
   }
     N <- nrow(res)
     df.extra <- do.call("rbind", lapply(1:N, function(k) df[i,]))
@@ -572,7 +572,7 @@ getIdeoGR <- function(gr){
   if(!is(gr, "GenomicRanges"))
     stop("require GenomicRanges")
   if(all(is.na(seqlengths(gr)))){
-    message("geom(ideogram) need valid seqlengths information for accurate mapping,
+    warning("geom(ideogram) need valid seqlengths information for accurate mapping,
                  now use reduced information as ideogram... ")
     res <- reduce(gr, ignore = TRUE)
     start(res) <- 1
@@ -626,20 +626,26 @@ getScale <- function(gr, unit = NULL, n = 100, type = c("M", "B", "sci")){
 
 
 parseArgsForAes <- function(args){
-  aes.lst <- unlist(lapply(args, function(x) class(eval(x)) == "uneval"))
+  ## idx.eval <- !names(args) %in%  names(ggplot2::aes_auto(names(args)))
+  aes.lst <- unlist(lapply(args, function(x){
+    class(eval(x, parent.frame())) == "uneval"
+  }))
   if(length(aes.lst)){
-    idx <- which(aes.lst)
+    idx <- base::which(aes.lst)
     if(length(idx))
-      return(eval(args[[idx]]))
+      res <- eval(args[[idx]])
     else
-      return(list())
+      res <- list()
   }else{
-    return(list())
+    res <- list()
   }
+  idx <- ggplot2:::is_calculated_aes(res)
+  res[idx] <- ggplot2:::strip_dots(res[idx])
+  res
 }
 
 parseArgsForNonAes <- function(args){
-  lst <- unlist(lapply(args, function(x) class(eval(x)) != "uneval"))
+  lst <- unlist(lapply(args, function(x) class(eval(x, parent.frame())) != "uneval"))
   args[lst]
 }
 
@@ -733,10 +739,34 @@ getDrawFunFromGeomStat <- function(geom, stat){
   .fun
 }
 
-flatGrl <- function(object, indName = ".grl.name"){
+flatGrl <- function(object, indName = "grl_name"){
   idx <- togroup(object)
-  indName <- ".grl.name"
   gr <- stack(object, indName)
   values(gr) <-   cbind(values(gr), values(object)[idx,,drop = FALSE])
   gr
+}
+
+
+.changeStrandColor <- function(p, args, fill = TRUE){
+  strandColor <- getOption("biovizBase")$strandColor
+  isStrand.color <- FALSE
+  isStrand.fill <- FALSE
+  ## default with no color
+  idx <- c("color", "colour") %in% names(args)
+  if((any(idx))){
+    nms <- c("color", "colour")[idx][1]
+    if(as.character(args[[nms]]) == "strand")
+      isStrand.color <- TRUE
+  }
+  if(("fill" %in% names(args))){
+    if(as.character(args$fill) == "strand")
+      isStrand.fill <- TRUE
+  }
+  if(isStrand.color)
+    p <- c(list(p), list(scale_color_manual(values = strandColor)))
+  if(fill){
+    if(isStrand.fill)
+      p <- c(p, list(scale_fill_manual(values = strandColor)))
+  }
+  p
 }

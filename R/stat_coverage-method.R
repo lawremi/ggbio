@@ -1,6 +1,8 @@
 setGeneric("stat_coverage", function(data, ...) standardGeneric("stat_coverage"))
 
-setMethod("stat_coverage", "GRanges", function(data, ..., xlim, facets = NULL, 
+setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
+                                               xlab, ylab, main,
+                                               facets = NULL, 
                                                geom = NULL){
 
 
@@ -21,6 +23,7 @@ setMethod("stat_coverage", "GRanges", function(data, ..., xlim, facets = NULL,
               max(end(ranges(data))))
   if(!length(facets))
     facets <- as.formula(~seqnames)
+  facets <- strip_facets_dots(facets)
   allvars <- all.vars(as.formula(facets))
   allvars.extra <- allvars[!allvars %in% c(".", "seqnames")]
   lst <- lapply(grl, function(dt){
@@ -42,12 +45,12 @@ setMethod("stat_coverage", "GRanges", function(data, ..., xlim, facets = NULL,
     }
 
     if(length(unique(values(dt)$.id.name)))                
-      res <- data.frame(vals = vals, seqs = seqs,
+      res <- data.frame(coverage = vals, seqs = seqs,
                         seqnames =
                         as.character(seqnames(dt))[1],
                         .id.name = unique(values(dt)$.id.name))
     else
-      res <- data.frame(vals = vals, seqs = seqs,
+      res <- data.frame(coverage = vals, seqs = seqs,
                         seqnames =
                         as.character(seqnames(dt))[1])
     res[,allvars.extra] <- rep(unique(values(dt)[, allvars.extra]),
@@ -57,15 +60,59 @@ setMethod("stat_coverage", "GRanges", function(data, ..., xlim, facets = NULL,
 
   res <- do.call(rbind, lst)
   ## df <- fortify(data = res)
-  args.aes <- args.aes[!(names(args.aes) %in% c("x", "y"))]
-  args.aes <- c(args.aes, list(x = substitute(seqs),
-                       y = substitute(vals)))
+  ## args.aes <- args.aes[!(names(args.aes) %in% c("x", "y"))]
+  if(!"y"  %in% names(args.aes))
+    args.aes$y <- as.name("coverage")
+  
+  if(!"x"  %in% names(args.aes))
+    args.aes$x <- as.name("seqs")
+
+  ## args.aes <- c(args.aes, list(x = substitute(seqs),
+  ##                      y = substitute(vals)))
   aes <- do.call(aes, args.aes)
   args.res <- c(list(data = res),
                 list(aes),
                 args.non)
   p <- do.call(stat_identity, args.res)
   p <- c(list(p) , list(facet))
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  else
+    p <- c(p, list(ggplot2::ylab("Coverage")))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
+  
+  p
+})
+
+
+setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
+                                                   xlab, ylab, main,
+                                                   facets = NULL, 
+                                               geom = NULL){
+  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  aes.res <- do.call(aes, args.aes)
+  gr <- flatGrl(data)
+  args.non$data <- gr
+  p <- do.call(stat_coverage, c(list(aes.res), args.non))
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  else
+    p <- c(p, list(ggplot2::ylab("Coverage")))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
   p
 })
 

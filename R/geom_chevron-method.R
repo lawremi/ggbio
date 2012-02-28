@@ -55,11 +55,11 @@ setMethod("geom_chevron", "GenomicRanges",
               group.name <- NULL
               if("group" %in% names(args.aes))
                 group.name <- as.character(args.aes$group)
-              if(!".levels" %in% colnames(values(data))){
+              if(!"stepping" %in% colnames(values(data))){
                 if(length(group.name))
-                  data <- addSteppings(data, group.name = group.name)
+                  data <- addStepping(data, group.name = group.name)
                 else
-                  data <- addSteppings(data)
+                  data <- addStepping(data)
               }
               aes.lst <- args.aes
               data.new <- breakGr(data)
@@ -78,8 +78,8 @@ setMethod("geom_chevron", "GenomicRanges",
               df <- cbind(df, ydf)
               args <- c(aes.lst, list(x = substitute(start),
                                       xend = substitute(end),
-                                      y = substitute(.levels + y.offset),
-                                      yend = substitute(.levels + yend.offset)))
+                                      y = substitute(stepping + y.offset),
+                                      yend = substitute(stepping + yend.offset)))
               args.res <- c(list(data = df), list(do.call(aes, args)),
                             args.non)
               p <- do.call(ggplot2::geom_segment, args.res)

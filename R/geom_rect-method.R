@@ -4,6 +4,7 @@ setMethod("geom_rect", "data.frame", function(data, ...){
 })
 ## alignment should be convenient toggle with chevron...
 setMethod("geom_rect", "GRanges", function(data,...,
+                                           xlab, ylab, main,
                                            facets = NULL,
                                            stat = c("stepping", "identity"),
                                            rect.height = 0.4,
@@ -13,7 +14,8 @@ setMethod("geom_rect", "GRanges", function(data,...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  args.non <- args.non[!names(args.non) %in% c("data", "facets", "rect.height", "geom", "stat")]
+  args.non <- args.non[!names(args.non) %in% c("data", "facets", "rect.height", "geom", "stat",
+                                               "xlab", "ylab", "main")]
   facet <- .buildFacetsFromArgs(data, args.facets)
   
   stat <- match.arg(stat)
@@ -28,10 +30,10 @@ setMethod("geom_rect", "GRanges", function(data,...,
     res <- endoapply(grl,
                      function(dt){
                        if("group" %in% names(args.aes))
-                         dt <- addSteppings(dt, group.name = as.character(args.aes$group),
+                         dt <- addStepping(dt, group.name = as.character(args.aes$group),
                                             group.selfish = group.selfish)
                        else
-                         dt <- addSteppings(dt)
+                         dt <- addStepping(dt)
                      })
     res <- unlist(res)
     df <- fortify(data = res)
@@ -41,12 +43,12 @@ setMethod("geom_rect", "GRanges", function(data,...,
     if("group" %in% names(args.aes))
       gpn <- as.character(args.aes$group)
     else
-      gpn <- ".levels"
+      gpn <- "stepping"
     args.aes <- args.aes[names(args.aes) != "group"]
     args.aes <- c(args.aes, list(xmin = substitute(start),
                                  xmax = substitute(end),
-                                 ymin = substitute(.levels - rect.height),
-                                 ymax = substitute(.levels + rect.height)))
+                                 ymin = substitute(stepping - rect.height),
+                                 ymax = substitute(stepping + rect.height)))
 
     args.aes <- args.aes[names(args.aes) != "size"]
     aes.res <- do.call(aes, args.aes)
@@ -54,12 +56,12 @@ setMethod("geom_rect", "GRanges", function(data,...,
                   args.non)
     p <- list(do.call(ggplot2::geom_rect,args.res))
     p <- .changeStrandColor(p, args.aes)
-    .df.lvs <- unique(df$.levels)
-    .df.sub <- df[, c(".levels", gpn)]
-    .df.sub <- .df.sub[!duplicated(.df.sub$.levels),]
+    .df.lvs <- unique(df$stepping)
+    .df.sub <- df[, c("stepping", gpn)]
+    .df.sub <- .df.sub[!duplicated(.df.sub$stepping),]
     ## FIXME:
-    if(gpn != ".levels" & group.selfish){
-      p <- c(p , list(scale_y_continuous(breaks = .df.sub$.levels,
+    if(gpn != "stepping" & group.selfish){
+      p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
                                          labels = as.character(.df.sub[, gpn]))))
     } else{
       p <- c(p, list(scale_y_continuous(breaks = NULL)))
@@ -89,6 +91,17 @@ setMethod("geom_rect", "GRanges", function(data,...,
     p <- list(do.call(ggplot2::geom_rect,args.res))
     p <- .changeStrandColor(p, args.aes)
   }
-  p <- c(list(p) , list(facet))  
+  p <- c(list(p) , list(facet))
+
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
+  
   p
 })
+

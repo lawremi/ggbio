@@ -1,8 +1,17 @@
+strip_facets_dots <- function(facets){
+  allvars <- all.vars(as.formula(facets))
+  idx <- ggplot2:::is_calculated_aes(allvars)
+  if(sum(idx))
+    facets[[which(idx)+1]] <- as.name(unlist(ggplot2:::strip_dots(allvars[idx])))
+  facets
+}
+
 setOldClass("formula")
 setGeneric("splitByFacets", function(object, facets, ...) standardGeneric("splitByFacets"))
 
 setMethod("splitByFacets", c("GRanges", "formula"), function(object, facets){
   .checkFacetsRestrict(facets, object)
+  facets <- strip_facets_dots(facets)
   allvars <- all.vars(as.formula(facets))
   if(length(allvars) > 1){
   if(allvars[1] == "."){
@@ -47,11 +56,13 @@ isFacetByOnlySeq <- function(facets){
 }
 
 
+
 ## need to consider a length 1 facets formula
 .buildFacetsFromArgs <- function(object, args){
   isOneSeq <- length(unique(as.character(seqnames(object)))) == 1
   args.facets <- args
-  facets <- args$facets
+  args.facets$facets <- strip_facets_dots(args$facets)
+  facets <- args.facets$facets
   if(length(facets)){
     ## allvars <- all.vars(as.formula(facets))
     ## if(length(allvars) == 1){
@@ -71,6 +82,7 @@ isFacetByOnlySeq <- function(facets){
       if(!("scales" %in% names(args.facets)))
         args.facets <- c(args.facets, list(scales = "fixed"))
       allvars <- all.vars(as.formula(args.facets$facets))
+      
       if(isOneSeq & isFacetByOnlySeq(args.facets$facets)){
         facet <- NULL
       }else{
@@ -87,7 +99,8 @@ isFacetByOnlySeq <- function(facets){
       if(!("scales" %in% names(args.facets)))
         args.facets <- c(args.facets, list(scales = "fixed"))
       args.facets$facets <- substitute(~seqnames)
-      allvars <- all.vars(as.formula(args.facets$facets))      
+      allvars <- all.vars(as.formula(args.facets$facets))
+      
       if(isOneSeq & isFacetByOnlySeq(args.facets$facets)){
         facet <- NULL
       }else{
@@ -104,7 +117,9 @@ isFacetByOnlySeq <- function(facets){
 }
 
 
+## that's for linear or default!
 .checkFacetsRestrict <- function(facets, object){
+  facets <- strip_facets_dots(facets)
   allvars <- all.vars(as.formula(facets))
   if(length(allvars) == 1){
     if(allvars[1] != "seqnames")
@@ -117,6 +132,24 @@ isFacetByOnlySeq <- function(facets){
     if(allvars[1] != "."){
       if(!allvars[1] %in% colnames(values(object)))
         stop(allvars[1]," doesn't exists in data columns")
+    }
+  }
+}
+
+## that's for layout_karyogram
+.checkFacetsRestrictForKaryogram <- function(facets, object){
+  allvars <- all.vars(as.formula(facets))
+  if(length(allvars) == 1){
+    if(allvars[1] != "seqnames")
+      stop("seqnames must be present in layout karyogram")
+  }
+  if(length(allvars) > 1){
+    if(!"seqnames" %in% allvars){
+      stop("seqnames must be present in layout karyogram")
+    }else{
+      allvars.extra <- setdiff(allvars, "seqnames")
+      if(!allvars.extra  %in% colnames(values(object)))
+        stop("facet variable must be in the data")
     }
   }
 }

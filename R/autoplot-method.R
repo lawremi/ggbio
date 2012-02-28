@@ -281,8 +281,8 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
     }
     args <- c(args, list(xmin = substitute(start),
                          xmax = substitute(end),
-                         ymin = substitute(.levels - 0.4),
-                         ymax = substitute(.levels + 0.4)))
+                         ymin = substitute(stepping - 0.4),
+                         ymax = substitute(stepping + 0.4)))
     p <- p + geom_rect(do.call("aes", args))+
       scale_color_manual(values = strandColor) +
         scale_fill_manual(values = strandColor)
@@ -290,8 +290,8 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
     if(show.junction){
       args <- args[!(names(args) %in% c("x", "y"))]
       args <- c(args, list(x = substitute(start), xend = substitute(end),
-                           y = substitute(.levels),
-                           yend = substitute(.levels)))
+                           y = substitute(stepping),
+                           yend = substitute(stepping)))
       p <- p + geom_segment(data = df.gaps, do.call("aes", args), color = "red")
     }}
   if(geom == "full"){

@@ -31,10 +31,10 @@ setMethod("geom_arrow", "GenomicRanges", function(data, ...,
       res <- endoapply(grl,
                        function(dt){
                          if("group" %in% names(args.aes))
-                           dt <- addSteppings(dt, group.name = as.character(args.aes$group),
+                           dt <- addStepping(dt, group.name = as.character(args.aes$group),
                                               group.selfish = group.selfish)
                          else
-                           dt <- addSteppings(dt)
+                           dt <- addStepping(dt)
                        })
       res <- unlist(res)
       ## df <- fortify(data = res)
@@ -48,7 +48,7 @@ setMethod("geom_arrow", "GenomicRanges", function(data, ...,
         N <- (x.e - x.s) %/% arrow.r
         N <- ifelse(N <= 2, 2, N )
         tryres <- try(res <- approx(c(x.s, x.e),
-                      rep(as.numeric(as.character(x$.levels)), 2),n = N))
+                      rep(as.numeric(as.character(x$stepping)), 2),n = N))
         if(inherits(tryres, "try-error")) browser()
         res.df <- do.call(rbind,lapply(1:N, function(i){
           x
@@ -61,7 +61,7 @@ setMethod("geom_arrow", "GenomicRanges", function(data, ...,
       res <- do.call(rbind,lst)
       args.aes$x <- as.name("temp.x")
       args.aes$xend <- as.name("temp.x2")
-      args.aes$y <- args.aes$yend <- as.name(".levels")
+      args.aes$y <- args.aes$yend <- as.name("stepping")
 
       ## need to split to two direction/maybe three?
       p <- by(res, res$strand, function(x){

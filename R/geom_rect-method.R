@@ -23,8 +23,8 @@ setMethod("geom_rect", "GRanges", function(data,...,
   rect.height <- force(rect.height)
   
   if(stat == "stepping"){
-    if(rect.height <= 0 | rect.height >= 0.5)
-      stop("rect.height must be a value in (0,0.5)")
+    ## if(rect.height <= 0 | rect.height >= 0.5)
+    ##   stop("rect.height must be a value in (0,0.5)")
     
     grl <- splitByFacets(data, facets)
     res <- endoapply(grl,

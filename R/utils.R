@@ -424,20 +424,25 @@ linkInter <- function(data, linked.to, space.skip = 0.1, trackWidth = 10, radius
                       direction = direction){
   if(missing(linked.to))
     stop("linked.to must be provided and be a GRanges")
+  ## trace id
+  N <- length(data)
+  values(data)$.biovizBase.idx <- 1:N
+  values(values(data)[, linked.to])$.biovizBase.idx <- 1:N
   obj <- gr2newLinear(data, space.skip)
   obj <- gr2circle(obj, y = 0, radius = radius, width = trackWidth,
                    direction = direction)
+  obj <- obj[order(values(obj)$.biovizBase.idx)]  
   df <- as.data.frame(obj)
   linktodata <- values(data)[,linked.to]
-  values(linktodata)$.biovizBase.idx <- 1:length(linktodata)
+  ## values(linktodata)$.biovizBase.idx <- 1:length(linktodata)
   ## missing y
   linktodata <- gr2newLinear(linktodata, space.skip)
   ## keep order
-  linktodata <- linktodata[order(values(linktodata)$.biovizBase.idx)]
   linktodata <- gr2circle(linktodata, radius = radius,
                           y = 0,
                           width = trackWidth,
                           direction = direction)
+  linktodata <- linktodata[order(values(linktodata)$.biovizBase.idx)]  
   linkdf <- as.data.frame(linktodata)
   extra.df <- subset(df, select = -c(.biovizBase.start, .biovizBase.x, .biovizBase.y))
   linkdf2 <- data.frame(from.x = df$.biovizBase.x,

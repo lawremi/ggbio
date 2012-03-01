@@ -50,8 +50,8 @@ setMethod("geom_alignment", "GRanges", function(data,...,
   if(stat == "stepping"){
     args.aes <- args.aes[!(names(args.aes) %in% c("xmin", "xmax", "ymin", "ymax", "data"))]
     args.non <- args.non[!(names(args.non) %in% c("xmin", "xmin", "ymin", "ymax", "data"))]
-    if(rect.height <= 0 | rect.height >= 0.5)
-      stop("rect.height must be a value in (0,0.5)")
+    ## if(rect.height <= 0 | rect.height >= 0.5)
+    ##   stop("rect.height must be a value in (0,0.5)")
     
     grl <- splitByFacets(data, facets)
     res <- endoapply(grl,

@@ -3,14 +3,17 @@ setGeneric("layout_karyogram", function(data,...)
 setMethod("layout_karyogram", "GRanges", 
           function(data,..., xlab, ylab, main,
                    facets = seqnames ~ ., cytoband = FALSE,
-                   geom = NULL, stat = NULL, ylim = NULL
+                   geom = NULL, stat = NULL, ylim = NULL,
+                   rect.height = 10
                    ) {
               
-            geom <- match.arg(geom)
+            ## geom <- match.arg(geom)
             args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
             args <- args[!names(args) %in% c("data", "geom")]
             args.aes <- parseArgsForAes(args)
             args.non <- parseArgsForNonAes(args)
+            if(!"rect.height" %in% names(args.non))
+              args.non$rect.height <- rect.height /2
 
             if(is.null(ylim)){
               ## compute y lim from data
@@ -19,10 +22,10 @@ setMethod("layout_karyogram", "GRanges",
                 .y.r <- range(.y)
                 .ideo.range <- expand_range(.y.r, mul = 0.05)
               }else{
-                if("rect.height" %in% names(args.non))
-                  .ideo.range <- c(0, args.non$rect.height)
-                else
-                  .ideo.range <- c(0, 10)
+                ## if("rect.height" %in% names(args.non))-
+                  .ideo.range <- c(0, rect.height)
+                ## else
+                ##   .ideo.range <- c(0, 10)
               }
             }else{
               .ideo.range <- ylim
@@ -79,31 +82,37 @@ setMethod("layout_karyogram", "GRanges",
               ideo.gr <- do.call(c, lst)
               names(ideo.gr) <- NULL
               df <- as.data.frame(ideo.gr)
-              p.ideo <- 
-                geom_rect(data = df, aes(xmin = start,
-                              ymin = .ideo.range[1],
-                              xmax = end,
-                              ymax = .ideo.range[2]), fill = "white", color = "black")
+              aes.ideo <- do.call(aes, list(xmin = substitute(start),
+                                            ymin = .ideo.range[1],
+                                            xmax = substitute(end),
+                                            ymax = .ideo.range[2]))
+
+
+              p.ideo <- do.call(ggplot2::geom_rect, c(list(data = df),
+                                                      list(aes.ideo),
+                                                      list(fill = "white", color = "black")))
             }
             
-            ## df <- as.data.frame(data)
-            ## if(geom == "rect"){
-            ##   args <- c(args.aes, list(xmin = substitute(start),
-            ##                           xmax = substitute(end),
-            ##                           ymin = 0,
-            ##                           ymax = 10))
-            ##   if(any(c("colour", "fill") %in% names(args))){
-            ##     if(!all(c("colour", "fill") %in% names(args))){
-            ##       idx <- which(c("colour", "fill") %in% names(args))
-            ##       known <- c("colour", "fill")[idx]
-            ##       unknown <- c("colour", "fill")[-idx]
-            ##       args[[unknown]] <- args[[known]]
-            ##     }
-            ##     p.addon <- geom_rect(data = df, do.call(aes, args))
-            ##   }
-            ##   else
-            ##     p.addon <- geom_rect(data = df, do.call(aes, args), color = "black", fill = "black")
-            ## }
+
+            if(geom == "rect"){
+              df <- as.data.frame(data)              
+              args.aes <- c(args.aes, list(xmin = substitute(start),
+                                       xmax = substitute(end),
+                                       ymin = .ideo.range[1],
+                                       ymax = .ideo.range[2]))
+              if(any(c("colour", "fill") %in% names(args.aes))){
+                if(!all(c("colour", "fill") %in% names(args.aes))){
+                  idx <- which(c("colour", "fill") %in% names(args.aes))
+                  known <- c("colour", "fill")[idx]
+                  unknown <- c("colour", "fill")[-idx]
+                  args.aes[[unknown]] <- args.aes[[known]]
+                }
+                p.addon <- do.call(ggplot2::geom_rect,
+                                   c(list(data = df), list(do.call(aes, args.aes)),args.non))
+              }else
+                p.addon <- do.call(ggplot2::geom_rect,
+                                   c(list(data = df), list(do.call(aes, args.aes)),args.non))
+            }else{
             
             ## if(geom == "area"){
             ##   if("y" %in% names(args.aes)){
@@ -129,9 +138,10 @@ setMethod("layout_karyogram", "GRanges",
             ##   p.addon <- geom_line(data = df.temp, do.call(aes, args))
             ## }
             .drawFun <- getDrawFunFromGeomStat(geom, stat)
-            aes.res <- do.call(aes, args.res)
+            aes.res <- do.call(aes, args.aes)
             args.res <- c(list(data = data), list(aes.res), args.non)
             p.addon <- do.call(.drawFun, args.res)
+          }
             o <- opts(axis.text.y = theme_blank(),
                       axis.title.y=theme_blank(),
                       axis.ticks = theme_blank(),

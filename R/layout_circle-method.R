@@ -9,30 +9,22 @@ setMethod("layout_circle",  "GRanges",
                                        "segment", "rectangle", "hist", "scale", 
                                 "ideogram", "text"), linked.to,
                           radius = 10, trackWidth = 5, trackBuffer, circle.skip,
-                          space.skip = 0.03, direction = c("clockwise", "anticlockwise"),
+                          space.skip = 0.015, direction = c("clockwise", "anticlockwise"),
                           link.fun = function(x, y, n = 30) bezier(x, y, evaluation = n),
                    rect.inter.n = 5, rank, 
                    scale.n = 60, scale.unit = NULL, scale.type = c("M", "B", "sci")){
 
+  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  ## args <- force(args)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  args.non <- args.non[!names(args.non) %in% c("geom", "data", "rank")]
 
   dots <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   scale.type <- match.arg(scale.type)
   geom <- match.arg(geom)
   if(geom == "rect")
     geom <- "rectangle"
-  args <- list(...)
-  aes.lst <- unlist(lapply(args, function(x) class(eval(x)) == "uneval"))
-  args.extra <- args[unlist(lapply(args, function(x) class(eval(x)) != "uneval"))]
-  if(length(aes.lst)){
-    idx <- which(aes.lst)
-    if(length(idx))
-      aes.lst <- eval(args[[idx]])
-    else
-      aes.lst <- list()
-  }else{
-    aes.lst <- list()
-  }
-
 
   ## rank
   if(!missing(rank)){
@@ -42,7 +34,7 @@ setMethod("layout_circle",  "GRanges",
   if(geom == "ideogram"){
     ## data.back <- data
     data <- getIdeoGR(data)
-    res <- rectInter(data, y = as.character(aes.lst$y),
+    res <- rectInter(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                     direction = direction, n = rect.inter.n)
     
@@ -50,71 +42,71 @@ setMethod("layout_circle",  "GRanges",
     idx <- order(df$.biovizBase.group, df$.int.id)
     df <- df[idx, ]
 
-    ## aes.lst.text <- aes.lst
-    ## aes.lst.text$y <- as.name(".biovizBase.y")
-    ## aes.lst.text$x <- as.name(".biovizBase.x")
+    ## args.aes.text <- args.aes
+    ## args.aes.text$y <- as.name(".biovizBase.y")
+    ## args.aes.text$x <- as.name(".biovizBase.x")
     
-    aes.lst <- aes.lst[names(aes.lst) != "label"]
-    aes.lst$y <- as.name(".biovizBase.y")
-    aes.lst$x <- as.name(".biovizBase.x")
+    args.aes <- args.aes[names(args.aes) != "label"]
+    args.aes$y <- as.name(".biovizBase.y")
+    args.aes$x <- as.name(".biovizBase.x")
     
 
     
-    aes.lst$group <- as.name(".biovizBase.group")
+    args.aes$group <- as.name(".biovizBase.group")
 
     
-    if("fill" %in% names(aes.lst)){
-      if(!"color" %in% names(aes.lst)){
-        aes.lst$color <- aes.lst$fill
+    if("fill" %in% names(args.aes)){
+      if(!"color" %in% names(args.aes)){
+        args.aes$color <- args.aes$fill
       }
     }
-    aes <- do.call("aes", aes.lst)
-    if(!"color" %in% names(aes.lst)){
+    aes <- do.call("aes", args.aes)
+    if(!"color" %in% names(args.aes)){
       col <- I("black")
-      args.extra$color <- col
+      args.non$color <- col
     }
 
-    args.tot <- c(list(data = df, aes), args.extra)
+    args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_polygon, args.tot)
     p <- list(res)
   }
 
   if(geom == "text"){
 
-    if("label" %in% names(aes.lst)){
-      lbs <- as.character(aes.lst$label)
+    if("label" %in% names(args.aes)){
+      lbs <- as.character(args.aes$label)
       if(!lbs %in% c(colnames(values(data)),"start", "end", "seqnames","width"))
         stop("label must be one of column names")
     }else{
       stop("missing label argument in aes()")
     }
     obj <- gr2newLinear(data, space.skip)    
-    obj <- gr2circle(obj, y = as.character(aes.lst$y), radius= radius, width = trackWidth,
+    obj <- gr2circle(obj, y = as.character(args.aes$y), radius= radius, width = trackWidth,
                      direction = direction)
     ## compute angle
-    if("angle" %in% names(aes.lst)){
-      ags <- eval(aes.lst$angle, data)
+    if("angle" %in% names(args.aes)){
+      ags <- eval(args.aes$angle, data)
       ags <-  - values(obj)$.biovizBase.angle * 180 / pi + ags
       values(obj)$.processed.angle <- ags
-      aes.lst$angle <- as.name(".processed.angle")      
+      args.aes$angle <- as.name(".processed.angle")      
     }else{
       ags <-  - values(obj)$.biovizBase.angle * 180/pi 
       values(obj)$.processed.angle <- ags
-      aes.lst$angle <- as.name(".processed.angle")      
+      args.aes$angle <- as.name(".processed.angle")      
     }
 
     if("angle" %in% names(dots)){
       ags <-  - values(obj)$.biovizBase.angle * 180 / pi +
         as.numeric(paste(as.character(dots$angle), collapse = ""))
       values(obj)$.processed.angle <- ags
-      aes.lst$angle <- as.name(".processed.angle")      
+      args.aes$angle <- as.name(".processed.angle")      
     }
 
     df <- as.data.frame(obj)
-    aes.lst$y <- as.name(".biovizBase.y")
-    aes.lst$x <- as.name(".biovizBase.x")
-    aes <- do.call("aes", aes.lst)
-    args.tot <- c(list(data = df, aes), args.extra)
+    args.aes$y <- as.name(".biovizBase.y")
+    args.aes$x <- as.name(".biovizBase.x")
+    aes <- do.call("aes", args.aes)
+    args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_text, args.tot)
     p <- list(res)
     
@@ -122,50 +114,50 @@ setMethod("layout_circle",  "GRanges",
 
   if(geom == "point"){
     obj <- gr2newLinear(data, space.skip)
-    if(!"y" %in% names(aes.lst)){
+    if(!"y" %in% names(args.aes)){
       .y <- 1
       warning("y is missing in aes(), use equal y")
     }else{
-      .y <- as.character(aes.lst$y)
+      .y <- as.character(args.aes$y)
     }
     obj <- gr2circle(obj, y = .y, radius= radius, width = trackWidth,
                      direction = direction)
     df <- as.data.frame(obj)
-    aes.lst$y <- as.name(".biovizBase.y")
-    aes.lst$x <- as.name(".biovizBase.x")
-    aes <- do.call("aes", aes.lst)
-    args.tot <- c(list(data = df, aes), args.extra)
+    args.aes$y <- as.name(".biovizBase.y")
+    args.aes$x <- as.name(".biovizBase.x")
+    aes <- do.call("aes", args.aes)
+    args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_point, args.tot)
     p <- list(res)
   }
   
   if(geom == "line"){
-    if(!"y" %in% names(aes.lst))
+    if(!"y" %in% names(args.aes))
       stop("y is missing in aes()")
     obj <- gr2newLinear(data, space.skip)    
-    obj <- gr2circle(obj, y = as.character(aes.lst$y), radius= radius, width = trackWidth,
+    obj <- gr2circle(obj, y = as.character(args.aes$y), radius= radius, width = trackWidth,
                      direction = direction)
     df <- as.data.frame(obj)
-    aes.lst$y <- as.name(".biovizBase.y")
-    aes.lst$x <- as.name(".biovizBase.x")
-    aes.lst$group <- as.name("seqnames")
-    aes <- do.call("aes", aes.lst)
-    args.tot <- c(list(data = df, aes), args.extra)
+    args.aes$y <- as.name(".biovizBase.y")
+    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$group <- as.name("seqnames")
+    aes <- do.call("aes", args.aes)
+    args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_path, args.tot)
     p <- list(res)
   }
   
   if(geom == "segment"){
     ## TODO
-    res <- segInter(data, y = as.character(aes.lst$y),
+    res <- segInter(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                       direction = direction)
     df <- as.data.frame(res)
-    aes.lst$y <- as.name(".biovizBase.y")
-    aes.lst$x <- as.name(".biovizBase.x")
-    aes.lst$group <- as.name(".biovizBase.group")    
-    aes <- do.call("aes", aes.lst)
-    args.tot <- c(list(data = df, aes), args.extra)
+    args.aes$y <- as.name(".biovizBase.y")
+    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$group <- as.name(".biovizBase.group")    
+    aes <- do.call("aes", args.aes)
+    args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_path, args.tot)
     p <- list(res)
 
@@ -190,65 +182,65 @@ setMethod("layout_circle",  "GRanges",
     res <- df[seq(1, N-1, by = 2),]
     res[,c(".biovizBase.xend", ".biovizBase.yend")] <-
       df[seq(2, N, by = 2), c(".biovizBase.x", ".biovizBase.y")]
-    aes.lst$y <- as.name(".biovizBase.y")
-    aes.lst$x <- as.name(".biovizBase.x")
-    aes.lst$yend <- as.name(".biovizBase.yend")
-    aes.lst$xend <- as.name(".biovizBase.xend")
-    aes <- do.call("aes", aes.lst)
-    aes.lst.text <- aes.lst[!names(aes.lst) %in% c("xend", "yend")]
-    if("angle" %in% names(aes.lst)){
-      ags <- eval(aes.lst$angle, data)
+    args.aes$y <- as.name(".biovizBase.y")
+    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$yend <- as.name(".biovizBase.yend")
+    args.aes$xend <- as.name(".biovizBase.xend")
+    ## aes <- do.call("aes", args.aes)
+    args.aes.text <- args.aes[!names(args.aes) %in% c("xend", "yend")]
+    if("angle" %in% names(args.aes)){
+      ags <- eval(args.aes$angle, data)
       ags <- 90 - res$.biovizBase.angle * 180 / pi + ags
       res$.processed.angle <- ags
-      aes.lst.text$angle <- as.name(".processed.angle")      
+      args.aes.text$angle <- as.name(".processed.angle")      
     }else{
       ags <- 90 - res$.biovizBase.angle * 180/pi 
       res$.processed.angle <- ags
-      aes.lst.text$angle <- as.name(".processed.angle")      
+      args.aes.text$angle <- as.name(".processed.angle")      
     }
+    args.aes.text$label <- as.name("text.major")
+    if(!"hjust" %in% c(names(args.non), names(args.aes.text)))
+      args.non$hjust <- 0
+    if(!"size" %in% c(names(args.non), names(args.aes.text)))    
+      args.non$size <- 3
     
-    aes.lst.text$label <- substitute(text.major)    
-    aes <- do.call("aes", aes.lst)
-    aes.text <- do.call("aes", aes.lst.text)
-    
-    if(!"hjust" %in% c(names(args.extra), names(aes.lst.text)))
-      aes.text$hjust <- 0
-    if(!"size" %in% c(names(args.extra), names(aes.lst.text)))    
-      aes.text$size <- 3
-    args.tot <- c(list(data = res, aes.text), args.extra)
+    aes <- do.call("aes", args.aes)
+    aes.text <- do.call("aes", c(args.aes.text))
+    args.tot <- c(list(data = res), list(aes.text), args.non)
     res.text <- do.call(geom_text, args.tot)
-    p <- list(res.text, geom_segment(data = res, aes))
+    res.seg <- do.call(ggplot2::geom_segment,c(list(data = res), list(aes)))
+    p <- c(list(res.text), list(res.seg))
   }
 
   if(geom == "rectangle"){
-    res <- rectInter(data, y = as.character(aes.lst$y),
+    res <- rectInter(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                     direction = direction, n = rect.inter.n)
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
     df <- df[idx, ]
-    aes.lst.p <- aes.lst
-    aes.lst.p$y <- as.name(".biovizBase.y")
-    aes.lst.p$x <- as.name(".biovizBase.x")
-    aes.lst.p$group <- as.name(".biovizBase.group")
+    args.aes.p <- args.aes
+    args.aes.p$y <- as.name(".biovizBase.y")
+    args.aes.p$x <- as.name(".biovizBase.x")
+    args.aes.p$group <- as.name(".biovizBase.group")
 
-    if("fill" %in% names(aes.lst.p)){
-      if(!"color" %in% names(aes.lst.p)){
-        aes.lst.p$color <- aes.lst.p$fill
+    if("fill" %in% names(args.aes.p)){
+      if(!"color" %in% names(args.aes.p)){
+        args.aes.p$color <- args.aes.p$fill
       }
     }
-    aes.p <- do.call("aes", aes.lst.p)
-    if(!"color" %in% names(aes.lst.p)){
+    aes.p <- do.call("aes", args.aes.p)
+    if(!"color" %in% names(args.aes.p)){
       col <- I("black")
-      args.extra$color <- col
+      args.non$color <- col
     }
-    args.tot <- c(list(data = df, aes.p), args.extra)
+    args.tot <- c(list(data = df, aes.p), args.non)
     res <- do.call(geom_polygon, args.tot)
     p <- list(res)
   }
   
   if(geom == "bar"){
-    res <- barInter(data, y = as.character(aes.lst$y),
+    res <- barInter(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                     direction = direction)
     df <- as.data.frame(res)
@@ -258,13 +250,13 @@ setMethod("layout_circle",  "GRanges",
     res <- df[seq(1, N-1, by = 2),]
     res[,c(".biovizBase.xend", ".biovizBase.yend")] <-
       df[seq(2, N, by = 2), c(".biovizBase.x", ".biovizBase.y")]
-    aes.lst$y <- as.name(".biovizBase.y")
-    aes.lst$x <- as.name(".biovizBase.x")
-    aes.lst$yend <- as.name(".biovizBase.yend")
-    aes.lst$xend <- as.name(".biovizBase.xend")
-    aes <- do.call("aes", aes.lst)
+    args.aes$y <- as.name(".biovizBase.y")
+    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$yend <- as.name(".biovizBase.yend")
+    args.aes$xend <- as.name(".biovizBase.xend")
+    aes <- do.call("aes", args.aes)
 
-    args.tot <- c(list(data = df, aes), args.extra)
+    args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_segment, args.tot)
     p <- list(res)
   }
@@ -273,11 +265,11 @@ setMethod("layout_circle",  "GRanges",
     res <- linkInter(data, space.skip = space.skip, linked.to = linked.to,
                      link.fun = link.fun, trackWidth = trackWidth, radius = radius,
                      direction = direction)
-    aes.lst$y <- as.name("y")
-    aes.lst$x <- as.name("x")
-    aes.lst$group <- as.name(".biovizBase.group")
-    aes <- do.call("aes", aes.lst)
-    args.tot <- c(list(data = res, aes), args.extra)
+    args.aes$y <- as.name("y")
+    args.aes$x <- as.name("x")
+    args.aes$group <- as.name(".biovizBase.group")
+    aes <- do.call("aes", args.aes)
+    args.tot <- c(list(data = res, aes), args.non )
     res <- do.call(geom_path, args.tot)
     p <- list(res)
 

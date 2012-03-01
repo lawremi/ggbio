@@ -7,6 +7,7 @@ import(reshape2)
 ## BiocGenerics
 importFrom(BiocGenerics, cbind, rbind, unique,
            lapply, sapply, setdiff, Reduce)
+## Biobase
 import(Biobase)
 import(biovizBase)
 import(grid)
@@ -90,7 +91,7 @@ exportMethods(geom_chevron,
 exportMethods(stat_aggregate,
               stat_coverage,
               stat_identity,	
-              ## stat_mismatch, 	
+              stat_mismatch, 	
               stat_stepping,
               stat_gene,
               stat_table)

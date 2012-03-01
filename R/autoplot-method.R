@@ -412,8 +412,13 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                                                 "segment",
                                                 "point",
                                                 "rect")){
-  dots <- list(...)
-  if(!"color" %in% names(dots))
+
+  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  args.non <- args.non[!names(args.non) %in% c("object", "which", "xlab", "ylab", "main",
+                                               "geom")]
+  if(!"color" %in% names(args.non))
     isDNABaseColor <- TRUE
   else
     isDNABaseColor <- FALSE
@@ -424,49 +429,96 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
   geom <- match.arg(geom)
   p <- ggplot(data = df, ...)
   baseColor <- getOption("biovizBase")$DNABasesColor
-  if(!isDNABaseColor)
-    cols <- dots$color
+  ## if(!isDNABaseColor)
+  ##   cols <- dots$color
   p <- switch(geom,
               text = {
-                if(isDNABaseColor)
-                  p + geom_text(aes(x = x, y = 0, label = seqs ,color = seqs))+
+                if(isDNABaseColor){
+                args.aes$x <- as.name("x")
+                args.aes$y <- 0
+                args.aes$label = as.name("seqs")
+                args.aes$color = as.name("seqs")
+                aes.res <- do.call(aes, args.aes)
+                args.res <- c(list(aes.res), args.non)
+                  p + do.call(geom_text, args.res)+
                     scale_color_manual(values = baseColor)
-                else
-                  p + geom_text(aes(x = x, y = 0, label = seqs), color = cols)
+                }else{
+                args.aes$x <- as.name("x")
+                args.aes$y <- 0
+                args.aes$label = as.name("seqs")
+                aes.res <- do.call(aes, args.aes)
+                args.res <- c(list(aes.res), args.non)
+                p + do.call(geom_text, args.res)
+                }
 
               },
               segment = {
-                if(isDNABaseColor)                
-                  p + geom_segment(aes(x = x, y = -1,
-                                       xend = x, yend = 1,
-                                       color = seqs)) +
+                if(isDNABaseColor){
+                args.aes$x <- as.name("x")
+                args.aes$y <- -1
+                args.aes$xend <- as.name("x")
+                args.aes$yend <- 1                
+                args.aes$color = as.name("seqs")
+                aes.res <- do.call(aes, args.aes)
+                args.res <- c(list(aes.res), args.non)
+                  
+                  p + do.call(ggplot2::geom_segment, args.res) + 
                                          scale_color_manual(values = baseColor)+
                                            scale_y_continuous(limits = c(-10, 10))
-                else
-                  p + geom_segment(aes(x = x, y = -1,
-                                       xend = x, yend = 1), color = cols)+
+                }else{
+                args.aes$x <- as.name("x")
+                args.aes$y <- -1
+                args.aes$xend <- as.name("x")
+                args.aes$yend <- 1                
+                aes.res <- do.call(aes, args.aes)
+                args.res <- c(list(aes.res), args.non)
+                  
+                  p + do.call(ggplot2::geom_segment, args.res) + 
                                          scale_y_continuous(limits = c(-10, 10))
+                }
               },
               point = {
-                if(isDNABaseColor)                                
-                  p + geom_point(aes(x = x, y = 0, color = seqs))+
+                if(isDNABaseColor){
+                args.aes$x <- as.name("x")
+                args.aes$y <- 0
+                args.aes$color = as.name("seqs")
+                aes.res <- do.call(aes, args.aes)
+                args.res <- c(list(aes.res), args.non)
+                  p + do.call(geom_point, args.res) +
                     scale_color_manual(values = baseColor)
-                else
-                  p + geom_point(aes(x = x, y = 0), color = cols)
+                }else{
+                  args.aes$x <- as.name("x")
+                args.aes$y <- 0
+                aes.res <- do.call(aes, args.aes)
+                args.res <- c(list(aes.res), args.non)
+                  p + do.call(geom_point, args.res)
+                }
                 
               },
               rect = {
-                if(isDNABaseColor)                                                
-                  p + geom_rect(aes(xmin = x, ymin = -1,
-                                    xmax = x+0.9, ymax = 1,
-                                    color = seqs, fill = seqs)) +
+                if(isDNABaseColor){
+                args.aes$xmin <- as.name("x")
+                args.aes$ymin <- -1
+                args.aes$xmax <- substitute(x + 0.9)
+                args.aes$ymax <- 1
+                args.aes$color = as.name("seqs")
+                args.aes$fill = as.name("seqs")                
+                aes.res <- do.call(aes, args.aes)
+                args.res <- c(list(aes.res), args.non)
+                  p + do.call(ggplot2::geom_rect, args.res) +
                                       scale_y_continuous(limits = c(-10, 10))+
                                         scale_color_manual(values = baseColor)+
                                           scale_fill_manual(values = baseColor)
-                else
-                  p + geom_rect(aes(xmin = x, ymin = -1,
-                                    xmax = x+0.9, ymax = 1), color = cols, fill = cols) +
+                }else{
+                args.aes$xmin <- as.name("x")
+                args.aes$ymin <- -1
+                args.aes$xmax <- substitute(x + 0.9)                
+                args.aes$ymax <- 1
+                aes.res <- do.call(aes, args.aes)
+                args.res <- c(list(aes.res), args.non)
+                  p + do.call(ggplot2::geom_rect, args.res) +
                                       scale_y_continuous(limits = c(-10, 10))
+                }
 
               })
   if(missing(xlab)){

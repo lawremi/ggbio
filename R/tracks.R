@@ -33,19 +33,20 @@ tracks <- function(...,
       xlim <- range(xlim)
     }
   }
-  ## s <- scale_x_continuous(limits = xlim)
-  s <- coord_cartesian(xlim = xlim, wise = TRUE)
+  
   ## need fix legend
     N <- length(grobs)
     lst <- lapply(seq_len(N),
                   function(i) {
+                    ylim <- getLimits(grobs[[i]])$ylim
+                    s <- coord_cartesian(xlim = xlim, ylim = ylim, wise = TRUE)
                     if(i %in% which(xlim.change))
                       grobs[[i]] <- grobs[[i]] + s
                     if(!is.null(theme))
                       grobs[[i]] <- grobs[[i]] + theme
                     ## margin
                     if(!is.null(track.skip))
-                      if(i < N){
+                      if(i < N){  s <- coord_cartesian(xlim = xlim, wise = TRUE)
                         grobs[[i]] <- grobs[[i]] +
                           opts(plot.margin = unit(c(1, 1, track.skip, 0.5), "lines"))
                       }

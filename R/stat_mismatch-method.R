@@ -1,8 +1,10 @@
 setGeneric("stat_mismatch", function(data, ...) standardGeneric("stat_mismatch"))
 ## this require a special GenomicRanges
-setMethod("stat_mismatch", "GenomicRanges", function(data, ..., genome, which,
+setMethod("stat_mismatch", "GenomicRanges", function(data, ..., bsgenome, which,
                                                      xlab, ylab, main,
+                                                     geom = c("segment", "bar"),
                                                      show.coverage = TRUE){
+  geom <- match.arg(geom)
   isPileupSum <- function(obj){
     if(is(obj, "GRanges")){
       all(c("read", "ref", "count", "depth", "match") %in% colnames(values(obj)))
@@ -24,7 +26,8 @@ setMethod("stat_mismatch", "GenomicRanges", function(data, ..., genome, which,
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   args.non <- args.non[!names(args.non) %in% c("data", "which",
-                                               "genome", "show.coverage")]
+                                               "bsgenome", "show.coverage",
+                                               "geom")]
   
   ## df <- as.data.frame(data)
   df <- fortify(data = data)
@@ -80,9 +83,18 @@ setMethod("stat_mismatch", "GenomicRanges", function(data, ..., genome, which,
   else
     p <- NULL
   DNABasesColor <- getBioColor("DNA_BASES_N")
-  p <- c(p, list(ggplot2::geom_segment(data = df.unmatch, aes(x = start, y = sts,
-                          xend = start, yend = eds, color = read))),
-         list(scale_color_manual(values = DNABasesColor)))
+  if(geom == "segment"){
+    p <- c(p, list(ggplot2::geom_segment(data = df.unmatch, aes(x = start, y = sts,
+                                           xend = start, yend = eds, color = read))),
+           list(scale_color_manual(values = DNABasesColor)))
+  }
+  if(geom == "bar"){
+    p <- c(p, list(ggplot2::geom_rect(data = df.unmatch, aes(xmin = start-0.5, ymin = sts,
+                                           xmax = start+0.5, ymax = eds, color = read,
+                                        fill = read))),
+           list(scale_color_manual(values = DNABasesColor)),
+           list(scale_fill_manual(values = DNABasesColor)))
+  }
   ## p <- c(p, list(xlab("Genomic Coordinates")), list(ylab("Counts")))
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))
@@ -102,7 +114,7 @@ setMethod("stat_mismatch", "GenomicRanges", function(data, ..., genome, which,
 
 
 setMethod("stat_mismatch", "BamFile", function(data, ..., which, bsgenome,
-                                               xlab, ylab, main,
+                                               xlab, ylab, main, 
                                                      show.coverage = TRUE){
 
     if(missing(bsgenome)){

@@ -21,6 +21,10 @@ plotMismatchSum <- function(obj, show.coverage = TRUE){
   }else{
     df.bg <- df
   }
+  df.bg <- df.bg[order(df.bg$start),]
+  df.bg <- rbind(df.bg[1,], df.bg)
+  df.bg <- rbind(df.bg, df.bg[nrow(df.bg),])
+  df.bg[c(1, nrow(df.bg)),]$depth <- 0
   addLevels <- function(x){
     idx <- order(x$start, x$read)
     ## assumption: on the same chromosome
@@ -41,7 +45,7 @@ plotMismatchSum <- function(obj, show.coverage = TRUE){
   df.bg <- df.bg[idx,]
   p <- ggplot(df.bg)
   if(show.coverage)
-    p <- p + geom_area(aes(x = start, y = depth), fill = I("gray70"), color = I("gray70"))
+    p <- p + geom_polygon(aes(x = start, y = depth), fill = I("gray70"), color = I("gray70"))
   DNABasesColor <- getBioColor("DNA_BASES_N")
   p <- p + geom_segment(data = df.unmatch, aes(x = start, y = sts,
                           xend = start, yend = eds, color = read))+

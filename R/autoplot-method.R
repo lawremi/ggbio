@@ -422,8 +422,6 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
   xs <- seq(start(which), length.out = width(which))
   df <- data.frame(x = xs, seqs = seqs)
   geom <- match.arg(geom)
-  ## dots.wocolor <- dots[names(dots) != "color"]
-  ## p <- do.call(ggplot, c(list(data = df), dots.wocolor))
   p <- ggplot(data = df, ...)
   baseColor <- getOption("biovizBase")$DNABasesColor
   if(!isDNABaseColor)
@@ -490,7 +488,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
   }
   p <- p + ylab(ylab)
   ## if(stat == "stepping" | geom == "alignment")
-  p <- p + scale_y_continuous(breaks = NA)
+  p <- p + scale_y_continuous(breaks = NULL)
   if(!missing(main))
     p <- p + opts(title = main)
   p
@@ -698,8 +696,7 @@ setMethod("autoplot", "RleList", function(object, lower, ...,
 ##======================================================================
 ##  For ExpressionSet/eSet??
 ##======================================================================
-
-autoplot <- function(object, ..., type = c("none", "heatmap",
+setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("none", "heatmap",
                                     "matrix", "parallel", "MA",
                                     "mean-sd", "volcano",
                                     "NUSE", "RLE"),
@@ -777,5 +774,5 @@ autoplot <- function(object, ..., type = c("none", "heatmap",
     p <- qplot(data = df.l, ...)
   }
   p
-}
+})
 

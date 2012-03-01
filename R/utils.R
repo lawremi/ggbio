@@ -770,3 +770,125 @@ flatGrl <- function(object, indName = "grl_name"){
   }
   p
 }
+
+## functions downbelow from workshop by Michael Lawrence
+elementGaps2 <- function(x) {
+  x_flat <- unlist(x, use.names = FALSE)
+  egaps <- gaps(ranges(x))
+  first_segment <- start(PartitioningByWidth(x))
+  sn <- seqnames(x_flat)[first_segment][togroup(egaps)]
+  strand <- strand(x_flat)[first_segment][togroup(egaps)]
+  relist(GRanges(sn, unlist(egaps, use.names = FALSE), 
+                 strand, seqlengths = seqlengths(x)), 
+         egaps)
+}
+
+
+elementGaps <- function(x) {
+  x_flat <- unlist(x, use.names = FALSE)
+  egaps <- gaps(ranges(x))
+  first_segment <- start(PartitioningByWidth(x))
+  sn <- seqnames(x_flat)[first_segment][togroup(egaps)]
+  strand <- strand(x_flat)[first_segment][togroup(egaps)]
+  relist(GRanges(sn, unlist(egaps, use.names = FALSE), 
+                 strand, seqlengths = seqlengths(x)), 
+         egaps)
+}
+
+pairReadRanges <- function(reads) {
+  pairs <- split(unlist(reads, use.names=FALSE),
+                 factor(names(reads)[togroup(reads)], 
+                        unique(names(reads))))
+  metadata(pairs) <- metadata(reads)
+  xs <- values(reads)$XS
+  has_xs <- !is.na(xs)
+  pair_xs <- setNames(rep.int(NA, length(pairs)), 
+                      names(pairs))
+  pair_xs[names(reads)[has_xs]] <- xs[has_xs]
+  values(pairs)$XS <- unname(pair_xs)
+  pairs
+}  
+
+
+
+strandFromXS <- function(pairs) {
+  xs <- values(pairs)$XS
+  strand <- ifelse(!is.na(xs) & xs != "?", xs, "*")
+  strand(pairs) <- relist(Rle(strand, elementLengths(pairs)), 
+                          pairs)
+  pairs
+}
+
+readReadRanges <- function(bam) {
+  param <- ScanBamParam(tag = "XS", which = aldoa_range)
+  ga <- readGappedAlignments(path(bam), 
+                             use.names = TRUE, 
+                             param = param)
+  reads <- grglist(ga)
+  metadata(reads)$bamfile <- bam
+  splices <- elementGaps(reads)
+  values(splices)$XS <- values(reads)$XS
+  pairs <- pairReadRanges(reads)
+  pairs <- strandFromXS(pairs)
+  splices <- pairReadRanges(splices)
+  splices <- strandFromXS(splices)
+  values(pairs)$splices <- splices
+  pairs
+}
+
+gr2key <- function(x) {
+  paste(seqnames(x), start(x), end(x), strand(x), 
+        sep = ":")
+}
+
+
+key2gr <- function(x, ...) {
+  key_mat <- matrix(unlist(strsplit(x, ":", fixed=TRUE)), 
+                    nrow = 4)
+  GRanges(key_mat[1,],
+          IRanges(as.integer(key_mat[2,]), 
+                  as.integer(key_mat[3,])),
+          key_mat[4,], ...)
+}
+
+
+countByTx <- function(x) {
+  tabulate(subjectHits(hits)[x], subjectLength(hits))
+}
+
+findIsoformOverlaps <- function(pairs) {
+  splices <- values(pairs)$splices
+  hits <- findOverlaps(pairs, tx)
+  hit_pairs <- ranges(pairs)[queryHits(hits)]
+  hit_splices <- ranges(splices)[queryHits(hits)]
+  hit_tx <- ranges(tx)[subjectHits(hits)]
+  read_within <- 
+    elementLengths(setdiff(hit_pairs, hit_tx)) == 0L
+  tx_within <- 
+    elementLengths(intersect(hit_tx, hit_splices)) == 0L
+  compatible <- read_within & tx_within
+  compat_hits <- hits[compatible]
+  reads_unique <- tabulate(queryHits(compat_hits), 
+                           queryLength(compat_hits)) == 1L
+  unique <- logical(length(hits))
+  unique[compatible] <- reads_unique[queryHits(compat_hits)]
+  strand_specific <- 
+    all(strand(pairs) != "*")[queryHits(hits)]
+  values(hits) <- DataFrame(strand_specific,
+                            compatible,
+                            unique)
+  hits
+}
+
+
+countIsoformHits <- function(hits) {
+  countByTx <- function(x) {
+    tabulate(subjectHits(hits)[x], subjectLength(hits))
+  }
+  compatible_strand <- 
+    countByTx(with(values(hits), 
+                   compatible & strand_specific))
+  counts <- DataFrame(compatible_strand,
+                      lapply(values(hits)[-1], countByTx))
+  counts
+}

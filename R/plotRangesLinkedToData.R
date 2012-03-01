@@ -115,7 +115,7 @@ plotRangesLinkedToData <- function(data, stat.col, stat.label,
                  color = as.name(sig),
                  geom = "alignment")
    p.single <- do.call(autoplot, args) +
-     theme.align + scale_y_continuous(breaks = NA)    
+     theme.align + scale_y_continuous(breaks = NULL)    
    p.single <- p.single +
      scale_color_manual(values = c("FALSE" = sig.col[1], "TRUE" = sig.col[2])) +
        scale_fill_manual(values = c("FALSE" = sig.col[1], "TRUE" = sig.col[2])) +

@@ -3,6 +3,9 @@
 ## 2. exons labels for plotRangesLinkedToData
 library(ggbio)
 library(GenomicRanges)
+library(devtools)
+load_all("~/Codes/gitrepos/ggbio")
+
 ##  GRanges
 set.seed(1)
 N <- 1000
@@ -24,20 +27,32 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 idx <- sample(1:length(gr), size = 200)
+
+grl <- split(gr, values(gr)$sample)
+grl <- endoapply(grl, function(gr){
+  nms <- setdiff(colnames(values(gr)), "sample")
+  values(gr) <- values(gr)[nms]
+  gr
+})
+grl
 ## ======================================================================
 ##      LOWER  LEVEL API(test)
 ## ======================================================================
 ## TODO
 ## facets == GRanges
 ## test lower level API
-## stat_identity()
+## sta_identity()
 
 ## transform to a normal data.frame and do it as free
 ggplot() + stat_identity(gr, aes(x = start, y = value), geom = "point")
-## yes, geom: alignment, rect, 
-ggplot() + stat_identity(gr, aes(xmin = start, xmax = end,
-                                 ymin = value - 0.5, ymax = value + 0.5),
-                          geom = "rect")
+## yes, geom: alignment, rect,
+## FIXME
+## ggplot() + stat_identity(gr, aes(xmin = start, xmax = end,
+##                                  ymin = value - 0.5, ymax = value + 0.5),
+##                           geom = "rect")
+## ggplot() + stat_identity(gr, aes(y = values),
+##                           geom = "rect")
+
 ggplot() + stat_identity(gr, aes(x = start, y = value),  geom = "line")
 ggplot() + stat_identity(gr, aes(x = start + width/2, y = value),  geom = "line")
 ggplot() + stat_identity(gr, aes(x = midpoint, y = value),  geom = "line")
@@ -48,7 +63,7 @@ ggplot() + stat_identity(gr, aes(y = value), geom = "segment")
 ggplot() + stat_stepping(gr)
 ggplot() + stat_stepping(gr, aes(color = strand))
 ggplot() + stat_stepping(gr, aes(color = strand, fill = strand))
-ggplot() + stat_stepping(gr, geom = "segment")
+ggplot() + stat_stepping(gr, geom = "segment", xlab = "s", ylab = "y", main = "m")
 
 ggplot() + stat_stepping(gr, aes(color = strand), geom = "segment")
 ggplot() + stat_stepping(gr, aes(group = pair),geom = "alignment")
@@ -57,6 +72,7 @@ ggplot() + stat_stepping(gr, geom = "alignment")
 ggplot() + stat_stepping(gr, facets = sample ~ seqnames)
 ## stat_coverage
 ggplot() + stat_coverage(gr, geom = "point")
+ggplot() + stat_coverage(gr, aes(y = ..coverage..), geom = "point")
 ggplot() + stat_coverage(gr, geom = "histogram")
 ggplot() + stat_coverage(gr, geom = "area")
 ggplot() + stat_coverage(gr, geom = "smooth")
@@ -64,10 +80,32 @@ ggplot() + stat_coverage(gr, geom = "step")
 
 ggplot() + stat_coverage(gr, geom = "point", facets = NULL)
 ggplot() + stat_coverage(gr, geom = "point", facets = sample ~ seqnames)
+
 ggplot() + stat_coverage(gr, geom = "point", facets =  ~ seqnames)
 ggplot() + stat_coverage(gr, geom = "point", facets =  . ~ seqnames)
 
+ggplot() + stat_coverage(grl, geom = "area", facets = ..grl_name.. ~ seqnames,
+                         aes(fill = ..grl_name..))
 
+ggplot() + stat_coverage(grl, geom = "area", 
+                         aes(fill = ..grl_name..))
+
+## stat_table, GRanges
+ggplot() + stat_table(gr)
+ggplot() + stat_table(gr, geom = "segment", aes(y = ..score.., color = ..score..))
+## FIXME
+ggplot() + stat_table(gr, aes(color = factor(score)))
+ggplot() + stat_table(gr, rect.height = 0.1, geom = "rect")
+ggplot() + stat_table(gr, geom = "segment")
+## ggplot() + stat_table(gr, rect.height = 0.1, geom = "5poly")
+## fix this could be just aes(y = ..score..)
+## Maybe confused about stat
+ggplot() + stat_table(gr, stat  = "aggregate", y = "score")
+ggplot() + stat_table(gr, stat  = "identity", aes(x = midpoint, y = score), geom = "point")
+
+ggplot() + stat_table(gr, stat  = "identity", aes(x = midpoint, y = score), geom = "point")
+
+ggplot() + stat_table(grl, geom = "segment", aes(y = ..score.., color = ..score..))
 ## stat_aggregate
 ## 36,37 doesn't work
 ggplot() + stat_aggregate(gr, y = "value",fill = "gray40")
@@ -90,25 +128,77 @@ ggplot() + stat_aggregate(gr, window = 100, aes(y = value),
                           geom = "boxplot", facets =  sample ~ seqnames)
 
 
-## stat_gene, Transcriptdb
+## stat_mismatch
+require(ggbio)
+require(BSgenome.Hsapiens.UCSC.hg19)
+require(biovizBase)
+data("genesymbol")
+bamfile <- system.file("extdata", "SRR027894subRBM17.bam", package="biovizBase")
+bamfile <- "~/Datas/seqs/ENCODE/caltech/single/wgEncodeCaltechRnaSeqK562R1x75dAlignsRep1V2.bam"
+## pgr <- pileupAsGRanges(bamfile, region = genesymbol["RBM17"])
+pgr <- pileupAsGRanges(bamfile, region = genesymbol["ALDOA"])
+pgr.match <- pileupGRangesAsVariantTable(pgr, genome = Hsapiens)
+
+ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE)
+ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE)
+ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE, geom = "bar")
+
+## ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE) +
+##   coord_cartesian(xlim = c(6134000, 6135000),wise = TRUE) + theme_bw()
+
+bf <- BamFile(bamfile)
+ggplot() + stat_mismatch(bf, which = genesymbol["RBM17"],
+                         bsgenome = Hsapiens,show.coverage = TRUE) +
+  coord_cartesian(xlim = c(6134000, 6135000), wise = TRUE) + theme_bw()
+
+
+## make a zoomed track
+bf <- BamFile(bamfile)
+
+gr.t <- GRanges("chr16", IRanges(30080000, 30080000 + 2000))
+p0 <- ggplot() + stat_mismatch(bf, which = gr.t,
+                         bsgenome = Hsapiens,show.coverage = TRUE,
+                               geom = "bar") + ylab("Coverage") +
+   ## coord_cartesian(ylim = c(0, 200), wise = TRUE) +
+  theme_bw()
+p1 <- ggplot() + stat_mismatch(bf, which = gr.t,
+                         bsgenome = Hsapiens,show.coverage = FALSE,
+                               geom = "bar") + 
+  coord_cartesian(ylim = c(0, 6), wise = TRUE)+
+  theme_bw()
+p2 <- autoplot(Hsapiens, which = gr.t, geom = "text") + theme_bw() +
+  opts(legend.position = "none") + xlim(c(30080800 + 20, 30080800 + 100))
+
+pdf("~/Desktop/mismatch.pdf", 13.1, 5.8)
+tracks(p0, p1, p2, heights = c(4, 4, 1.5), xlim = c(30080800 + 20, 30080800 + 100))
+dev.off()
+
+bf <- pgr.match
+p0 <- ggplot() + stat_mismatch(bf, show.coverage = TRUE, geom = "bar") + ylab("Coverage") +
+  theme_bw()
+p1 <- ggplot() + stat_mismatch(bf,show.coverage = FALSE, geom = "bar") + 
+  coord_cartesian(ylim = c(0, 6), wise = TRUE)+
+  theme_bw()
+p2 <- autoplot(Hsapiens, which = gr.t, geom = "text") + theme_bw() +
+  opts(legend.position = "none") 
+tracks(p0, p1, p2, heights = c(4, 4, 1.5), xlim = c(30080800 + 20, 30080800 + 100))
+
+
+
+
+## autoplot, BamFile
+
 ## TODO
 require(ggbio)
+
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 data(genesymbol, package = "biovizBase")
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
-
 ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], fill = "black")
 ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "reduced_gene")
 gr2 <- resize(genesymbol["RBM17"], width(genesymbol["RBM17"])-10000)
 ggplot() + stat_gene(txdb, which = gr2)
-## stat_table, GRanges
-ggplot() + stat_table(gr)
-ggplot() + stat_table(gr, rect.height = 0.1, geom = "rect")
-ggplot() + stat_table(gr, rect.height = 0.1, geom = "5poly")
-## fix this could be just aes(y = ..score..)
-## Maybe confused about stat
-ggplot() + stat_table(gr, stat  = "aggregate", y = "score")
-ggplot() + stat_table(gr, stat  = "identity", aes(x = midpoint, y = score), geom = "point")
+
 ## geom_chevron
 
 ggplot() + geom_chevron(gr[idx])
@@ -205,6 +295,7 @@ autoplot(gr, geom = "segment", facets = sample ~ seqnames)
 autoplot(gr[idx], geom = "alignment", facets = sample ~ seqnames)
 autoplot(gr[idx], geom = "alignment", aes(group = pair))
 autoplot(gr[idx], geom = "alignment", aes(group = pair), group.selfish = FALSE)
+autoplot(gr[idx], geom = "alignment", aes(group = pair), group.selfish = TRUE)
 
 autoplot(gr, stat = "coverage", facets = sample ~ seqnames)
 autoplot(gr, stat = "coverage", facets = sample ~ seqnames, geom = "point")
@@ -227,7 +318,7 @@ autoplot(gr[idx], stat = "aggregate", y = "value", facets = sample ~ seqnames, w
 ## ----------------------------------------------------------------------
 ##        autoplot, GRangesList
 ## ----------------------------------------------------------------------
-require(ggbio)
+library(ggbio)
 require(GenomicRanges)
 set.seed(1)
 s1 <- c(1, 1000, 1500)
@@ -288,10 +379,10 @@ p2 <- autoplot(gr.c, geom = "alignment", fill = "gray50", ylab = "")+
 pdf("~/Desktop/splice2.pdf", 10, 5)
 tracks(p1, p2 , heights = c(3, 1))
 dev.off()
+
 ## plot GRangesList, a more general approach
 grs <- flatGrl(grl.r, "sample")
 ## group them make them looks like gaps
-
 idx <- findOverlaps(grs, reduce(grs))@subjectHits
 values(grs)$group.hits <- idx
 Ngaps <- 300
@@ -317,8 +408,11 @@ grl <- split(grs, values(grs)$group)
 
 ## defaul is alignment, slow
 autoplot(grl[idx])
-autoplot(grl[idx], group.selfish = TRUE)
-autoplot(grl[idx], group.selfish = TRUE) + scale_y_continuous(breaks = NULL)
+## chekc
+
+## autoplot(grl[idx], group.selfish = TRUE)
+## 
+## autoplot(grl[idx], group.selfish = TRUE) + scale_y_continuous(breaks = NULL)
 ## rect/segment is fast
 autoplot(grl[idx], geom = "segment")         #no groupping
 autoplot(grl[idx], geom = "segment", group.selfish = TRUE)         #no groupping
@@ -329,10 +423,12 @@ autoplot(grl, type = "sashimi", coverage.col = "white", coverage.fill = "black",
          ylab = "coverage", main = "hello world")
 
 
+
 values(gr.c)$value <- 100
 p <- autoplot(grl, type = "sashimi")
 p + geom_rect(data = gr.c, stat = "identity", aes(y = value), rect.height = 10)
 p + geom_5poly(data = gr.c, stat = "identity", aes(y = value), rect.height = 10)
+
 
 ## equals to lower level: more delicate control
 gps <- unlist(psetdiff(unlist(range(grl), use.names=FALSE), grl))
@@ -356,9 +452,73 @@ autoplot(txdb, which = genesymbol["RBM17"])
 autoplot(txdb, which = genesymbol["RBM17"], geom = "reduced_gene")
 
 
-## **********************************************************************
-## tengfei is up to here.
-## **********************************************************************
+## ----------------------------------------------------------------------
+##        layout_karyogram
+## ----------------------------------------------------------------------
+## layout karyogram
+requrie(ggbio)
+data(hg19IdeogramCyto, package = "biovizBase")
+library(GenomicRanges)
+## make shorter and clean labels
+old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
+new.chrs <- gsub("chr", "", old.chrs)
+## lst <- as.list(new.chrs)
+names(new.chrs) <- old.chrs
+new.ideo <- renameSeqlevels(hg19IdeogramCyto, new.chrs)
+ggplot() + layout_karyogram(new.ideo, cytoband = TRUE)
+
+
+## ----------------------------------------------------------------------
+##        autoplot, BSgenome
+## ----------------------------------------------------------------------
+## BSgenome for reference genome
+gr <- GRanges("chr1", IRanges(5e7, 5e7+50))
+autoplot(Hsapiens, which = gr, geom = "text")
+autoplot(Hsapiens, which = gr, geom = "text", size = 10, color = "red")
+autoplot(Hsapiens, which = gr, geom = "point")
+autoplot(Hsapiens, which = gr, geom = "point", size = 10, color = "red") 
+autoplot(Hsapiens, which = gr, geom = "segment")
+autoplot(Hsapiens, which = gr, geom = "segment", size = 10, color = "red") 
+autoplot(Hsapiens, which = gr, geom = "rect")
+autoplot(Hsapiens, which = gr, geom = "rect", size = 10, color = "red") 
+
+
+p1 <- autoplot(Hsapiens, which = gr, geom = "text") 
+p2 <- autoplot(Hsapiens, which = gr, geom = "point") 
+p3 <- autoplot(Hsapiens, which = gr, geom = "segment") 
+p4 <- autoplot(Hsapiens, which = gr, geom = "rectangle") 
+tracks(p1, p2, p3, p4)
+
+p <- plotStackedOverview(new.ideo, cytoband = TRUE)
+print(p)
+## fixing order
+new.ideo <- sort(new.ideo)
+p <- plotStackedOverview(new.ideo, cytoband = FALSE, facets = . ~ seqnames)
+print(p)
+
+data(darned_hg19_subset500)
+## rename 
+old.chrs <- seqnames(seqinfo(darned_hg19_subset500))
+new.chrs <- gsub("chr", "", old.chrs)
+names(new.chrs) <- old.chrs
+
+new.darned <- renameSeqlevels(darned_hg19_subset500, new.chrs)
+values(new.darned)$value <- rnorm(length(new.darned))
+p + layout_stacked(new.darned)
+p + layout_stacked(new.darned, aes(y = value), geom = "area")
+p + layout_stacked(new.darned, aes(y = value), geom = "line")
+
+p <- plotStackedOverview(new.ideo, cytoband = FALSE)
+p <- p + layout_stacked(new.darned, aes(color = exReg))
+print(p)
+
+p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
+print(p)
+
+p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1",
+                zoom.region = c(1e8, 1.5e8))
+print(p)
+
 
 
 ggplot() + geom_arch(data = grl, aes(size = size), rect.height = 5)
@@ -371,6 +531,7 @@ ggplot() + geom_arch(data = grl, aes(height = value, size = size, color = value)
 
 ## stat_gene(geom = c("gene", "reduced")), TranscriptDb
 ## stat_mismatch
+
 
 
 gr.sub <- gr[seqnames(gr) == "chr1"] #or 
@@ -545,58 +706,8 @@ p.dense <- autoplot(txdb, geom = "reduced_gene", which = genesymbol["RBM17"])
 tracks(p.full, p.dense, theme = theme_bw(), heights = c(2, 1))
 
 
-## BSgenome for reference genome
-gr <- GRanges("chr1", IRanges(5e7, 5e7+50))
-p1 <- autoplot(Hsapiens, which = gr, geom = "text") +
-  theme_bw()
-p2 <- autoplot(Hsapiens, which = gr, geom = "point") +
-    theme_bw()
-p3 <- autoplot(Hsapiens, which = gr, geom = "segment") +
-    theme_bw()
-p4 <- autoplot(Hsapiens, which = gr, geom = "rectangle") +
-    theme_bw()
-tracks(p1, p2, p3, p4)
 
 
-## stacked
-library(ggbio)
-data(hg19IdeogramCyto, package = "biovizBase")
-library(GenomicRanges)
-## make shorter and clean labels
-old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
-new.chrs <- gsub("chr", "", old.chrs)
-## lst <- as.list(new.chrs)
-names(new.chrs) <- old.chrs
-new.ideo <- renameSeqlevels(hg19IdeogramCyto, new.chrs)
-p <- plotStackedOverview(new.ideo, cytoband = TRUE)
-print(p)
-## fixing order
-new.ideo <- sort(new.ideo)
-p <- plotStackedOverview(new.ideo, cytoband = FALSE, facets = . ~ seqnames)
-print(p)
-
-data(darned_hg19_subset500)
-## rename 
-old.chrs <- seqnames(seqinfo(darned_hg19_subset500))
-new.chrs <- gsub("chr", "", old.chrs)
-names(new.chrs) <- old.chrs
-
-new.darned <- renameSeqlevels(darned_hg19_subset500, new.chrs)
-values(new.darned)$value <- rnorm(length(new.darned))
-p + layout_stacked(new.darned)
-p + layout_stacked(new.darned, aes(y = value), geom = "area")
-p + layout_stacked(new.darned, aes(y = value), geom = "line")
-
-p <- plotStackedOverview(new.ideo, cytoband = FALSE)
-p <- p + layout_stacked(new.darned, aes(color = exReg))
-print(p)
-
-p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
-print(p)
-
-p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1",
-                zoom.region = c(1e8, 1.5e8))
-print(p)
 ## ========================================
 ## Grand Linear
 ## ========================================
@@ -1254,3 +1365,5 @@ ggplot() + stat_aggregate(gr, window = 30, aes(y = value), fill = "gray40",
 data <- gr
 data
 window = 4
+
+

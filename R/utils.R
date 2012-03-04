@@ -855,9 +855,11 @@ splicefun <- function(files, txdb, id, xlim){
     values(hits) <- DataFrame(strand_specific,
                               compatible,
                               unique)
-    hits
+    list(hits = hits,
+         compatible = compatible,
+         strand_specific = strand_specific)
   }
-  countIsoformHits <- function(hits) {
+  countIsoformHits <- function(hits, compatible, strand_specific) {
     countByTx <- function(x) {
       tabulate(subjectHits(hits)[x], subjectLength(hits))
     }
@@ -945,34 +947,34 @@ splicefun <- function(files, txdb, id, xlim){
 
 
 
-  hits <- findOverlaps(pairs, tx)
+  ## hits <- findOverlaps(pairs, tx)
 
-  hit_pairs <- ranges(pairs)[queryHits(hits)]
-  hit_splices <- ranges(splices)[queryHits(hits)]
-  hit_tx <- ranges(tx)[subjectHits(hits)]
+  ## hit_pairs <- ranges(pairs)[queryHits(hits)]
+  ## hit_splices <- ranges(splices)[queryHits(hits)]
+  ## hit_tx <- ranges(tx)[subjectHits(hits)]
 
-  read_within <- 
-    elementLengths(setdiff(hit_pairs, hit_tx)) == 0L
-  tx_within <- 
-    elementLengths(intersect(hit_tx, hit_splices)) == 0L
-  compatible <- read_within & tx_within
-
-
-  compat_hits <- hits[compatible]
-  reads_unique <- tabulate(queryHits(compat_hits), 
-                           queryLength(compat_hits)) == 1L
-  unique <- logical(length(hits))
-  unique[compatible] <- reads_unique[queryHits(compat_hits)]
+  ## read_within <- 
+  ##   elementLengths(setdiff(hit_pairs, hit_tx)) == 0L
+  ## tx_within <- 
+  ##   elementLengths(intersect(hit_tx, hit_splices)) == 0L
+  ## compatible <- read_within & tx_within
 
 
-  strand_specific <- 
-    all(strand(pairs) != "*")[queryHits(hits)]
-  values(hits) <- DataFrame(strand_specific,
-                            compatible,
-                            unique)
+  ## compat_hits <- hits[compatible]
+  ## reads_unique <- tabulate(queryHits(compat_hits), 
+  ##                          queryLength(compat_hits)) == 1L
+  ## unique <- logical(length(hits))
+  ## unique[compatible] <- reads_unique[queryHits(compat_hits)]
 
-  values(hits)$spliced <- 
-    (elementLengths(pairs) > 2)[queryHits(hits)]
+
+  ## strand_specific <- 
+  ##   all(strand(pairs) != "*")[queryHits(hits)]
+  ## values(hits) <- DataFrame(strand_specific,
+  ##                           compatible,
+  ##                           unique)
+
+  ## values(hits)$spliced <- 
+  ##   (elementLengths(pairs) > 2)[queryHits(hits)]
 
   introns <- elementGaps(tx)
   introns_flat <- unlist(introns, use.names = FALSE)
@@ -1012,9 +1014,9 @@ splicefun <- function(files, txdb, id, xlim){
     bf <- bamFiles[[i]]
     rr <- readReadRanges(bf)
     lst_rr <- c(lst_rr, rr)
-    htis <- findIsoformOverlaps(rr)
-    lst_hits <- c(lst_hits, hits)
-    lst_counts <- c(lst_counts, countIsoformHits(hits))
+    hits.lst <- findIsoformOverlaps(rr)
+    lst_hits <- c(lst_hits, hits.lst$hits)
+    lst_counts <- c(lst_counts, countIsoformHits(hits.lst$hits, hits.lst$compatible, hits.lst$strand_specific))
     lst_splices <- c(lst_splices, summarizeSplices(rr))
   }
   names(lst_hits) <- nms

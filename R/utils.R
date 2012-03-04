@@ -777,123 +777,319 @@ flatGrl <- function(object, indName = "grl_name"){
 }
 
 ## functions downbelow from workshop by Michael Lawrence
-elementGaps2 <- function(x) {
-  x_flat <- unlist(x, use.names = FALSE)
-  egaps <- gaps(ranges(x))
-  first_segment <- start(PartitioningByWidth(x))
-  sn <- seqnames(x_flat)[first_segment][togroup(egaps)]
-  strand <- strand(x_flat)[first_segment][togroup(egaps)]
-  relist(GRanges(sn, unlist(egaps, use.names = FALSE), 
-                 strand, seqlengths = seqlengths(x)), 
-         egaps)
-}
+## will be implmented by into his package, so I will replace this function later
+splicefun <- function(files, txdb, id, xlim){
+  elementGaps <- function(x) {
+    x_flat <- unlist(x, use.names = FALSE)
+    egaps <- gaps(ranges(x))
+    first_segment <- start(PartitioningByWidth(x))
+    sn <- seqnames(x_flat)[first_segment][togroup(egaps)]
+    strand <- strand(x_flat)[first_segment][togroup(egaps)]
+    relist(GRanges(sn, unlist(egaps, use.names = FALSE), 
+                   strand, seqlengths = seqlengths(x)), 
+           egaps)
+  }
 
 
-elementGaps <- function(x) {
-  x_flat <- unlist(x, use.names = FALSE)
-  egaps <- gaps(ranges(x))
-  first_segment <- start(PartitioningByWidth(x))
-  sn <- seqnames(x_flat)[first_segment][togroup(egaps)]
-  strand <- strand(x_flat)[first_segment][togroup(egaps)]
-  relist(GRanges(sn, unlist(egaps, use.names = FALSE), 
-                 strand, seqlengths = seqlengths(x)), 
-         egaps)
-}
+  pairReadRanges <- function(reads) {
+    pairs <- split(unlist(reads, use.names=FALSE),
+                   factor(names(reads)[togroup(reads)], 
+                          unique(names(reads))))
+    metadata(pairs) <- metadata(reads)
+    xs <- values(reads)$XS
+    has_xs <- !is.na(xs)
+    pair_xs <- setNames(rep.int(NA, length(pairs)), 
+                        names(pairs))
+    pair_xs[names(reads)[has_xs]] <- xs[has_xs]
+    values(pairs)$XS <- unname(pair_xs)
+    pairs
+  }  
 
-pairReadRanges <- function(reads) {
+  strandFromXS <- function(pairs) {
+    xs <- values(pairs)$XS
+    strand <- ifelse(!is.na(xs) & xs != "?", xs, "*")
+    strand(pairs) <- relist(Rle(strand, elementLengths(pairs)), 
+                            pairs)
+    pairs
+  }
+
+  gr2key <- function(x) {
+    paste(seqnames(x), start(x), end(x), strand(x), 
+          sep = ":")
+  }
+
+  key2gr <- function(x, ...) {
+    key_mat <- matrix(unlist(strsplit(x, ":", fixed=TRUE)), 
+                      nrow = 4)
+    GRanges(key_mat[1,],
+            IRanges(as.integer(key_mat[2,]), 
+                    as.integer(key_mat[3,])),
+            key_mat[4,], ...)
+  }
+  ## countByTx <- function(x) {
+  ##   tabulate(subjectHits(hits)[x], subjectLength(hits))
+  ## }
+  ## compatible_strand <- 
+  ##   countByTx(with(values(hits), 
+  ##                  compatible & strand_specific))
+  ## counts <- DataFrame(compatible_strand,
+  ##                     lapply(values(hits)[-1], countByTx))
+  findIsoformOverlaps <- function(pairs) {
+    splices <- values(pairs)$splices
+    hits <- findOverlaps(pairs, tx)
+    hit_pairs <- ranges(pairs)[queryHits(hits)]
+    hit_splices <- ranges(splices)[queryHits(hits)]
+    hit_tx <- ranges(tx)[subjectHits(hits)]
+    read_within <- 
+      elementLengths(setdiff(hit_pairs, hit_tx)) == 0L
+    tx_within <- 
+      elementLengths(intersect(hit_tx, hit_splices)) == 0L
+    compatible <- read_within & tx_within
+    compat_hits <- hits[compatible]
+    reads_unique <- tabulate(queryHits(compat_hits), 
+                             queryLength(compat_hits)) == 1L
+    unique <- logical(length(hits))
+    unique[compatible] <- reads_unique[queryHits(compat_hits)]
+    strand_specific <- 
+      all(strand(pairs) != "*")[queryHits(hits)]
+    values(hits) <- DataFrame(strand_specific,
+                              compatible,
+                              unique)
+    hits
+  }
+  countIsoformHits <- function(hits) {
+    countByTx <- function(x) {
+      tabulate(subjectHits(hits)[x], subjectLength(hits))
+    }
+    compatible_strand <- 
+      countByTx(with(values(hits), 
+                     compatible & strand_specific))
+    counts <- DataFrame(compatible_strand,
+                        lapply(values(hits)[-1], countByTx))
+    counts
+  }
+
+  summarizeSplices <- function(reads) {
+    splices <- values(reads)$splices
+    splices_flat <- unlist(splices, use.names = FALSE)
+    splice_table <- table(gr2key(splices_flat))
+    splice_summary <- 
+      key2gr(names(splice_table), 
+             score = as.integer(splice_table),
+             novel = !names(splice_table) %in% tx_keys,
+             seqlengths = seqlengths(splices))
+    splice_summary
+  }
+
+  getUniqueReads <- function(reads, hits) {
+    sel <- values(hits)$unique & 
+    subjectHits(hits) %in% c(1, 4)
+    reads[unique(queryHits(hits)[sel])]
+  }
+
+
+  message("Parsing gene structure from txdb...")
+  aldoa_gr <- exons(txdb, vals = list(gene_id = id),
+                    columns = c("tx_id", "gene_id"))
+  aldoa_range <- range(aldoa_gr)
+  wh <- aldoa_range  
+  aldoa_vals <- values(aldoa_gr)
+  tx <- multisplit(aldoa_gr, aldoa_vals$tx_id)
+  tx_to_val <- match(names(tx), unlist(aldoa_vals$tx_id))
+  values(tx)$gene_id <- 
+    rep(unlist(aldoa_vals$gene_id), 
+        elementLengths(aldoa_vals$tx_id))[tx_to_val]
+  values(tx)$tx_id <- names(tx)
+
+  message("Parsing bam files")
+  bamFiles <- Rsamtools::BamFileList(files)
+  bam <- bamFiles[[1]]
+  param <- ScanBamParam(tag = "XS", which = aldoa_range)
+  ga <- readGappedAlignments(path(bam), 
+                             use.names = TRUE, 
+                             param = param)
+
+  reads <- grglist(ga)
+  metadata(reads)$bamfile <- bam
+
+  metadata(reads)$param <- param
+
+  splices <- elementGaps(reads)
+  values(splices)$XS <- values(reads)$XS
+
+  tx_part <- PartitioningByWidth(tx)
+  tx_flat <- unlist(tx, use.names = FALSE)
+
   pairs <- split(unlist(reads, use.names=FALSE),
                  factor(names(reads)[togroup(reads)], 
                         unique(names(reads))))
   metadata(pairs) <- metadata(reads)
+
+
   xs <- values(reads)$XS
   has_xs <- !is.na(xs)
   pair_xs <- setNames(rep.int(NA, length(pairs)), 
                       names(pairs))
   pair_xs[names(reads)[has_xs]] <- xs[has_xs]
   values(pairs)$XS <- unname(pair_xs)
-  pairs
-}  
 
 
-
-strandFromXS <- function(pairs) {
   xs <- values(pairs)$XS
   strand <- ifelse(!is.na(xs) & xs != "?", xs, "*")
   strand(pairs) <- relist(Rle(strand, elementLengths(pairs)), 
                           pairs)
-  pairs
-}
 
-readReadRanges <- function(bam) {
-  param <- ScanBamParam(tag = "XS", which = aldoa_range)
-  ga <- readGappedAlignments(path(bam), 
-                             use.names = TRUE, 
-                             param = param)
-  reads <- grglist(ga)
-  metadata(reads)$bamfile <- bam
-  splices <- elementGaps(reads)
-  values(splices)$XS <- values(reads)$XS
-  pairs <- pairReadRanges(reads)
-  pairs <- strandFromXS(pairs)
+  message("Analysing...")
   splices <- pairReadRanges(splices)
   splices <- strandFromXS(splices)
-  values(pairs)$splices <- splices
-  pairs
-}
-
-gr2key <- function(x) {
-  paste(seqnames(x), start(x), end(x), strand(x), 
-        sep = ":")
-}
 
 
-key2gr <- function(x, ...) {
-  key_mat <- matrix(unlist(strsplit(x, ":", fixed=TRUE)), 
-                    nrow = 4)
-  GRanges(key_mat[1,],
-          IRanges(as.integer(key_mat[2,]), 
-                  as.integer(key_mat[3,])),
-          key_mat[4,], ...)
-}
 
-
-countByTx <- function(x) {
-  tabulate(subjectHits(hits)[x], subjectLength(hits))
-}
-
-findIsoformOverlaps <- function(pairs) {
-  splices <- values(pairs)$splices
   hits <- findOverlaps(pairs, tx)
+
   hit_pairs <- ranges(pairs)[queryHits(hits)]
   hit_splices <- ranges(splices)[queryHits(hits)]
   hit_tx <- ranges(tx)[subjectHits(hits)]
+
   read_within <- 
     elementLengths(setdiff(hit_pairs, hit_tx)) == 0L
   tx_within <- 
     elementLengths(intersect(hit_tx, hit_splices)) == 0L
   compatible <- read_within & tx_within
+
+
   compat_hits <- hits[compatible]
   reads_unique <- tabulate(queryHits(compat_hits), 
                            queryLength(compat_hits)) == 1L
   unique <- logical(length(hits))
   unique[compatible] <- reads_unique[queryHits(compat_hits)]
+
+
   strand_specific <- 
     all(strand(pairs) != "*")[queryHits(hits)]
   values(hits) <- DataFrame(strand_specific,
                             compatible,
                             unique)
-  hits
-}
+
+  values(hits)$spliced <- 
+    (elementLengths(pairs) > 2)[queryHits(hits)]
+
+  introns <- elementGaps(tx)
+  introns_flat <- unlist(introns, use.names = FALSE)
+  tx_keys <- gr2key(introns_flat)
+
+  ## splices_flat <- unlist(splices, use.names = FALSE)
+  ## splice_table <- table(gr2key(splices_flat))
+  ## splice_summary <- 
+  ##   key2gr(names(splice_table), 
+  ##          score = as.integer(splice_table),
+  ##          novel = !names(splice_table) %in% tx_keys,
+  ##          seqlengths = seqlengths(splices))
 
 
-countIsoformHits <- function(hits) {
-  countByTx <- function(x) {
-    tabulate(subjectHits(hits)[x], subjectLength(hits))
+  readReadRanges <- function(bam) {
+    param <- ScanBamParam(tag = "XS", which = aldoa_range)
+    ga <- readGappedAlignments(path(bam), 
+                               use.names = TRUE, 
+                               param = param)
+    reads <- grglist(ga)
+    metadata(reads)$bamfile <- bam
+    splices <- elementGaps(reads)
+    values(splices)$XS <- values(reads)$XS
+    pairs <- pairReadRanges(reads)
+    pairs <- strandFromXS(pairs)
+    splices <- pairReadRanges(splices)
+    splices <- strandFromXS(splices)
+    values(pairs)$splices <- splices
+    pairs
   }
-  compatible_strand <- 
-    countByTx(with(values(hits), 
-                   compatible & strand_specific))
-  counts <- DataFrame(compatible_strand,
-                      lapply(values(hits)[-1], countByTx))
-  counts
+
+  N <- length(bamFiles)
+  nms <- names(bamFiles)
+  lst_hits <- lst_counts <- lst_splices <- lst_rr <- list()
+  message("parsing hits/counts/splcies")
+  for(i in 1:N){
+    bf <- bamFiles[[i]]
+    rr <- readReadRanges(bf)
+    lst_rr <- c(lst_rr, rr)
+    htis <- findIsoformOverlaps(rr)
+    lst_hits <- c(lst_hits, hits)
+    lst_counts <- c(lst_counts, countIsoformHits(hits))
+    lst_splices <- c(lst_splices, summarizeSplices(rr))
+  }
+  names(lst_hits) <- nms
+  names(lst_counts) <- nms
+  names(lst_splices) <- nms
+  names(lst_rr) <- nms
+  ## normal <- readReadRanges(bamFiles)
+  ## tumor <- readReadRanges(bamFiles$tumor)
+  
+  ## normal_hits <- findIsoformOverlaps(normal)
+  ## normal_counts <- countIsoformHits(normal_hits)
+  ## normal_splices <- summarizeSplices(normal)
+
+  ## tumor_hits <- findIsoformOverlaps(tumor)
+  ## tumor_counts <- countIsoformHits(tumor_hits)
+  ## tumor_splices <- summarizeSplices(tumor)
+
+
+###################################################
+### code chunk number 39: combine-samples
+###################################################
+  assays <- do.call(mapply, c(list(cbind), lst_counts, list(SIMPLIFY = FALSE)))
+  ## assays <- mapply(cbind, normal_counts, SIMPLIFY = FALSE)
+  ## assays <- mapply(cbind, normal_counts, tumor_counts, 
+  ##                  SIMPLIFY = FALSE)
+
+  colData <- DataFrame(tumorStatus =  names(bamFiles))
+  rownames(colData) <- colData$tumorStatus
+  se <- SummarizedExperiment(assays, tx, colData)
+
+###################################################
+### code chunk number 40: order-se
+###################################################
+  uc <- assay(se, "unique")
+  uc_ord <- order(rowSums(uc), decreasing = TRUE)
+  uc_top <- uc[head(uc_ord, 2),]
+  ## fisher.test(uc_top)$estimate
+
+###################################################
+### code chunk number 41: get-unique-reads
+###################################################
+  lst_uniq <- lapply(1:N, function(i){
+    getUniqueReads(lst_rr[[i]], lst_hits[[i]])
+  })
+  names(lst_uniq) <- nms
+  ## normal_uniq <- getUniqueReads(normal, normal_hits)
+  ## tumor_uniq <- getUniqueReads(tumor, tumor_hits)
+  both_uniq <- do.call(mstack, lapply(lst_uniq, unlist))
+
+###################################################
+### code chunk number 42: combine-splices
+###################################################
+  lst_uniq_splices <- lapply(lst_uniq, summarizeSplices)
+  names(lst_uniq_splices) <- nms
+  uniq_splices <- do.call(mstack, lst_uniq_splices)
+  all_splices <- do.call(mstack, lst_splices)
+  ## novel_splices <-  all_splices[values(all_splices)$novel &
+  ##                               values(all_splices)$score == 9]
+  ## novel_splices <-  all_splices[values(all_splices)$novel &
+  ##                               values(all_splices)$score == 9]
+  ## uniq_novel_splices <- c(uniq_splices, novel_splices)
+  uniq_novel_splices <- c(uniq_splices, all_splices)
+  both_uniq <- keepSeqlevels(both_uniq, unique(as.character(seqnames(both_uniq))))
+  .wt <- max(width(uniq_novel_splices))/max(coverage(both_uniq))
+  .wt <- as.numeric(.wt)
+  aes.res <- do.call(aes,list(size = substitute(score), 
+                              height = substitute(width/.wt, list(.wt = .wt)),
+                              color = substitute(novel)))
+  message("Constructing splicing graphics....")
+  p.novel <- do.call(geom_arch, c(list(data = uniq_novel_splices,
+                                    ylab = "coverage"), list(aes.res)))
+  p.s <- ggplot() + p.novel + do.call(stat_coverage, list(data = both_uniq, facets = name~.))
+  message("Constructing gene model....")
+  tx_track <- do.call(autoplot, list(object = txdb, which = wh))
+  if(missing(xlim))
+    xlim <- c(start(wh), end(wh))
+  tracks(p.s, tx_track, xlim  = xlim, heights = c(3, 1))
 }

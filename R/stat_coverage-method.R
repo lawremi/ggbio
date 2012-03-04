@@ -8,6 +8,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
 
   if(is.null(geom))
     geom <- "area"
+  data <- keepSeqlevels(data, unique(as.character(seqnames(data))))
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   args$geom <- geom  
   args.aes <- parseArgsForAes(args)
@@ -43,7 +44,6 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
       seqs <- c(seqs[1], seqs, seqs[length(seqs)])
       vals <- c(0, vals, 0)
     }
-
     if(length(unique(values(dt)$.id.name)))                
       res <- data.frame(coverage = vals, seqs = seqs,
                         seqnames =
@@ -57,22 +57,18 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
                                nrow(res))
     res
   })
-
   res <- do.call(rbind, lst)
-  ## df <- fortify(data = res)
-  ## args.aes <- args.aes[!(names(args.aes) %in% c("x", "y"))]
   if(!"y"  %in% names(args.aes))
     args.aes$y <- as.name("coverage")
   
   if(!"x"  %in% names(args.aes))
     args.aes$x <- as.name("seqs")
 
-  ## args.aes <- c(args.aes, list(x = substitute(seqs),
-  ##                      y = substitute(vals)))
   aes <- do.call(aes, args.aes)
   args.res <- c(list(data = res),
                 list(aes),
                 args.non)
+  
   p <- do.call(stat_identity, args.res)
   p <- c(list(p) , list(facet))
   if(!missing(xlab))

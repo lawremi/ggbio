@@ -12,6 +12,8 @@ names(files) <- tools::file_path_sans_ext(basename(files))
 ## 226 is your gene_id in txdb, this will give you a plot of tracks
 res <- ggbio:::splicefun(files, txdb, id = "226")
 
+
+
 ## other ways to just plot gene stucture
 data(genesymbol, package = "biovizBase")
 ## which is a GRanges object to specify a viewd range

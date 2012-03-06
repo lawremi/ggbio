@@ -7,6 +7,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
                                                "(", gene_id,")", sep = "")),
                                                 xlim, facets = NULL){
 
+
   ## need to test facets = gene
   ## if(is.null(geom))
   ##   geom <- "area"
@@ -15,7 +16,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
   if(missing(xlim))
     xlim <- c(start(range(which)),
               end(range(which)))
-  
+
   object <- data
   geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
@@ -23,11 +24,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  ## args.facets <- args.facets[names(args.facets) != "facets"]
   args.non <- args.non[!names(args.non) %in% c("data", "which",
                                                "geom", "names.expr", "xlim", "facets")]
-  ## facet <- .buildFacetsFromArgs(data, args.facets)
-  ## grl <- splitByFacets(data, facets)
 
   if(geom == "gene"){
     message("Aggregating TranscriptDb...")
@@ -47,10 +45,14 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
                          ymin = substitute(stepping - 0.4),
                          ymax = substitute(stepping + 0.4)))
     aes.res <- do.call(aes, args.cds)
+    if(nrow(df.cds)){
     args.cds.res <- c(list(data = df.cds),
                       list(aes.res),
                       args.non)
     p <- list(do.call(ggplot2::geom_rect, args.cds.res))
+  }else{
+    p <- NULL
+  }
     ## utrs
     df.utr <- df[df$type == "utr",]
     args.utr <- args.aes[names(args.aes) != "y"]
@@ -99,7 +101,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
     ## }
     p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
                                 labels = .labels)))
-    p
+   ggplot() +  p
   }
   if(geom == "reduced_gene"){
     message("Aggregating TranscriptDb...")

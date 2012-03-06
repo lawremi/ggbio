@@ -10,8 +10,8 @@ files <- tools::list_files_with_exts(extdatadir, "bam")
 ## need to name your bamfiles
 names(files) <- tools::file_path_sans_ext(basename(files))
 ## 226 is your gene_id in txdb, this will give you a plot of tracks
-res <- ggbio:::splicefun(files, txdb, id = "226")
-
+res <- ggbio:::splicefun(files[1], txdb, id = "226")
+res <- splicefun(files, txdb, id = "226")
 
 
 ## other ways to just plot gene stucture

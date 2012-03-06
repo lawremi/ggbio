@@ -778,7 +778,7 @@ flatGrl <- function(object, indName = "grl_name"){
 
 ## functions downbelow from workshop by Michael Lawrence
 ## will be implmented by into his package, so I will replace this function later
-splicefun <- function(files, txdb, id, xlim){
+splicefun <- function(files, txdb, which, id,  xlim, txdb.chr.pre = character(), weight = 1){
   elementGaps <- function(x) {
     x_flat <- unlist(x, use.names = FALSE)
     egaps <- gaps(ranges(x))
@@ -789,7 +789,6 @@ splicefun <- function(files, txdb, id, xlim){
                    strand, seqlengths = seqlengths(x)), 
            egaps)
   }
-
 
   pairReadRanges <- function(reads) {
     pairs <- split(unlist(reads, use.names=FALSE),
@@ -874,12 +873,16 @@ splicefun <- function(files, txdb, id, xlim){
   summarizeSplices <- function(reads) {
     splices <- values(reads)$splices
     splices_flat <- unlist(splices, use.names = FALSE)
+    if(length(splices_flat)){    
     splice_table <- table(gr2key(splices_flat))
     splice_summary <- 
       key2gr(names(splice_table), 
              score = as.integer(splice_table),
              novel = !names(splice_table) %in% tx_keys,
              seqlengths = seqlengths(splices))
+  }else{
+    splice_summary <- GRanges()
+  }
     splice_summary
   }
 
@@ -889,10 +892,16 @@ splicefun <- function(files, txdb, id, xlim){
     reads[unique(queryHits(hits)[sel])]
   }
 
-
   message("Parsing gene structure from txdb...")
+  if(!missing(id)){
   aldoa_gr <- exons(txdb, vals = list(gene_id = id),
                     columns = c("tx_id", "gene_id"))
+  aldoa_gr <- keepSeqlevels(aldoa_gr, unique(as.character(seqnames(aldoa_gr))))
+  ## FIXME later
+  nms <- as.character(names(seqlengths(aldoa_gr)))
+  nms.new <- paste(txdb.chr.pre, nms, sep = "")
+  names(nms.new) <- nms
+  aldoa_gr <- renameSeqlevels(aldoa_gr, nms.new)
   aldoa_range <- range(aldoa_gr)
   wh <- aldoa_range  
   aldoa_vals <- values(aldoa_gr)
@@ -902,49 +911,82 @@ splicefun <- function(files, txdb, id, xlim){
     rep(unlist(aldoa_vals$gene_id), 
         elementLengths(aldoa_vals$tx_id))[tx_to_val]
   values(tx)$tx_id <- names(tx)
+}else if(!missing(which) & is(which, "GRanges")){
+    isActiveSeq(txdb)[seqlevels(txdb)] <- FALSE
+    seqnms <- as.character(unique(seqnames(which)))
+    seqnms <- gsub(txdb.chr.pre, "", seqnms)
+    isActiveSeq(txdb)[seqnms] <- TRUE
+    ## aldoa_gr <- exons(txdb, columns = c("tx_id", "gene_id"))
+    ## aldoa_gr <- keepSeqlevels(aldoa_gr, unique(as.character(seqnames(aldoa_gr))))
+    ## nms <- as.character(names(seqlengths(aldoa_gr)))
+    ## nms.new <- paste(txdb.chr.pre, nms, sep = "")
+    ## names(nms.new) <- nms
+    ## aldoa_gr <- renameSeqlevels(aldoa_gr, nms.new)
+    ## aldoa_gr <- subsetByOverlaps(aldoa_gr, which)
+    ## aldoa_range <- range(aldoa_gr)
+    aldoa_range <- which
+    exons_grl <- exonsBy(txdb)
+    gr.l <- stack(exons_grl, ".sample")
+    gr.l <- keepSeqlevels(gr.l, unique(as.character(seqnames(gr.l))))
+    nms <- as.character(names(seqlengths(gr.l)))
+    nms.new <- paste(txdb.chr.pre, nms, sep = "")
+    names(nms.new) <- nms
+    gr.l <- renameSeqlevels(gr.l, nms.new)
+      exons_grl <- split(gr.l, values(gr.l)$.sample)
+     ans <- subsetByOverlaps(exons_grl, which)
+    values(ans)$tx_id <- names(ans)
+    tx_gr <- transcripts(txdb, columns = c("tx_id", "gene_id"))
+    values(ans)$gene_id <- 
+      drop(values(tx_gr)$gene_id)[match(names(ans), 
+                                        values(tx_gr)$tx_id)]
+    tx <- ans
+    ## wh <- aldoa_range
+    ## aldoa_vals <- values(aldoa_gr)
+    ## tx <- multisplit(aldoa_gr, aldoa_vals$tx_id)
+    ## tx_to_val <- match(names(tx), unlist(aldoa_vals$tx_id))
+    ## values(tx)$gene_id <- 
+    ##   rep(unlist(aldoa_vals$gene_id), 
+    ##       elementLengths(aldoa_vals$tx_id))[tx_to_val]
+    ## values(tx)$tx_id <- names(tx)
+}
 
   message("Parsing bam files")
   bamFiles <- Rsamtools::BamFileList(files)
-  bam <- bamFiles[[1]]
-  param <- ScanBamParam(tag = "XS", which = aldoa_range)
-  ga <- readGappedAlignments(path(bam), 
-                             use.names = TRUE, 
-                             param = param)
+  ## bam <- bamFiles[[1]]
+  ## param <- ScanBamParam(tag = "XS", which = aldoa_range)
+  ## ga <- readGappedAlignments(path(bam), 
+  ##                            use.names = TRUE, 
+  ##                            param = param)
+  ## browser()
+  ## reads <- grglist(ga)
+  ## metadata(reads)$bamfile <- bam
 
-  reads <- grglist(ga)
-  metadata(reads)$bamfile <- bam
+  ## metadata(reads)$param <- param
 
-  metadata(reads)$param <- param
-
-  splices <- elementGaps(reads)
-  values(splices)$XS <- values(reads)$XS
-
-  tx_part <- PartitioningByWidth(tx)
-  tx_flat <- unlist(tx, use.names = FALSE)
-
-  pairs <- split(unlist(reads, use.names=FALSE),
-                 factor(names(reads)[togroup(reads)], 
-                        unique(names(reads))))
-  metadata(pairs) <- metadata(reads)
+  ## splices <- elementGaps(reads)
+  ## values(splices)$XS <- values(reads)$XS
 
 
-  xs <- values(reads)$XS
-  has_xs <- !is.na(xs)
-  pair_xs <- setNames(rep.int(NA, length(pairs)), 
-                      names(pairs))
-  pair_xs[names(reads)[has_xs]] <- xs[has_xs]
-  values(pairs)$XS <- unname(pair_xs)
+  ## tx_part <- PartitioningByWidth(tx)
+  ## tx_flat <- unlist(tx, use.names = FALSE)
 
-
-  xs <- values(pairs)$XS
-  strand <- ifelse(!is.na(xs) & xs != "?", xs, "*")
-  strand(pairs) <- relist(Rle(strand, elementLengths(pairs)), 
-                          pairs)
-
+  ## pairs <- split(unlist(reads, use.names=FALSE),
+  ##                factor(names(reads)[togroup(reads)], 
+  ##                       unique(names(reads))))
+  ## metadata(pairs) <- metadata(reads)
+  ## xs <- values(reads)$XS
+  ## has_xs <- !is.na(xs)
+  ## pair_xs <- setNames(rep.int(NA, length(pairs)), 
+  ##                     names(pairs))
+  ## pair_xs[names(reads)[has_xs]] <- xs[has_xs]
+  ## values(pairs)$XS <- unname(pair_xs)
+  ## xs <- values(pairs)$XS
+  ## strand <- ifelse(!is.na(xs) & xs != "?", xs, "*")
+  ## strand(pairs) <- relist(Rle(strand, elementLengths(pairs)), 
+  ##                         pairs)
   message("Analysing...")
-  splices <- pairReadRanges(splices)
-  splices <- strandFromXS(splices)
-
+  ## splices <- pairReadRanges(splices)
+  ## splices <- strandFromXS(splices)
 
 
   ## hits <- findOverlaps(pairs, tx)
@@ -988,7 +1030,6 @@ splicefun <- function(files, txdb, id, xlim){
   ##          novel = !names(splice_table) %in% tx_keys,
   ##          seqlengths = seqlengths(splices))
 
-
   readReadRanges <- function(bam) {
     param <- ScanBamParam(tag = "XS", which = aldoa_range)
     ga <- readGappedAlignments(path(bam), 
@@ -1005,6 +1046,7 @@ splicefun <- function(files, txdb, id, xlim){
     values(pairs)$splices <- splices
     pairs
   }
+
 
   N <- length(bamFiles)
   nms <- names(bamFiles)
@@ -1042,7 +1084,6 @@ splicefun <- function(files, txdb, id, xlim){
   ## assays <- mapply(cbind, normal_counts, SIMPLIFY = FALSE)
   ## assays <- mapply(cbind, normal_counts, tumor_counts, 
   ##                  SIMPLIFY = FALSE)
-
   colData <- DataFrame(tumorStatus =  names(bamFiles))
   rownames(colData) <- colData$tumorStatus
   se <- SummarizedExperiment(assays, tx, colData)
@@ -1080,17 +1121,30 @@ splicefun <- function(files, txdb, id, xlim){
   ## uniq_novel_splices <- c(uniq_splices, novel_splices)
   uniq_novel_splices <- c(uniq_splices, all_splices)
   both_uniq <- keepSeqlevels(both_uniq, unique(as.character(seqnames(both_uniq))))
-  .wt <- max(width(uniq_novel_splices))/max(coverage(both_uniq))
+  .wt <- max(width(uniq_novel_splices))/max(coverage(both_uniq)) * weight
   .wt <- as.numeric(.wt)
   aes.res <- do.call(aes,list(size = substitute(score), 
                               height = substitute(width/.wt, list(.wt = .wt)),
                               color = substitute(novel)))
+
   message("Constructing splicing graphics....")
+  uniq_novel_splices
   p.novel <- do.call(geom_arch, c(list(data = uniq_novel_splices,
-                                    ylab = "coverage"), list(aes.res)))
+                                    ylab = "coverage",
+                                       rect.height = 0), list(aes.res)))
   p.s <- ggplot() + p.novel + do.call(stat_coverage, list(data = both_uniq, facets = name~.))
   message("Constructing gene model....")
-  tx_track <- do.call(autoplot, list(object = txdb, which = wh))
+  if(length(txdb.chr.pre))
+    wh <- GRanges(gsub(txdb.chr.pre, "", as.character(seqnames(wh))),
+                  ranges(wh))
+  ## browser()
+  tx_un <- stack(tx, ".sample")
+  tx_cur <- keepSeqlevels(tx_un, unique(as.character(seqnames(tx_un))))
+  tx_cur <- tx_cur[, setdiff(colnames(values(tx_cur)), c("tx_id", "gene_id"))]
+  tx_cur <- split(tx_cur, values(tx_cur)$.sample)
+  tx_track <- do.call(autoplot, list(object = tx_cur, geom = "alignment", ylab = ""))
+  ## tx_track <- autoplot(tx_16, geom = "alignment", ylab = "")
+  ## tx_track <- do.call(autoplot, list(object = txdb, which = wh))
   if(missing(xlim))
     xlim <- c(start(wh), end(wh))
   tracks(p.s, tx_track, xlim  = xlim, heights = c(3, 1))

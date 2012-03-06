@@ -825,14 +825,6 @@ splicefun <- function(files, txdb, which, id,  xlim, txdb.chr.pre = character(),
                     as.integer(key_mat[3,])),
             key_mat[4,], ...)
   }
-  ## countByTx <- function(x) {
-  ##   tabulate(subjectHits(hits)[x], subjectLength(hits))
-  ## }
-  ## compatible_strand <- 
-  ##   countByTx(with(values(hits), 
-  ##                  compatible & strand_specific))
-  ## counts <- DataFrame(compatible_strand,
-  ##                     lapply(values(hits)[-1], countByTx))
   findIsoformOverlaps <- function(pairs) {
     splices <- values(pairs)$splices
     hits <- findOverlaps(pairs, tx)
@@ -952,83 +944,11 @@ splicefun <- function(files, txdb, which, id,  xlim, txdb.chr.pre = character(),
 
   message("Parsing bam files")
   bamFiles <- Rsamtools::BamFileList(files)
-  ## bam <- bamFiles[[1]]
-  ## param <- ScanBamParam(tag = "XS", which = aldoa_range)
-  ## ga <- readGappedAlignments(path(bam), 
-  ##                            use.names = TRUE, 
-  ##                            param = param)
-  ## browser()
-  ## reads <- grglist(ga)
-  ## metadata(reads)$bamfile <- bam
 
-  ## metadata(reads)$param <- param
-
-  ## splices <- elementGaps(reads)
-  ## values(splices)$XS <- values(reads)$XS
-
-
-  ## tx_part <- PartitioningByWidth(tx)
-  ## tx_flat <- unlist(tx, use.names = FALSE)
-
-  ## pairs <- split(unlist(reads, use.names=FALSE),
-  ##                factor(names(reads)[togroup(reads)], 
-  ##                       unique(names(reads))))
-  ## metadata(pairs) <- metadata(reads)
-  ## xs <- values(reads)$XS
-  ## has_xs <- !is.na(xs)
-  ## pair_xs <- setNames(rep.int(NA, length(pairs)), 
-  ##                     names(pairs))
-  ## pair_xs[names(reads)[has_xs]] <- xs[has_xs]
-  ## values(pairs)$XS <- unname(pair_xs)
-  ## xs <- values(pairs)$XS
-  ## strand <- ifelse(!is.na(xs) & xs != "?", xs, "*")
-  ## strand(pairs) <- relist(Rle(strand, elementLengths(pairs)), 
-  ##                         pairs)
   message("Analysing...")
-  ## splices <- pairReadRanges(splices)
-  ## splices <- strandFromXS(splices)
-
-
-  ## hits <- findOverlaps(pairs, tx)
-
-  ## hit_pairs <- ranges(pairs)[queryHits(hits)]
-  ## hit_splices <- ranges(splices)[queryHits(hits)]
-  ## hit_tx <- ranges(tx)[subjectHits(hits)]
-
-  ## read_within <- 
-  ##   elementLengths(setdiff(hit_pairs, hit_tx)) == 0L
-  ## tx_within <- 
-  ##   elementLengths(intersect(hit_tx, hit_splices)) == 0L
-  ## compatible <- read_within & tx_within
-
-
-  ## compat_hits <- hits[compatible]
-  ## reads_unique <- tabulate(queryHits(compat_hits), 
-  ##                          queryLength(compat_hits)) == 1L
-  ## unique <- logical(length(hits))
-  ## unique[compatible] <- reads_unique[queryHits(compat_hits)]
-
-
-  ## strand_specific <- 
-  ##   all(strand(pairs) != "*")[queryHits(hits)]
-  ## values(hits) <- DataFrame(strand_specific,
-  ##                           compatible,
-  ##                           unique)
-
-  ## values(hits)$spliced <- 
-  ##   (elementLengths(pairs) > 2)[queryHits(hits)]
-
   introns <- elementGaps(tx)
   introns_flat <- unlist(introns, use.names = FALSE)
   tx_keys <- gr2key(introns_flat)
-
-  ## splices_flat <- unlist(splices, use.names = FALSE)
-  ## splice_table <- table(gr2key(splices_flat))
-  ## splice_summary <- 
-  ##   key2gr(names(splice_table), 
-  ##          score = as.integer(splice_table),
-  ##          novel = !names(splice_table) %in% tx_keys,
-  ##          seqlengths = seqlengths(splices))
 
   readReadRanges <- function(bam) {
     param <- ScanBamParam(tag = "XS", which = aldoa_range)
@@ -1114,12 +1034,14 @@ splicefun <- function(files, txdb, which, id,  xlim, txdb.chr.pre = character(),
   names(lst_uniq_splices) <- nms
   uniq_splices <- do.call(mstack, lst_uniq_splices)
   all_splices <- do.call(mstack, lst_splices)
+  novel_splices <- all_splices[values(all_splices)$novel]
   ## novel_splices <-  all_splices[values(all_splices)$novel &
   ##                               values(all_splices)$score == 9]
   ## novel_splices <-  all_splices[values(all_splices)$novel &
   ##                               values(all_splices)$score == 9]
   ## uniq_novel_splices <- c(uniq_splices, novel_splices)
-  uniq_novel_splices <- c(uniq_splices, all_splices)
+  ## uniq_novel_splices <- c(uniq_splices, all_splices)
+  uniq_novel_splices <- c(uniq_splices, novel_splices)  
   both_uniq <- keepSeqlevels(both_uniq, unique(as.character(seqnames(both_uniq))))
   .wt <- max(width(uniq_novel_splices))/max(coverage(both_uniq)) * weight
   .wt <- as.numeric(.wt)
@@ -1128,7 +1050,6 @@ splicefun <- function(files, txdb, which, id,  xlim, txdb.chr.pre = character(),
                               color = substitute(novel)))
 
   message("Constructing splicing graphics....")
-  uniq_novel_splices
   p.novel <- do.call(geom_arch, c(list(data = uniq_novel_splices,
                                     ylab = "coverage",
                                        rect.height = 0), list(aes.res)))

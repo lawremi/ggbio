@@ -12,7 +12,7 @@ Authors:
 
 Thanks Jennifer for the arches geom development.
 
-Thanks Prof. Robert Gentleman and [Genentech](http://www.gene.com/) for generous sponsorship!
+Thanks [Prof. Robert Gentleman](http://www.gene.com/gene/gred/people/robertgentleman.php) and [Genentech](http://www.gene.com/) for generous sponsorship!
 
 ### Bug report
 For any issues please contact yintengfei at gmail.com or file a issue in

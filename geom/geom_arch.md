@@ -7,7 +7,7 @@ title: geom_arch
 
 
 ### Introduction
-**geom_arch** is lower level API for creating arches for interval data,
+`geom_arch` is lower level API for creating arches for interval data,
 such as *GRanges* object. It could be used for showing splicing events or any
 defined interactions in linear view.
 
@@ -18,6 +18,7 @@ Iowa state univeristy, who initialize the first visualization of arches in
 ### Objects
   * *GRanges*
   * *data.frame* 
+  
 ### Usage
   upcomming
   
@@ -60,11 +61,11 @@ get gaps intervals to show the links between exons.
 ggplot() + geom_arch(gr)
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-2](http://i.imgur.com/Dw2aU.png) 
+![plot of chunk unnamed-chunk-2](http://i.imgur.com/mkypP.png) 
 
 
 Facetting and aesthetics mapping are supported, make sure you put your
-aesthetics mapping in constructor **aes()**, and those variables are not quoted.
+aesthetics mapping in constructor `aes()`, and those variables are not quoted.
 
 
 
@@ -76,7 +77,7 @@ ggplot() + geom_arch(gr, aes(color = value, height = value,
     size = value), alpha = 0.2, facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-3](http://i.imgur.com/Nbraa.png) 
+![plot of chunk unnamed-chunk-3](http://i.imgur.com/N8ESX.png) 
 
 
 

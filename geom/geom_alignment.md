@@ -7,11 +7,12 @@ title: geom_alignment
 
 
 ### Introduction
-**geom_alignment** is lower level API for creating alignemtns for interval data,
+`geom_alignment` is lower level API for creating alignemtns for interval data,
 such as *GRanges*  and even more native *GRangesList* object. 
 
 ### Objects
   * *GRanges*
+  
 ### Usage
   upcomming
   
@@ -59,11 +60,11 @@ plotting, it's a very rough exploration as first step for some interval data.
 ggplot() + geom_alignment(gr)
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-2](http://i.imgur.com/W936Y.png) 
+![plot of chunk unnamed-chunk-2](http://i.imgur.com/kmNZp.png) 
 
 
 Facetting and aesthetics mapping are supported, make sure you put your
-aesthetics mapping in constructor **aes()**, and those variables are not quoted.
+aesthetics mapping in constructor `aes()`, and those variables are not quoted.
 
 
 
@@ -75,7 +76,7 @@ ggplot() + geom_alignment(gr, facets = sample ~
     seqnames, aes(color = strand, fill = strand))
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-3](http://i.imgur.com/XpbSb.png) 
+![plot of chunk unnamed-chunk-3](http://i.imgur.com/dQGax.png) 
 
 
 Group your interval based on some other variable, here is simulated "pair"
@@ -92,7 +93,7 @@ names showing as y labels.
 ggplot() + geom_alignment(gr, aes(group = pair))
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-4](http://i.imgur.com/XS9Cm.png) 
+![plot of chunk unnamed-chunk-4](http://i.imgur.com/6a6Tx.png) 
 
 
 Group your interval based on some other variable, here is simulated "pair"
@@ -108,7 +109,7 @@ ggplot() + geom_alignment(gr, aes(group = pair),
     group.selfish = FALSE)
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-5](http://i.imgur.com/G4Yf7.png) 
+![plot of chunk unnamed-chunk-5](http://i.imgur.com/ptP6p.png) 
 
 
 We allow you to change main geoms and gaps geoms too, you can always use
@@ -124,7 +125,7 @@ ggplot() + geom_alignment(gr, main.geom = "arrowrect",
     gap.geom = "arrow")
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-6](http://i.imgur.com/Hd751.png) 
+![plot of chunk unnamed-chunk-6](http://i.imgur.com/lARLW.png) 
 
 
 

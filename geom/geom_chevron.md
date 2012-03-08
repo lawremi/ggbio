@@ -7,7 +7,7 @@ title: geom_chevron
 
 
 ### Introduction
-**geom_chevron** is lower level API for creating chevrons for interval data,
+`geom_chevron` is lower level API for creating chevrons for interval data,
 such as *GRanges* object, it could be used to visuzalize introns or splicing. 
 
 ### Objects
@@ -42,7 +42,7 @@ gr <- GRanges(seqnames = sample(c("chr1", "chr2",
 
 
 
-Default **stat** is still "stepping"
+Default `stat` is still "stepping"
 
 
 
@@ -50,13 +50,13 @@ Default **stat** is still "stepping"
 ggplot() + geom_chevron(gr)
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-2](http://i.imgur.com/EIHw8.png) 
+![plot of chunk unnamed-chunk-2](http://i.imgur.com/qUcQn.png) 
 
 
 
 But most time, **chevron** is going to be used together with other geoms to
 create a slightly complex new "geom", in this case, we need the flexibility to
-allow a customized y value by using **stat** "identity".
+allow a customized y value by using `stat` "identity".
 
 
 
@@ -65,4 +65,4 @@ ggplot() + geom_chevron(gr, stat = "identity",
     aes(y = value))
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-3](http://i.imgur.com/T9c5X.png) 
+![plot of chunk unnamed-chunk-3](http://i.imgur.com/yZELz.png) 

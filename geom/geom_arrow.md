@@ -7,11 +7,12 @@ title: geom_arrow
 
 
 ### Introduction
-**geom_arrow** is lower level API for creating small arrows for interval data,
+`geom_arrow` is lower level API for creating small arrows for interval data,
 such as *GRanges* object.
 
 ### Objects
   * *GRanges*
+  
 ### Usage
   upcomming
   
@@ -41,14 +42,14 @@ gr <- GRanges(seqnames = sample(c("chr1", "chr2",
 
 
 
-Default **stat** is "stepping". 
+Default `stat` is "stepping". 
 
 
 {% highlight r %}
 ggplot() + geom_arrow(gr)
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-2](http://i.imgur.com/dIqoX.png) 
+![plot of chunk unnamed-chunk-2](http://i.imgur.com/r6kJN.png) 
 
 
 Faceting and aesthetics mapping
@@ -59,10 +60,10 @@ ggplot() + geom_arrow(gr, facets = sample ~ seqnames,
     color = "red")
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-3](http://i.imgur.com/3YIWf.png) 
+![plot of chunk unnamed-chunk-3](http://i.imgur.com/Zy8ac.png) 
 
 
-**stat** "identity" allows you assign customized y value.
+`stat = "identity"` allows you assign customized `y` value.
 
 
 {% highlight r %}
@@ -70,4 +71,4 @@ ggplot() + geom_arrow(gr, stat = "identity", aes(x = start,
     y = value, xend = end, yend = value))
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-4](http://i.imgur.com/uIybF.png) 
+![plot of chunk unnamed-chunk-4](http://i.imgur.com/Zife4.png) 

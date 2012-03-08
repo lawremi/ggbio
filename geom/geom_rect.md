@@ -55,7 +55,7 @@ plotting, it's a very rough exploration as first step for some interval data.
 ggplot() + geom_rect(gr)
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-2](http://i.imgur.com/NYceA.png) 
+![plot of chunk unnamed-chunk-2](http://i.imgur.com/1x1F0.png) 
 
 
 Facetting and aesthetics mapping are supported, make sure you put your
@@ -71,7 +71,7 @@ ggplot() + geom_rect(gr, facets = sample ~ seqnames,
     aes(color = strand, fill = strand))
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-3](http://i.imgur.com/kKllM.png) 
+![plot of chunk unnamed-chunk-3](http://i.imgur.com/5Hwro.png) 
 
 
 Stat "identity" allows you to specify a y value to use as y-axis instead of
@@ -86,7 +86,7 @@ default stepping level.
 ggplot() + geom_rect(gr, stat = "identity", aes(y = value))
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-4](http://i.imgur.com/vKlYp.png) 
+![plot of chunk unnamed-chunk-4](http://i.imgur.com/YcWcP.png) 
 
 
 **Group** make sure grouped intervals are on the same levels when stat =
@@ -103,7 +103,7 @@ ggplot() + geom_rect(gr, stat = "stepping", aes(y = value,
     group = pair))
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-5](http://i.imgur.com/tyMnq.png) 
+![plot of chunk unnamed-chunk-5](http://i.imgur.com/5pk5M.png) 
 
 
 **group.selfish** force the grouped intervals to take unique stepping level,
@@ -111,6 +111,6 @@ ggplot() + geom_rect(gr, stat = "stepping", aes(y = value,
   it's disabled, the y-label will be automatically hided to avoid overlapped
   group labels as y axis.
 
-![plot of chunk unnamed-chunk-6](http://i.imgur.com/LSF6D.png) 
+![plot of chunk unnamed-chunk-6](http://i.imgur.com/wVkyF.png) 
 
 

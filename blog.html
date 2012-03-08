@@ -1,0 +1,27 @@
+---
+layout: base
+title: Blog
+---
+{% for page in site.categories.blog limit:5 %}
+<div class="row entry">
+	<div class="post-meta column grid_2">
+		{% include meta.html %}
+	</div>
+	<div class="column grid_7">
+		<div class="entry content">
+			<h2>
+				<a href="{{ page.url }}" title="{{ page.title }}"> 
+					{{ page.title }}
+				</a>
+			</h2>
+			<p>{{ page.excerpt }} <a href="{{ page.url }}">Read the whole post&nbsp;&raquo;</a></p>
+		</div>
+	</div>
+</div>
+{% endfor %}
+<div class="row">
+	<div class="column grid_2">&nbsp;</div>
+	<div class="column grid_7">
+		<p class="archive-link"><a href="/archive/">Older posts &raquo;</a></p>
+	</div>
+</div>

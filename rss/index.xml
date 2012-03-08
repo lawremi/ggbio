@@ -1,0 +1,30 @@
+---
+layout: nil
+---
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>Mike West</title>
+    <link rel="alternate" type="text/html" href="http://mikewest.org/" />
+    <link rel="self" type="application/atom+xml" href="http://feeds.mikewest.org/mikewest/" />
+    <id>http://mikewest.org/</id>
+    <author>
+        <name>Mike West</name>
+        <uri>http://mikewest.org/</uri>
+        <email>mike@mikewest.org</email>
+    </author>
+{% for post in site.posts limit:10 %}
+    {% if forloop.first %}
+    <updated>{{ post.date | date_to_xmlschema }}</updated>
+    {% endif %}
+    <entry>
+        <title type='text'>{{ post.title }}</title>
+        <link rel="alternate" href="http://mikewest.org{{ post.url }}" />
+        <id>http://mikewest.org{{ post.id }}</id>
+        <updated>{{ post.date | date_to_xmlschema }}</updated>
+        <published>{{ post.date | date_to_xmlschema }}</published>
+        <content type='html'>
+{{ post.content | xml_escape }}
+</content>
+    </entry>
+{% endfor %}
+</feed>

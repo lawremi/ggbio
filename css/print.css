@@ -1,0 +1,66 @@
+/* @override http://localhost:4000/css/print.css */
+
+body {
+	background: white;
+}
+
+#header {
+	text-align: left;
+	background: none;
+	text-shadow: none;
+	height: auto;
+	border-bottom: 1px solid #999;
+}
+
+#header a, #header h2 {
+	color: #999;
+}
+
+#wrapper {
+	margin: 0 auto;
+}
+
+#wrapper p {
+	font-size: 12pt;
+}
+
+#navbar-wrapper {
+	display: none;
+}
+
+#wrapper a:link:after {
+	content: " (" attr(href) ") ";
+	font-size: 8pt;
+}
+
+#footer-inner-wrapper {
+	background: none;
+}
+
+#footer, #footer a {
+	color: #999;
+	text-shadow: none;
+	background: none;
+}
+
+#footer-wrapper .online {
+	display: none;
+}
+
+#footer-wrapper {
+	background: none;
+	border-top: 1px solid #999;
+}
+
+.copyright {
+	text-align: left;
+}
+
+#print-message {
+	display: block;
+	text-align: left;
+}
+
+#disqus_thread {
+	page-break-before: always;
+}

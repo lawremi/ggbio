@@ -1,0 +1,21 @@
+---
+layout: portfolio
+title: HBLL Multimedia Lab
+category: portfolio
+permalink: /portfolio/test-project/
+thumb: /images/mmlab-thumb.png
+full: /images/mmlab-full.png
+link: https://mmlab.lib.byu.edu/mmlab/
+type: web
+details:
+- PHP/MySQL
+- Custom CMS
+- Uses pdftk-php to generate dynamic PDFs
+- Hooks into university authentication system
+---
+
+For most of my undergraduate years at BYU I worked at the Harold B. Lee Library Multimedia Lab. The Multimedia Lab was an incredibly unique library feature—rather than provide basic computer lab services like word processing, database searching, and printing, the Multimedia Lab had ten quad core Mac Pros set aside for video editing and graphic design. It had several video cameras and digital voice recorders available for checkout and offered regular classes to teach the general public how to use powerful programs like Final Cut Pro, AfterEffects, and the Adobe Creative Suite. 
+
+Because our lab had so much going on—equipment checkouts, class scheduling, computer reservations—it was really hard to keep track of everything. For a long time we kept records with a fragile Excel file and several huge binders full of legal loan agreement forms (for checking out the expensive stuff). I took the initiative to simplify and streamline everything, and during the summer of 2008, I completed this massive site. It was my first full-blown web app, designed in-browser and coded in PHP and MySQL.
+
+Beyond displaying basic information about the lab itself, the site allows patrons to log in using their university ID and digitally sign their loan agreement forms. The system can later serve a PDF version of their agreement using [`pdftk-php`](http://github.com/andrewheiss/pdftk-php "andrewheiss's pdftk-php at master - GitHub"), an open-source PHP class I developed [specifically for this project](http://www.andrewheiss.com/blog/2007/10/06/populating-a-livecycle-pdf-with-php-and-mysql/ "Populating a LiveCycle PDF with PHP and MySQL | Andrew Heiss.com"). The site also uses a custom CMS to manage the details of all the classes the lab offers. 

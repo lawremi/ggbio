@@ -1,0 +1,25 @@
+---
+layout: archive
+title: Archive
+excerpt: A listing of all the posts at AndrewHeiss.com
+---
+
+{% assign first = true %}
+{% for post in site.categories.blog %}
+{% capture post_year %}{{ post.date | date: '%Y' }}{% endcapture %}
+  {% if next_year == nil or post_year != next_year %}
+	{% unless first == true %}
+	</ul>
+	{% endunless %}
+    <h3>{{ post_year }}</h3>
+	<ul>
+  {% endif %}
+	{% assign first = false %}
+		<li>
+			<span class="faux grid_2">{{ post.date | date: '%B %e' }}</span> 
+			<span class="faux grid_7">
+				<a href="{{ post.url }}">{{ post.title }}</a> <span class="comment-archive">(<a class="disqus-comment-count" href="http://www.andrewheiss.com{{ post.url }}#disqus_thread">comments</a>)</span>
+			</span>
+		</li>
+{% assign next_year = post_year %}{% endfor %}
+	</ul>

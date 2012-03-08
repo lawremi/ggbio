@@ -1,0 +1,29 @@
+RewriteEngine On
+ 
+# Map http://www.andrewheiss.com to /jekyll.
+RewriteRule ^$ /jekyll/ [L]
+ 
+# Map http://www.andrewheiss.com/x to /jekyll/x unless there is a x in the web root.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/jekyll/
+RewriteRule ^(.*)$ /jekyll/$1
+
+# For NFSN
+# Add trailing slash to directories within jekyll
+# This does not expose the internal URL.
+RewriteCond %{SCRIPT_FILENAME} -d
+RewriteRule ^jekyll/(.*[^/])$ http://www.andrewheiss.com/$1/ [R=301]
+
+# Not for NFSN 
+# Add trailing slash to directories without them so DirectoryIndex works.
+# This does not expose the internal URL.
+# RewriteCond %{REQUEST_FILENAME} -d
+# RewriteCond %{REQUEST_FILENAME} !/$
+# RewriteRule ^(.*)$ $1/
+
+# Also not for NFSN
+# Disable auto-adding slashes to directories without them, since this happens
+# after mod_rewrite and exposes the rewritten internal URL, e.g. turning
+# http://www.andrewheiss.com/about into http://www.andrewheiss.com/jekyll/about.
+# DirectorySlash off

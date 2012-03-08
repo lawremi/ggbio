@@ -1,0 +1,44 @@
+---
+layout: base
+---
+
+<div id="portfolio-entry">
+	<div class="row">
+		<div class="column grid_7">
+			<h2>{{ page.title }}</h2>
+		</div>
+		<div class="port-breadcrumb column grid_2">
+			<p><a href="/portfolio/">&laquo; Back to portfolio</a></p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="column grid_6">
+			{% if page.link %}
+			<a href="{{ page.link }}" title="{{ page.title }}"><img src="{{ page.full }}" alt="{{ page.title }}" class="captify" /></a>
+			{% else %}
+			<img src="{{ page.full }}" alt="{{ page.title }}" class="captify" />
+			{% endif %}
+		</div>
+		<div class="project-meta column grid_3">
+			<h3>{{ page.date | date: '%B %Y' }}</h3>
+			
+			{% if page.link %}
+			<h4><a href="{{ page.link }}" title="{{ page.title }}">Visit live</a></h4>
+			{% endif %}
+			
+			{% if page.details %}
+			<h4>Quick details</h4>
+			<ul>
+				{% for detail in page.details %}
+				<li>{{ detail | markdownify }}</li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+		</div>
+	</div>
+	<div class="row">
+		<div class="project-desc column grid_9">
+			{{ content }}
+		</div>
+	</div>
+</div>

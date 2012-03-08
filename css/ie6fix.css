@@ -1,0 +1,5 @@
+*a{position:relative;}
+
+#navbar-wrapper, #footer-inner-wrapper, #footer {
+	behavior: url(/css/iepngfix.htc);
+}

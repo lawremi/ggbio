@@ -1,0 +1,18 @@
+<p class="byline">
+	By <a rel="author" href="/about/">Andrew Heiss</a><br />
+	<span class="date" title="{{ page.date | date_to_xmlschema }}">
+		<span class="month">{{ page.date | date: '%B' }}</span>
+		<span class="date">{{ page.date | date: '%e' }}, </span>
+		<span class="year">{{ page.date | date: '%Y' }}</span>
+	</span>
+</p>
+
+{% if page.tags != empty %}
+<p>Tagged as:
+	{% for tag in page.tags | sort %}
+	<a href="/tag/#{{tag | downcase | slugify }}" class="tag">{{tag | downcase}}</a>{% unless forloop.last %}, {% endunless %}
+	{% endfor %}
+</p>
+{% endif %}
+
+<p><a class="disqus-comment-count" href="http://www.andrewheiss.com{{ page.url }}#disqus_thread">comments</a></p>

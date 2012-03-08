@@ -1,0 +1,30 @@
+---
+layout: archive
+title: Tags
+---
+
+<ul id="tag-list">
+{% for tag in site.tags %}
+  <li><a href="#{{ tag | first | downcase | slugify }}">{{ tag | first }}</a></li>
+{% endfor %}
+</ul>
+
+{% assign first = true %}
+{% for tag in site.tags %}
+	{% unless first == true %}
+	</ul>
+	{% endunless %}
+  <h3 id="{{ tag | first | downcase | slugify }}">{{ tag | first}} <a href="#" class="top" title="Back to top">&uarr;</a></h3>
+    <ul>
+    {% for posts in tag %}
+      {% for post in posts %}
+        <li>
+			<span class="faux grid_2">{{ post.date | date: '%b %e, %Y' }}</span> 
+			<span class="faux grid_7">
+				<a href="{{ post.url }}">{{ post.title }}</a>
+			</span>
+		</li>
+      {% endfor %}
+    {% endfor %}{% assign first = false %}
+{% endfor %}
+</ul>

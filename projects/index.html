@@ -1,0 +1,21 @@
+---
+layout: base
+title: Home
+---
+{% for p in site.categories.projects %}
+<div class="row">
+	<div class="post-meta column grid_2">
+		{% include meta.html %}
+	</div>
+	<div class="column grid_7">
+		<div class="entry content">
+			<h2>
+				<a href="{{ p.url }}" title="{{ p.title }}"> 
+					{{ p.title }}
+				</a>
+			</h2>
+			{{ p.excerpt }} <a href="{{ p.url }}">Read the rest&nbsp;&raquo;</a>
+		</div>
+	</div>
+</div>
+{% endfor %}

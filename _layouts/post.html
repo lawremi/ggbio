@@ -1,0 +1,17 @@
+---
+layout: base
+---
+<div class="row">
+	<div class="post-meta column grid_2">
+		{% include meta.html %}
+	</div>
+	<div class="column grid_7">
+		<div class="entry content">
+			<h2>{{ page.title }}</h2>
+			<div id="page-content">
+			{{ content }}
+			</div>
+			<div id="comments"><div id="disqus_thread"></div><a href="http://disqus.com" class="dsq-brlink">Discuss this post on <span class="logo-disqus">Disqus</span></a></div>
+		</div>
+	</div>
+</div>

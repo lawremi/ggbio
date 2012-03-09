@@ -2,13 +2,16 @@
 layout: base
 title: Tutorial
 ---
-- [autoplot](#autoplot)
-- [geom](#geom)
-- [stat](#stat)
-- [layout](#layout)
-- [theme](#theme)
 
-### [Autoplot generic function] <a id = "autoplot"></a>
+<!-- - [autoplot](#autoplot) -->
+<!-- - [geom](#geom) -->
+<!-- - [stat](#stat) -->
+<!-- - [layout](#layout) -->
+<!-- - [theme](#theme) -->
+
+
+
+### [Autoplot generic function]({{site.url}}/autoplot) <a id = "autoplot"></a>
 
 ### [Geometric object(geom)]({{site.url}}/geom) <a id = "geom"></a>
   -  [geom_rect]({{site.url}}/geom/geom_rect)

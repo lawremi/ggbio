@@ -5,7 +5,9 @@ title: Support
 - [Installation](#install)
 - [FAQ](#FAQ)
 - [Bug report](#bug)
+
 ## Installation <a id = "install"></a>
+
 #### For R 2.15 with git version *ggbio*(latest)
 _This is for developers, notice I am not using bioc-devel svn as major version control system. If you want to play with latest_ **ggbio** _you have to stick with this method._
 
@@ -32,9 +34,12 @@ __This is currently now working due to unsycronized ggbio in bioc-dev__
 
 ## FAQ<a id = "FAQ"></a>
 - Test question
-  > a
-  > b
+
+> a
+> b
+ 
 - test 2
+
 >3
 >4
 

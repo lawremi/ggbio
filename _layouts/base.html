@@ -2,6 +2,8 @@
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 	<head>
+	  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+	  <script src="{{ site.url }}/galleria/galleria-1.2.6.min.js"></script>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<meta name="description" content="{{ page.excerpt|descriptionify }}" />
 		<meta name="author" content="Tengfei Yin" />
@@ -20,6 +22,9 @@
 		<link href="{{ site.url }}/favicon.ico" rel="icon" type="image/x-icon" />
 	</head>
 	<body>
+	  <script>
+            if (Galleria) { $("body").text('Galleria works') }
+          </script>
 		<div id="header">
 			{% include header.html %}
 			<div id="navbar-wrapper">

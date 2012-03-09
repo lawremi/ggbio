@@ -2,6 +2,18 @@
 layout: base
 title: Home
 ---
+<div id="gallery">
+  <img src="{{ site.url }}/images/cir.png">
+  <img src="{{ site.url }}/images/overview.pdf">
+  <img src="{{ site.url }}/images/stacked-darn.pdf">
+</div>
+<script>
+  Galleria.loadTheme('{{ site.url }}/galleria/themes/classic/galleria.classic.min.js');
+  $("#gallery").galleria({
+  width: 800,
+  height: 500
+  });
+</script>
 <div class="row">
 	<div class="column grid_9">
 		<p id="frontbio"> ggbio: An R implementation for extending the

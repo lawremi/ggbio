@@ -2,7 +2,10 @@
 layout: base
 title: Support
 ---
-## Installation
+- [Installation](#install)
+- [FAQ](#FAQ)
+- [Bug report](#bug)
+## Installation <a id = "install"></a>
 #### For R 2.15 with git version *ggbio*(latest)
 _This is for developers, notice I am not using bioc-devel svn as major version control system. If you want to play with latest_ **ggbio** _you have to stick with this method._
 
@@ -27,8 +30,15 @@ command line again.
 
 __This is currently now working due to unsycronized ggbio in bioc-dev__
 
+## FAQ<a id = "FAQ"></a>
+- Test question
+  > a
+  > b
+- test 2
+>3
+>4
 
-## Bug report
+## Bug report<a id = "bug"></a>
 For any issues please contact yintengfei at gmail.com or file a issue in
 **ggbio** [github issue page](https://github.com/tengfei/ggbio/issues).
 

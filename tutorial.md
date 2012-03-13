@@ -8,10 +8,21 @@ title: Tutorial
 <!-- - [stat](#stat) -->
 <!-- - [layout](#layout) -->
 <!-- - [theme](#theme) -->
+<!-- - [Specialized plots](#splot) -->
 
 
 
 ### [Autoplot generic function]({{site.url}}/autoplot) <a id = "autoplot"></a>
+  -  [autoplot, GRanges]({{site.url}}/autoplot/GRanges)
+  -  [autoplot, GRangesList]({{site.url}}/autoplot/GRangesList)
+  -  [autoplot, IRanges]({{site.url}}/autoplot/IRanges)
+  -  [autoplot, TranscriptDb]({{site.url}}/autoplot/TranscriptDb)
+  -  [autoplot, BamFile]({{site.url}}/autoplot/BamFile)
+  -  [autoplot, GappedAlignment]({{site.url}}/autoplot/GappedAlignment)
+  -  [autoplot, BSgenome]({{site.url}}/autoplot/BSgenome)
+  -  [autoplot, Rle]({{site.url}}/autoplot/Rle)
+  -  [autoplot, RleList]({{site.url}}/autoplot/RleList)
+  -  [autoplot, character]({{site.url}}/autoplot/character)
 
 
 ### [Geometric object(geom)]({{site.url}}/geom) <a id = "geom"></a>
@@ -36,5 +47,8 @@ title: Tutorial
   -  [layout_circle]({{site.url}}/layout/layout_circle)
   -  [layout_karyogram]({{site.url}}/layout/layout_karyogram)
 
-  
+
 ### [Theme]({{site.url}}/theme) <a id = "theme"></a>
+
+### [Specialized plots]({{site.url}}/splots) <a id = "splots"></a>
+

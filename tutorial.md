@@ -7,6 +7,7 @@ title: Tutorial
 <!-- - [geom](#geom) -->
 <!-- - [stat](#stat) -->
 <!-- - [layout](#layout) -->
+<!-- - [tracks](#tracks) -->
 <!-- - [theme](#theme) -->
 <!-- - [Specialized plots](#splot) -->
 
@@ -47,6 +48,7 @@ title: Tutorial
   -  [layout_circle]({{site.url}}/layout/layout_circle)
   -  [layout_karyogram]({{site.url}}/layout/layout_karyogram)
 
+### [Tracks]({{site.url}}/tracks) <a id = "tracks"></a>
 
 ### [Theme]({{site.url}}/theme) <a id = "theme"></a>
 

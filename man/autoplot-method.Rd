@@ -1,22 +1,18 @@
-\name{qplot}
+\name{autoplot}
 
-\alias{qplot}
-\alias{qplot,data.frame-method}
-\alias{qplot,matrix-method}
-\alias{qplot,numeric-method}
-\alias{qplot,integer-method}
-\alias{qplot,GRanges-method}
-\alias{qplot,GRangesList-method}
-\alias{qplot,IRanges-method}
-\alias{qplot,BSgenome-method}
-\alias{qplot,GappedAlignments-method}
-\alias{qplot,BamFile-method}
-\alias{qplot,TranscriptDb-method}
-\alias{qplot,character-method}
-\alias{qplot,Rle-method}
-\alias{qplot,RleList-method}
+\alias{autoplot}
+\alias{autoplot,GRanges-method}
+\alias{autoplot,GRangesList-method}
+\alias{autoplot,IRanges-method}
+\alias{autoplot,BSgenome-method}
+\alias{autoplot,GappedAlignments-method}
+\alias{autoplot,BamFile-method}
+\alias{autoplot,TranscriptDb-method}
+\alias{autoplot,character-method}
+\alias{autoplot,Rle-method}
+\alias{autoplot,RleList-method}
 
-\title{Generic qplot function}
+\title{Generic autoplot function}
 
 \description{
   To visualize different objects describing biological data,
@@ -28,19 +24,19 @@
 
 \usage{
 ## For object data.frame
-\S4method{qplot}{data.frame}(data, ...)
+\S4method{autoplot}{data.frame}(data, ...)
 
 ## For object matrix
-\S4method{qplot}{matrix}(data, ...)
+\S4method{autoplot}{matrix}(data, ...)
 
 ## For object numeric
-\S4method{qplot}{numeric}(data, ...)
+\S4method{autoplot}{numeric}(data, ...)
 
 ## For object numeric
-\S4method{qplot}{integer}(data, ...)
+\S4method{autoplot}{integer}(data, ...)
 
 ## For object GRanges
-\S4method{qplot}{GRanges}(data, x, y,...,
+\S4method{autoplot}{GRanges}(data, x, y,...,
       facet_gr, legend = TRUE,
       show.coverage = TRUE,
       show.gaps = FALSE,
@@ -50,45 +46,45 @@
                "coverage.line", "coverage.polygon"))
 
 ## For object GRangesList
-\S4method{qplot}{GRangesList}(data, ..., freq, show.label = FALSE,
+\S4method{autoplot}{GRangesList}(data, ..., freq, show.label = FALSE,
       show.gaps = TRUE, scale.size = c(5, 17),
       label.type = c("name", "count"),
       label.size = 5, label.color = "black")
 
 ## For object IRanges
-\S4method{qplot}{IRanges}(data, ..., legend = TRUE,
+\S4method{autoplot}{IRanges}(data, ..., legend = TRUE,
       geom = c("full", "segment", 
                "coverage.line", "coverage.polygon"))
 
 ## For object GappedAlignments
-\S4method{qplot}{GappedAlignments}(data, ..., which,
+\S4method{autoplot}{GappedAlignments}(data, ..., which,
       geom = c("gapped.pair", "full"),
       show.junction = FALSE)
 
 ## For object BamFile
-\S4method{qplot}{BamFile}(data, ..., which, 
+\S4method{autoplot}{BamFile}(data, ..., which, 
       bsgenome, resize.extra = 10, show.coverage = TRUE,
       geom = c("gapped.pair", "full",
                "coverage.line",
                "coverage.polygon", "mismatch.summary"))
 
 ## For object character
-\S4method{qplot}{character}(data, ..., which, 
+\S4method{autoplot}{character}(data, ..., which, 
       bsgenome, resize.extra = 10, show.coverage = TRUE,
       geom = c("gapped.pair", "full", 
                "coverage.line", "coverage.polygon",
                "mismatch.summary"))
 
 ## For object TranscriptDb
-\S4method{qplot}{TranscriptDb}(data, which, ...,
+\S4method{autoplot}{TranscriptDb}(data, which, ...,
       geom = c("full", "single", "tx"))
 
 ## For object BSgenome
-\S4method{qplot}{BSgenome}(data, name, ...,
+\S4method{autoplot}{BSgenome}(data, name, ...,
       geom = c("text", "segment", "point", "rectangle"))
 
 ## For object Rle
-\S4method{qplot}{Rle}(data, lower, ...,
+\S4method{autoplot}{Rle}(data, lower, ...,
       size, shape, color, alpha,
       xlab = "x", ylab = "y",
       geom = c("point", "line", "segment"),
@@ -96,7 +92,7 @@
                "viewSums", "viewMeans"))
 
 ## For object RleList
-\S4method{qplot}{RleList}(data, lower, ...,
+\S4method{autoplot}{RleList}(data, lower, ...,
       size, shape, color, alpha,
       facetByRow = TRUE,
       xlab = "x", ylab = "y",
@@ -110,7 +106,7 @@
     A \code{\link{data.frame}}, \code{\link{matrix}},
     \code{\link{GRanges}}, \code{\link{BSgenome}},
     \code{\link{TranscriptDb}}, \code{\link{GappedAlignments}} object
-    or any other objects for which the qplot method is defined.    
+    or any other objects for which the autoplot method is defined.    
   }
   \item{x}{
     x value, start/end/midpoint without quotes. e.g \code{x = start},
@@ -241,7 +237,7 @@
   Color of label.
 }
   \item{...}{
-    Extra parameters. Usually are those parameters used in qplot to
+    Extra parameters. Usually are those parameters used in autoplot to
     control aesthetics or geometries.
   }
 }
@@ -252,8 +248,8 @@
 }
 
 \section{Introduction}{
-  \code{qplot} is redefined as generic s4 method inside this package,
-  user could use \code{qplot} in the way they are familiar with, and
+  \code{autoplot} is redefined as generic s4 method inside this package,
+  user could use \code{autoplot} in the way they are familiar with, and
   we are also setting limitation inside this package, like
 
   \itemize{
@@ -280,7 +276,7 @@
   This package is designed for only biological data, especially genomic
   data if users want to explore the data in a more flexible way, you
   could simply coerce the \code{\link{GRanges}} to a data.frame, then
-  just use formal \code{qplot} function in ggplot2, or \code{qplot}
+  just use formal \code{autoplot} function in ggplot2, or \code{autoplot}
   generic for \code{data.frame}.
 
   Some objects share the same geom so we introduce all the geom together
@@ -375,14 +371,14 @@ Faceting in ggbio package is a little differnt from ggplot2 in several ways
 \dontrun{
 library(ggbio)
 
-## overide qplot
-qplot(data = mtcars, mpg, cyl)
-qplot(1:3)
-qplot(volcano)
-qplot(c(1, 2.2, 3.3))
-ggplot2::qplot(1:3)
-ggplot2::qplot(c(1, 2.2, 3.3))
-ggplot2::qplot(volcano)
+## overide autoplot
+autoplot(data = mtcars, mpg, cyl)
+autoplot(1:3)
+autoplot(volcano)
+autoplot(c(1, 2.2, 3.3))
+ggplot2::autoplot(1:3)
+ggplot2::autoplot(c(1, 2.2, 3.3))
+ggplot2::autoplot(volcano)
 
 
 ##  GRanges
@@ -403,46 +399,46 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
-qplot(gr)
-qplot(gr, geom = "full")
-qplot(gr, geom = "segment")
-qplot(gr, geom = "line", y = value)
-qplot(gr, geom = "point", y = value)
-qplot(gr, geom = "coverage.line")
-qplot(gr, geom = "coverage.polygon")
+autoplot(gr)
+autoplot(gr, geom = "full")
+autoplot(gr, geom = "segment")
+autoplot(gr, geom = "line", y = value)
+autoplot(gr, geom = "point", y = value)
+autoplot(gr, geom = "coverage.line")
+autoplot(gr, geom = "coverage.polygon")
 
 gr.sub <- gr[seqnames(gr) == "chr1"] #or 
-p1 <- qplot(gr.sub, geom = "full") + opts(title = "full")
-p2 <- qplot(gr.sub, geom = "point", y = value) + opts(title = "point")
-p3 <- qplot(gr.sub, geom = "line", y = value) + opts(title = "line")
-p4 <- qplot(gr.sub, geom = "coverage.line") + opts(title = "coverage.line")   
-p5 <- qplot(gr.sub, geom = "coverage.polygon") + opts(title = "coverage.polygon")   
+p1 <- autoplot(gr.sub, geom = "full") + opts(title = "full")
+p2 <- autoplot(gr.sub, geom = "point", y = value) + opts(title = "point")
+p3 <- autoplot(gr.sub, geom = "line", y = value) + opts(title = "line")
+p4 <- autoplot(gr.sub, geom = "coverage.line") + opts(title = "coverage.line")   
+p5 <- autoplot(gr.sub, geom = "coverage.polygon") + opts(title = "coverage.polygon")   
 library(gridExtra)
 grid.arrange(p1, p2, p3, p4, p5, ncol = 2)
 
-qplot(gr, ncol = 2)
+autoplot(gr, ncol = 2)
 ## faceting, use facets not facet
-qplot(gr, facets = group ~ seqnames)
-qplot(gr, geom = "segment", facets = group ~ seqnames)
-qplot(gr, geom = "line", y = value, facets = group ~ seqnames)
-qplot(gr, geom = "point", y = value, facets = group ~ seqnames)
-qplot(gr, geom = "coverage.line", facets = group ~ seqnames)
-qplot(gr, geom = "coverage.polygon", facets = group ~ seqnames)
+autoplot(gr, facets = group ~ seqnames)
+autoplot(gr, geom = "segment", facets = group ~ seqnames)
+autoplot(gr, geom = "line", y = value, facets = group ~ seqnames)
+autoplot(gr, geom = "point", y = value, facets = group ~ seqnames)
+autoplot(gr, geom = "coverage.line", facets = group ~ seqnames)
+autoplot(gr, geom = "coverage.polygon", facets = group ~ seqnames)
 
 ## facet gr
 gr.region <- GRanges(c("chr1", "chr2", "chr3"), 
                      IRanges(c(100, 200, 250), 
                              width = 70))
 ## facet_grid
-qplot(gr, facet_gr = gr.region)
+autoplot(gr, facet_gr = gr.region)
 ## facet_wrap
-qplot(gr, facet_gr = gr.region, nrow = 2) + 
+autoplot(gr, facet_gr = gr.region, nrow = 2) + 
   scale_y_continuous(limits = c(0, 90))
 
 
 ## checvron
 gr <- GRanges("chr1", IRanges(c(100, 200, 300), width = 50))
-p <- qplot(gr)
+p <- autoplot(gr)
 gr.gaps <- gaps(gr)[-1]
 values(gr.gaps)$score <- c(1, 100)
 p1 <- p + geom_chevron(gr.gaps)
@@ -460,22 +456,22 @@ exons.rbm17 <- subsetByOverlaps(exons.tx, genesymbol["RBM17"])
 nms <- names(exons.rbm17)
 freqs <- c(100, 200, 300)
 names(freqs) <- nms
-p.splice1 <- qplot(exons.rbm17)
+p.splice1 <- autoplot(exons.rbm17)
 ## when turning on frequency 
-p.splice <- qplot(exons.rbm17, freq = freqs, show.label = TRUE, label.type = "count",
+p.splice <- autoplot(exons.rbm17, freq = freqs, show.label = TRUE, label.type = "count",
       scale.size = c(1, 5), label.size = 3)
-p.splice2 <- qplot(exons.rbm17, freq = freqs, show.label = TRUE, offset = 0.05,
+p.splice2 <- autoplot(exons.rbm17, freq = freqs, show.label = TRUE, offset = 0.05,
                    label.type = "count")
 print(p.splice1)
 print(p.splice2)
 
 ir <- IRanges(c(10, 20, 30) ,width  = 15)
-qplot(ir)
+autoplot(ir)
 ir <- ranges(gr[seqnames(gr) == "chr1"])[1:40]
-p1 <- qplot(ir) + opts(title = "full")
-p2 <- qplot(ir, geom = "segment")+ opts(title = "segment")
-p3 <- qplot(ir, geom = "coverage.line")+ opts(title = "coverage.line")
-p4 <- qplot(ir, geom = "coverage.polygon")+ opts(title = "coverage.polygon")
+p1 <- autoplot(ir) + opts(title = "full")
+p2 <- autoplot(ir, geom = "segment")+ opts(title = "segment")
+p3 <- autoplot(ir, geom = "coverage.line")+ opts(title = "coverage.line")
+p4 <- autoplot(ir, geom = "coverage.polygon")+ opts(title = "coverage.polygon")
 library(gridExtra)
 grid.arrange(p1, p2, p3, p4, ncol = 2)
 
@@ -488,25 +484,25 @@ xRle <- Rle(xVector)
 xRleList <- RleList(xRle, 2L * xRle)
 
 
-qplot(xRle)
-qplot(xRle, geom = "line")
-qplot(xRle, geom = "segment")
-qplot(xRle, type = "viewMaxs", lower = 5)
-qplot(xRle, type = "viewMins", lower = 5)
-qplot(xRle, type = "viewMeans", lower = 5)
-qplot(xRle, type = "viewSums", lower = 5)
+autoplot(xRle)
+autoplot(xRle, geom = "line")
+autoplot(xRle, geom = "segment")
+autoplot(xRle, type = "viewMaxs", lower = 5)
+autoplot(xRle, type = "viewMins", lower = 5)
+autoplot(xRle, type = "viewMeans", lower = 5)
+autoplot(xRle, type = "viewSums", lower = 5)
 
-qplot(xRleList)
-qplot(xRleList, geom = "segment")
-qplot(xRleList, geom = "line")
-qplot(xRleList, type = "viewMaxs", lower = 5)
-qplot(xRleList, type = "viewMaxs", lower = 5, geom = "line")
-qplot(xRleList, type = "viewSums", lower = 5, geom = "segment",
+autoplot(xRleList)
+autoplot(xRleList, geom = "segment")
+autoplot(xRleList, geom = "line")
+autoplot(xRleList, type = "viewMaxs", lower = 5)
+autoplot(xRleList, type = "viewMaxs", lower = 5, geom = "line")
+autoplot(xRleList, type = "viewSums", lower = 5, geom = "segment",
       facetByRow = FALSE, color = I("red"), size = I(5))
-qplot(xRle, size = y)
-qplot(xRle, type = "viewSums", lower = 5)
+autoplot(xRle, size = y)
+autoplot(xRle, type = "viewSums", lower = 5)
 
-qplot(xRle, type = "viewSums", lower = 5, size = I(10), color = I("red"),
+autoplot(xRle, type = "viewSums", lower = 5, size = I(10), color = I("red"),
       alpha = y)
 }
 }

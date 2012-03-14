@@ -1,12 +1,15 @@
 \name{geom_chevron}
 \alias{geom_chevron}
-\title{Chevron Geoms for GRanges object}
+\alias{geom_chevron,GRanges-method}
+\title{Chevron geoms for GRanges object}
 \description{
   Break normal intervals stroed in \code{GRanges} object and show them
-  as chevron geom, useful for showing model or splice summary.
+  as chevron, useful for showing model or splice summary.
 }
 \usage{
-geom_chevron(data, ..., group.name, offset = 0.1,
+geom_chevron(data, ..., offset = 0.1,
+             facets = NULL,
+             stat = c("stepping", "identity"),
              chevron.height = c(0.1, 0.8))
 }
 \arguments{
@@ -14,12 +17,7 @@ geom_chevron(data, ..., group.name, offset = 0.1,
     A GRanges object.
   }
   \item{...}{
-    Extra parameters passed to qplot function.
-  }
-  \item{group.name}{
-    group.name passed to \code{addSteppings}, in case your
-    \code{GRanges} object doesn't contain ".levels" column. You can
-    do it here.
+    Extra parameters passed to autoplot function.
   }
   \item{offset}{
     A nunmeric value or characters. If it's numeric value, indicate how
@@ -29,6 +27,14 @@ geom_chevron(data, ..., group.name, offset = 0.1,
     one of those columns, this will use height of the chevron to
     indicate the columns. Of course you could use size of the chevron to
     indicate the column variable easily, please see the examples.
+  }
+  \item{facets}{
+    faceting formula to use.
+  }
+  \item{stat}{
+    character vector specifying statistics to use. "stepping" with
+    randomly assigned stepping levels as y varialbe. "identity" allow
+    users to specify \code{y} value in \code{aes}.
   }
   \item{chevron.height}{
     A numeric vector of length 2. When the offset parameters is a
@@ -40,8 +46,7 @@ geom_chevron(data, ..., group.name, offset = 0.1,
   A 'Layer'.
 }
 \details{
-  To draw a normal GRanges as Chevron instead of segments or rectangle
-as shown in previous sections, we need to provide a special geom for
+  To draw a normal GRanges as Chevron, we need to provide a special geom for
 this purpose. Chevron is popular in gene viewer or genomoe browser,
 when they try to show isoforms or gene model.\code{geom_chevron},
 just like any other \code{geom_*} function in ggplot2, you can pass
@@ -50,18 +55,6 @@ of chevron to show statistics summary.
 }
 
 \examples{
-\dontrun{
-library(GenomicRanges)
-gr <- GRanges("chr1", IRanges(c(100, 200, 300), width = 50))
-p <- qplot(gr)
-gr.gaps <- gaps(gr)[-1]
-values(gr.gaps)$score <- c(1, 100)
-p + geom_chevron(gr.gaps)
-p + geom_chevron(gr.gaps, aes(size = score), offset = "score")
-p + geom_chevron(gr.gaps, aes(size = score), offset = "score",
-                 chevron.height = c(0.1, 0.2))
-p + geom_chevron(gr.gaps, offset = -0.1)
-}
 }
 \author{Tengfei Yin}
 

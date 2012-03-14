@@ -1,6 +1,6 @@
 setGeneric("geom_arrow", function(data, ...) standardGeneric("geom_arrow"))
 
-setMethod("geom_arrow", "GenomicRanges", function(data, ...,
+setMethod("geom_arrow", "GRanges", function(data, ...,
                                                   angle = 30,
                                                   length = unit(0.15, "cm"),
                                                   type = "open", 

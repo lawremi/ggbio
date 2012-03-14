@@ -1,9 +1,10 @@
 setGeneric("geom_segment", function(data, ...) standardGeneric("geom_segment"))
 setMethod("geom_segment", "data.frame", function(data, ...){
-  ggplot2::geom_segment(data, ...)
+  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  do.call(ggplot2::geom_segment, args)
 })
 ## alignment should be convenient toggle with chevron...
-setMethod("geom_segment", "GRanges", function(data,...,
+setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
                                            facets = NULL,
                                            stat = c("stepping", "identity"),
                                            rect.height = 0.4,
@@ -18,7 +19,7 @@ setMethod("geom_segment", "GRanges", function(data,...,
   
   stat <- match.arg(stat)
 
-  rect.height <- force(rect.height)
+  rect.height <- force(rect.heighnt)
   
   if(stat == "stepping"){
     ## if(rect.height <= 0 | rect.height >= 0.5)
@@ -86,6 +87,14 @@ setMethod("geom_segment", "GRanges", function(data,...,
     p <- list(do.call(ggplot2::geom_segment,args.res))
     p <- .changeStrandColor(p, args.aes)
   }
-  p <- c(list(p) , list(facet))  
+  p <- c(list(p) , list(facet))
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
   p
 })

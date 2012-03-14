@@ -1,5 +1,5 @@
 setGeneric("geom_arrowrect", function(data, ...) standardGeneric("geom_arrowrect"))
-setMethod("geom_arrowrect", "GenomicRanges", function(data, ...,
+setMethod("geom_arrowrect", "GRanges", function(data, ...,
                                                   facets = NULL,
                                                   stat = c("stepping", "identity"),
                                                   rect.height = 0.4,

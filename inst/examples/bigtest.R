@@ -3,9 +3,8 @@
 ## 2. exons labels for plotRangesLinkedToData
 library(ggbio)
 library(GenomicRanges)
-library(devtools)
-load_all("~/Codes/gitrepos/ggbio")
-
+## library(devtools)
+## load_all("~/Codes/gitrepos/ggbio")
 ##  GRanges
 set.seed(1)
 N <- 1000
@@ -26,6 +25,7 @@ gr <- GRanges(seqnames =
                 size = N, replace = TRUE),
               pair = sample(letters, size = N, 
                 replace = TRUE))
+
 idx <- sample(1:length(gr), size = 200)
 
 grl <- split(gr, values(gr)$sample)
@@ -211,11 +211,13 @@ ggplot() + geom_chevron(gr[idx], stat = "identity",
 ggplot() + geom_arch(gr[idx])
 ggplot() + geom_arch(gr[idx], max.height = 100)
 ggplot() + geom_arch(gr[idx], max.height = 100, aes(height = value))
+ggplot() + geom_arch(gr[idx], aes(height = width))
 ggplot() + geom_arch(gr[idx], max.height = 100, aes(y = value)) #base
-
 ggplot() + geom_arch(gr[idx], facets = sample ~ seqnames)
-ggplot() + geom_arch(gr[idx], aes(height = value))
-ggplot() + geom_arch(gr[idx], aes(height = value, size = value), alpha = 0.3)
+ggplot() + geom_arch(gr[idx], aes(color = value),)
+
+ggplot() + geom_arch(gr[idx], aes(color = value, height = value, size = value),
+                     alpha = 0.2, facets = sample ~ seqnames)
 
 
 ## geom_arrow
@@ -224,15 +226,17 @@ ggplot() + geom_arrow(gr[idx])
 ggplot() + geom_arrow(gr[idx], facets = sample ~ seqnames, color = "red")
 ggplot() + geom_arrow(gr[idx], stat = "identity", aes(x = start, y = value,
                                         xend = end, yend = value))
-ggplot() + geom_arrow(gr[idx], facets = sample ~ seqnames, color = "red",
-                      aes(x = start, y = value, xend = end, yend = value),
-                      stat = "identity")
+## ggplot() + geom_arrow(gr[idx], facets = sample ~ seqnames, color = "red",
+##                       aes(x = start, y = value, xend = end, yend = value),
+##                       stat = "identity")
 
-## geom_5poly
-ggplot() + geom_5poly(gr[idx])
-ggplot() + geom_5poly(gr[idx], facets = sample ~ seqnames, fill = "red")
-ggplot() + geom_5poly(gr[idx], stat = "identity", aes(y = value))
-ggplot() + geom_5poly(gr[idx], facets = sample ~ seqnames, fill = "red",
+## geom_arrowrect
+ggplot() + geom_arrowrect(gr[idx])
+ggplot() + geom_arrowrect(gr[idx], facets = sample ~ seqnames, fill = "red")
+ggplot() + geom_arrowrect(gr[idx], stat = "identity", aes(y = value), rect.height = 0.1)
+
+
+ggplot() + geom_arrowrect(gr[idx], facets = sample ~ seqnames, fill = "red",
                       aes(x = start, y = value, xend = end, yend = value),
                       stat = "identity",  rect.height = 0.2)
 
@@ -259,18 +263,19 @@ ggplot() + geom_chevron(gr)
 ggplot() + geom_chevron(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
 
 ggplot() + geom_chevron(gr, stat = "identity", aes(y = value))
+
 ggplot() + geom_chevron(gr, facets = sample ~ seqnames,
                         aes(y = value,color = strand, fill = strand),
                      stat = "identity")
 
 ## geom_alignment
 ggplot() + geom_alignment(gr[idx])
+
 ggplot() + geom_alignment(gr[idx], aes(group  = pair))
 ggplot() + geom_alignment(gr[idx], aes(group  = pair), group.selfish = FALSE)
-ggplot() + geom_alignment(gr[idx], main.geom = "5poly")
-ggplot() + geom_alignment(gr[idx], main.geom = "5poly", aes(group  = pair))
-ggplot() + geom_alignment(gr[idx], main.geom = "5poly", gap.geom = "arrow")
-
+ggplot() + geom_alignment(gr[idx], main.geom = "arrowrect")
+ggplot() + geom_alignment(gr[idx], main.geom = "arrowrect", aes(group  = pair))
+ggplot() + geom_alignment(gr[idx], main.geom = "arrowrect", gap.geom = "arrow")
 ggplot() + geom_alignment(gr[idx], facets = sample ~ seqnames, aes(color = strand, fill = strand))
 
 ## ======================================================================
@@ -281,6 +286,9 @@ ggplot() + geom_alignment(gr[idx], facets = sample ~ seqnames, aes(color = stran
 ##        autoplot, GRanges
 ## ----------------------------------------------------------------------
 autoplot(gr)
+## FIXME:
+autoplot(gr, geom = "point", aes(y = score))
+
 autoplot(gr, fill = "red")
 autoplot(gr, aes(fill = value))
 autoplot(gr, facets = sample ~ seqnames)
@@ -427,7 +435,7 @@ autoplot(grl, type = "sashimi", coverage.col = "white", coverage.fill = "black",
 values(gr.c)$value <- 100
 p <- autoplot(grl, type = "sashimi")
 p + geom_rect(data = gr.c, stat = "identity", aes(y = value), rect.height = 10)
-p + geom_5poly(data = gr.c, stat = "identity", aes(y = value), rect.height = 10)
+p + geom_arrowrect(data = gr.c, stat = "identity", aes(y = value), rect.height = 10)
 
 
 ## equals to lower level: more delicate control

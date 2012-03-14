@@ -1,11 +1,11 @@
+## FIXME: more flexible name.expr arguments
 setGeneric("stat_gene", function(data, ...) standardGeneric("stat_gene"))
-
-setMethod("stat_gene", "TranscriptDb", function(data, ..., which,
+setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim, 
                                                 xlab, ylab, main,
-                                           geom = c("gene", "reduced_gene"),
-                                           names.expr = expression(paste(tx_name,
-                                               "(", gene_id,")", sep = "")),
-                                                xlim, facets = NULL){
+                                                facets = NULL,
+                                                geom = c("gene", "reduced_gene"),
+                                                names.expr = expression(paste(tx_name,
+                                               "(", gene_id,")", sep = ""))){
 
 
   ## need to test facets = gene

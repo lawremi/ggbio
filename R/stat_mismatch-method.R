@@ -1,6 +1,6 @@
 setGeneric("stat_mismatch", function(data, ...) standardGeneric("stat_mismatch"))
 ## this require a special GenomicRanges
-setMethod("stat_mismatch", "GenomicRanges", function(data, ..., bsgenome, which,
+setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome, which,
                                                      xlab, ylab, main,
                                                      geom = c("segment", "bar"),
                                                      show.coverage = TRUE){
@@ -114,8 +114,9 @@ setMethod("stat_mismatch", "GenomicRanges", function(data, ..., bsgenome, which,
 
 
 setMethod("stat_mismatch", "BamFile", function(data, ..., which, bsgenome,
-                                               xlab, ylab, main, 
-                                                     show.coverage = TRUE){
+                                               xlab, ylab, main,
+                                               geom = c("segment", "bar"),  
+                                               show.coverage = TRUE){
 
     if(missing(bsgenome)){
       stop("For geom mismatch.summary, please provide bsgenome(A BSgenome object)")

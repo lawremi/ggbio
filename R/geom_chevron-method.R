@@ -1,5 +1,5 @@
 setGeneric("geom_chevron", function(data, ...) standardGeneric("geom_chevron"))
-setMethod("geom_chevron", "GenomicRanges", 
+setMethod("geom_chevron", "GRanges", 
           function(data, ...,  offset = 0.1, facets = NULL,
                    stat = c("stepping", "identity"),
                    chevron.height = c(0.1, 0.8)){

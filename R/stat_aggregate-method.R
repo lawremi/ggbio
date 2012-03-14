@@ -1,8 +1,9 @@
 setGeneric("stat_aggregate", function(data, ...) standardGeneric("stat_aggregate"))
 
-setMethod("stat_aggregate", "GenomicRanges", function(data, by, FUN, start = NULL,
+setMethod("stat_aggregate", "GRanges", function(data, xlab, ylab, main, by, FUN, start = NULL,
                                                       end = NULL, width = NULL,  y = NULL,
-                                                      delta = NULL, ..., simplify = TRUE,
+                                                      frequency = NULL, delta = NULL,
+                                                      ..., simplify = TRUE,
                                                       window = NULL, facets = NULL, 
                                                       type = c("mean", "median","max",
                                                         "min", "sum", "count", "identity"),
@@ -150,6 +151,14 @@ setMethod("stat_aggregate", "GenomicRanges", function(data, by, FUN, start = NUL
      p <- do.call(stat_boxplot, args.res)
    }
   p <- c(list(p) , list(facet))
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
   p
 })
 

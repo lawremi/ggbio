@@ -1,3 +1,4 @@
+## FIXME: add ..coverage.., and a new way
 setGeneric("stat_coverage", function(data, ...) standardGeneric("stat_coverage"))
 
 setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
@@ -111,5 +112,4 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
     p <- c(p, list(opts(title = main)))
   p
 })
-
 

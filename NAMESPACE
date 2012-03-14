@@ -5,10 +5,6 @@
 import(ggplot2)
 import(reshape2)
 import(BiocGenerics)
-## BiocGenerics
-## importFrom(BiocGenerics, cbind, rbind, unique,
-##            lapply, sapply, setdiff, Reduce)
-## Biobase
 import(Biobase)
 import(biovizBase)
 import(grid)

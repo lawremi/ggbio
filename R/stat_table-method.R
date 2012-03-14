@@ -1,8 +1,10 @@
+## FIXME: stat should be removed?
+## facets??
+## ..score..
 setGeneric("stat_table", function(data, ...) standardGeneric("stat_table"))
 
-setMethod("stat_table", "GenomicRanges", function(data, ..., geom = NULL,
-                                                  xlab, ylab, main,
-                                                  stat = NULL){
+setMethod("stat_table", "GRanges", function(data, ..., xlab, ylab, main,
+                                            geom = NULL, stat = NULL){
 
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   args.aes <- parseArgsForAes(args)

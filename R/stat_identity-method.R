@@ -1,6 +1,7 @@
 setGeneric("stat_identity", function(data, ...) standardGeneric("stat_identity"))
 setMethod("stat_identity", "data.frame", function(data, ...){
-  ggplot2::stat_identity(data = data, ...)
+  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  do.call(ggplot2::stat_identity, args)
 })
 
 setMethod("stat_identity", "GRanges", function(data, ..., geom = NULL){

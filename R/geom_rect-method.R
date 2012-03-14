@@ -1,6 +1,8 @@
 setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
 setMethod("geom_rect", "data.frame", function(data, ...){
-  ggplot2::geom_rect(data, ...)
+  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  do.call(ggplot2::geom_rect, args)
+  ## ggplot2::geom_rect(data, ...)
 })
 ## alignment should be convenient toggle with chevron...
 setMethod("geom_rect", "GRanges", function(data,...,

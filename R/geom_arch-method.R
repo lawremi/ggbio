@@ -68,9 +68,8 @@ setMethod("geom_arch", "data.frame", function(data, ...,
 
 
 ## that means span the range of two end 
-setMethod("geom_arch", "GRanges", function(data, ..., rect.height = 0.4,
-                                              n = 25, max.height = 10,
-                                           facets = NULL
+setMethod("geom_arch", "GRanges", function(data, ..., facets = NULL, rect.height = 0.4,
+                                              n = 25, max.height = 10
                                               ){
 
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])

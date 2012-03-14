@@ -2,6 +2,7 @@ setGeneric("geom_alignment", function(data, ...) standardGeneric("geom_alignment
 
 ## alignment should be convenient toggle with chevron...
 setMethod("geom_alignment", "GRanges", function(data,...,
+                                                xlab, ylab, main,
                                                 facets = NULL,
                                                    stat = c("stepping", "identity"),
                                                    main.geom = c("rect", "arrowrect"),
@@ -115,7 +116,16 @@ dt <- addStepping(dt, group.name = as.character(args.aes$group),
   if(stat == "identity"){
    stop("stat identity is nor supported for geom alignment") 
   }
-    p <- c(list(p) , list(ylab("")), list(facet))  
+    p <- c(list(p) , list(ylab("")), list(facet))
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
+  
   p
 })
 

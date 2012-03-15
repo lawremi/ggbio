@@ -1,0 +1,17 @@
+\name{theme_NULL}
+\title{Blank theme}
+\description{
+  Theme with no background, axis, legend.
+}
+\usage{
+theme_NULL()
+}
+\arguments{
+}
+\value{
+  Return a options list.
+}
+\examples{
+}
+\author{Tengfei Yin}
+

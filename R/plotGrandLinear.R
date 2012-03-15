@@ -1,4 +1,4 @@
-plotGrandLinear <- function(obj, y, title, facet, 
+plotGrandLinear <- function(obj, y, facets, 
                             size, shape, color, alpha,
                             ...,                            
                             geom = c("point", "line"),
@@ -8,27 +8,28 @@ plotGrandLinear <- function(obj, y, title, facet,
                             cutoff.color = "red",
                             cutoff.size = 1,
                             legend = FALSE,
-                            ## axis.text.x.angle = 0,
-                            xlab = "Chromosome",
+                            xlim, ylim, 
+                            xlab = "Genomic Coordinates",
                             ylab = substitute(y),
-##                           expression(-log[10](italic(p))),
-                            theme_bw = TRUE){
+                            main,
+                            theme){
 
-
+  geom <- match.arg(geom)
   args.dots <- as.list(match.call(call = sys.call(sys.parent()))[-1])
   if(geom == "line")
     args.dots <- c(group = substitute(seqnames),
                    args.dots)
   color.type <- match.arg(color.type)
-  geom <- match.arg(geom)
   ## adding extra spacing for compact view
   df <- transformGRangesToDfWithTicks(obj)$df
-  ticks <- transformGRangesToDfWithTicks(obj)$ticks  
+  ticks <- transformGRangesToDfWithTicks(obj)$ticks
   idx <- order(df$midpoint)
   df <- df[idx,]
   chrs <- unique(as.character(df$seqnames))
   if(missing(y))
-    stop("need to provide y") 
+    stop("need to provide y")
+  ## ggplot2::qplot(data = df, x = midpoint, y = GenVar, geom = "point", facets = category ~ .)
+  ## ggplot2::qplot(data = df, x = midpoint, y = GenVar, geom = "point")
   if(color.type %in% c("seqnames", "twocolor")){
     args <- list(data = df, geom = geom,
                  x = substitute(midpoint),
@@ -36,19 +37,19 @@ plotGrandLinear <- function(obj, y, title, facet,
                  color = substitute(seqnames))
     args.s <- args.dots[names(args.dots) %in% c("size", "color", "alpha", "shape")]
     args <- c(args, args.s)
-    p <- do.call(ggplot2::qplot, args)
+    p <- do.call(qplot, args)
   }else{
-    ## change lalter
-    ## ggplot2::qplot(data = df, geom = geom, x = midpoint, y = pvalue)
     args.s <- args.dots[names(args.dots) %in% c("size", "color", "alpha", "shape")]
     args <- list(data = df, geom = geom,
                  x = substitute(midpoint),
                  y = substitute(y))
-    args <- c(args, args.s)        
-    p <- do.call(ggplot2::qplot, args)
+    args <- c(args, args.s)
+    p <- do.call(qplot, args)
+    ## p + facet_grid(category ~ .)
+    ## p + facet_grid( . ~ category)
   }
-  if(theme_bw)
-    p <- p + theme_bw()
+  if(!missing(theme))
+    p <- p + theme
   if(!legend)
     p <- p + opts(legend.position = "none")
 
@@ -67,24 +68,28 @@ plotGrandLinear <- function(obj, y, title, facet,
     names(cols) <- c(chrs[id1], chrs[id2])
     p <- p + scale_color_manual(values = cols)
   }
-  if(!missing(title))
-    p <- p + opts(title = title)
-  if(!missing(facet)){
-    args.facet <- args.dots[names(args.dots) %in%
+  ## if(!missing(title))
+  ##   p <- p + opts(title = title)
+  if(!missing(facets)){
+    args.facets <- args.dots[names(args.dots) %in%
                             c("margins", "scales", "space",
                               "labeller", "as.table")]
-    args.facet <- c(facets = facet,
-                    args.facet)
-    p <- p + do.call(facet_grid, args.facet)
+    args.facets <- c(facets = facets,
+                    args.facets)
+    p <- p + do.call(facet_grid, args.facets)
   }
   p <- p +  scale_x_continuous(name = xlab,
                                breaks = ticks,
                                labels = names(ticks))
-  ## make it default to remove minor grid line
   p <- p +  opts(panel.background=theme_blank(), 
                    panel.grid.minor=theme_blank())
-  ## p <- p + opts(axis.text.x =
-  ##               theme_text(angle = axis.text.x.angle, hjust = 0))
+  if(!missing(main))
+    p <- p + opts(title = main)
+  if(!missing(xlim))
+    p <- p + xlim(xlim)
+  if(!missing(ylim))
+    p <- p + ylim(ylim)
   p
 }
+
 

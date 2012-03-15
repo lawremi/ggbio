@@ -1,5 +1,3 @@
-setGeneric("qplot", function(data, ...) standardGeneric("qplot"))
-
 setGeneric("rescale", function(x, ...) standardGeneric("rescale"))
 
 setGeneric("plotFragLength", function(data, model, ...)

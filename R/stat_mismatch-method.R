@@ -1,0 +1,150 @@
+setGeneric("stat_mismatch", function(data, ...) standardGeneric("stat_mismatch"))
+## this require a special GenomicRanges
+setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome, which,
+                                                     xlab, ylab, main,
+                                                     geom = c("segment", "bar"),
+                                                     show.coverage = TRUE){
+  geom <- match.arg(geom)
+  isPileupSum <- function(obj){
+    if(is(obj, "GRanges")){
+      all(c("read", "ref", "count", "depth", "match") %in% colnames(values(obj)))
+    }else if(is(obj, "data.frame")){
+      all(c("read", "ref", "count", "depth", "match") %in% colnames(obj))
+    }else{
+      FALSE
+    }
+  }
+  if(!isPileupSum(data))
+    stop("For geom mismatch summary, data must returned from
+                        biovizBase::pileupGRangesAsVariantTable function. Or is a GRanges
+                        object including arbitrary columns: read, ref, count, depth,
+                        match")
+
+  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  ## args <- force(args)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
+  args.non <- args.non[!names(args.non) %in% c("data", "which",
+                                               "bsgenome", "show.coverage",
+                                               "geom")]
+  
+  ## df <- as.data.frame(data)
+  df <- fortify(data)
+  df.unmatch <- df[!df$match, ]
+  ## add two end point?
+  pos <- min(df$start):max(df$end)
+  idx <- ! (pos %in% df$start)
+  if(sum(idx)){
+    df.bg <- df[,c("seqnames", "start", "end", "width", "strand", "depth")]
+    df.bg.extra <- data.frame(seqnames = unique(as.character(df.bg$seqnames)),
+                              start = pos[idx],
+                              end = pos[idx],
+                              width = 1,
+                              strand = "*",
+                              depth = 0)
+    df.bg <- rbind(df.bg, df.bg.extra)
+  }else{
+    df.bg <- df
+  }
+  df.bg <- df.bg[order(df.bg$start),]
+  df.bg <- rbind(df.bg[1,], df.bg)
+  df.bg <- rbind(df.bg, df.bg[nrow(df.bg),])
+  df.bg[c(1, nrow(df.bg)),]$depth <- 0
+  addLevels <- function(x){
+    idx <- order(x$start, x$read)
+    ## assumption: on the same chromosome
+    x <- x[idx,]
+    eds <- unlist(by(x$count, x$start, function(x){
+      cumsum(x)
+    }))
+    sts <- unlist(by(x$count, x$start, function(x){
+      N <- length(x)
+      c(0,cumsum(x)[-N])
+    }))
+    x$eds <- eds
+    x$sts <- sts
+    x
+  }
+  df.unmatch <- addLevels(df.unmatch)
+  idx <- order(df.bg$start)
+  df.bg <- df.bg[idx,]
+  ## p <- ggplot(df.bg)
+  args.aes$x <- as.name("start")
+  args.aes$y <- as.name("depth")
+  aes.res <- do.call(aes, args.aes)
+  args.non$fill <- I("gray70")
+  ## args.non$color <- I("gray70")
+  args.res <- c(list(data = df.bg),
+                list(aes.res),
+                args.non)
+  if(show.coverage)
+    p <- list(do.call(ggplot2::geom_polygon, args.res))
+  else
+    p <- NULL
+  DNABasesColor <- getBioColor("DNA_BASES_N")
+  if(geom == "segment"){
+    p <- c(p, list(ggplot2::geom_segment(data = df.unmatch, aes(x = start, y = sts,
+                                           xend = start, yend = eds, color = read))),
+           list(scale_color_manual(values = DNABasesColor)))
+  }
+  if(geom == "bar"){
+    p <- c(p, list(ggplot2::geom_rect(data = df.unmatch, aes(xmin = start-0.5, ymin = sts,
+                                           xmax = start+0.5, ymax = eds, color = read,
+                                        fill = read))),
+           list(scale_color_manual(values = DNABasesColor)),
+           list(scale_fill_manual(values = DNABasesColor)))
+  }
+  ## p <- c(p, list(xlab("Genomic Coordinates")), list(ylab("Counts")))
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  else
+    p <- c(p, list(ggplot2::ylab("Counts")))
+
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
+  
+  p
+})
+
+
+setMethod("stat_mismatch", "BamFile", function(data, ..., which, bsgenome,
+                                               xlab, ylab, main,
+                                               geom = c("segment", "bar"),  
+                                               show.coverage = TRUE){
+
+    if(missing(bsgenome)){
+      stop("For geom mismatch.summary, please provide bsgenome(A BSgenome object)")
+    }else
+    if(!is(bsgenome, "BSgenome")){
+      stop("bsgenome must be A BSgenome object")
+    }
+    data <- data$path
+    args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+    pgr <- pileupAsGRanges(data, region = which)
+    pgr.match <- pileupGRangesAsVariantTable(pgr, bsgenome)
+    args$show.coverage <- show.coverage
+    args$data <- pgr.match
+    p <- do.call(stat_mismatch, args)
+    if(!missing(xlab))
+      p <- c(p, list(ggplot2::xlab(xlab)))
+    else
+      p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+
+    if(!missing(ylab))
+      p <- c(p, list(ggplot2::ylab(ylab)))
+    else
+      p <- c(p, list(ggplot2::ylab("Counts")))
+
+    if(!missing(main))
+      p <- c(p, list(opts(title = main)))
+    
+    p
+    
+  })
+

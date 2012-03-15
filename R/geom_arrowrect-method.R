@@ -1,0 +1,102 @@
+setGeneric("geom_arrowrect", function(data, ...) standardGeneric("geom_arrowrect"))
+setMethod("geom_arrowrect", "GRanges", function(data, ...,
+                                                  facets = NULL,
+                                                  stat = c("stepping", "identity"),
+                                                  rect.height = 0.4,
+                                                  arrow.head = 0.06,
+                                                  group.selfish = TRUE){
+  stat <- match.arg(stat)
+  ## shape <- match.arg(shape)
+  
+  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  args.non <- args.non[!names(args.non) %in% c("data", "facets", "N", "stat",
+                                               "length", "angle", "type", "shape",
+                                               "rect.height", "arrow.head")]            
+  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
+  facet <- .buildFacetsFromArgs(data, args.facets)
+    if(stat == "stepping"){
+      grl <- splitByFacets(data, facets)
+      res <- endoapply(grl,
+                       function(dt){
+                         if("group" %in% names(args.aes))
+                           dt <- addStepping(dt, group.name = as.character(args.aes$group),
+                                              group.selfish = group.selfish)
+                         else
+                           dt <- addStepping(dt)
+                       })
+      res <- unlist(res)
+      df <- breakGrTo5polyDf(res, y = "stepping", rect.height = rect.height,
+                             arrow.head = arrow.head)
+      args.aes$x <- as.name(".temp.x")
+      args.aes$y <- as.name(".temp.y")
+      args.aes$group <- as.name(".id")
+      aes.temp <- do.call(aes, args.aes)                    
+      p <- do.call(geom_polygon, c(list(data = df), list(aes.temp), args.non))
+      }
+    if(stat == "identity"){
+      if(!"y" %in% names(args.aes))
+        stop("aes(y = ) is requried for stat identity")
+      df <- breakGrTo5polyDf(data, y = as.character(args.aes$y), rect.height = rect.height,
+                             arrow.head = arrow.head)
+      args.aes$x <- as.name(".temp.x")
+      args.aes$y <- as.name(".temp.y")
+      args.aes$group <- as.name(".id")      
+      aes.temp <- do.call(aes, args.aes)                    
+      p <- do.call(geom_polygon, c(list(data = df), list(aes.temp), args.non))
+    }
+    p <- c(list(p) , list(facet))
+  
+})
+
+
+breakGrTo5polyDf <- function(object, arrow.head = 0.02, rect.height = 0.4, y){
+  ah <- width(range(ranges(object))) * arrow.head
+  df <- as.data.frame(object)
+  df$.id <- seq_len(nrow(df))
+  res <- do.call(rbind,lapply(1:5, function(i) df))
+  res <- res[order(res$.id), ]
+  lst <- lapply(1:nrow(df), function(i){
+    x <- df[i,, drop = FALSE]
+    std <- x$strand
+    if(x$width > ah){
+      if(std == "+"){
+        .x <- c(x$start, x$end-ah, x$end)
+        .x <- c(.x, rev(.x)[-1])
+        .y <- c(rep(x[, y] - rect.height, 2), x[, y], rep(x[, y] + rect.height, 2))
+      }
+      if(std == "-"){
+        .x <- c(x$start, x$start+ah, x$end)
+        .x <- c(.x, rev(.x)[-3])
+        .y <- c(x[, y], rep(x[, y] - rect.height, 2), rep(x[, y] + rect.height, 2))
+      }
+      if(std == "*"){
+        .x <- c(x$start, x$end, x$end)
+        .x <- c(.x, rev(.x)[-1])
+        .y <- c(rep(x[, y] - rect.height, 2), x[, y], rep(x[, y] + rect.height, 2))
+      }
+  }else{
+      if(std == "+"){
+        .x <- c(x$start, x$start, x$end)
+        .x <- c(.x, rev(.x)[-1])
+        .y <- c(rep(x[, y] - rect.height, 2), x[, y], rep(x[, y] + rect.height, 2))
+      }
+      if(std == "-"){
+        .x <- c(x$start, x$end, x$end)
+        .x <- c(.x, rev(.x)[-3])
+        .y <- c(x[, y], rep(x[, y] - rect.height, 2), rep(x[, y] + rect.height, 2))
+      }
+      if(std == "*"){
+        .x <- c(x$start, x$end, x$end)
+        .x <- c(.x, rev(.x)[-1])
+        .y <- c(rep(x[, y] - rect.height, 2), x[, y], rep(x[, y] + rect.height, 2))
+      }
+  }
+    data.frame(.temp.x = .x, .temp.y = .y)
+  })
+  temp <- do.call(rbind, lst)
+  res <- cbind(res, temp)
+  res
+}
+

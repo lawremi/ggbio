@@ -8,10 +8,10 @@
 }
 \usage{
 % for data.frame
-geom_arch(data, ..., n = 25, max.height = 10)
+\S4method{geom_arch}{data.frame}(data, ..., n = 25, max.height = 10)
 
 % for GRanges
-geom_arch(data, ..., facets = NULL, rect.height = 0.4,
+\S4method{geom_arch}{GRanges}(data, ..., facets = NULL, rect.height = 0.4,
           n = 25, max.height = 10)
 }
 \arguments{
@@ -28,8 +28,8 @@ geom_arch(data, ..., facets = NULL, rect.height = 0.4,
     }
   }
   \item{n}{
-    Integer values at which interpolation takes place to create ‘n’
-    equally spaced points spanning the interval [‘min(x)’,'max(x)’].
+    Integer values at which interpolation takes place to create 'n'
+    equally spaced points spanning the interval ['min(x)', 'max(x)'].
   }
   \item{facets}{
     Faceting formula to use.
@@ -54,6 +54,44 @@ aes() to it to map variable to height of arches.
 }
 
 \examples{
+## @knitr load
+set.seed(1)
+N <- 100
+library(ggbio)
+library(GenomicRanges)
+
+## @knitr simul
+## =======================================
+##  simmulated GRanges
+## =======================================
+gr <- GRanges(seqnames = 
+              sample(c("chr1", "chr2", "chr3"),
+                     size = N, replace = TRUE),
+              IRanges(
+                      start = sample(1:300, size = N, replace = TRUE),
+                      width = sample(70:75, size = N,replace = TRUE)),
+              strand = sample(c("+", "-", "*"), size = N, 
+                replace = TRUE),
+              value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
+              sample = sample(c("Normal", "Tumor"), 
+                size = N, replace = TRUE),
+              pair = sample(letters, size = N, 
+                replace = TRUE))
+
+## @knitr default
+## =======================================
+##  default
+## =======================================
+ggplot() + geom_arch(gr)
+
+## @knitr facet_aes
+## =======================================
+##  facetting and aesthetics
+## =======================================
+ggplot() + geom_arch(gr, aes(color = value, height = value, size = value),
+                     alpha = 0.2, facets = sample ~ seqnames)
+
+
 }
 \author{Tengfei Yin}
 

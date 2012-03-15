@@ -8,9 +8,9 @@
 }
 \usage{
 % data.frame
-stat_identity(data, ...)
+\S4method{stat_identity}{data.frame}(data, ...)
 % GRanges
-stat_identity(data, ..., geom = NULL)
+\S4method{stat_identity}{GRanges}(data, ..., geom = NULL)
 }
 \arguments{
   \item{data}{

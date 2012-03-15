@@ -11,19 +11,14 @@ single nucleotide polymorphism. So higher the value, more stronger the
 association they are.
 }
 \usage{
-plotGrandLinear(obj, y, title, facet,
-              size, shape, color, alpha,
-              ...,
-              geom = c("point", "line"),
-              color.type = c("twocolor", "identity", "seqnames"),
-              two.color = c("#0080FF", "#4CC4FF"),
-              cutoff = NULL,
-              cutoff.color = "red",
-              cutoff.size = 1,
-              legend = FALSE,
-              xlab = "Chromosome",
-              ylab = substitute(y),
-              theme_bw = TRUE)
+plotGrandLinear(obj, y, facets, size, shape, color, alpha, ..., geom =
+                 c("point", "line"), color.type = c("twocolor",
+                 "identity", "seqnames"), two.color = c("#0080FF",
+                 "#4CC4FF"), cutoff = NULL, cutoff.color = "red",
+                 cutoff.size = 1, legend = FALSE, xlim, ylim, xlab =
+                 "Genomic Coordinates", ylab = substitute(y), main,
+                 theme)
+
 }
 \arguments{
   \item{obj}{
@@ -35,18 +30,6 @@ plotGrandLinear(obj, y, title, facet,
     Unevaluated name which should be one the of the column names
     indicating the p-value Or other score used as y value in the plot.
     This is required field.
-  }
-  \item{title}{
-    Title for the plot, default plot without title.
-  }
-  \item{facet}{
-    A facet formula, when provided, should be in two forms. First one,
-    \code{facet = group ~ seqnames}, where group should be the name you
-    want to facet by rows, if not, use \code{.} instead. this 
-    is faceted by seqnames, the different chromosomes will be in
-    different panel. The second form, \code{facet = group ~ .} will give
-    you a compact grand linear view, seqnames will not be in different
-    panels, this is a better way to plot a overview, e.g. a Manhattan plot.
   }
   \item{size}{
     Size for point or lines. Could equal a column name or a fixed
@@ -107,9 +90,15 @@ plotGrandLinear(obj, y, title, facet,
   \item{ylab}{
     Label for yscale.
   }
-  \item{theme_bw}{
-    A logical value indicate whether to show gray background or
-    not. Default is TRUE, use theme_bw() in ggplot2.
+  \item{facets}{
+  }
+  \item{xlim}{
+  }
+  \item{ylim}{
+  }
+  \item{main}{
+  }
+  \item{theme}{
   }
 }
 \value{
@@ -123,8 +112,8 @@ and values in the data will be the same across all panels
 \dontrun{
 library(GenomicRanges)
 library(ggbio)
-data(hg19IdeogramCyto)
-data(hg19Ideogram)
+data(hg19IdeogramCyto, package = "biovizBase")
+data(hg19Ideogram, package = "biovizBase")
 chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
 seqlths <- seqlengths(hg19Ideogram)[chrs]
 set.seed(1)

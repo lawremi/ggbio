@@ -6,7 +6,7 @@
   Calculate stepping levels.
 }
 \usage{
-stat_stepping(data, ..., xlab, ylab, main,
+\S4method{stat_stepping}{GRanges}(data, ..., xlab, ylab, main,
               facets = NULL,
               geom = c("rect", "alignment", "segment"))
 }

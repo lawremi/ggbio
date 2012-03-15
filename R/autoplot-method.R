@@ -261,13 +261,6 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
     gr.junction <- gr[values(gr)$junction == TRUE]
     gr.gaps <- getGap(gr.junction, "qname")
     gr.read <- gr  
-    ## if(shrink){
-    ##   max.gap <- maxGap(gr.read, shrink.ratio)
-    ##   if(missing(shrink.fun))
-    ##     shrink.fun <- shrinkageFun(gr.gaps, max.gap = max.gap)
-    ##   gr.read <- shrink.fun(gr.read)
-    ##   gr.gaps <- shrink.fun(gr.gaps)
-    ## }
     df.read <- as.data.frame(gr.read)
     df.gaps <- as.data.frame(gr.gaps)
     p <- ggplot(df.read)

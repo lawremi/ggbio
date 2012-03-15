@@ -54,7 +54,6 @@ plotMismatchSum <- function(obj, show.coverage = TRUE){
   p
 }
 
-
 isPileupSum <- function(x){
   is(x, "GRanges") &&
   c("read", "ref", "count", "depth", "match") %in% colnames(values(x))

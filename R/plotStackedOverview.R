@@ -18,7 +18,7 @@ plotStackedOverview <- function(obj, xlab, ylab, main, facets = seqnames ~ .,
     df.tri.q <- df.tri[substr(df.tri$name, 1, 1) == "q",]
     p <- ggplot(df.rect)
     p <- p + facet_grid(seqnames ~ .) +
-      geom_rect(aes(xmin = start,
+      ggplot2::geom_rect(aes(xmin = start,
                     ymin = 0,
                     xmax = end,
                     ymax = 10,
@@ -46,14 +46,13 @@ plotStackedOverview <- function(obj, xlab, ylab, main, facets = seqnames ~ .,
    
   }else {
     ideo.gr <- getIdeoGR(obj)
-    browser()
     apply(as.data.frame(values(obj)), 2, class)
     df <- as.data.frame(ideo.gr)
     ## df$seqnames <- factor(as.character(df$seqnames),
     ##                       levels = sortChr(unique(as.character(df$seqnames))))
     p <- ggplot(df)
     p <- p + facet_grid(facets) +
-      geom_rect(aes(xmin = start,
+      ggplot2::geom_rect(aes(xmin = start,
                     ymin = 0,
                     xmax = end,
                     ymax = 10), fill = "white", color = "black") +
@@ -90,7 +89,7 @@ plotSingleChrom <- function(obj, subchr, zoom.region, xlabel = FALSE,
     zoom.df <- data.frame(x1 = zoom.region[1],
                           x2 = zoom.region[2],
                           seqnames = unique(as.character(seqnames(obj))))
-    p <- p + geom_rect(data = zoom.df, aes(xmin = x1,
+    p <- p + ggplot2::geom_rect(data = zoom.df, aes(xmin = x1,
                          xmax = x2, ymin = -3, ymax = 13), color = "red", fill = NA)
   }
   if(!xlabel)

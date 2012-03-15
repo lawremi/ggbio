@@ -6,7 +6,7 @@
   Calculate gene structure.
 }
 \usage{
-stat_gene(data, ..., which, xlim,
+\S4method{stat_gene}{TranscriptDb}(data, ..., which, xlim,
           xlab, ylab, main,
           facets = NULL,          
           geom = c("gene", "reduced_gene"),

@@ -7,7 +7,8 @@ Generates summaries on the specified windows
 }
 \usage{
 % for GRanges
-stat_aggregate(data, xlab, ylab, main, by, FUN, start = NULL,
+\S4method{stat_aggregate}{GRanges}(data, xlab, ylab,
+               main, by, FUN, start = NULL,
                end = NULL, width = NULL,  y = NULL, frequency = NULL,
                delta = NULL, ..., simplify = TRUE,
                window = NULL, facets = NULL, 
@@ -29,24 +30,24 @@ stat_aggregate(data, xlab, ylab, main, by, FUN, start = NULL,
     Title for plot.
   }
   \item{by}{
-    An object with ‘start’, ‘end’, and ‘width’ methods. Passed to \code{aggreagate}.
+    An object with 'start', 'end', and 'width' methods. Passed to \code{aggreagate}.
   }
   \item{FUN}{
-    The function, found via ‘match.fun’, to be applied to each window of
-    ‘x’. Passed to \code{aggreagate}.
+    The function, found via 'match.fun', to be applied to each window of
+    'x'. Passed to \code{aggreagate}.
   }
   \item{start}{
-    Start of the window. If ‘by’ is missing, then must supply two of the
+    Start of the window. If 'by' is missing, then must supply two of the
     'start', 'end', 'width'. If 'window' is provided then you don't have
     to specify it.
   }
   \item{end}{
-    End of the window. If ‘by’ is missing, then must supply two of the
+    End of the window. If 'by' is missing, then must supply two of the
     'start', 'end', 'width'. If 'window' is provided then you don't have
     to specify it.
   }
   \item{width}{
-    Width of the window. If ‘by’ is missing, then must supply two of the
+    Width of the window. If 'by' is missing, then must supply two of the
     'start', 'end', 'width'. If 'window' is provided then you don't have
     to specify it.
   }

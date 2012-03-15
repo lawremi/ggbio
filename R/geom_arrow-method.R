@@ -1,12 +1,14 @@
+## FIXME: the group.selfish doesn't work
 setGeneric("geom_arrow", function(data, ...) standardGeneric("geom_arrow"))
 
 setMethod("geom_arrow", "GRanges", function(data, ...,
-                                                  angle = 30,
-                                                  length = unit(0.15, "cm"),
-                                                  type = "open", 
-                                                  stat = c("stepping", "identity"),
-                                                  facets = NULL, arrow.rate = 0.05,
-                                                  group.selfish = TRUE){
+                                            xlab, ylab, main, 
+                                            angle = 30,
+                                            length = unit(0.15, "cm"),
+                                            type = "open", 
+                                            stat = c("stepping", "identity"),
+                                            facets = NULL, arrow.rate = 0.05,
+                                            group.selfish = TRUE){
 
 
   ## remove width = 1
@@ -37,7 +39,6 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
                            dt <- addStepping(dt)
                        })
       res <- unlist(res)
-      ## df <- fortify(data = res)
       data <- res
       df <- as.data.frame(data)
       ## rest?
@@ -86,9 +87,21 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
                     })
         p
       })
+    ## if("group" %in% names(args.aes))
+    ##   gpn <- as.character(args.aes$group)
+    ## else
+    ##   gpn <- "stepping"
+    ## .df.lvs <- unique(res$stepping)
+    ## .df.sub <- res[, c("stepping", gpn)]
+    ## .df.sub <- .df.sub[!duplicated(.df.sub$stepping),]
+    ## if(gpn != "stepping" & group.selfish){
+    ##   p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
+    ##                                      labels = as.character(.df.sub[, gpn]))))
+    ## }else{
+    ##   p <- c(p, list(scale_y_continuous(breaks = NULL)))
+    ## }
     }
     if(stat == "identity"){
-      ## df <- fortify(data = res)
     if(!"y" %in% names(args.aes)){
       if(!all(c("x","xend", "y", "yend") %in% names(args.aes))){
         stop("aes(x =, xend= , y =, yend= ) is required for stat 'identity',
@@ -153,7 +166,17 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
       })
     }
     p <- c(list(p) , list(facet))
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
+  
   p
+
 })
 
 

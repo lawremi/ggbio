@@ -1,6 +1,6 @@
 setGeneric("geom_segment", function(data, ...) standardGeneric("geom_segment"))
 setMethod("geom_segment", "data.frame", function(data, ...){
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- as.list(match.call(call = sys.call(sys.parent(1)))[-1])
   do.call(ggplot2::geom_segment, args)
 })
 ## alignment should be convenient toggle with chevron...
@@ -19,7 +19,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
   
   stat <- match.arg(stat)
 
-  rect.height <- force(rect.heighnt)
+  rect.height <- force(rect.height)
   
   if(stat == "stepping"){
     ## if(rect.height <= 0 | rect.height >= 0.5)
@@ -35,7 +35,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
                          dt <- addStepping(dt)
                      })
     res <- unlist(res)
-    df <- fortify(data = res)
+    df <- fortify(res)
 
     args.aes <- args.aes[!(names(args.aes) %in% c("x", "xend", "y", "yend", "data"))]
     args.non <- args.non[!(names(args.non) %in% c("x", "xend", "yend", "yend", "data"))]
@@ -77,7 +77,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
       args.aes$xend <- as.name("end")
       args.aes$y <- args.aes$yend <- .y
     }
-    df <- fortify(data = data)
+    df <- fortify(data)
     args.aes <- args.aes[names(args.aes) != "group"]
     args.aes <- args.aes[names(args.aes) != "size"]
     

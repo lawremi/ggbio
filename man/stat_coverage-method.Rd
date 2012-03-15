@@ -8,11 +8,11 @@
 }
 \usage{
 % for GRanges
-stat_coverage(data, ..., xlim, xlab, ylab, main,
+\S4method{stat_coverage}{GRanges}(data, ..., xlim, xlab, ylab, main,
               facets = NULL,
               geom = NULL)
 % for GRangesList
-stat_coverage(data, ..., xlim, xlab, ylab, main,
+\S4method{stat_coverage}{GRangesList}(data, ..., xlim, xlab, ylab, main,
               facets = NULL,
               geom = NULL)
 

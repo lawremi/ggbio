@@ -4,12 +4,14 @@
 ## ggplot2
 import(ggplot2)
 import(reshape2)
+import(scales)
 import(BiocGenerics)
 import(Biobase)
 import(biovizBase)
 import(grid)
+import(plyr)
 importFrom(gridExtra, grid.arrange)
-importFrom(scales, cscale, dscale)
+
 ## Hmisc
 importFrom(Hmisc, bezier)
 ## GenomicRanges
@@ -104,7 +106,6 @@ export(tracks,
        plotSpliceSum,       
        plotStackedOverview,
        plotSingleChrom,
-       plotMismatchSum,
        plotGrandLinear,
        plotRangesLinkedToData)
 

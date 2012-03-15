@@ -1,10 +1,10 @@
 \name{tracks}
 \alias{tracks}
 \title{Tracks for genomic graphics}
-\usage{tracks(..., show.axis.text.y = FALSE,
-              show.ticks = FALSE,
-              show.title = TRUE,
-              legend = FALSE, xlim, ylim)
+\usage{
+tracks(..., heights, xlim, ylim, theme = NULL,
+         legend = FALSE, xlab = NULL, track.skip = -1, xlim.change =
+                 rep(TRUE, length(list(...))))
 }
 \description{In most genome browsers, they all have such a view that including
 many tracks, could be any anntation data along genomic
@@ -64,19 +64,15 @@ graphics before passing to \code{grid.arrange}.
 \author{Tengfei Yin}
 \arguments{\item{...}{Plots of class ggplot2, trellis, or grobs, and valid
     arguments to grid.layout.}
-  \item{show.axis.text.y}{
-    logical value indicate to show y axis text or not.
-  }
-  \item{show.ticks}{
-    logical value indicate to show ticks or not.
-  }
-  \item{show.title}{
-    logical value indicate to show title of tracks or not.
-  }
 \item{legend}{Default is FALSE, remove legend, this make sure all
  tracks are aligned exactly based on the same position.}
 \item{xlim}{Limits on x.}
 \item{ylim}{Limits on y.}
+\item{heights}{}
+\item{theme}{}
+\item{xlab}{}
+\item{track.skip}{}
+\item{xlim.change}{}
 }
 \examples{
 \dontrun{

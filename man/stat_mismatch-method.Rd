@@ -7,13 +7,13 @@
   Calculate mismatch summary  
 }
 \usage{
-% for GRanges
-stat_mismatch(data, ..., bsgenome, which,
+## for GRanges
+\S4method{stat_mismatch}{GRanges}(data, ..., bsgenome, which,
               xlab, ylab, main,
               geom = c("segment", "bar"),
               show.coverage = TRUE)
-% for BamFile
-stat_mismatch(data, ..., bsgenome, which
+## for BamFile
+\S4method{stat_mismatch}{BamFile}(data, ..., bsgenome, which
               xlab, ylab, main,
               geom = c("segment", "bar"),
               show.coverage = TRUE)

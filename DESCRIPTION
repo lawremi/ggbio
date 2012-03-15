@@ -5,8 +5,8 @@ Description: The ggbio package extends and specializes the grammar of graphics f
 Author: Tengfei Yin, Dianne Cook, Michael Lawrence
 Maintainer: Tengfei Yin <yintengfei@gmail.com>
 Depends: methods, ggplot2(>= 0.9) 
-Imports: methods, biovizBase(>= 1.1.3), reshape2, ggplot2(>= 0.9), BiocGenerics, Biobase, IRanges, GenomicRanges, GenomicFeatures, Rsamtools, BSgenome, gridExtra, scales, Hmisc
-Suggests: BSgenome.Hsapiens.UCSC.hg19, TxDb.Hsapiens.UCSC.hg19.knownGene
+Imports: methods, biovizBase(>= 1.1.3), reshape2, ggplot2(>= 0.9), BiocGenerics, Biobase, IRanges, GenomicRanges, GenomicFeatures, Rsamtools, BSgenome, gridExtra, scales, Hmisc, plyr
+Suggests: BSgenome.Hsapiens.UCSC.hg19, TxDb.Hsapiens.UCSC.hg19.knownGene, affyPLM
 biocViews: Infrastructure, Visualization, Bioinformatics
 License: Artistic-2.0 
 LazyLoad: Yes

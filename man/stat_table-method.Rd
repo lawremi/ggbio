@@ -7,8 +7,11 @@
   Tabulate a GRanges object  
 }
 \usage{
-stat_table(data, ..., xlab, ylab, main,
-           geom = NULL,stat = NULL)
+\S4method{stat_table}{GRanges}(data, ..., xlab, ylab, main,
+            geom = NULL,stat = NULL)
+\S4method{stat_table}{GRangesList}(data, ..., xlab, ylab, main,
+            facets = NULL, geom = NULL)
+
 }
 \arguments{
   \item{data}{
@@ -26,6 +29,9 @@ stat_table(data, ..., xlab, ylab, main,
   }
   \item{main}{
     Title for plot.
+  }
+  \item{facets}{
+    Faceting formula to use. 
   }
   \item{geom}{
     The geometric object to use display the data. 

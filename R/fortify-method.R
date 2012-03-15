@@ -1,7 +1,7 @@
 setGeneric("fortify")
 
-setMethod("fortify", c("ANY", "eSet"), function(model = NULL, data){
-  object <- data
+setMethod("fortify", c("eSet", "missing"), function(model, data){
+  object <- model
   pdata <- phenoData(object)
   df <- as(object, "data.frame")
   df$sampleNames <- row.names(df)
@@ -9,8 +9,8 @@ setMethod("fortify", c("ANY", "eSet"), function(model = NULL, data){
   df.m
 })
 
-setMethod("fortify", c("ANY", "GRanges"), function(model = NULL, data){
-  df <- as.data.frame(data)
+setMethod("fortify", c("GRanges", "missing"), function(model, data){
+  df <- as.data.frame(model)
   df$midpoint <- (df$start+df$end)/2
   df
 })

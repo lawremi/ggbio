@@ -11,6 +11,8 @@
 \alias{autoplot,character-method}
 \alias{autoplot,Rle-method}
 \alias{autoplot,RleList-method}
+\alias{autoplot,ExpressionSet-method}
+
 
 \title{Generic autoplot function}
 
@@ -23,86 +25,80 @@
 }
 
 \usage{
-## For object data.frame
-\S4method{autoplot}{data.frame}(data, ...)
-
-## For object matrix
-\S4method{autoplot}{matrix}(data, ...)
-
-## For object numeric
-\S4method{autoplot}{numeric}(data, ...)
-
-## For object numeric
-\S4method{autoplot}{integer}(data, ...)
-
 ## For object GRanges
-\S4method{autoplot}{GRanges}(data, x, y,...,
-      facet_gr, legend = TRUE,
-      show.coverage = TRUE,
-      show.gaps = FALSE,
-      show.label = FALSE,
-      geom = c("full", "line","point",
-               "segment", 
-               "coverage.line", "coverage.polygon"))
+\S4method{autoplot}{GRanges}(object, ..., xlab, ylab, main, 
+      legend = TRUE,  geom = NULL, stat = NULL, layout = c("linear", "stacked", "circle"))
 
 ## For object GRangesList
-\S4method{autoplot}{GRangesList}(data, ..., freq, show.label = FALSE,
-      show.gaps = TRUE, scale.size = c(5, 17),
-      label.type = c("name", "count"),
-      label.size = 5, label.color = "black")
+\S4method{autoplot}{GRangesList}(object, ..., xlab, ylab,
+                 main, indName = ".grl.name",
+                 geom = NULL, stat = NULL, type = c("none", "sashimi"),
+                 coverage.col = "gray50", coverage.fill = coverage.col,
+                 group.selfish = FALSE, arch.offset = 1.3)
 
 ## For object IRanges
-\S4method{autoplot}{IRanges}(data, ..., legend = TRUE,
-      geom = c("full", "segment", 
-               "coverage.line", "coverage.polygon"))
+\S4method{autoplot}{IRanges}(object, ..., legend = TRUE,
+                 xlab, ylab, main, facets,
+                 facet, stat = c("identity", "coverage", "step"), geom
+                 = c("rect", "segment", "alignment", "line", "point",
+                 "area"), coord = "linear")
 
 ## For object GappedAlignments
-\S4method{autoplot}{GappedAlignments}(data, ..., which,
+\S4method{autoplot}{GappedAlignments}(object, ..., which,
       geom = c("gapped.pair", "full"),
       show.junction = FALSE)
 
 ## For object BamFile
-\S4method{autoplot}{BamFile}(data, ..., which, 
+\S4method{autoplot}{BamFile}(object, ..., which, 
       bsgenome, resize.extra = 10, show.coverage = TRUE,
       geom = c("gapped.pair", "full",
-               "coverage.line",
-               "coverage.polygon", "mismatch.summary"))
+                 "coverage.line", "coverage.area", "mismatch.summary"))
 
 ## For object character
-\S4method{autoplot}{character}(data, ..., which, 
-      bsgenome, resize.extra = 10, show.coverage = TRUE,
-      geom = c("gapped.pair", "full", 
-               "coverage.line", "coverage.polygon",
-               "mismatch.summary"))
+\S4method{autoplot}{character}(object, ..., which,
+                 bsgenome, resize.extra = 10,
+                 show.coverage = TRUE, geom = c("gapped.pair", "full",
+                 "coverage.line", "coverage.area", "mismatch.summary"))
 
 ## For object TranscriptDb
-\S4method{autoplot}{TranscriptDb}(data, which, ...,
-      geom = c("full", "single", "tx"))
+\S4method{autoplot}{TranscriptDb}(object, which, ..., xlab,
+                 ylab, main, xlim, ylim,
+                 geom = c("gene", "reduced_gene"),
+                 names.expr =
+                 expression(paste(tx_name, "(", gene_id, ")", sep = "")))
 
 ## For object BSgenome
-\S4method{autoplot}{BSgenome}(data, name, ...,
-      geom = c("text", "segment", "point", "rectangle"))
+\S4method{autoplot}{BSgenome}(object, which, ...,
+                    xlab, ylab, main, geom = c("text",
+                   "segment", "point", "rect"))
+
+
 
 ## For object Rle
-\S4method{autoplot}{Rle}(data, lower, ...,
-      size, shape, color, alpha,
-      xlab = "x", ylab = "y",
-      geom = c("point", "line", "segment"),
-      type = c("raw", "viewMaxs","viewMins",
-               "viewSums", "viewMeans"))
+\S4method{autoplot}{Rle}(object, lower, ..., xlab = "x", ylab = "y", main,
+                 color, size, shape, alpha, geom = c("point", "line",
+                 "segment"), type = c("raw", "viewMaxs", "viewMins",
+                 "viewSums", "viewMeans"))
+
 
 ## For object RleList
-\S4method{autoplot}{RleList}(data, lower, ...,
-      size, shape, color, alpha,
-      facetByRow = TRUE,
-      xlab = "x", ylab = "y",
-      geom = c("point", "line", "segment"),
-      type = c("raw", "viewMaxs","viewMins",
-               "viewSums", "viewMeans"))
+\S4method{autoplot}{RleList}(object, lower, ...,
+                 xlab = "x", ylab = "y", main,
+                 size, shape, color, alpha, facetByRow = TRUE, geom =
+                 c("point", "line", "segment"), type = c("raw",
+                 "viewMaxs", "viewMins", "viewSums", "viewMeans"))
+
+
+## For object ExpressionSet
+\S4method{autoplot}{ExpressionSet}(object, ..., type = c("none", "heatmap",
+                                    "matrix", "parallel", "MA",
+                                    "mean-sd", "volcano",
+                                    "NUSE", "RLE"),
+                     test.method = "t")
 }
 
 \arguments{
-  \item{data}{
+  \item{object}{
     A \code{\link{data.frame}}, \code{\link{matrix}},
     \code{\link{GRanges}}, \code{\link{BSgenome}},
     \code{\link{TranscriptDb}}, \code{\link{GappedAlignments}} object
@@ -121,10 +117,6 @@
     Geom to use (Single character for now). Please see section Geometry
     for details.
   }
-  \item{facet_gr}{
-    A \code{\link{GRanges}} object which contains the regions you want
-  to facet on. 			%
-}
   \item{size}{
     Size for point or lines. Could equal a column name or a fixed
     number. When it's fixed, please use \code{I()} to wrap the value.
@@ -181,20 +173,6 @@
     A logical value indicates whether to show coverage or not. This is
   used for geom "mismatch.summary".
 }
-  \item{show.gaps}{
-    A logical value indicates whether to show gaps or not. This is
-  used for geom "full".
-}
-  \item{show.label}{
-    A logical value indicates whether to show labels or not. This is
-  used for geom "full".
-}
-\item{freq}{
-  A numeric vector indicating counts. This used for \code{GRangesList}
-  plot when you try to produce a summary for gene model or alternative
-  splicing, the name of the vector corresponding to the names of the
-  \code{GRangesList}.
-}
   \item{resize.extra}{
     A numeric value used to add buffer to intervals to compute stepping
     levels on.
@@ -221,27 +199,45 @@
   IRanges. For "viewMins", "viewMaxs", we use \code{viewWhichMin} and
   \code{viewWhichMax} to get x scale, for "viewMeans", "viewSums", we
   use window midpoint as x.
+
+  For ExpreesionSet, ploting types.
 }
-\item{scale.size}{
-  A numeric vector of length two specifying the size of point from
-  minimum to maximum.
-}
-\item{label.type}{
-  Either "name" or "count". "name" try to use the name of list to label
-  the model, but "count" use information from freq to label it.
-}
-\item{label.size}{
-  Size of label.
-}
-\item{label.color}{
-  Color of label.
-}
+\item{test.method}{test method}
   \item{...}{
     Extra parameters. Usually are those parameters used in autoplot to
     control aesthetics or geometries.
   }
+  \item{layout}{
+  }
+  \item{main}{
+  }
+  \item{stat}{
+  }
+  \item{indName}{
+  }
+  \item{coverage.col}{
+  }
+  \item{coverage.fill}{
+  }
+  \item{group.selfish}{
+  }
+  \item{arch.offset}{
+  }
+  \item{facets}{
+  }
+  \item{facet}{
+  }
+  \item{coord}{
+  }
+  \item{xlim}{
+  }
+  \item{ylim}{
+    
+  }
+  \item{names.expr}{
+    
+  }
 }
-
 \value{
   A \code{ggplot} object, so you can use common features from ggplot2
   package to manipulate the plot.

@@ -30,7 +30,7 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome, which,
                                                "geom")]
   
   ## df <- as.data.frame(data)
-  df <- fortify(data = data)
+  df <- fortify(data)
   df.unmatch <- df[!df$match, ]
   ## add two end point?
   pos <- min(df$start):max(df$end)

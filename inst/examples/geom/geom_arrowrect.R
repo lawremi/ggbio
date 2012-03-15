@@ -1,7 +1,9 @@
+## @knitr load
 set.seed(1)
 N <- 100
-library(ggbio)
-library(GenomicRanges)
+require(ggbio)
+require(GenomicRanges)
+## @knitr simul
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -19,24 +21,34 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
+
+## @knitr default
 ## ======================================================================
 ##  default
 ## ======================================================================
-ggplot() + geom_rect(gr)
+ggplot() + geom_arrowrect(gr)
+
+## @knitr facet_aes
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot() + geom_rect(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
+ggplot() + geom_arrowrect(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
+
+## @knitr stat:identity
 ## ======================================================================
 ##  stat:identity
 ## ======================================================================
-ggplot() + geom_rect(gr, stat = "identity", aes(y = value))
+ggplot() + geom_arrowrect(gr, stat = "identity", aes(y = value))
+
+## @knitr stat:stepping
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot() + geom_rect(gr, stat = "stepping", aes(y = value, group = pair))
+ggplot() + geom_arrowrect(gr, stat = "stepping", aes(y = value, group = pair))
+
+## @knitr group.selfish
 ## ======================================================================
 ##  group.selfish controls when 
 ## ======================================================================
-ggplot() + geom_rect(gr, stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
+ggplot() + geom_arrowrect(gr, stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
 

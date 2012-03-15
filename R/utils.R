@@ -420,7 +420,7 @@ segInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
 
 ## for a special GRanges
 linkInter <- function(data, linked.to, space.skip = 0.1, trackWidth = 10, radius = 10,
-                      link.fun = function(x, y, n = 100) bezier(x, y, evaluatio = n),
+                      link.fun = function(x, y, n = 100) bezier(x, y, evaluation = n),
                       direction = direction){
   if(missing(linked.to))
     stop("linked.to must be provided and be a GRanges")
@@ -494,7 +494,7 @@ ddplyFun <- function(data, .fun, ..., window = 1e5){
     idx <- !is.na(of)
     df <- as.data.frame(gr[idx])
     df$of <- of[idx]
-    resdf <- ddply(df, .(of), .fun, ...)
+    resdf <- plyr::ddply(df, .(of), .fun, ...)
     idx <- as.numeric(resdf$of)
     ## idx <- idx[!is.na(idx)]
     res <- qgr[idx]
@@ -602,12 +602,12 @@ getScale <- function(gr, unit = NULL, n = 100, type = c("M", "B", "sci")){
     minor.pos <- seq(st, ed, by = unit)
     minor.pos <- setdiff(minor.pos, major.pos)
     if(type == "M"){
-      texts <- c(paste(as.character(round(major.pos/1e6, digit = 1)), "M",
+      texts <- c(paste(as.character(round(major.pos/1e6, digits = 1)), "M",
                        sep = ""),
                rep("", length(minor.pos)))
     }
     if(type == "B"){
-      texts <- c(paste(as.character(round(major.pos/1e9, digit = 1)), "B",
+      texts <- c(paste(as.character(round(major.pos/1e9, digits = 1)), "B",
                        sep = ""),
                rep("", length(minor.pos)))
     }
@@ -655,8 +655,8 @@ parseArgsForNonAes <- function(args){
 }
 
 getNR <- function(x, type = c("NUSE", "RLE"),range = 0, ...){
-require(affyPLM)
-compute.nuse <- function(which) {
+  require(affyPLM)
+  compute.nuse <- function(which) {
   nuse <- apply(x@weights[[1]][which, ], 2, sum)
   1/sqrt(nuse)
 }

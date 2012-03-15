@@ -36,7 +36,7 @@
   \item{trackWidth}{
     Numeric value indicates the track width.
   }
-  \items{space.skip}{
+  \item{space.skip}{
     Numeric value indicates the ratio of skipped region between chunks(chromosomes
     in \code{GRanges}) to the whole track space.
   }

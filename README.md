@@ -1,3 +1,6 @@
+# Homeapge
+[ggbio homepage](http://tengfei.github.com/ggbio)
+
 # INSTALL
 ### For R 2.15 with git version *ggbio*(latest)
 #### This is for developers, notice I am not using bioc-devel svn as major version control system. If you want to play with latest *ggbio* you have to stick with this method.

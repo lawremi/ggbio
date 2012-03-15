@@ -8,6 +8,7 @@
 \usepackage{hyperref}
 \usepackage{verbatim}
 \usepackage{graphicx}
+\usepackage{url}
 
 % \SweaveOpts{width = 2.5, height = 2}
 
@@ -60,10 +61,10 @@ options(width=72)
 From this version of \ggbio{}, I am going to move documentation from pdf to
 on-line version, new website is here
 
-http://tengfei.github.com/ggbio
+\url{http://tengfei.github.com/ggbio}
 
 Please allow several datas to make all demos and examples availabe, this new
-system is still reproducible, the html is produced from /inst/md_example file, a
+system is still reproducible, the html is produced from /inst/md\_example file, a
 bunch of markdown files hybrided with R code. 
 
 On-line documentation is google searchable and multi-media friendly, more

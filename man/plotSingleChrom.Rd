@@ -1,7 +1,9 @@
 \name{plotSingleChrom}
 \alias{plotSingleChrom}
 \title{Plot single chromosome with cytoband}
-\usage{plotSingleChrom(obj, subchr, zoom.region, xlabel = FALSE)
+\usage{
+plotSingleChrom(obj, subchr, zoom.region, xlabel = FALSE, xlab, ylab,
+                 main)
 }
 \description{Plot single chromosome with cytoband}
 \details{User could provide the whole ideogram and use subchr to point to
@@ -17,8 +19,11 @@ information about cytoband.}
   A logical value. Show the x label or not.
 }
 }
-\examples{data(hg19IdeogramCyto)
+\examples{
+data(hg19IdeogramCyto, package = "biovizBase")
+library(grid)
 vp1 <- viewport(width = 1, height = 0.14)
 p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
-print(p, vp = vp1)}
+print(p, vp = vp1)
+}
 

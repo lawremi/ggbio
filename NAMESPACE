@@ -1,12 +1,19 @@
 ## ============================================================
 ## Import
 ## ============================================================
-import(methods)
-## import(ggplot2)
-## import(biovizBase)
-importFrom(gridExtra, grid.arrange)
+## ggplot2
+import(ggplot2)
+import(reshape2)
 import(scales)
 import(BiocGenerics)
+import(Biobase)
+import(biovizBase)
+import(grid)
+import(plyr)
+importFrom(gridExtra, grid.arrange)
+
+## Hmisc
+importFrom(Hmisc, bezier)
 ## GenomicRanges
 ## IRanges
 importFrom(IRanges, IRanges,  disjointBins,
@@ -16,17 +23,18 @@ importFrom(IRanges, IRanges,  disjointBins,
            "values", "values<-",
            ranges, "ranges<-", 
            isTRUEorFALSE, coverage, slice,
-           elementLengths,
-           reduce, punion, pgap, gaps)
+           elementLengths, 
+           reduce, punion, pgap, gaps, "%in%")
 
-importMethodsFrom(IRanges,  split, unique,
-                  unlist, setdiff,
-                  Reduce, range,
+importMethodsFrom(IRanges,  split, 
+                  unlist, psetdiff,
+                  range,
                   as.data.frame,
                   length,
+                  ## "%in%",
                   "[","[<-","[[", "[[<-","$",
-                  "%in%", show, 
-                  lapply, sapply)
+                  show,
+                  as.list)
 
 importClassesFrom(IRanges, Rle, RleList, IRanges)
 
@@ -40,15 +48,15 @@ importMethodsFrom(GenomicRanges, ranges, "ranges<-",
                    "elementMetadata<-", elementMetadata,
                   as.data.frame, keepSeqlevels, renameSeqlevels)
 
-importClassesFrom(GenomicRanges, GRanges)
 
-##
+importClassesFrom(GenomicRanges, GRanges, GRangesList)
+
 ## ## ## Rsamtools
 importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,
            scanBamFlag,BamFile,
            PileupFiles, PileupParam ,
            readBamGappedAlignments)
-importMethodsFrom(Rsamtools, applyPileups)
+importMethodsFrom(Rsamtools, applyPileups, path)
 importClassesFrom(Rsamtools, BamFile)
 
 ## ## ## BSgenome
@@ -67,10 +75,39 @@ importFrom(GenomicFeatures,
 ## ============================================================
 ## Export
 ## ============================================================
-exportMethods(qplot, rescale, plotFragLength, plotSpliceSum)
-export(tracks, plotOverview, plotSingleChrom, geom_hotregion,
-       geom_chevron, 
-       plotMismatchSum,
+exportMethods(autoplot, rescale, fortify)
+
+## geom
+exportMethods(geom_chevron,
+              geom_arch,
+              geom_alignment,
+              geom_arrow,
+              geom_arrowrect,
+              geom_rect,
+              geom_segment)
+
+## stat
+exportMethods(stat_aggregate,
+              stat_coverage,
+              stat_identity,	
+              stat_mismatch, 	
+              stat_stepping,
+              stat_gene,
+              stat_table)
+
+## layout
+exportMethods(layout_karyogram,
+              layout_circle)
+
+
+
+export(tracks,
+       plotFragLength,        
+       plotSpliceSum,       
+       plotStackedOverview,
+       plotSingleChrom,
        plotGrandLinear,
        plotRangesLinkedToData)
+
+export(theme_null, theme_alignment)
 

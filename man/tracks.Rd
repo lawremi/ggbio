@@ -1,10 +1,10 @@
 \name{tracks}
 \alias{tracks}
 \title{Tracks for genomic graphics}
-\usage{tracks(..., show.axis.text.y = FALSE,
-              show.ticks = FALSE,
-              show.title = TRUE,
-              legend = FALSE, xlim, ylim)
+\usage{
+tracks(..., heights, xlim, ylim, theme = NULL,
+         legend = FALSE, xlab = NULL, track.skip = -1, xlim.change =
+                 rep(TRUE, length(list(...))))
 }
 \description{In most genome browsers, they all have such a view that including
 many tracks, could be any anntation data along genomic

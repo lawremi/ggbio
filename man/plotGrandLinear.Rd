@@ -11,19 +11,14 @@ single nucleotide polymorphism. So higher the value, more stronger the
 association they are.
 }
 \usage{
-plotGrandLinear(obj, y, title, facet,
-              size, shape, color, alpha,
-              ...,
-              geom = c("point", "line"),
-              color.type = c("twocolor", "identity", "seqnames"),
-              two.color = c("#0080FF", "#4CC4FF"),
-              cutoff = NULL,
-              cutoff.color = "red",
-              cutoff.size = 1,
-              legend = FALSE,
-              xlab = "Chromosome",
-              ylab = substitute(y),
-              theme_bw = TRUE)
+plotGrandLinear(obj, y, facets, size, shape, color, alpha, ..., geom =
+                 c("point", "line"), color.type = c("twocolor",
+                 "identity", "seqnames"), two.color = c("#0080FF",
+                 "#4CC4FF"), cutoff = NULL, cutoff.color = "red",
+                 cutoff.size = 1, legend = FALSE, xlim, ylim, xlab =
+                 "Genomic Coordinates", ylab = substitute(y), main,
+                 theme)
+
 }
 \arguments{
   \item{obj}{
@@ -123,8 +118,8 @@ and values in the data will be the same across all panels
 \dontrun{
 library(GenomicRanges)
 library(ggbio)
-data(hg19IdeogramCyto)
-data(hg19Ideogram)
+data(hg19IdeogramCyto, package = "biovizBase")
+data(hg19Ideogram, package = "biovizBase")
 chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
 seqlths <- seqlengths(hg19Ideogram)[chrs]
 set.seed(1)

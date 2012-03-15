@@ -6,9 +6,11 @@
   coordinates plot which represting the data in elementeMetadata.
 }
 \usage{
-plotRangesLinkedToData(data, stat.col, stat.label, ..., annotation = list(),
-                       width.ratio = 0.8,
-                       heights = c(400, 100, 100, rep(300, length(annotation))))
+plotRangesLinkedToData(data, stat.col, stat.label, stat.ylab, sig, sig.col =
+                 c("black", "red"), stat.coord.trans = coord_trans(),
+                 solid.size = 1.3, ..., annotation = list(),
+                 width.ratio = 0.8, track.skip = -1, theme.stat =
+                 theme_grey(), theme.align = theme_grey(), heights)
 }
 \arguments{
   \item{data}{
@@ -21,6 +23,21 @@ plotRangesLinkedToData(data, stat.col, stat.label, ..., annotation = list(),
   \item{stat.label}{
     Labels of the columns, if missing, use stat.col.
   }
+  \item{stat.ylab}{
+    y label for stat track(the top track).
+  }
+  \item{sig}{
+    
+  }
+  \item{sig.col}{
+    
+  }
+  \item{stat.coord.trans}{
+    
+  }
+  \item{solid.size}{
+    
+  }
   \item{...}{
     Parameters passed to qplot.
   }
@@ -29,6 +46,15 @@ plotRangesLinkedToData(data, stat.col, stat.label, ..., annotation = list(),
   }
   \item{width.ratio}{
     Control the segment length of statistic layer.
+  }
+  \item{track.stat}{
+    
+  }
+  \item{theme.stat}{
+    
+  }
+  \item{theme.align}{
+    
   }
   \item{heights}{
     Heights of each track.

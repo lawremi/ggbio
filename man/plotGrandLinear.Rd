@@ -31,18 +31,6 @@ plotGrandLinear(obj, y, facets, size, shape, color, alpha, ..., geom =
     indicating the p-value Or other score used as y value in the plot.
     This is required field.
   }
-  \item{title}{
-    Title for the plot, default plot without title.
-  }
-  \item{facet}{
-    A facet formula, when provided, should be in two forms. First one,
-    \code{facet = group ~ seqnames}, where group should be the name you
-    want to facet by rows, if not, use \code{.} instead. this 
-    is faceted by seqnames, the different chromosomes will be in
-    different panel. The second form, \code{facet = group ~ .} will give
-    you a compact grand linear view, seqnames will not be in different
-    panels, this is a better way to plot a overview, e.g. a Manhattan plot.
-  }
   \item{size}{
     Size for point or lines. Could equal a column name or a fixed
     number. When it's fixed, please use \code{I()} to wrap the value.
@@ -102,9 +90,15 @@ plotGrandLinear(obj, y, facets, size, shape, color, alpha, ..., geom =
   \item{ylab}{
     Label for yscale.
   }
-  \item{theme_bw}{
-    A logical value indicate whether to show gray background or
-    not. Default is TRUE, use theme_bw() in ggplot2.
+  \item{facets}{
+  }
+  \item{xlim}{
+  }
+  \item{ylim}{
+  }
+  \item{main}{
+  }
+  \item{theme}{
   }
 }
 \value{

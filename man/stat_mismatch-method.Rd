@@ -7,17 +7,16 @@
   Calculate mismatch summary  
 }
 \usage{
-% for GRanges
+## for GRanges
 \S4method{stat_mismatch}{GRanges}(data, ..., bsgenome, which,
               xlab, ylab, main,
               geom = c("segment", "bar"),
               show.coverage = TRUE)
-% for BamFile
-\S4method{stat_mismatch}{BamFile}(data, ..., bsgenome, which
+## for BamFile
+\S4method{stat_mismatch}{BamFile}(data, ..., bsgenome, which,
               xlab, ylab, main,
               geom = c("segment", "bar"),
               show.coverage = TRUE)
-
 }
 \arguments{
   \item{data}{
@@ -51,8 +50,6 @@
 }
 \value{
   A 'Layer'.
-}
-\examples{
 }
 \author{Tengfei Yin}
 

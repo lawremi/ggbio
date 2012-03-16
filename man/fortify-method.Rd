@@ -1,14 +1,14 @@
 \name{fortify}
 \alias{fortify}
-\alias{fortify,eSet,ANY-method}
-\alias{fortify,GRanges,ANY-method}
+\alias{fortify,eSet,missing-method}
+\alias{fortify,GRanges,missing-method}
 \title{Fortify a object to a data frame}
 \description{
   Fortify a object to a data frame.
 }
 \usage{
-\S4method{fortify}{eSet,ANY}(model = NULL, data)
-\S4method{fortify}{GRanges,ANY}(model = NULL, data)
+\S4method{fortify}{eSet,missing}(model, data)
+\S4method{fortify}{GRanges,missing}(model, data)
 }
 \arguments{
   \item{model}{

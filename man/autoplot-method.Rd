@@ -98,7 +98,7 @@
 }
 
 \arguments{
-  \item{data}{
+  \item{object}{
     A \code{\link{data.frame}}, \code{\link{matrix}},
     \code{\link{GRanges}}, \code{\link{BSgenome}},
     \code{\link{TranscriptDb}}, \code{\link{GappedAlignments}} object
@@ -117,10 +117,6 @@
     Geom to use (Single character for now). Please see section Geometry
     for details.
   }
-  \item{facet_gr}{
-    A \code{\link{GRanges}} object which contains the regions you want
-  to facet on. 			%
-}
   \item{size}{
     Size for point or lines. Could equal a column name or a fixed
     number. When it's fixed, please use \code{I()} to wrap the value.
@@ -177,20 +173,6 @@
     A logical value indicates whether to show coverage or not. This is
   used for geom "mismatch.summary".
 }
-  \item{show.gaps}{
-    A logical value indicates whether to show gaps or not. This is
-  used for geom "full".
-}
-  \item{show.label}{
-    A logical value indicates whether to show labels or not. This is
-  used for geom "full".
-}
-\item{freq}{
-  A numeric vector indicating counts. This used for \code{GRangesList}
-  plot when you try to produce a summary for gene model or alternative
-  splicing, the name of the vector corresponding to the names of the
-  \code{GRangesList}.
-}
   \item{resize.extra}{
     A numeric value used to add buffer to intervals to compute stepping
     levels on.
@@ -221,26 +203,41 @@
   For ExpreesionSet, ploting types.
 }
 \item{test.method}{test method}
-\item{scale.size}{
-  A numeric vector of length two specifying the size of point from
-  minimum to maximum.
-}
-\item{label.type}{
-  Either "name" or "count". "name" try to use the name of list to label
-  the model, but "count" use information from freq to label it.
-}
-\item{label.size}{
-  Size of label.
-}
-\item{label.color}{
-  Color of label.
-}
   \item{...}{
     Extra parameters. Usually are those parameters used in autoplot to
     control aesthetics or geometries.
   }
+  \item{layout}{
+  }
+  \item{main}{
+  }
+  \item{stat}{
+  }
+  \item{indName}{
+  }
+  \item{coverage.col}{
+  }
+  \item{coverage.fill}{
+  }
+  \item{group.selfish}{
+  }
+  \item{arch.offset}{
+  }
+  \item{facets}{
+  }
+  \item{facet}{
+  }
+  \item{coord}{
+  }
+  \item{xlim}{
+  }
+  \item{ylim}{
+    
+  }
+  \item{names.expr}{
+    
+  }
 }
-
 \value{
   A \code{ggplot} object, so you can use common features from ggplot2
   package to manipulate the plot.

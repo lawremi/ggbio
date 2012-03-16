@@ -42,11 +42,10 @@
   \item{ylim}{
     limits for y axis
   }
-  \item{rect.heigh}{
+  \item{rect.height}{
     numreic value indicate half of the rectangle ploting region, used
     for alignment of multiple layers.
-  }
-}
+  }}
 \value{
   A 'Layer'.
 }

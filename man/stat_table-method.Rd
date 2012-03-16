@@ -30,6 +30,9 @@
   \item{main}{
     Title for plot.
   }
+  \item{facets}{
+    Faceting formula to use. 
+  }
   \item{geom}{
     The geometric object to use display the data. 
   }

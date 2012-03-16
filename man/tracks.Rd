@@ -2,11 +2,30 @@
 \alias{tracks}
 \title{Tracks for genomic graphics}
 \usage{
-tracks(..., heights, xlim, ylim, theme = NULL,
-         legend = FALSE, xlab = NULL, track.skip = -1, xlim.change =
-                 rep(TRUE, length(list(...))))
+tracks(..., heights, xlim, ylim, xlab = NULL,                
+            theme = NULL, legend = FALSE,     
+            track.skip = -1,
+            xlim.change = rep(TRUE, length(list(...))))
 }
-\description{In most genome browsers, they all have such a view that including
+\arguments{
+  \item{...}{plots of class ggplot2, trellis, or grobs, and valid
+    arguments to grid.layout.}
+  \item{legend}{default is FALSE, remove legend, this make sure all
+    tracks are aligned exactly based on the same position.}
+  \item{xlim}{limits on x.}
+  \item{ylim}{limits on y.}
+  \item{xlab}{label for x axis.}
+  \item{heights}{numeric vector of the same length of passed graphic
+    object to indicate the ratio of each track.}
+  \item{theme}{Option list or theme applied to each track.}
+  \item{track.skip}{Numeric value, skip between tracks, unit is 'lines'.}
+  \item{xlim.change}{Vector of logical value of the same length as
+    passed graphic objects, to control whether we adjust that track with
+  each other or just leave it as it is. This could be useful when you
+  pass a single chromosome view on top of the tracks.}
+}
+\description{
+  In most genome browsers, they all have such a view that including
 many tracks, could be any anntation data along genomic
 coordinate. So we try to provide a convenient constructor for
 building tracks, which here in this package is simply vertically
@@ -62,31 +81,5 @@ graphics before passing to \code{grid.arrange}.
 \seealso{\code{\link{grid.arrange}}}
 \value{return a frame grob; side-effect (plotting) if plot=T.}
 \author{Tengfei Yin}
-\arguments{\item{...}{Plots of class ggplot2, trellis, or grobs, and valid
-    arguments to grid.layout.}
-  \item{show.axis.text.y}{
-    logical value indicate to show y axis text or not.
-  }
-  \item{show.ticks}{
-    logical value indicate to show ticks or not.
-  }
-  \item{show.title}{
-    logical value indicate to show title of tracks or not.
-  }
-\item{legend}{Default is FALSE, remove legend, this make sure all
- tracks are aligned exactly based on the same position.}
-\item{xlim}{Limits on x.}
-\item{ylim}{Limits on y.}
-}
-\examples{
-\dontrun{
-library(BSgenome.Hsapiens.UCSC.hg19)
-gr <- GRanges("chr1", IRanges(5e7, 5e7+50))
-p1 <- qplot(Hsapiens, name = gr, geom = "text")
-p2 <- qplot(Hsapiens, name = gr, geom = "point")
-p3 <- qplot(Hsapiens, name = gr, geom = "segment")
-p4 <- qplot(Hsapiens, name = gr, geom = "rectangle")
-tracks(p1, p2, p3, p4)
-}
-}
+
 

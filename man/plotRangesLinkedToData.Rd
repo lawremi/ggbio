@@ -47,7 +47,7 @@ plotRangesLinkedToData(data, stat.col, stat.label, stat.ylab, sig, sig.col =
   \item{width.ratio}{
     Control the segment length of statistic layer.
   }
-  \item{track.stat}{
+  \item{track.skip}{
     
   }
   \item{theme.stat}{

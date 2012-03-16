@@ -116,6 +116,7 @@ setMethod("autoplot", "GRangesList", function(object, ...,
 
   type <- match.arg(type)
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args$object <- NULL
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.non <- args.non[!names(args.non) %in% c("object", "indName")]

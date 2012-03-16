@@ -11,12 +11,13 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
     geom <- "area"
   data <- keepSeqlevels(data, unique(as.character(seqnames(data))))
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  args$geom <- geom  
+  args$data <- NULL
+  args$geom <- geom
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   ## args.facets <- args.facets[names(args.facets) != "facets"]
-  args.non <- args.non[!names(args.non) %in% c("data", "facets")]
+  args.non <- args.non[!names(args.non) %in% "facets"]
   facet <- .buildFacetsFromArgs(data, args.facets)
   grl <- splitByFacets(data, facets)
 
@@ -93,6 +94,7 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
                                                    facets = NULL, 
                                                geom = NULL){
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args$data <- NULL
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   aes.res <- do.call(aes, args.aes)

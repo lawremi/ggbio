@@ -31,6 +31,7 @@ in pacakge \code{biovizBase}.}
 cytoband.}
 }
 \examples{
+\dontrun{
 library(GenomicRanges)
 data(hg19IdeogramCyto, package = "biovizBase")
 ## make shorter and clean labels
@@ -44,5 +45,6 @@ print(p)
 ## with nocytoband
 p <- plotStackedOverview(new.ideo, cytoband = FALSE)
 print(p)
+}
 }
 

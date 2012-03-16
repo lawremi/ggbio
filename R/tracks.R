@@ -1,9 +1,5 @@
-tracks <- function(...,
-                   heights,
-                   xlim, ylim,                   
-                   theme = NULL,
-                   legend = FALSE,     #
-                   xlab = NULL,
+tracks <- function(..., heights, xlim, ylim, xlab = NULL,                
+                   theme = NULL, legend = FALSE,     #
                    track.skip = -1,
                    xlim.change = rep(TRUE, length(list(...)))){
 
@@ -18,7 +14,6 @@ tracks <- function(...,
       data.frame(xmin = res$xlim[1], xmax = res$xlim[2])
     })
     res <- do.call(rbind, lst)
-    ## take the smallest range
     xlim <- c(min(res$xmin), max(res$xmax))
     xlim <- scales::expand_range(xlim, mul = 0.05)
   }else{

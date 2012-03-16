@@ -1,6 +1,6 @@
 setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
 setMethod("geom_rect", "data.frame", function(data, ...){
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- as.list(match.call(call = sys.call(sys.parent(1)))[-1])
   do.call(ggplot2::geom_rect, args)
   ## ggplot2::geom_rect(data, ...)
 })
@@ -25,8 +25,6 @@ setMethod("geom_rect", "GRanges", function(data,...,
   rect.height <- force(rect.height)
   
   if(stat == "stepping"){
-    ## if(rect.height <= 0 | rect.height >= 0.5)
-    ##   stop("rect.height must be a value in (0,0.5)")
     
     grl <- splitByFacets(data, facets)
     res <- endoapply(grl,
@@ -38,7 +36,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
                          dt <- addStepping(dt)
                      })
     res <- unlist(res)
-    df <- fortify(model = res)
+    df <- fortify(res)
 
     args.aes <- args.aes[!(names(args.aes) %in% c("xmin", "xmax", "ymin", "ymax", "data"))]
     args.non <- args.non[!(names(args.non) %in% c("xmin", "xmax", "ymax", "ymax", "data"))]
@@ -65,7 +63,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
     if(gpn != "stepping" & group.selfish){
       p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
                                          labels = as.character(.df.sub[, gpn]))))
-    } else{
+    }else{
       p <- c(p, list(scale_y_continuous(breaks = NULL)))
     }
   }

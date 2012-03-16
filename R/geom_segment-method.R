@@ -1,6 +1,6 @@
 setGeneric("geom_segment", function(data, ...) standardGeneric("geom_segment"))
 setMethod("geom_segment", "data.frame", function(data, ...){
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- as.list(match.call(call = sys.call(sys.parent(1)))[-1])
   do.call(ggplot2::geom_segment, args)
 })
 ## alignment should be convenient toggle with chevron...
@@ -19,7 +19,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
   
   stat <- match.arg(stat)
 
-  rect.height <- force(rect.heighnt)
+  rect.height <- force(rect.height)
   
   if(stat == "stepping"){
     ## if(rect.height <= 0 | rect.height >= 0.5)

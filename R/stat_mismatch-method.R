@@ -113,7 +113,7 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome, which,
 })
 
 
-setMethod("stat_mismatch", "BamFile", function(data, ..., which, bsgenome,
+setMethod("stat_mismatch", "BamFile", function(data, ...,  bsgenome, which,
                                                xlab, ylab, main,
                                                geom = c("segment", "bar"),  
                                                show.coverage = TRUE){

@@ -116,7 +116,7 @@ dt <- addStepping(dt, group.name = as.character(args.aes$group),
   if(stat == "identity"){
    stop("stat identity is nor supported for geom alignment") 
   }
-    p <- c(list(p) , list(ylab("")), list(facet))
+    p <- c(list(p) , list(ggplot2::ylab("")), list(facet))
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))
   else

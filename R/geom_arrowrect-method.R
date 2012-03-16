@@ -1,6 +1,7 @@
 setGeneric("geom_arrowrect", function(data, ...) standardGeneric("geom_arrowrect"))
 setMethod("geom_arrowrect", "GRanges", function(data, ...,
-                                                  facets = NULL,
+                                                  xlab, ylab, main,
+                                                facets = NULL,
                                                   stat = c("stepping", "identity"),
                                                   rect.height = 0.4,
                                                   arrow.head = 0.06,
@@ -47,7 +48,15 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
       p <- do.call(geom_polygon, c(list(data = df), list(aes.temp), args.non))
     }
     p <- c(list(p) , list(facet))
-  
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
+p  
 })
 
 

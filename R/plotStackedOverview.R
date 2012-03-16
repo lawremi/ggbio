@@ -46,7 +46,6 @@ plotStackedOverview <- function(obj, xlab, ylab, main, facets = seqnames ~ .,
    
   }else {
     ideo.gr <- getIdeoGR(obj)
-    browser()
     apply(as.data.frame(values(obj)), 2, class)
     df <- as.data.frame(ideo.gr)
     ## df$seqnames <- factor(as.character(df$seqnames),
@@ -73,8 +72,8 @@ plotStackedOverview <- function(obj, xlab, ylab, main, facets = seqnames ~ .,
 }
 
 
-plotSingleChrom <- function(obj, subchr, zoom.region, xlabel = FALSE,
-                            xlab, ylab, main){
+plotSingleChrom <- function(obj, subchr, zoom.region,
+                            xlab, ylab, main,  xlabel = FALSE){
   ## do we need subchr here
   if(!missing(subchr)){
     obj <- obj[seqnames(obj) == subchr]

@@ -1,8 +1,11 @@
 setGeneric("geom_chevron", function(data, ...) standardGeneric("geom_chevron"))
 setMethod("geom_chevron", "GRanges", 
-          function(data, ...,  offset = 0.1, facets = NULL,
+          function(data, ...,
+                   xlab, ylab, main,
+                   offset = 0.1, facets = NULL,
                    stat = c("stepping", "identity"),
-                   chevron.height = c(0.1, 0.8)){
+                   chevron.height.rescale = c(0.1, 0.8),
+                   group.selfish = TRUE){
 
             stat <- match.arg(stat)
             
@@ -10,7 +13,7 @@ setMethod("geom_chevron", "GRanges",
             args.aes <- parseArgsForAes(args)
             args.non <- parseArgsForNonAes(args)
             args.non <- args.non[!names(args.non) %in% c("data", "offset", "facets",
-                                                        "stat", "chevron.height")]            
+                                                        "stat", "chevron.height.rescale")]            
             args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
             facet <- .buildFacetsFromArgs(data, args.facets)
 
@@ -31,7 +34,7 @@ setMethod("geom_chevron", "GRanges",
             }
             getY2 <- function(df){
               res <- df[,offset]
-              os <- rescale(res, chevron.height)
+              os <- rescale(res, chevron.height.rescale)
               lst <- lapply(1:nrow(df), function(i){
                 n <- df[i,".bioviz.chevron"]
                 switch(n,
@@ -57,7 +60,8 @@ setMethod("geom_chevron", "GRanges",
                 group.name <- as.character(args.aes$group)
               if(!"stepping" %in% colnames(values(data))){
                 if(length(group.name))
-                  data <- addStepping(data, group.name = group.name)
+                  data <- addStepping(data, group.name = group.name,
+                                      group.selfish = group.selfish)
                 else
                   data <- addStepping(data)
               }
@@ -82,7 +86,23 @@ setMethod("geom_chevron", "GRanges",
                                       yend = substitute(stepping + yend.offset)))
               args.res <- c(list(data = df), list(do.call(aes, args)),
                             args.non)
-              p <- do.call(ggplot2::geom_segment, args.res)
+              p <- c(list(do.call(ggplot2::geom_segment, args.res)), list(ggplot2::ylab("")))
+
+              if("group" %in% names(args.aes))
+                gpn <- as.character(args.aes$group)
+              else
+                gpn <- "stepping"
+              
+              .df.lvs <- unique(df$stepping)
+              .df.sub <- df[, c("stepping", gpn)]
+              .df.sub <- .df.sub[!duplicated(.df.sub$stepping),]
+
+              if(gpn != "stepping" & group.selfish){
+                p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
+                                                   labels = as.character(.df.sub[, gpn]))))
+              } else{
+                p <- c(p, list(scale_y_continuous(breaks = NULL)))
+              }
 
             }
             if(stat == "identity"){
@@ -121,9 +141,19 @@ setMethod("geom_chevron", "GRanges",
               args.aes$yend <- substitute(yend + yend.offset, list(yend = .yend))
               args.res <- c(list(data = df), list(do.call(aes, args.aes)),
                             args.non)
-              p <- do.call(ggplot2::geom_segment, args.res)
+              p <- c(list(do.call(ggplot2::geom_segment, args.res)),
+                     list(ggplot2::ylab("")))
+
             }
             p <- c(list(p) , list(facet))            
+            if(!missing(xlab))
+              p <- c(p, list(ggplot2::xlab(xlab)))
+            else
+              p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+            if(!missing(ylab))
+              p <- c(p, list(ggplot2::ylab(ylab)))
+            if(!missing(main))
+              p <- c(p, list(opts(title = main)))
             p
           })
 

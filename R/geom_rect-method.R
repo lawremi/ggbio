@@ -70,7 +70,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
   
   if(stat == "identity"){
     if(!"y" %in% names(args.aes)){
-      if(!all(c("ymin","ymax", "x", "xmax") %in% names(args.aes))){
+      if(!all(c("ymin","ymax", "xmin", "xmax") %in% names(args.aes))){
         stop("aes(xmin =, xmax= , ymin =, ymax= ) is required for stat 'identity',
               you could also specify aes(y =) only as alternative")
       }

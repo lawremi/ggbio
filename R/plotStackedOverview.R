@@ -72,8 +72,8 @@ plotStackedOverview <- function(obj, xlab, ylab, main, facets = seqnames ~ .,
 }
 
 
-plotSingleChrom <- function(obj, subchr, zoom.region, xlabel = FALSE,
-                            xlab, ylab, main){
+plotSingleChrom <- function(obj, subchr, zoom.region,
+                            xlab, ylab, main,  xlabel = FALSE){
   ## do we need subchr here
   if(!missing(subchr)){
     obj <- obj[seqnames(obj) == subchr]

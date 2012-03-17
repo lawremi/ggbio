@@ -26,7 +26,10 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   args.non <- args.non[!names(args.non) %in% c("data", "which",
                                                "geom", "names.expr", "xlim", "facets")]
-
+  ## tweak with args.aes to overcome the problem that single tiny rectangle missed.
+  if(!"fill" %in% names(args.aes) & "fill" %in% names(args.non)){
+    args.non$fill <- "black"
+  }
   if(geom == "gene"){
     message("Aggregating TranscriptDb...")
     gr <- biovizBase:::fetch(object, which)
@@ -74,7 +77,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                        list(aes.res),
                        args.non)
      p <- c(p , list(do.call(geom_chevron, args.gaps.res)))
-    ## p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
+
     .df.lvs <- unique(df$stepping)
     .df.sub <- df[, c("stepping", "tx_id", "tx_name", "gene_id")]
     .df.sub <- .df.sub[!duplicated(.df.sub),]

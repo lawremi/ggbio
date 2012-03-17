@@ -34,9 +34,7 @@ tracks(..., heights, xlim, xlab = NULL,
 \S4method{Arith}{Tracks,ANY}(e1, e2)
 \S4method{xlim}{numeric}(obj, ...)
 \S4method{xlim}{Tracks}(obj, ...)
-\S4method{xlim<-}{Tracks,IRanges}(x, value)
-\S4method{xlim<-}{Tracks,GRanges}(x, value)
-\S4method{xlim<-}{Tracks,numeric}(x, value)
+xlim(x) <- value
 \S4method{update}{Tracks}(object, xlim)
 \S4method{reset}{Tracks}(obj)
 \S4method{backup}{Tracks}(obj)

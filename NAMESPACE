@@ -102,6 +102,7 @@ exportMethods(layout_karyogram,
 
 
 export(tracks,
+       align.plots,
        plotFragLength,        
        plotSpliceSum,       
        plotStackedOverview,

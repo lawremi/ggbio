@@ -382,6 +382,7 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                geom = c("gene", "reduced_gene"),
                                                names.expr = expression(paste(tx_name,
                                                    "(", gene_id,")", sep = ""))){
+  geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   args <- args[!names(args) %in% c("object", "xlab", "ylab", "main")]
   args$data <- object

@@ -50,5 +50,5 @@ p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "reduced_ge
 ## align.plots
 ## ==========================================================
 }
-\author{Tengfei Yin}
+\author{Tengfei Yin, Baptiste Auguie}
 

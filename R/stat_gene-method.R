@@ -42,23 +42,53 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     df <- as.data.frame(gr)
     df.cds <- df[df$type == "cds",]
     ## p <- ggplot(df.cds)
-    args.cds <- args.aes[names(args.aes) != "y"]
-    args.cds <- c(args.cds, list(xmin = substitute(start),
-                         xmax = substitute(end),
-                         ymin = substitute(stepping - 0.4),
-                         ymax = substitute(stepping + 0.4)))
-    aes.res <- do.call(aes, args.cds)
+    ## add a segment for hacking at 1pix
     if(nrow(df.cds)){
+    args.cds <- args.aes[names(args.aes) != "y"]
+    args.cds <- c(args.cds, list(x = substitute(start),
+                         xend = substitute(start),
+                         y = substitute(stepping - 0.4),
+                         yend = substitute(stepping + 0.4)))
+    aes.res <- do.call(aes, args.cds)
     args.cds.res <- c(list(data = df.cds),
                       list(aes.res),
                       args.non)
-    p <- list(do.call(ggplot2::geom_rect, args.cds.res))
+    p <- list(do.call(ggplot2::geom_segment, args.cds.res))
   }else{
     p <- NULL
   }
+    ## rect
+    if(nrow(df.cds)){
+      args.cds <- args.aes[names(args.aes) != "y"]
+      args.cds <- c(args.cds, list(xmin = substitute(start),
+                                   xmax = substitute(end),
+                                   ymin = substitute(stepping - 0.4),
+                                   ymax = substitute(stepping + 0.4)))
+      aes.res <- do.call(aes, args.cds)
+      args.cds.res <- c(list(data = df.cds),
+                        list(aes.res),
+                        args.non)
+      p <- c(p, list(do.call(ggplot2::geom_rect, args.cds.res)))
+    }else{
+      p <- NULL
+    }
     ## utrs
     df.utr <- df[df$type == "utr",]
+
+    ## add a segment for hacking at 1pix
     args.utr <- args.aes[names(args.aes) != "y"]
+    args.utr <- c(args.utr, list(x = substitute(start),
+                         xend = substitute(start),
+                         y = substitute(stepping - 0.2),
+                         yend = substitute(stepping + 0.2)))
+    aes.res <- do.call(aes, args.utr)
+    args.utr.res <- c(list(data = df.utr),
+                      list(aes.res),
+                      args.non)
+    p <- c(p, list(do.call(ggplot2::geom_segment, args.utr.res)))
+
+    args.utr <- args.aes[names(args.aes) != "y"]
+
     args.utr <- c(args.utr, list(xmin = substitute(start),
                          xmax = substitute(end),
                          ymin = substitute(stepping - 0.2),
@@ -68,6 +98,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                       list(aes.res),
                       args.non)
     p <- c(p, list(do.call(ggplot2::geom_rect, args.utr.res)))
+    
     ## p <- p + geom_rect(data = df.utr, do.call("aes", args))
     ## gaps
     df.gaps <- gr[values(gr)$type == "gap"] 
@@ -104,7 +135,6 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     ## }
     p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
                                 labels = .labels)))
-   ggplot() +  p
   }
   if(geom == "reduced_gene"){
     message("Aggregating TranscriptDb...")

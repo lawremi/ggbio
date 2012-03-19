@@ -8,13 +8,12 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
                                                   group.selfish = TRUE){
   stat <- match.arg(stat)
   ## shape <- match.arg(shape)
-  
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
+  args$facets <- facets
+
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  args.non <- args.non[!names(args.non) %in% c("data", "facets", "N", "stat",
-                                               "length", "angle", "type", "shape",
-                                               "rect.height", "arrow.head")]            
+
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(data, args.facets)
     if(stat == "stepping"){

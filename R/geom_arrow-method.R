@@ -17,13 +17,13 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
   stat <- match.arg(stat)
   ## shape <- match.arg(shape)
   arrow.r <- round(width(range(ranges(data))) * arrow.rate, 0)
+
+  args <- list(...)
+  args$facets <- facets
   
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  args.non <- args.non[!names(args.non) %in% c("data", "facets", "N", "stat",
-                                               "length", "angle", "type", "shape",
-                                               "rect.height", "arrow.head")]            
+
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(data, args.facets)
 

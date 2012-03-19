@@ -31,11 +31,11 @@ setMethod("autoplot", "GRanges", function(object, ...,
                                           ){
   formals.cur <- c("object", "stat", "geom", "legend",
                    "xlab", "ylab", "main")
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
+
   ## args.facets <- args[names(args) %in% formals.facets]
   args <- args[!(names(args) %in% formals.cur)]
   args$data <- object
-
 
   .ggbio.geom <- c("rect", "chevron", "alignment", "arrowrect", "arrow", "segment")
   .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate", "table")
@@ -115,11 +115,11 @@ setMethod("autoplot", "GRangesList", function(object, ...,
                                               arch.offset = 1.3){
 
   type <- match.arg(type)
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  args$object <- NULL
+  args <- list(...)
+
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  args.non <- args.non[!names(args.non) %in% c("object", "indName")]
+
   if(!"group.selfish" %in% names(args.non))
     args.non$group.selfish <- group.selfish
   if(type == "none")  {
@@ -133,8 +133,8 @@ setMethod("autoplot", "GRangesList", function(object, ...,
     if(!"group" %in% names(args.aes))
       args.aes$group <- substitute(.grl.name)
     aes.res <- do.call(aes, args.aes)
-    args.res <- c(args.non, list(aes.res), list(object = gr))
-    ## args.res <- args.res[names(args.res) != "group.selfish"]
+    args.non$object <- gr
+    args.res <- c(args.non, list(aes.res))
     p <- do.call(autoplot, args.res)
     p
   }

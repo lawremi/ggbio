@@ -8,17 +8,16 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
 
 
 
+
   if(is.null(geom))
-    geom <- "area"
+    geom <- "line"
   data <- keepSeqlevels(data, unique(as.character(seqnames(data))))
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  ## args$data <- NULL
+  args <- list(...)
+  args$facets <- facets
   args$geom <- geom
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  ## args.facets <- args.facets[names(args.facets) != "facets"]
-  args.non <- args.non[!names(args.non) %in% c("facets", "data")]
   facet <- .buildFacetsFromArgs(data, args.facets)
   grl <- splitByFacets(data, facets)
 
@@ -94,7 +93,8 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
                                                    xlab, ylab, main,
                                                    facets = NULL, 
                                                geom = NULL){
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
+  args$facets <- facets
   args.aes <- parseArgsForAes(args)
   if(!"y" %in% names(args.aes))
     args.aes$y <- as.name("coverage")
@@ -136,7 +136,8 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
       stop("which must be missing, GRanges or character(for seqnames)")
     }
   }
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
+  args$facets <- facets
   args.aes <- parseArgsForAes(args)
   if(!"y" %in% names(args.aes)){
     args.aes$y <- as.name("score")

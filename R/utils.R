@@ -162,14 +162,19 @@ getGap <- function(data, group.name, facets = NULL){
     })
     idx <- which(!unlist(lapply(gps.lst, is.null)))
     gps <- do.call(c, gps.lst[idx])
-    ## if(!is.null(gps)){
-    ##   res.e <- try(gps <- do.call("c", unname(gps)))
-    ##   if(inherits(res.e, "try-error")) browser()
-    ## }
   })
-  res <- unlist(do.call(GRangesList, do.call(c, grl)))
-  values(res)$type <- "gaps"
-  res <- resize(res, width = width(res) + 2, fix = "center")
+
+  grl <- grl[!unlist(lapply(grl, is.null))]
+  ## grl
+  if(length(grl)){
+    ## res <- unlist(do.call(GRangesList, grl))a
+    res <- unlist(do.call(GRangesList, do.call(c, grl)))
+    values(res)$type <- "gaps"
+    res <- resize(res, width = width(res) + 2, fix = "center")
+  }else{
+    res <- GRanges()
+  }
+  res
 }
 
 ## suppose we have freq?
@@ -631,7 +636,6 @@ getScale <- function(gr, unit = NULL, n = 100, type = c("M", "B", "sci")){
 
 
 parseArgsForAes <- function(args){
-  ## idx.eval <- !names(args) %in%  names(ggplot2::aes_auto(names(args)))
   aes.lst <- unlist(lapply(args, function(x){
     class(eval(x, parent.frame())) == "uneval"
   }))

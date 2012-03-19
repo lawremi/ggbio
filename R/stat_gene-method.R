@@ -19,13 +19,14 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
 
   object <- data
   geom <- match.arg(geom)
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  args$geom <- geom  
+
+  args <- list(...)
+  args$facets <- facets
+  
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  args.non <- args.non[!names(args.non) %in% c("data", "which",
-                                               "geom", "names.expr", "xlim", "facets")]
+
   ## tweak with args.aes to overcome the problem that single tiny rectangle missed.
   if(!"fill" %in% names(args.aes) & "fill" %in% names(args.non)){
     args.non$fill <- "black"

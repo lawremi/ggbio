@@ -20,14 +20,14 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome, which,
                         object including arbitrary columns: read, ref, count, depth,
                         match")
 
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+
+  args <- list(...)
+
   ## args <- force(args)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  args.non <- args.non[!names(args.non) %in% c("data", "which",
-                                               "bsgenome", "show.coverage",
-                                               "geom")]
+
   
   ## df <- as.data.frame(data)
   df <- fortify(data)
@@ -125,7 +125,8 @@ setMethod("stat_mismatch", "BamFile", function(data, ...,  bsgenome, which,
       stop("bsgenome must be A BSgenome object")
     }
     data <- data$path
-    args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+    args <- list(...)
+
     pgr <- pileupAsGRanges(data, region = which)
     pgr.match <- pileupGRangesAsVariantTable(pgr, bsgenome)
     args$show.coverage <- show.coverage

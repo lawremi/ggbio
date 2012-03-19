@@ -10,7 +10,10 @@ setMethod("fortify", c("eSet", "missing"), function(model, data){
 })
 
 setMethod("fortify", c("GRanges", "missing"), function(model, data){
-  df <- as.data.frame(model)
+  vals <- values(model)
+  idx <- !unlist(lapply(vals@listData, function(x) is(x, "List")))
+  warning(colnames(vals)[!idx], " column has been dropped for the reason that the corecion of class List is not supported")
+  df <- as.data.frame(model[,idx])
   df$midpoint <- (df$start+df$end)/2
   df
 })

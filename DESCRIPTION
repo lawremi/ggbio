@@ -19,7 +19,6 @@ Collate: utils.R
 	 tracks.R
 	 facets-method.R
 	 fortify-method.R
-         geoms.R
 	 geom_chevron-method.R
          geom_alignment-method.R 
 	 geom_arch-method.R

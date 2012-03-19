@@ -2,6 +2,7 @@
 ## Import
 ## ============================================================
 ## ggplot2
+import(methods)
 import(ggplot2)
 import(reshape2)
 import(scales)
@@ -23,7 +24,7 @@ importFrom(IRanges, IRanges,  disjointBins,
            "values", "values<-",
            ranges, "ranges<-", 
            isTRUEorFALSE, coverage, slice,
-           elementLengths, 
+           elementLengths,   endoapply,
            reduce, punion, pgap, gaps, "%in%")
 
 importMethodsFrom(IRanges,  split, 

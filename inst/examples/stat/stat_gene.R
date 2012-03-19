@@ -1,4 +1,5 @@
 ## @knitr load
+library(ggbio)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 data(genesymbol, package = "biovizBase")
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene

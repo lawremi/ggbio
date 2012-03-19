@@ -35,7 +35,8 @@ grl <- endoapply(grl, function(gr){
   gr
 })
 
-
+ggplot() + stat_coverage(gr)
+ggplot() + stat_coverage(gr, geom = "line")
 ggplot() + stat_coverage(gr, geom = "point")
 ggplot() + stat_coverage(gr, aes(y = ..coverage..), geom = "point")
 ggplot() + stat_coverage(gr, aes(y = ..coverage..), geom = "histogram")
@@ -52,12 +53,30 @@ ggplot() + stat_coverage(grl, geom = "area")
 
 ## FIXME:
 myfun <- function(data, ...){
-  ## ggplot() + stat_coverage(data, ...) ## doesn't work
-  ggplot() + do.call(stat_coverage, as.list(match.call())[-1])
+  ggplot() + stat_coverage(data, ...) ## doesn't work
 }
-myfun(data = gr, aes(y = ..coverage..), geom = "histogram")
+myfun(gr, aes(y = ..coverage..), geom = "histogram", color = "blue")
+myfun(grl)
 
 ## default is line
-ggplot() + stat_coverage(bf, which = c(paste("chr", 1:10, sep = "")))
+p <- ggplot() + stat_coverage(bf)
+p
+p+ xlim(c(0, 2.5e6))
 ggplot() + stat_coverage(bf, geom = "point")
 
+myfun(bf, geom = "point")
+
+f <- function(y) function() y
+lf <- vector("list", 5)
+
+for (i in seq_along(lf)) lf[[i]] <- f(i)
+lf[[1]]()  # returns 5
+lf[[1]]
+
+g <- function(y) { force(y); function() y }
+lg <- vector("list", 5)
+for (i in seq_along(lg)) lg[[i]] <- g(i)
+lg[[1]]()  # returns 1
+
+## This is identical to
+g <- function(y) { y; function() y }

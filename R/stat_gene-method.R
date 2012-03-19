@@ -13,9 +13,6 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   ##   geom <- "area"
   if(missing(which))
     stop("missing which is not supported yet")
-  if(missing(xlim))
-    xlim <- c(start(range(which)),
-              end(range(which)))
 
   object <- data
   geom <- match.arg(geom)
@@ -34,7 +31,6 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   if(geom == "gene"){
     message("Aggregating TranscriptDb...")
     gr <- biovizBase:::fetch(object, which)
-    ## gr <- fetch(object, which)
     message("Constructing graphics...")
     values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
     ## drawing
@@ -185,7 +181,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     p <- c(p, list(scale_y_continuous(breaks = NULL)), list(opts(axis.text.y = theme_blank())))
   }
   if(missing(xlab)){
-    chrs <- unique(seqnames(which))
+    chrs <- unique(seqnames(gr))
     gms <- genome(object)
     gm <- unique(gms[chrs])
     chrs.tx <- paste(chrs, sep = ",")
@@ -204,6 +200,10 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   }
   if(!missing(main))
     p <- c(p, opts(title = main))
+  
+  if(missing(xlim))
+    xlim <- c(start(range(gr)),
+              end(range(gr)))
   p <- c(p, list(coord_cartesian(xlim = xlim, wise = TRUE)))
   
 })

@@ -20,7 +20,6 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(data, args.facets)
   grl <- splitByFacets(data, facets)
-
   if(missing(xlim))
     xlim <- c(min(start(ranges(data))),
               max(end(ranges(data))))
@@ -28,7 +27,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
     facets <- as.formula(~seqnames)
   facets <- strip_facets_dots(facets)
   allvars <- all.vars(as.formula(facets))
-  allvars.extra <- allvars[!allvars %in% c(".", "seqnames")]
+  allvars.extra <- allvars[!allvars %in% c(".", "seqnames", "strand")]
   lst <- lapply(grl, function(dt){
     vals <- coverage(keepSeqlevels(dt, unique(as.character(seqnames(dt)))))
     if(any(is.na(seqlengths(dt)))){
@@ -54,7 +53,8 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
     else
       res <- data.frame(coverage = vals, seqs = seqs,
                         seqnames =
-                        as.character(seqnames(dt))[1])
+                        as.character(seqnames(dt))[1],
+                        strand = unique(as.character(strand(dt))))
     res[,allvars.extra] <- rep(unique(values(dt)[, allvars.extra]),
                                nrow(res))
     res

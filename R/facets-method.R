@@ -17,7 +17,10 @@ setMethod("splitByFacets", c("GRanges", "formula"), function(object, facets){
   if(allvars[1] == "."){
     res <- split(object, seqnames(object))
   }else{
-    fts <- interaction(as.character(values(object)[,allvars[1]]),as.character(seqnames(object)))
+    if(allvars[1] != "strand")
+      fts <- interaction(as.character(values(object)[,allvars[1]]),as.character(seqnames(object)))
+    else
+      fts <- interaction(as.character(strand(object)),as.character(seqnames(object)))
     res <- split(object, fts)    
   }}
   if(length(allvars) == 1)
@@ -130,7 +133,7 @@ isFacetByOnlySeq <- function(facets){
       stop("Column of facets formula can only be seqnames, such as . ~ seqnames, in default restrict mode, you can only change row varaibles")
     }
     if(allvars[1] != "."){
-      if(!allvars[1] %in% colnames(values(object)))
+      if(!allvars[1] %in% c(colnames(values(object)), "strand"))
         stop(allvars[1]," doesn't exists in data columns")
     }
   }

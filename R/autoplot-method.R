@@ -27,7 +27,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
                                           legend = TRUE,
                                           geom = NULL,
                                           stat = NULL,
-                                          layout = c("linear", "stacked", "circle")
+                                          layout = c("linear", "karyogram", "circle")
                                           ){
   formals.cur <- c("object", "stat", "geom", "legend",
                    "xlab", "ylab", "main")
@@ -52,19 +52,20 @@ setMethod("autoplot", "GRanges", function(object, ...,
         args$geom <- geom
       }
   }
-  ## ------------------------------
-  ##   get the right function
-  ## ------------------------------
-  
-  .fun <- getDrawFunFromGeomStat(geom, stat)
-  p <- list(do.call(.fun, args))
+
+
   ## ------------------------------
   ## layout check
   ## ------------------------------
   layout <- match.arg(layout)
   ## since some of the geom or stat are not fully supported by all layout
-
   if(layout == "linear"){
+  ## ------------------------------
+  ##   get the right function
+  ## ------------------------------
+    
+    .fun <- getDrawFunFromGeomStat(geom, stat)    
+    p <- list(do.call(.fun, args))    
     if(!legend)
       p <- c(p, list(opts(legend.position = "none")))
     
@@ -88,15 +89,15 @@ setMethod("autoplot", "GRanges", function(object, ...,
     if(!missing(main))
       p <- c(p, list(opts(title = main)))
 
-}  
+      p <- ggplot() + p
+  }  
   if(layout == "karyogram"){
-    stop("layout karyogram is not implemented")
+    p <- plotStackedOverview(object, ...,  geom = geom)
   }
-  
   if(layout == "circle"){
     stop("layout circle is not implemented")
   }
-  ggplot() + p
+  p
 })
 
 
@@ -165,78 +166,20 @@ setMethod("autoplot", "GRangesList", function(object, ...,
 ##        For "IRanges"
 ## ======================================================================
 
-
-setMethod("autoplot", "IRanges", function(object, ...,
-                                          legend = TRUE,
-                                          xlab, ylab, main,
-                                          facets, facet, 
-                                          stat = c("identity", "coverage", "step"),
-                                          geom = c("rect", "segment","alignment",
-                                            "line","point", "area"),
-                                          coord = "linear"){
-
-  args <- as.list(match.call(call = sys.call(1)))[-1]
-  args <- args[!(names(args) %in% c("geom", "geom.engine",
-                                    "object",  "legend"))]
-  geom <- match.arg(geom)
-  p <- switch(geom,
-              full = {
-                df <- as.data.frame(object)
-                df$midpoint <- (df$start+df$end)/2
-                df$y <- as.numeric(disjointBins(object))
-                p <- ggplot(df)
-                args <- args[names(args) != "y"]
-                args <- c(args, list(xmin = substitute(start),
-                                     xmax = substitute(end),
-                                     ymin = substitute(y - 0.4),
-                                     ymax = substitute(y + 0.4)))
-                p + geom_rect(do.call("aes", args))
-              },
-              segment = {
-                df <- as.data.frame(object)
-                df$midpoint <- (df$start+df$end)/2
-                df$y <- as.numeric(disjointBins(object))
-                p <- ggplot(df)
-                args <- args[!(names(args) %in% c("x", "y"))]
-                args <- c(args, list(x = substitute(start), xend = substitute(end),
-                                     y = substitute(y), yend = substitute(y)))
-                p + geom_segment(do.call("aes", args))
-              },
-              coverage.line = {
-                df <- as.data.frame(object)
-                df$midpoint <- (df$start+df$end)/2
-                p <- ggplot(df)
-                st <- min(start(object))
-                cv <- coverage(object)
-                vals <- as.numeric(cv)
-                seqs <- seq.int(from = st, length.out = length(vals))
-                ## remove x
-                args <- args[!(names(args) %in% c("x", "y"))]
-                args <- c(args, list(x = substitute(seqs),
-                                     y = substitute(vals)))
-                p + geom_line(do.call("aes", args))+
-                  ylab("coverage")
-              },
-              coverage.area = {
-                df <- as.data.frame(object)
-                df$midpoint <- (df$start+df$end)/2
-                p <- ggplot(df)
-                st <- min(start(object))
-                cv <- coverage(object)
-                vals <- as.numeric(cv)
-                seqs <- seq.int(from = st, length.out = length(vals))
-                seqs <- c(seqs[1],seqs,tail(seqs, 1))
-                vals <- c(0, vals, 0)
-                ## remove x
-                args <- args[!(names(args) %in% c("x", "y"))]
-                args <- c(args, list(x = substitute(seqs),
-                                     y = substitute(vals)))
-                p + geom_polygon(do.call("aes", args))+
-                  ylab("coverage")
-              }
-              )
-  if(!legend)
-    p <- p + opts(legend.position = "none")
+setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
+  ## ok, for simple impmlementation, let's make it a GRanges.....:)
+  gr <- GRanges("chr_non", object)
+  p <- autoplot(gr, ...)
+  if(!missing(xlab))
+    p <- p + ggplot2::xlab(xlab)
+  else
+    p <- p + ggplot2::xlab("")
+  if(!missing(ylab))
+    p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main) +
+        opts(strip.background = theme_rect(colour = 'NA', fill = 'NA'))+ 
+        opts(strip.text.y = theme_text(colour = 'white')) 
   p
 })
 

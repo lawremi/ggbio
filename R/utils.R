@@ -586,6 +586,7 @@ getIdeoGR <- function(gr){
                  now use reduced information as ideogram... ")
     res <- reduce(gr, ignore = TRUE)
     start(res) <- 1
+    res
   }else{
     res <- as(seqinfo(gr), "GenomicRanges")
   }

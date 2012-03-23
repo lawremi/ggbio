@@ -1,12 +1,7 @@
-## reference:http://groups.google.com/group/ggplot2/browse_thread/thread/72403c6997b79c3b?pli=1
-## "link" and "ribbon" requie a special data structure
-## 1. we could implement it as GRangesList with no direction specification
-## 2. we could use a to.gr as element meta data which is a granges with direction,
-## this is also a GRanges object which is general(implemented this first)
 setGeneric("layout_circle", function(data,...) standardGeneric("layout_circle"))
 setMethod("layout_circle",  "GRanges",
-          function(data, ..., geom = c("point", "line", "link", "ribbon","rect", "bar",
-                                       "segment", "rectangle", "hist", "scale", 
+          function(data, ..., geom = c("point","line", "link", "ribbon","rect", "bar",
+                                       "segment","hist", "scale", 
                                 "ideogram", "text"), linked.to,
                           radius = 10, trackWidth = 5, 
                           space.skip = 0.015, direction = c("clockwise", "anticlockwise"),
@@ -14,44 +9,27 @@ setMethod("layout_circle",  "GRanges",
                    rect.inter.n = 5, rank, 
                    scale.n = 60, scale.unit = NULL, scale.type = c("M", "B", "sci")){
 
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  ## args <- force(args)
+  args <- dots <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  args.non <- args.non[!names(args.non) %in% c("geom", "data", "rank")]
-
-  dots <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   scale.type <- match.arg(scale.type)
   geom <- match.arg(geom)
-  if(geom == "rect")
-    geom <- "rectangle"
-
   ## rank
   if(!missing(rank)){
     radius <- radius + rank * trackWidth
   }
   ## idoegram parse seqlengths
   if(geom == "ideogram"){
-    ## data.back <- data
     data <- getIdeoGR(data)
     res <- rectInter(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                     direction = direction, n = rect.inter.n)
-    
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
     df <- df[idx, ]
-
-    ## args.aes.text <- args.aes
-    ## args.aes.text$y <- as.name(".biovizBase.y")
-    ## args.aes.text$x <- as.name(".biovizBase.x")
-    
     args.aes <- args.aes[names(args.aes) != "label"]
     args.aes$y <- as.name(".biovizBase.y")
     args.aes$x <- as.name(".biovizBase.x")
-    
-
-    
     args.aes$group <- as.name(".biovizBase.group")
 
     
@@ -65,14 +43,11 @@ setMethod("layout_circle",  "GRanges",
       col <- I("black")
       args.non$color <- col
     }
-
     args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_polygon, args.tot)
     p <- list(res)
   }
-
   if(geom == "text"){
-
     if("label" %in% names(args.aes)){
       lbs <- as.character(args.aes$label)
       if(!lbs %in% c(colnames(values(data)),"start", "end", "seqnames","width"))
@@ -94,7 +69,6 @@ setMethod("layout_circle",  "GRanges",
       values(obj)$.processed.angle <- ags
       args.aes$angle <- as.name(".processed.angle")      
     }
-
     if("angle" %in% names(dots)){
       ags <-  - values(obj)$.biovizBase.angle * 180 / pi +
         as.numeric(paste(as.character(dots$angle), collapse = ""))
@@ -148,19 +122,17 @@ setMethod("layout_circle",  "GRanges",
   }
   
   if(geom == "segment"){
-    ## TODO
     res <- segInter(data, y = as.character(args.aes$y),
-                    space.skip = space.skip, trackWidth = trackWidth, radius = radius,
-                      direction = direction)
+                    space.skip = space.skip, trackWidth = trackWidth,
+                    radius = radius, direction = direction)
     df <- as.data.frame(res)
     args.aes$y <- as.name(".biovizBase.y")
     args.aes$x <- as.name(".biovizBase.x")
     args.aes$group <- as.name(".biovizBase.group")    
     aes <- do.call("aes", args.aes)
-    args.tot <- c(list(data = df, aes), args.non)
+    args.tot <- c(list(data = df), list(aes), args.non)
     res <- do.call(geom_path, args.tot)
     p <- list(res)
-
   }
   
   if(geom == "scale"){
@@ -212,7 +184,7 @@ setMethod("layout_circle",  "GRanges",
     p <- c(list(res.text), list(res.seg))
   }
 
-  if(geom == "rectangle"){
+  if(geom == "rect"){
     res <- rectInter(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                     direction = direction, n = rect.inter.n)
@@ -255,7 +227,6 @@ setMethod("layout_circle",  "GRanges",
     args.aes$yend <- as.name(".biovizBase.yend")
     args.aes$xend <- as.name(".biovizBase.xend")
     aes <- do.call("aes", args.aes)
-
     args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_segment, args.tot)
     p <- list(res)
@@ -276,6 +247,9 @@ setMethod("layout_circle",  "GRanges",
   }
   if(geom == "ribbon"){
     stop("geom(ribbon) is not implemented yet")
+  }
+  if(geom == "hist"){
+    stop("geom(hist) is not implemented yet")
   }
   p <- c(p, list(opts(aspect.ratio = 1), theme_null()))
   p 

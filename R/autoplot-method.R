@@ -1,21 +1,9 @@
-## TODO: Priority this week til Wednesday
-## 5. GappedAlignments
-## 6. Bam/BamFile/character
-## 7. IRanges
-## 8. factorize statistics out
-## 10. autoplot,GRanges, geom = "area" is slow
-## 11. autoplot,GRanges, geom = "histogram"
-## 12. autoplot,SummarizedExpriment
-## 13. txdb y label
-## 14. implement layout htere
-
 setGeneric("autoplot")
 
 formals.qplot <- getFormalNames(qplot)
 formals.facet_grid <- getFormalNames(facet_grid)
 formals.facet_wrap <- getFormalNames(facet_wrap)
 formals.facets <- union(formals.facet_grid, formals.facet_wrap)
-
 
 
 ## ======================================================================
@@ -85,17 +73,17 @@ setMethod("autoplot", "GRanges", function(object, ...,
     ## tweak with default y lab
     if(!missing(ylab))
       p <- c(p,list(ylab(ylab)))
-
     if(!missing(main))
       p <- c(p, list(opts(title = main)))
-
-      p <- ggplot() + p
+    
+    p <- ggplot() + p
   }  
   if(layout == "karyogram"){
     p <- plotStackedOverview(object, ...,  geom = geom)
+    ## FIXME: xlab/ylab/main
   }
   if(layout == "circle"){
-    stop("layout circle is not implemented")
+    p <- ggplot() + layout_circle(object, ..., geom = geom)
   }
   p
 })
@@ -188,15 +176,13 @@ setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
 ##        For "GappedAlignments"
 ## ======================================================================
 setMethod("autoplot", "GappedAlignments", function(object, ...,
+                                                   xlab, ylab, main,
                                                    which,
-                                                   geom = c("gapped.pair",
-                                                     "full"),
+                                                   geom = "gapped.pair",
                                                    show.junction = FALSE
                                                    ){
-  geom <- match.arg(geom)
-  args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
-  args <- args[!(names(args) %in% c("geom", "which", "show.junction",
-                                    "show.pair"))]
+
+  args <- list(...)
   if(!missing(which))
     gr <- biovizBase:::fetch(object, which)
   else
@@ -220,7 +206,7 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
                          xmax = substitute(end),
                          ymin = substitute(stepping - 0.4),
                          ymax = substitute(stepping + 0.4)))
-    p <- p + geom_rect(do.call("aes", args))+
+    p <- p + ggplot2::geom_rect(do.call("aes", args))+
       scale_color_manual(values = strandColor) +
         scale_fill_manual(values = strandColor)
     ## mapped read
@@ -229,12 +215,18 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
       args <- c(args, list(x = substitute(start), xend = substitute(end),
                            y = substitute(stepping),
                            yend = substitute(stepping)))
-      p <- p + geom_segment(data = df.gaps, do.call("aes", args), color = "red")
-    }}
-  if(geom == "full"){
-    p <- autoplot(gr)
+      p <- p + ggplot2::geom_segment(data = df.gaps, do.call("aes", args), color = "red")
+    }}else{
+    p <- autoplot(gr, ..., geom = geom)
   }
-  p <- p + xlab("Genomic Coordinate") + ylab("")
+  if(!missing(xlab))
+    p <- p + ggplot2::xlab(xlab)
+  else
+    p <- p + ggplot2::xlab("Genomic Coordinate")
+  if(!missing(ylab))
+    p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main) 
   p
 })
 
@@ -246,18 +238,16 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
 ## 1. mismatch
 ## 2. simply summary
 setMethod("autoplot", "BamFile", function(object, ..., which,
+                                          xlab, ylab, main,
                                           bsgenome,
+                                          geom = "line",
+                                          stat = "coverage",
+                                          method = c("estimate", "raw"),
                                           resize.extra = 10,
-                                          show.coverage = TRUE,
-                                          geom = c("gapped.pair",
-                                            "full",
-                                            "coverage.line",
-                                            "coverage.area",
-                                            "mismatch.summary")){
-  
-  args <- as.list(match.call(call = sys.call(1)))[-1]
-  args <- args[!(names(args) %in% c("geom", "which", "heights"))]
-  geom <- match.arg(geom)
+                                          show.coverage = TRUE){
+
+  args <- list(...)
+  method <- match.arg(method)
   bf <- open(object)
   if(geom == "gapped.pair"){
     message("Read GappedAlignments from BamFile...")
@@ -267,52 +257,55 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
     message("plotting...")
     args.ga <- args[names(args) %in% "show.junction"]
     args <- c(args.ga, list(data = ga))
-
     p <- do.call(autoplot, args)
-    ## p <- autoplot(ga, ..., resize.extra = resize.extra)
-
-  }
-  if(geom %in% c("coverage.line", "coverage.area", "full")){
-    ga <- readBamGappedAlignments(bf,
-                                  param = ScanBamParam(which = which),
-                                  use.name = TRUE)
-    gr <- biovizBase:::fetch(ga, type = "raw")
-    p <- autoplot(gr, geom = geom)
-  }
-  if(geom %in% c("mismatch.summary")){
-    if(missing(bsgenome)){
-      stop("For geom mismatch.summary, please provide bsgenome(A BSgenome object)")
-    }else
-    if(!is(bsgenome, "BSgenome")){
-      stop("bsgenome must be A BSgenome object")
+  }else{
+    if(stat == "coverage"){
+      p <- ggplot() + stat_coverage(bf, ..., method = method, geom  =  geom)
+    }else if(stat == "mismatch"){
+      p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which)
+    }else{
+      ga <- readBamGappedAlignments(bf,
+                                    param = ScanBamParam(which = which),
+                                    use.name = TRUE)
+      gr <- biovizBase:::fetch(ga, type = "raw")
+      p <- autoplot(gr, ..., geom = geom, stat = stat)
     }
-    pgr <- pileupAsGRanges(bamfile, region = which)
-    pgr.match <- pileupGRangesAsVariantTable(pgr, bsgenome)
-    p <- plotMismatchSum(pgr.match, show.coverage)
   }
-  p + ylab("")
+  if(!missing(xlab))
+    p <- p + ggplot2::xlab(xlab)
+  else
+    p <- p + ggplot2::xlab("Genomic Coordinate")
+  if(!missing(ylab))
+    p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main) 
+
+  p
 })
+
 ## ======================================================================
 ##  For "character" need to check if it's path including bamfile or not
 ## ======================================================================
-setMethod("autoplot", "character", function(object, ...,
-                                            which, 
-                                            bsgenome,
-                                            resize.extra = 10,
-                                            show.coverage = TRUE,
-                                            geom = c("gapped.pair",
-                                              "full",
-                                              "coverage.line",
-                                              "coverage.area",
-                                              "mismatch.summary")){
-  geom <- match.arg(geom)
-  if(tools::file_ext(object) == "bam")
-    bf <- BamFile(object)
+setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
+                                            asRangedData = FALSE){
+  .ext <- tools::file_ext(object)
+  if(.ext == "bam"){
+    message("reading in as Bamfile")
+    obj <- BamFile(object)
+  }else{
+    message("reading in")
+    obj <- import(object, asRangedData = asRangedData)
+  }
+  p <- autoplot(obj,  ...)
+  if(!missing(xlab))
+    p <- p + ggplot2::xlab(xlab)
   else
-    stop("Please pass a bam file path")
-  autoplot(bf,  ..., which = which, model = model, bsgenome = bsgenome,
-           show.coverage = show.coverage,
-           geom = geom, resize.extra = reszie.extra)
+    p <- p + ggplot2::xlab("Genomic Coordinate")
+  if(!missing(ylab))
+    p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main) 
+  p  
 })
 
 ## FIX THIS first:
@@ -351,7 +344,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                                                 "point",
                                                 "rect")){
 
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.non <- args.non[!names(args.non) %in% c("object", "which", "xlab", "ylab", "main",
@@ -489,6 +482,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
 ##        For "Rle"
 ## ======================================================================
 ## geom: ... color = I("red"), doesn't work
+## FIXME: idenity
 setMethod("autoplot", "Rle", function(object, lower, ...,
                                       xlab = "x", 
                                       ylab = "y", main,
@@ -765,4 +759,14 @@ setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("none", "h
   }
   p
 })
+
+
+
+##======================================================================
+##  For GenomicRangesList, for circular view
+##======================================================================
+## TODO for circular layout first
+setMethod("autoplot", "GenomicRangesList", function(object, ...){
+  stop("not implemented yet")
+}) 
 

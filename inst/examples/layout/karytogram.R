@@ -26,7 +26,7 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
-
+library(biovizBase)
 data(hg19IdeogramCyto, package = "biovizBase")
 library(GenomicRanges)
 ## make shorter and clean labels

@@ -27,8 +27,9 @@ plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
       rescale(values(obj)[, as.character(args.aes$y)],rescale.range)
 
   }}
-  p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, facets = facets) +
-    layout_karyogram(data = obj, do.call(aes, args.aes),
+  p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, facets = facets)
+  if(!cytoband)
+    p <- p + layout_karyogram(data = obj, do.call(aes, args.aes),
                          facets = facets, geom = geom)
 }
   if(!missing(xlab))

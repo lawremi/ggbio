@@ -47,10 +47,11 @@ importMethodsFrom(GenomicRanges, ranges, "ranges<-",
                   start, end, width, "start<-", "end<-", "width<-",
                   seqnames, strand, seqinfo, show, 
                    "elementMetadata<-", elementMetadata,
-                  as.data.frame, keepSeqlevels, renameSeqlevels)
+                  as.data.frame, keepSeqlevels, renameSeqlevels,
+                  sort)
 
 
-importClassesFrom(GenomicRanges, GRanges, GRangesList)
+importClassesFrom(GenomicRanges, GRanges, GRangesList, GenomicRangesList)
 
 ## ## ## Rsamtools
 importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,

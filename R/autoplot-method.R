@@ -497,8 +497,9 @@ setMethod("autoplot", "Rle", function(object, lower, ...,
   if(type %in% c("viewMaxs", "viewMeans", "viewMins", "viewSums") && missing(lower))
     stop("please at least specify the value of lower, you could pass
           extra parameters to slice too")
-
-  args.dots <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  
+  ## args.dots <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args.dots <- list(...)
   args.slice <- args.dots[names(args.dots) %in%
                           c("upper", "includeLower",
                             "includeUpper", "rangesOnly")] 
@@ -580,7 +581,8 @@ setMethod("autoplot", "RleList", function(object, lower, ...,
     stop("please at least specify the value of lower, you could pass
           extra parameters to slice too")
 
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])  
+  ## args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
   args <- args[names(args) %in% c("size", "shape", "color", "alpha", "geom")]
   if(!"geom" %in% names(args))
     args$geom <- geom
@@ -766,7 +768,118 @@ setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("none", "h
 ##  For GenomicRangesList, for circular view
 ##======================================================================
 ## TODO for circular layout first
-setMethod("autoplot", "GenomicRangesList", function(object, ...){
-  stop("not implemented yet")
+## need to name the aes list otherwise following the order
+setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
+                                                    trackWidth, radius = 10, layout = c("circle")){
+  
+  if(missing(trackWidth)){
+    trackWidth <- rep(5, length(object))
+    idx <- which(unlist(lapply(args, function(arg){
+      arg$geom == "link"
+    })))
+    trackWidth[1] <- 1
+  }else{
+    if(length(trackWidth > length(object))){
+      warning("Unequal lengths of trackWidth, removing extra track width")
+      trackWidth <- trackWidth[1:length(object)]
+
+    }
+    if(length(trackWidth < length(object))){
+      warning("Unequal lengths of trackWidth, adding default 5 to  extra track width")
+      trackWidth <- c(trackWidth, rep(5, length(object) - length(trackWidth)))
+    }
+  }
+    if(length(radius) == 1){
+      radius <- radius + c(0, cumsum(trackWidth)[-length(trackWidth)])
+    }else{
+      if(length(radius) != length(object))
+        stop("radius must of length 1 showing innermost radius or of the same length
+              as object")
+    }
+    p <- ggplot()
+  
+    for(i in 1:length(object)){
+      p <- p + do.call(layout_circle, c(list(data = object[[i]]), radius = radius[i],
+                                        trackWidth = trackWidth[i],
+                                        args[[i]]))
+    }
+    p
 }) 
+
+
+##======================================================================
+##  For VCF
+##======================================================================
+setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
+                                      type = c("geno", "info", "fixed"),
+                                      ylabel = TRUE){
+  args <- list(...)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  type <- match.arg(type)
+  hdr <- exptData(object)[["header"]]
+  if(type == "geno"){
+    nms <- rownames(geno(hdr))
+    if("GT" %in% nms){
+      message("use GT for type geno as default")
+      gt <- geno(object)[["GT"]]
+    }else{
+      nm <- nms[1]
+      message("use ", nm, " for type geno as default")
+      gt <- geno(object)[[nm]]
+    }
+    sts <- start(rowData(object))
+    idx <- !duplicated(sts)
+    if(sum(!idx))
+      warning("remove ", sum(!idx), " snp with duplicated position, only keep first one")
+    gt <- gt[idx,]
+    df <- melt(gt)
+    df$start <- start(rowData(object)[idx])
+    df$y <- as.integer(df$Var2)
+    ## df <- melt(gt)
+    .y <- unique(df$y)
+    .label <- df$Var2[match(.y, df$y)]
+    p <- qplot(data = df, ..., x = start, y = y,  fill = value, geom = "raster") +
+      scale_y_continuous(breaks = .y, label = .label)
+    
+  }
+  if(type == "info"){
+    df <- fortify(info(object))
+    if(!"y" %in% names(args.aes)){
+      hdr.i <- rownames(info(hdr))
+      if("AF" %in% hdr.i){
+        args.aes$y <- as.name("AF")
+        message("use AF for type info as default")
+      }else{
+        nm <- hdr.i[i]
+        message("use ", nm, " for type info as default")
+        args.aes$y <- as.name(nm)
+      }
+    }
+    if(!"x" %in% names(args)){
+      args.aes$x <- as.name("start")
+    }
+    if(!"color" %in% names(args)){
+      args.non$color <- "black"
+    }
+    if(!"fill" %in% names(args)){
+      args.non$fill <- "black"
+    }
+    p <- ggplot(data = df) + do.call(geom_bar, c(list(stat = "identity"),
+                                   list(do.call(aes, args.aes)),
+                                   args.non))
+  }
+  if(type == "fixed"){
+    stop("not implemented yet")
+  }
+  if(!ylabel)
+    p <- p + scale_y_continuous(breaks = NULL)
+  if(!missing(xlab))
+    p <- p + ggplot2::xlab(xlab)
+  if(!missing(ylab))
+    p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main)
+  p
+})
 

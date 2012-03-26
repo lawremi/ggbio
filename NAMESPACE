@@ -12,7 +12,8 @@ import(biovizBase)
 import(grid)
 import(plyr)
 importFrom(gridExtra, grid.arrange)
-
+## VariantAnnotation
+import(VariantAnnotation) 
 ## Hmisc
 importFrom(Hmisc, bezier)
 ## GenomicRanges

@@ -588,13 +588,10 @@ setMethod("autoplot", "RleList", function(object, lower, ...,
     args$geom <- geom
   
   ## args <- c(geom = geom, args)
-  ## args.dots <- list(...)
+
   args.slice <- args[names(args) %in%
                      c("upper", "includeLower",
                        "includeUpper", "rangesOnly")]
-  ## args <- args.dots[!(names(args) %in%
-  ##                         c("upper", "includeLower",
-  ##                           "includeUpper", "rangesOnly"))]
   if(!missing(lower))
     args.slice <- c(list(x = object,
                          lower = lower), args.slice)
@@ -770,7 +767,11 @@ setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("none", "h
 ## TODO for circular layout first
 ## need to name the aes list otherwise following the order
 setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
-                                                    trackWidth, radius = 10, layout = c("circle")){
+                                                    trackWidth,
+                                                    radius = 10,
+                                                    grid = FALSE,
+                                                    trackSkip = 1,
+                                                    layout = c("circle")){
   
   if(missing(trackWidth)){
     trackWidth <- rep(5, length(object))
@@ -779,28 +780,47 @@ setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
     })))
     trackWidth[1] <- 1
   }else{
-    if(length(trackWidth > length(object))){
+    if(length(trackWidth) > length(object)){
       warning("Unequal lengths of trackWidth, removing extra track width")
       trackWidth <- trackWidth[1:length(object)]
 
     }
-    if(length(trackWidth < length(object))){
+    if(length(trackWidth) < length(object)){
       warning("Unequal lengths of trackWidth, adding default 5 to  extra track width")
       trackWidth <- c(trackWidth, rep(5, length(object) - length(trackWidth)))
     }
   }
-    if(length(radius) == 1){
-      radius <- radius + c(0, cumsum(trackWidth)[-length(trackWidth)])
+    if(length(trackSkip) == 1){
+      trackSkip <- rep(trackSkip, length(object))
     }else{
-      if(length(radius) != length(object))
-        stop("radius must of length 1 showing innermost radius or of the same length
+      if(length(trackSkip) != length(object))
+        stop("trackSkip must be of length 1 or of the same length
               as object")
     }
+  
+    if(length(radius) == 1){
+      radius <- radius + c(0, cumsum(trackWidth)[-length(trackWidth)]) +
+        cumsum(trackSkip)
+    }else{
+      if(length(radius) != length(object))
+        stop("radius must be of length 1 showing innermost radius or of the same length
+              as object")
+    }
+
+  
+    if(length(grid) == 1){
+      grid <- rep(grid, length(object))
+    }else{
+      if(length(grid) != length(object))
+        stop("grid must of length 1 or of the same length
+              as object")
+    }
+  
     p <- ggplot()
   
     for(i in 1:length(object)){
       p <- p + do.call(layout_circle, c(list(data = object[[i]]), radius = radius[i],
-                                        trackWidth = trackWidth[i],
+                                        trackWidth = trackWidth[i], grid = grid[i],
                                         args[[i]]))
     }
     p
@@ -870,7 +890,7 @@ setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
                                    args.non))
   }
   if(type == "fixed"){
-    stop("not implemented yet")
+    fix <- fixed(object)
   }
   if(!ylabel)
     p <- p + scale_y_continuous(breaks = NULL)

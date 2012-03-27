@@ -246,7 +246,8 @@ gr2newLinear <- function(obj, space.skip = 0.1){
 ## then need a transformation to circlular view
 ## data is a GRanges object
 gr2circle <- function(obj, x = ".biovizBase.mid", y,
-                      radius = 10, width = 10, direction = c("clockwise", "anticlockwise")){
+                      radius = 10, width = 10, direction = c("clockwise", "anticlockwise"),
+                      mul = 0.05){
 
   if(!length(y)){
     values(obj)$.biovizBase.equal.y <- 1
@@ -264,7 +265,7 @@ gr2circle <- function(obj, x = ".biovizBase.mid", y,
     temp.y <- y
   }
   
-  temp.y.r <- expand_range(range(temp.y), mul = 0.05)
+  temp.y.r <- expand_range(range(temp.y), mul = mul)
   temp.y <- (temp.y - min(temp.y.r))/diff(temp.y.r) * width + radius
   
   ## always from 1 to max
@@ -290,9 +291,9 @@ gr2circle <- function(obj, x = ".biovizBase.mid", y,
 
 rectInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
                       direction = direction,
-                      n = 5){
+                      n = 5, mul = 0.05){
 
-data.back <- data
+  data.back <- data
   inter.fun <- function(x, y) approx(x, y, n = n)
     ## need to consider the space
   if(length(y)){
@@ -349,7 +350,7 @@ data.back <- data
 ## res.bk <- gr2newLinear(data.back, space.skip)
   res <- gr2newLinear(res.gr, space.skip)
   res <- gr2circle(res, y = .y, radius = radius, width = trackWidth,
-                   direction = direction)  
+                   direction = direction, mul = mul)  
 }
 
 barInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,

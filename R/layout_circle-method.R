@@ -7,7 +7,9 @@ setMethod("layout_circle",  "GRanges",
                           space.skip = 0.015, direction = c("clockwise", "anticlockwise"),
                           link.fun = function(x, y, n = 30) bezier(x, y, evaluation = n),
                    rect.inter.n = 5, rank, 
-                   scale.n = 60, scale.unit = NULL, scale.type = c("M", "B", "sci")){
+                   scale.n = 60, scale.unit = NULL, scale.type = c("M", "B", "sci"),
+                   grid.n = 5, grid.background = "gray70", grid.line = "white",
+                   grid = FALSE){
 
   args <- dots <- list(...)
   args.aes <- parseArgsForAes(args)
@@ -18,6 +20,41 @@ setMethod("layout_circle",  "GRanges",
   if(!missing(rank)){
     radius <- radius + rank * trackWidth
   }
+
+  drawGrid <- function(){
+    data <- getIdeoGR(data)
+    res <- rectInter(data, y = character(),
+                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
+                     direction = direction, n = rect.inter.n, mul = 0)
+    df <- as.data.frame(res)
+    idx <- order(df$.biovizBase.group, df$.int.id)
+    df <- df[idx, ]
+    args.aes <-   args.non <- list()
+    args.aes$y <- as.name(".biovizBase.y")
+    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$group <- as.name(".biovizBase.group")
+    args.non$fill <- args.non$color <- grid.background
+    args.tot <- c(list(data = df), list(do.call(aes, args.aes)),args.non)
+    res <- do.call(geom_polygon, args.tot)
+    p <- list(res)
+    data <- rep(data, grid.n)
+    values(data)$.grid.level <- rep(1:grid.n, each = length(data)/grid.n)
+    res <- segInter(data, y = ".grid.level",
+                    space.skip = space.skip, trackWidth = trackWidth,
+                    radius = radius, direction = direction)
+    df <- as.data.frame(res)
+    args.aes <-   args.non <- list()    
+    args.aes$y <- as.name(".biovizBase.y")
+    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$group <- as.name(".biovizBase.group")    
+    aes <- do.call("aes", args.aes)
+    args.non$color <- grid.line  
+    args.tot <- c(list(data = df), list(aes), args.non)
+    res <- do.call(geom_path, args.tot)
+    p <- c(p ,list(res))
+  }
+  if(grid)
+    p.grid <- drawGrid()
   ## idoegram parse seqlengths
   if(geom == "ideogram"){
     data <- getIdeoGR(data)
@@ -46,6 +83,7 @@ setMethod("layout_circle",  "GRanges",
     args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_polygon, args.tot)
     p <- list(res)
+    
   }
   if(geom == "text"){
     if("label" %in% names(args.aes)){
@@ -195,17 +233,14 @@ setMethod("layout_circle",  "GRanges",
     args.aes.p$y <- as.name(".biovizBase.y")
     args.aes.p$x <- as.name(".biovizBase.x")
     args.aes.p$group <- as.name(".biovizBase.group")
-
-    if("fill" %in% names(args.aes.p)){
-      if(!"color" %in% names(args.aes.p)){
-        args.aes.p$color <- args.aes.p$fill
-      }
-    }
     aes.p <- do.call("aes", args.aes.p)
-    if(!"color" %in% names(args.aes.p)){
-      col <- I("black")
-      args.non$color <- col
+    if(!"color" %in% names(args.aes) & !"color" %in% names(args.non)){
+      args.non$color <- "black"
     }
+    if(!"fill" %in% names(args.aes) & !"fill" %in% names(args.non)){
+      args.non$fill <- "black"
+    }
+    
     args.tot <- c(list(data = df, aes.p), args.non)
     res <- do.call(geom_polygon, args.tot)
     p <- list(res)
@@ -251,6 +286,8 @@ setMethod("layout_circle",  "GRanges",
   if(geom == "hist"){
     stop("geom(hist) is not implemented yet")
   }
+  if(grid)
+    p <- c(p.grid, p)
   p <- c(p, list(opts(aspect.ratio = 1), theme_null()))
   p 
 })

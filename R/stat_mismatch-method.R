@@ -58,10 +58,12 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome, which,
     eds <- unlist(by(x$count, x$start, function(x){
       cumsum(x)
     }))
+    eds <- as.numeric(eds)
     sts <- unlist(by(x$count, x$start, function(x){
       N <- length(x)
       c(0,cumsum(x)[-N])
     }))
+    sts <- as.numeric(sts)
     x$eds <- eds
     x$sts <- sts
     x
@@ -74,7 +76,6 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome, which,
   args.aes$y <- as.name("depth")
   aes.res <- do.call(aes, args.aes)
   args.non$fill <- I("gray70")
-  ## args.non$color <- I("gray70")
   args.res <- c(list(data = df.bg),
                 list(aes.res),
                 args.non)

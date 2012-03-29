@@ -349,19 +349,17 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
   args.non <- parseArgsForNonAes(args)
   args.non <- args.non[!names(args.non) %in% c("object", "which", "xlab", "ylab", "main",
                                                "geom")]
-  if(!"color" %in% names(args.non))
-    isDNABaseColor <- TRUE
-  else
-    isDNABaseColor <- FALSE
   seqs <- getSeq(object, which, as.character = TRUE)
   seqs <- IRanges:::safeExplode(seqs)
   xs <- seq(start(which), length.out = width(which))
   df <- data.frame(x = xs, seqs = seqs)
   geom <- match.arg(geom)
   p <- ggplot(data = df, ...)
+  if(!"color" %in% names(args.non))
+    isDNABaseColor <- TRUE
+  else
+    isDNABaseColor <- FALSE
   baseColor <- getOption("biovizBase")$DNABasesColor
-  ## if(!isDNABaseColor)
-  ##   cols <- dots$color
   p <- switch(geom,
               text = {
                 if(isDNABaseColor){
@@ -828,6 +826,18 @@ setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
 
 
 ##======================================================================
+##  For DNAStringSet
+##======================================================================
+## setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main){
+##   args <- list(...)
+##   args.aes <- parseArgsForAes(args)
+##   args.non <- parseArgsForNonAes(args)
+  
+  
+## })
+
+
+##======================================================================
 ##  For VCF
 ##======================================================================
 setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
@@ -891,13 +901,44 @@ setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
   }
   if(type == "fixed"){
     fix <- fixed(object)
+    fix <- fix[, !colnames(values(fix)) %in% c("ALT", "REF")]
+    values(fix)$ALT <- unlist(values(alt(object))[, "ALT"])
+    idx <- width(values(fix)$ALT) > 1
+    type <- vector("character", length  = length(fix))
+    type[idx] <- "I"
+    type[!idx] <- as.character(values(fix[!idx])$ALT)
+    values(fix)$type <- type
+    id <- start(fix) < 25238400 & start(fix) > 25238100
+    if(!"color" %in% names(args.non))
+      isDNABaseColor <- TRUE
+    else
+      isDNABaseColor <- FALSE
+    baseColor <- getOption("biovizBase")$DNABasesColor
+    .i <- "black"
+    names(.i) <- "I"
+    baseColor <- c(baseColor, .i)
+    fix <- addStepping(fix)
+    id <- start(fix) < 25238400 & start(fix) > 25238100
+    ## only show SNP
+    df <- fortify(fix)
+    df$type <- factor(df$type, levels = c(names(baseColor)))
+    ylim <- range(df$stepping)
+    ylim <- scales::expand_range(ylim, mul = 0.5)
+    p <- ggplot() + geom_text(data = df,
+                         aes(x = start, label = type, color = type,  y = stepping)) +
+                          scale_color_manual(values = baseColor) +  
+                            scale_y_continuous(breaks = unique(sort(values(fix)$stepping)),
+                                               labels = unique(sort(values(fix)$stepping)),
+                                               limits = ylim)
   }
   if(!ylabel)
     p <- p + scale_y_continuous(breaks = NULL)
-  if(!missing(xlab))
-    p <- p + ggplot2::xlab(xlab)
-  if(!missing(ylab))
-    p <- p + ggplot2::ylab(ylab)
+  if(missing(xlab))
+    xlab <- "Genomic Coordinates"
+  p <- p + ggplot2::xlab(xlab)
+  if(missing(ylab))
+    ylab <- ""
+  p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
     p <- p + opts(title = main)
   p

@@ -12,8 +12,9 @@ setMethod("fortify", c("eSet", "missing"), function(model, data){
 setMethod("fortify", c("GRanges", "missing"), function(model, data){
   vals <- values(model)
   if(length(vals)){
-    idx <- !unlist(lapply(vals@listData, function(x) is(x, "List")))
-    warning(colnames(vals)[!idx], " column has been dropped for the reason that the corecion of class List is not supported")
+    idx <- !unlist(lapply(vals@listData, function(x) is(x, "List") & !is(x, "DNAStringSet")))
+    if(sum(!idx))
+      warning(colnames(vals)[!idx], " column has been dropped for the reason that the corecion of class List is not supported")
     df <- as.data.frame(model[,idx])
   }else{
     df <- as.data.frame(model)

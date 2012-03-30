@@ -2,6 +2,7 @@
 ## Import
 ## ============================================================
 ## ggplot2
+import(methods)
 import(ggplot2)
 import(reshape2)
 import(scales)
@@ -11,7 +12,6 @@ import(biovizBase)
 import(grid)
 import(plyr)
 importFrom(gridExtra, grid.arrange)
-
 ## Hmisc
 importFrom(Hmisc, bezier)
 ## GenomicRanges
@@ -23,7 +23,7 @@ importFrom(IRanges, IRanges,  disjointBins,
            "values", "values<-",
            ranges, "ranges<-", 
            isTRUEorFALSE, coverage, slice,
-           elementLengths, 
+           elementLengths,   endoapply,
            reduce, punion, pgap, gaps, "%in%")
 
 importMethodsFrom(IRanges,  split, 
@@ -39,17 +39,18 @@ importMethodsFrom(IRanges,  split,
 importClassesFrom(IRanges, Rle, RleList, IRanges)
 
 ## ## GenomicRanges
-importFrom(GenomicRanges, "seqnames<-","strand<-",
+importFrom(GenomicRanges, "seqnames<-",
            seqlevels, "seqlevels<-",
            GRanges, GRangesList, Seqinfo, seqlengths, "seqlengths<-")
 importMethodsFrom(GenomicRanges, ranges, "ranges<-",
                   start, end, width, "start<-", "end<-", "width<-",
-                  seqnames, strand, seqinfo, show, 
+                  seqnames, seqinfo, show, 
                    "elementMetadata<-", elementMetadata,
-                  as.data.frame, keepSeqlevels, renameSeqlevels)
+                  as.data.frame, keepSeqlevels, renameSeqlevels,
+                  sort)
 
 
-importClassesFrom(GenomicRanges, GRanges, GRangesList)
+importClassesFrom(GenomicRanges, GRanges, GRangesList, GenomicRangesList)
 
 ## ## ## Rsamtools
 importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,
@@ -70,12 +71,16 @@ importFrom(GenomicFeatures,
            exonsBy,
            cdsBy)
 
+## VariantAnnotation
+importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref, "ref<-",
+                  alt, "alt<-", info, "info<-", geno, "geno<-",
+                  readVcf) 
 
 
 ## ============================================================
 ## Export
 ## ============================================================
-exportMethods(autoplot, rescale, fortify)
+exportMethods(autoplot, rescale, fortify, xlim, "xlim<-", update, reset, backup)
 
 ## geom
 exportMethods(geom_chevron,
@@ -102,6 +107,7 @@ exportMethods(layout_karyogram,
 
 
 export(tracks,
+       align.plots,
        plotFragLength,        
        plotSpliceSum,       
        plotStackedOverview,

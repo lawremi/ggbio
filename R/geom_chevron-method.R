@@ -9,11 +9,11 @@ setMethod("geom_chevron", "GRanges",
 
             stat <- match.arg(stat)
             
-            args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-            args.aes <- parseArgsForAes(args)
+            args <- list(...)
+            args$facets <- facets
+            
+            args.aes <- parseArgsForAes(args)            
             args.non <- parseArgsForNonAes(args)
-            args.non <- args.non[!names(args.non) %in% c("data", "offset", "facets",
-                                                        "stat", "chevron.height.rescale")]            
             args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
             facet <- .buildFacetsFromArgs(data, args.facets)
 

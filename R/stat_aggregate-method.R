@@ -18,7 +18,8 @@ setMethod("stat_aggregate", "GRanges", function(data, xlab, ylab, main, by, FUN,
   if(all(is.null(c(start, end, width, window))))
     window <- as.integer(width(range(ranges(data)))/20)
 
-  args <- as.list(match.call(call = sys.call(sys.parent(2))))[-1]
+  args <- list(...)
+  args$facets <- facets
   args$geom <- geom  
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)

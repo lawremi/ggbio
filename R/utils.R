@@ -162,14 +162,19 @@ getGap <- function(data, group.name, facets = NULL){
     })
     idx <- which(!unlist(lapply(gps.lst, is.null)))
     gps <- do.call(c, gps.lst[idx])
-    ## if(!is.null(gps)){
-    ##   res.e <- try(gps <- do.call("c", unname(gps)))
-    ##   if(inherits(res.e, "try-error")) browser()
-    ## }
   })
-  res <- unlist(do.call(GRangesList, do.call(c, grl)))
-  values(res)$type <- "gaps"
-  res <- resize(res, width = width(res) + 2, fix = "center")
+
+  grl <- grl[!unlist(lapply(grl, is.null))]
+  ## grl
+  if(length(grl)){
+    ## res <- unlist(do.call(GRangesList, grl))a
+    res <- unlist(do.call(GRangesList, do.call(c, grl)))
+    values(res)$type <- "gaps"
+    res <- resize(res, width = width(res) + 2, fix = "center")
+  }else{
+    res <- GRanges()
+  }
+  res
 }
 
 ## suppose we have freq?
@@ -241,7 +246,8 @@ gr2newLinear <- function(obj, space.skip = 0.1){
 ## then need a transformation to circlular view
 ## data is a GRanges object
 gr2circle <- function(obj, x = ".biovizBase.mid", y,
-                      radius = 10, width = 10, direction = c("clockwise", "anticlockwise")){
+                      radius = 10, width = 10, direction = c("clockwise", "anticlockwise"),
+                      mul = 0.05){
 
   if(!length(y)){
     values(obj)$.biovizBase.equal.y <- 1
@@ -259,7 +265,7 @@ gr2circle <- function(obj, x = ".biovizBase.mid", y,
     temp.y <- y
   }
   
-  temp.y.r <- expand_range(range(temp.y), mul = 0.05)
+  temp.y.r <- expand_range(range(temp.y), mul = mul)
   temp.y <- (temp.y - min(temp.y.r))/diff(temp.y.r) * width + radius
   
   ## always from 1 to max
@@ -285,9 +291,9 @@ gr2circle <- function(obj, x = ".biovizBase.mid", y,
 
 rectInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
                       direction = direction,
-                      n = 5){
+                      n = 5, mul = 0.05){
 
-data.back <- data
+  data.back <- data
   inter.fun <- function(x, y) approx(x, y, n = n)
     ## need to consider the space
   if(length(y)){
@@ -344,7 +350,7 @@ data.back <- data
 ## res.bk <- gr2newLinear(data.back, space.skip)
   res <- gr2newLinear(res.gr, space.skip)
   res <- gr2circle(res, y = .y, radius = radius, width = trackWidth,
-                   direction = direction)  
+                   direction = direction, mul = mul)  
 }
 
 barInter <- function(data, y, space.skip = 0.1, trackWidth = 10, radius = 10,
@@ -581,6 +587,7 @@ getIdeoGR <- function(gr){
                  now use reduced information as ideogram... ")
     res <- reduce(gr, ignore = TRUE)
     start(res) <- 1
+    res
   }else{
     res <- as(seqinfo(gr), "GenomicRanges")
   }
@@ -631,7 +638,6 @@ getScale <- function(gr, unit = NULL, n = 100, type = c("M", "B", "sci")){
 
 
 parseArgsForAes <- function(args){
-  ## idx.eval <- !names(args) %in%  names(ggplot2::aes_auto(names(args)))
   aes.lst <- unlist(lapply(args, function(x){
     class(eval(x, parent.frame())) == "uneval"
   }))

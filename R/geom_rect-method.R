@@ -1,8 +1,6 @@
 setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
 setMethod("geom_rect", "data.frame", function(data, ...){
-  args <- as.list(match.call(call = sys.call(sys.parent(1)))[-1])
-  do.call(ggplot2::geom_rect, args)
-  ## ggplot2::geom_rect(data, ...)
+  ggplot2::geom_rect(data = data, ...)
 })
 ## alignment should be convenient toggle with chevron...
 setMethod("geom_rect", "GRanges", function(data,...,
@@ -12,12 +10,13 @@ setMethod("geom_rect", "GRanges", function(data,...,
                                            rect.height = 0.4,
                                            group.selfish = TRUE){
 
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  ## make this by hand
+  args <- list(...)
+  args$facets <- facets
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  args.non <- args.non[!names(args.non) %in% c("data", "facets", "rect.height", "geom", "stat",
-                                               "xlab", "ylab", "main")]
+  
   facet <- .buildFacetsFromArgs(data, args.facets)
   
   stat <- match.arg(stat)
@@ -70,7 +69,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
   
   if(stat == "identity"){
     if(!"y" %in% names(args.aes)){
-      if(!all(c("ymin","ymax", "x", "xmax") %in% names(args.aes))){
+      if(!all(c("ymin","ymax", "xmin", "xmax") %in% names(args.aes))){
         stop("aes(xmin =, xmax= , ymin =, ymax= ) is required for stat 'identity',
               you could also specify aes(y =) only as alternative")
       }

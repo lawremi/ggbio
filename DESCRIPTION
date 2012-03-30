@@ -1,13 +1,15 @@
 Package: ggbio
-Version: 1.1.6
+Version: 1.1.8
 Title: Static visualization for genomic data.
 Description: The ggbio package extends and specializes the grammar of graphics for biological data. The graphics are designed to answer common scientific questions, in particular those often asked of high throughput genomics data. All core Bioconductor data structures are supported, where appropriate. The package supports detailed views of particular genomic regions, as well as genome-wide overviews. Supported overviews include ideograms and grand linear views. High-level plots include sequence fragment length, edge-linked interval to data view, mismatch pileup, and several splicing summaries.
 Author: Tengfei Yin, Dianne Cook, Michael Lawrence
 Maintainer: Tengfei Yin <yintengfei@gmail.com>
 Depends: methods, ggplot2(>= 0.9) 
-Imports: methods, biovizBase(>= 1.1.3), reshape2, ggplot2(>= 0.9), BiocGenerics, Biobase, IRanges, GenomicRanges, GenomicFeatures, Rsamtools, BSgenome, gridExtra, scales, Hmisc, plyr
+Imports: methods, biovizBase(>= 1.1.3), reshape2, ggplot2(>= 0.9), BiocGenerics, Biobase, IRanges, GenomicRanges, GenomicFeatures, Rsamtools, BSgenome, gridExtra, scales, Hmisc, plyr, VariantAnnotation
 Suggests: BSgenome.Hsapiens.UCSC.hg19, TxDb.Hsapiens.UCSC.hg19.knownGene, affyPLM
 biocViews: Infrastructure, Visualization, Bioinformatics
+URL: http://tengfei.github.com/ggbio/
+BugReports: https://github.com/tengfei/ggbio/issues
 License: Artistic-2.0 
 LazyLoad: Yes
 Collate: utils.R
@@ -17,7 +19,6 @@ Collate: utils.R
 	 tracks.R
 	 facets-method.R
 	 fortify-method.R
-         geoms.R
 	 geom_chevron-method.R
          geom_alignment-method.R 
 	 geom_arch-method.R
@@ -41,6 +42,5 @@ Collate: utils.R
 	 plotRangesLinkedToData.R
 	 plotFragLength-method.R
 	 plotSpliceSum-method.R
-	 plotMismatchSum.R
 	 rescale-method.R
 	 ggbio.R

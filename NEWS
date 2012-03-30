@@ -1,4 +1,44 @@
-================================
-2011-10-10
-===============================
-Submit to BioC
+CHANGES IN VERSION 1.1.8
+------------------------
+
+NEW FEATURES
+
+    o create lower level API and rewrite higher level API
+
+    o new geom: geom_alignment, geom_chevron, geom_arch, geom_arrow, 
+                geom_arrowrect
+
+    o redefined geom: geom_rect, geom_segment
+
+    o new stat: stat_aggregate, stat_coverage, stat_mismatch, stat_gene, stat_table, 
+                stat_stepping
+
+    o redefined stat: stat_identity
+
+    o new layout: layout_circle, layout_karyogram
+
+    o tracks function are more smart and with more accessors.
+
+    o themes provided.
+
+    o More supported object for autoplot: VCF, ExpressionSet, GenomicRangesList.
+    
+SIGNIFICANT USER-LEVEL CHANGES
+
+    o qplot changed to generic autoplot function.
+
+    o argument use only "facets", no alias "facet_gr" or "facet" accepted.
+
+    o plotMismatchSum will be replaced by stat_mismatch, or autoplot, BamFile.
+    
+Notes
+
+    o new website for ggbio: 
+      http://tengfei.github.com/ggbio
+      hosting docs, tutorials and case study
+
+    o pdf version vignette will not longer supported or just provide a short form.
+
+
+
+

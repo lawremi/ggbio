@@ -1,7 +1,6 @@
 setGeneric("geom_segment", function(data, ...) standardGeneric("geom_segment"))
 setMethod("geom_segment", "data.frame", function(data, ...){
-  args <- as.list(match.call(call = sys.call(sys.parent(1)))[-1])
-  do.call(ggplot2::geom_segment, args)
+  ggplot2::geom_segment(data  = data, ...)
 })
 ## alignment should be convenient toggle with chevron...
 setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
@@ -10,11 +9,11 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
                                            rect.height = 0.4,
                                            group.selfish = TRUE){
 
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
+  args$facets <- facets
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  args.non <- args.non[!names(args.non) %in% c("data", "facets", "rect.height", "geom", "stat")]
   facet <- .buildFacetsFromArgs(data, args.facets)
   
   stat <- match.arg(stat)

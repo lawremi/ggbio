@@ -1,88 +1,58 @@
 ## ======================================================================
 ##        For "Overview"
 ## ======================================================================
-plotStackedOverview <- function(obj, xlab, ylab, main, facets = seqnames ~ .,
-                         cytoband = FALSE){
+plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
+                         cytoband = FALSE, rescale = TRUE, rescale.range = c(0, 10)){
 
-  ## args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
-  if(cytoband){
-    cytobandColor <- getOption("biovizBase")$cytobandColor
-    if(!isIdeogram(obj))
-        stop("Need cytoband information, please check the getIdeogram function")
-    df <- as.data.frame(obj)
-    ## df$seqnames <- factor(as.character(df$seqnames),
-    ##                       levels = sort(unique(as.character(df$seqnames))))
-    df.rect <- subset(df, gieStain != "acen")
-    df.tri <- subset(df, gieStain == "acen")
-    df.tri.p <- df.tri[substr(df.tri$name, 1, 1) == "p",]
-    df.tri.q <- df.tri[substr(df.tri$name, 1, 1) == "q",]
-    p <- ggplot(df.rect)
-    p <- p + facet_grid(seqnames ~ .) +
-      ggplot2::geom_rect(aes(xmin = start,
-                    ymin = 0,
-                    xmax = end,
-                    ymax = 10,
-                    fill = gieStain),
-                color = "black")
-     p <- p +  geom_polygon(data = df.tri.p, aes(x = c(start, start, end),
-                    y = c(rep(0, length(start)),
-                      rep(10,length(start)),
-                      rep(5,length(start))), fill = gieStain))
-     p <- p +  geom_polygon(data = df.tri.q, aes(x = c(start, end, end),
-                    y = c(rep(5, length(start)),
-                      rep(10,length(start)),
-                      rep(0,length(start))), fill = gieStain))
-    
-     p <- p + geom_polygon(data = df.tri.p, aes(x = c(start, start, end),
-                     y = c(0, 10, 5), fill = gieStain))+
-      geom_polygon(data = df.tri.q, aes(x = c(start, end, end),
-                     y = c(5, 10, 0), fill = gieStain))+
-                    opts(axis.text.y = theme_blank(),
-                         axis.title.y=theme_blank(),
-                         axis.ticks = theme_blank(),
-                         panel.grid.minor = theme_line(colour = NA),
-                         panel.grid.major = theme_line(colour = NA))+
-                           scale_fill_manual(values = cytobandColor)
-   
-  }else {
-    ideo.gr <- getIdeoGR(obj)
-    apply(as.data.frame(values(obj)), 2, class)
-    df <- as.data.frame(ideo.gr)
-    ## df$seqnames <- factor(as.character(df$seqnames),
-    ##                       levels = sortChr(unique(as.character(df$seqnames))))
-    p <- ggplot(df)
-    p <- p + facet_grid(facets) +
-      ggplot2::geom_rect(aes(xmin = start,
-                    ymin = 0,
-                    xmax = end,
-                    ymax = 10), fill = "white", color = "black") +
-                        opts(axis.text.y = theme_blank(),
-                             axis.title.y=theme_blank(),
-                             axis.ticks = theme_blank(),
-                             panel.grid.minor = theme_line(colour = NA),
-                             panel.grid.major = theme_line(colour = NA))
-  }
+  args <- list(...)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  facets <- seqnames ~ .
+  if(missing(obj)){
+    obj <- getIdeogram(cytoband = cytoband)
+    cat("-------get following seqnames------\n")
+    message(paste(seqnames(seqinfo(obj)), collapse = "\n"))
+    ## obj <- keepSeqlevels(obj, unique(seqnames()))
+    idx <- order(seqlengths(obj), decreasing = TRUE)
+    nms <- names(seqlengths(obj))[idx]
+    obj <- keepSeqlevels(obj, nms)
+    p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, facets = facets)
+  }else{
+  if(!is(obj, "GRanges"))
+    stop("only GRanges supported now")
+  ## tweak with y
+  if(rescale){
+  if("y" %in% names(args.aes)){
+    values(obj)[, as.character(args.aes$y)] <-
+      rescale(values(obj)[, as.character(args.aes$y)],rescale.range)
+
+  }}
+  p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, facets = facets)
+  if(!cytoband)
+    p <- p + layout_karyogram(data = obj, do.call(aes, args.aes),
+                         facets = facets, geom = geom)
+}
   if(!missing(xlab))
     p <- p + xlab(xlab)
   if(!missing(ylab))
-    p <- p + ylab(ylab)
+    p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
     p <- p + opts(title = main)
+  
   p
 }
 
 
 plotSingleChrom <- function(obj, subchr, zoom.region,
-                            xlab, ylab, main,  xlabel = FALSE){
+                            xlab, ylab, main, xlabel = FALSE){
   ## do we need subchr here
   if(!missing(subchr)){
     obj <- obj[seqnames(obj) == subchr]
-    ## seqlevels(obj) <- sortChr(unique(as.character(seqnames(obj))))
+    obj <- keepSeqlevels(obj, subchr)
   }
   if(length(unique(as.character(seqnames(obj))))>1)
     stop("Mulptiple chromosome information found")
-  p <- plotStackedOverview(obj, cytoband = TRUE)
-  p <- p + opts(legend.position = "none") + ggplot2::xlab("")
+  p <- ggplot() + layout_karyogram(obj, cytoband = TRUE) 
   if(!missing(zoom.region)){
     if(length(zoom.region) != 2)
       stop("zoom.region must be a numeric vector of length 2")
@@ -94,12 +64,19 @@ plotSingleChrom <- function(obj, subchr, zoom.region,
   }
   if(!xlabel)
     p <- p + opts(axis.text.x = theme_blank())
+  
   p <- p + theme_alignment(grid = FALSE, label = TRUE, border = FALSE) +
-    scale_y_continuous(breaks = 5, label = subchr)
+    scale_y_continuous(breaks = 5, label = subchr) +
+      opts(strip.background = theme_rect(colour = 'NA', fill = 'NA'))+ 
+        opts(strip.text.y = theme_text(colour = 'white'))   + opts(legend.position = "none")+
+          ggplot2::xlab("")
+
   if(!missing(xlab))
     p <- p + ggplot2::xlab(xlab)
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
+  else
+    p <- p + ggplot2::ylab(subchr)
   if(!missing(main))
     p <- p + opts(title = main)
   p

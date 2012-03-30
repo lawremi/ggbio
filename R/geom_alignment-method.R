@@ -13,14 +13,11 @@ setMethod("geom_alignment", "GRanges", function(data,...,
 
 
   stat <- match.arg(stat)
-  
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
+  args$facets <- facets
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  args.non <- args.non[!names(args.non) %in% c("data", "facets",
-                                               "rect.height", "geom", "stat",
-                                               "main.geom", "gap.geom")]
   facet <- .buildFacetsFromArgs(data, args.facets)
   
   rect.height <- force(rect.height)
@@ -53,12 +50,11 @@ setMethod("geom_alignment", "GRanges", function(data,...,
     args.non <- args.non[!(names(args.non) %in% c("xmin", "xmin", "ymin", "ymax", "data"))]
     ## if(rect.height <= 0 | rect.height >= 0.5)
     ##   stop("rect.height must be a value in (0,0.5)")
-    
     grl <- splitByFacets(data, facets)
     res <- endoapply(grl,
                      function(dt){
                        if("group" %in% names(args.aes)){
-dt <- addStepping(dt, group.name = as.character(args.aes$group),              
+                         dt <- addStepping(dt, group.name = as.character(args.aes$group),
                                            group.selfish = group.selfish)
                        }else{
                          dt <- addStepping(dt)
@@ -76,6 +72,7 @@ dt <- addStepping(dt, group.name = as.character(args.aes$group),
     ## plot gaps
 
     gps <- suppressWarnings(getGap(res, group.name = gpn, facets))
+    if(length(gps)){
     gps <- keepSeqlevels(gps, names(seqlengths(res)))
     args.gaps <- args.aes[!names(args.aes) %in% c("x", "y",
                                                   "xend", "yend",
@@ -94,6 +91,9 @@ dt <- addStepping(dt, group.name = as.character(args.aes$group),
     gps.lst <- c(list(aes.lst), list(data = gps, stat = "identity"),
                  args.gaps.extra)
     p <- list(do.call(gap.fun, gps.lst))
+  }else{
+    p <- NULL
+  }
     ## plot main
     args.aes$y <- as.name("stepping")
     args.aes <- args.aes[names(args.aes) != "size"]

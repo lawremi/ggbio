@@ -1,21 +1,9 @@
-## TODO: Priority this week til Wednesday
-## 5. GappedAlignments
-## 6. Bam/BamFile/character
-## 7. IRanges
-## 8. factorize statistics out
-## 10. autoplot,GRanges, geom = "area" is slow
-## 11. autoplot,GRanges, geom = "histogram"
-## 12. autoplot,SummarizedExpriment
-## 13. txdb y label
-## 14. implement layout htere
-
 setGeneric("autoplot")
 
 formals.qplot <- getFormalNames(qplot)
 formals.facet_grid <- getFormalNames(facet_grid)
 formals.facet_wrap <- getFormalNames(facet_wrap)
 formals.facets <- union(formals.facet_grid, formals.facet_wrap)
-
 
 
 ## ======================================================================
@@ -27,15 +15,15 @@ setMethod("autoplot", "GRanges", function(object, ...,
                                           legend = TRUE,
                                           geom = NULL,
                                           stat = NULL,
-                                          layout = c("linear", "stacked", "circle")
+                                          layout = c("linear", "karyogram", "circle")
                                           ){
   formals.cur <- c("object", "stat", "geom", "legend",
                    "xlab", "ylab", "main")
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
+
   ## args.facets <- args[names(args) %in% formals.facets]
   args <- args[!(names(args) %in% formals.cur)]
   args$data <- object
-
 
   .ggbio.geom <- c("rect", "chevron", "alignment", "arrowrect", "arrow", "segment")
   .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate", "table")
@@ -52,19 +40,20 @@ setMethod("autoplot", "GRanges", function(object, ...,
         args$geom <- geom
       }
   }
-  ## ------------------------------
-  ##   get the right function
-  ## ------------------------------
-  
-  .fun <- getDrawFunFromGeomStat(geom, stat)
-  p <- list(do.call(.fun, args))
+
+
   ## ------------------------------
   ## layout check
   ## ------------------------------
   layout <- match.arg(layout)
   ## since some of the geom or stat are not fully supported by all layout
-
   if(layout == "linear"){
+  ## ------------------------------
+  ##   get the right function
+  ## ------------------------------
+    
+    .fun <- getDrawFunFromGeomStat(geom, stat)    
+    p <- list(do.call(.fun, args))    
     if(!legend)
       p <- c(p, list(opts(legend.position = "none")))
     
@@ -84,19 +73,19 @@ setMethod("autoplot", "GRanges", function(object, ...,
     ## tweak with default y lab
     if(!missing(ylab))
       p <- c(p,list(ylab(ylab)))
-
     if(!missing(main))
       p <- c(p, list(opts(title = main)))
-
-}  
+    
+    p <- ggplot() + p
+  }  
   if(layout == "karyogram"){
-    stop("layout karyogram is not implemented")
+    p <- plotStackedOverview(object, ...,  geom = geom)
+    ## FIXME: xlab/ylab/main
   }
-  
   if(layout == "circle"){
-    stop("layout circle is not implemented")
+    p <- ggplot() + layout_circle(object, ..., geom = geom)
   }
-  ggplot() + p
+  p
 })
 
 
@@ -115,10 +104,11 @@ setMethod("autoplot", "GRangesList", function(object, ...,
                                               arch.offset = 1.3){
 
   type <- match.arg(type)
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
+
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  args.non <- args.non[!names(args.non) %in% c("object", "indName")]
+
   if(!"group.selfish" %in% names(args.non))
     args.non$group.selfish <- group.selfish
   if(type == "none")  {
@@ -132,8 +122,8 @@ setMethod("autoplot", "GRangesList", function(object, ...,
     if(!"group" %in% names(args.aes))
       args.aes$group <- substitute(.grl.name)
     aes.res <- do.call(aes, args.aes)
-    args.res <- c(args.non, list(aes.res), list(object = gr))
-    ## args.res <- args.res[names(args.res) != "group.selfish"]
+    args.non$object <- gr
+    args.res <- c(args.non, list(aes.res))
     p <- do.call(autoplot, args.res)
     p
   }
@@ -164,78 +154,20 @@ setMethod("autoplot", "GRangesList", function(object, ...,
 ##        For "IRanges"
 ## ======================================================================
 
-
-setMethod("autoplot", "IRanges", function(object, ...,
-                                          legend = TRUE,
-                                          xlab, ylab, main,
-                                          facets, facet, 
-                                          stat = c("identity", "coverage", "step"),
-                                          geom = c("rect", "segment","alignment",
-                                            "line","point", "area"),
-                                          coord = "linear"){
-
-  args <- as.list(match.call(call = sys.call(1)))[-1]
-  args <- args[!(names(args) %in% c("geom", "geom.engine",
-                                    "object",  "legend"))]
-  geom <- match.arg(geom)
-  p <- switch(geom,
-              full = {
-                df <- as.data.frame(object)
-                df$midpoint <- (df$start+df$end)/2
-                df$y <- as.numeric(disjointBins(object))
-                p <- ggplot(df)
-                args <- args[names(args) != "y"]
-                args <- c(args, list(xmin = substitute(start),
-                                     xmax = substitute(end),
-                                     ymin = substitute(y - 0.4),
-                                     ymax = substitute(y + 0.4)))
-                p + geom_rect(do.call("aes", args))
-              },
-              segment = {
-                df <- as.data.frame(object)
-                df$midpoint <- (df$start+df$end)/2
-                df$y <- as.numeric(disjointBins(object))
-                p <- ggplot(df)
-                args <- args[!(names(args) %in% c("x", "y"))]
-                args <- c(args, list(x = substitute(start), xend = substitute(end),
-                                     y = substitute(y), yend = substitute(y)))
-                p + geom_segment(do.call("aes", args))
-              },
-              coverage.line = {
-                df <- as.data.frame(object)
-                df$midpoint <- (df$start+df$end)/2
-                p <- ggplot(df)
-                st <- min(start(object))
-                cv <- coverage(object)
-                vals <- as.numeric(cv)
-                seqs <- seq.int(from = st, length.out = length(vals))
-                ## remove x
-                args <- args[!(names(args) %in% c("x", "y"))]
-                args <- c(args, list(x = substitute(seqs),
-                                     y = substitute(vals)))
-                p + geom_line(do.call("aes", args))+
-                  ylab("coverage")
-              },
-              coverage.area = {
-                df <- as.data.frame(object)
-                df$midpoint <- (df$start+df$end)/2
-                p <- ggplot(df)
-                st <- min(start(object))
-                cv <- coverage(object)
-                vals <- as.numeric(cv)
-                seqs <- seq.int(from = st, length.out = length(vals))
-                seqs <- c(seqs[1],seqs,tail(seqs, 1))
-                vals <- c(0, vals, 0)
-                ## remove x
-                args <- args[!(names(args) %in% c("x", "y"))]
-                args <- c(args, list(x = substitute(seqs),
-                                     y = substitute(vals)))
-                p + geom_polygon(do.call("aes", args))+
-                  ylab("coverage")
-              }
-              )
-  if(!legend)
-    p <- p + opts(legend.position = "none")
+setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
+  ## ok, for simple impmlementation, let's make it a GRanges.....:)
+  gr <- GRanges("chr_non", object)
+  p <- autoplot(gr, ...)
+  if(!missing(xlab))
+    p <- p + ggplot2::xlab(xlab)
+  else
+    p <- p + ggplot2::xlab("")
+  if(!missing(ylab))
+    p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main) +
+        opts(strip.background = theme_rect(colour = 'NA', fill = 'NA'))+ 
+        opts(strip.text.y = theme_text(colour = 'white')) 
   p
 })
 
@@ -244,15 +176,13 @@ setMethod("autoplot", "IRanges", function(object, ...,
 ##        For "GappedAlignments"
 ## ======================================================================
 setMethod("autoplot", "GappedAlignments", function(object, ...,
+                                                   xlab, ylab, main,
                                                    which,
-                                                   geom = c("gapped.pair",
-                                                     "full"),
+                                                   geom = "gapped.pair",
                                                    show.junction = FALSE
                                                    ){
-  geom <- match.arg(geom)
-  args <- as.list(match.call(call = sys.call(sys.parent())))[-1]
-  args <- args[!(names(args) %in% c("geom", "which", "show.junction",
-                                    "show.pair"))]
+
+  args <- list(...)
   if(!missing(which))
     gr <- biovizBase:::fetch(object, which)
   else
@@ -276,7 +206,7 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
                          xmax = substitute(end),
                          ymin = substitute(stepping - 0.4),
                          ymax = substitute(stepping + 0.4)))
-    p <- p + geom_rect(do.call("aes", args))+
+    p <- p + ggplot2::geom_rect(do.call("aes", args))+
       scale_color_manual(values = strandColor) +
         scale_fill_manual(values = strandColor)
     ## mapped read
@@ -285,12 +215,18 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
       args <- c(args, list(x = substitute(start), xend = substitute(end),
                            y = substitute(stepping),
                            yend = substitute(stepping)))
-      p <- p + geom_segment(data = df.gaps, do.call("aes", args), color = "red")
-    }}
-  if(geom == "full"){
-    p <- autoplot(gr)
+      p <- p + ggplot2::geom_segment(data = df.gaps, do.call("aes", args), color = "red")
+    }}else{
+    p <- autoplot(gr, ..., geom = geom)
   }
-  p <- p + xlab("Genomic Coordinate") + ylab("")
+  if(!missing(xlab))
+    p <- p + ggplot2::xlab(xlab)
+  else
+    p <- p + ggplot2::xlab("Genomic Coordinate")
+  if(!missing(ylab))
+    p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main) 
   p
 })
 
@@ -302,18 +238,16 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
 ## 1. mismatch
 ## 2. simply summary
 setMethod("autoplot", "BamFile", function(object, ..., which,
+                                          xlab, ylab, main,
                                           bsgenome,
+                                          geom = "line",
+                                          stat = "coverage",
+                                          method = c("estimate", "raw"),
                                           resize.extra = 10,
-                                          show.coverage = TRUE,
-                                          geom = c("gapped.pair",
-                                            "full",
-                                            "coverage.line",
-                                            "coverage.area",
-                                            "mismatch.summary")){
-  
-  args <- as.list(match.call(call = sys.call(1)))[-1]
-  args <- args[!(names(args) %in% c("geom", "which", "heights"))]
-  geom <- match.arg(geom)
+                                          show.coverage = TRUE){
+
+  args <- list(...)
+  method <- match.arg(method)
   bf <- open(object)
   if(geom == "gapped.pair"){
     message("Read GappedAlignments from BamFile...")
@@ -323,52 +257,55 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
     message("plotting...")
     args.ga <- args[names(args) %in% "show.junction"]
     args <- c(args.ga, list(data = ga))
-
     p <- do.call(autoplot, args)
-    ## p <- autoplot(ga, ..., resize.extra = resize.extra)
-
-  }
-  if(geom %in% c("coverage.line", "coverage.area", "full")){
-    ga <- readBamGappedAlignments(bf,
-                                  param = ScanBamParam(which = which),
-                                  use.name = TRUE)
-    gr <- biovizBase:::fetch(ga, type = "raw")
-    p <- autoplot(gr, geom = geom)
-  }
-  if(geom %in% c("mismatch.summary")){
-    if(missing(bsgenome)){
-      stop("For geom mismatch.summary, please provide bsgenome(A BSgenome object)")
-    }else
-    if(!is(bsgenome, "BSgenome")){
-      stop("bsgenome must be A BSgenome object")
+  }else{
+    if(stat == "coverage"){
+      p <- ggplot() + stat_coverage(bf, ..., method = method, geom  =  geom)
+    }else if(stat == "mismatch"){
+      p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which)
+    }else{
+      ga <- readBamGappedAlignments(bf,
+                                    param = ScanBamParam(which = which),
+                                    use.name = TRUE)
+      gr <- biovizBase:::fetch(ga, type = "raw")
+      p <- autoplot(gr, ..., geom = geom, stat = stat)
     }
-    pgr <- pileupAsGRanges(bamfile, region = which)
-    pgr.match <- pileupGRangesAsVariantTable(pgr, bsgenome)
-    p <- plotMismatchSum(pgr.match, show.coverage)
   }
-  p + ylab("")
+  if(!missing(xlab))
+    p <- p + ggplot2::xlab(xlab)
+  else
+    p <- p + ggplot2::xlab("Genomic Coordinate")
+  if(!missing(ylab))
+    p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main) 
+
+  p
 })
+
 ## ======================================================================
 ##  For "character" need to check if it's path including bamfile or not
 ## ======================================================================
-setMethod("autoplot", "character", function(object, ...,
-                                            which, 
-                                            bsgenome,
-                                            resize.extra = 10,
-                                            show.coverage = TRUE,
-                                            geom = c("gapped.pair",
-                                              "full",
-                                              "coverage.line",
-                                              "coverage.area",
-                                              "mismatch.summary")){
-  geom <- match.arg(geom)
-  if(tools::file_ext(object) == "bam")
-    bf <- BamFile(object)
+setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
+                                            asRangedData = FALSE){
+  .ext <- tools::file_ext(object)
+  if(.ext == "bam"){
+    message("reading in as Bamfile")
+    obj <- BamFile(object)
+  }else{
+    message("reading in")
+    obj <- import(object, asRangedData = asRangedData)
+  }
+  p <- autoplot(obj,  ...)
+  if(!missing(xlab))
+    p <- p + ggplot2::xlab(xlab)
   else
-    stop("Please pass a bam file path")
-  autoplot(bf,  ..., which = which, model = model, bsgenome = bsgenome,
-           show.coverage = show.coverage,
-           geom = geom, resize.extra = reszie.extra)
+    p <- p + ggplot2::xlab("Genomic Coordinate")
+  if(!missing(ylab))
+    p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main) 
+  p  
 })
 
 ## FIX THIS first:
@@ -381,6 +318,7 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                geom = c("gene", "reduced_gene"),
                                                names.expr = expression(paste(tx_name,
                                                    "(", gene_id,")", sep = ""))){
+  geom <- match.arg(geom)
   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   args <- args[!names(args) %in% c("object", "xlab", "ylab", "main")]
   args$data <- object
@@ -406,24 +344,22 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                                                 "point",
                                                 "rect")){
 
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.non <- args.non[!names(args.non) %in% c("object", "which", "xlab", "ylab", "main",
                                                "geom")]
-  if(!"color" %in% names(args.non))
-    isDNABaseColor <- TRUE
-  else
-    isDNABaseColor <- FALSE
   seqs <- getSeq(object, which, as.character = TRUE)
   seqs <- IRanges:::safeExplode(seqs)
   xs <- seq(start(which), length.out = width(which))
   df <- data.frame(x = xs, seqs = seqs)
   geom <- match.arg(geom)
   p <- ggplot(data = df, ...)
+  if(!"color" %in% names(args.non))
+    isDNABaseColor <- TRUE
+  else
+    isDNABaseColor <- FALSE
   baseColor <- getOption("biovizBase")$DNABasesColor
-  ## if(!isDNABaseColor)
-  ##   cols <- dots$color
   p <- switch(geom,
               text = {
                 if(isDNABaseColor){
@@ -544,6 +480,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
 ##        For "Rle"
 ## ======================================================================
 ## geom: ... color = I("red"), doesn't work
+## FIXME: idenity
 setMethod("autoplot", "Rle", function(object, lower, ...,
                                       xlab = "x", 
                                       ylab = "y", main,
@@ -558,8 +495,9 @@ setMethod("autoplot", "Rle", function(object, lower, ...,
   if(type %in% c("viewMaxs", "viewMeans", "viewMins", "viewSums") && missing(lower))
     stop("please at least specify the value of lower, you could pass
           extra parameters to slice too")
-
-  args.dots <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  
+  ## args.dots <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args.dots <- list(...)
   args.slice <- args.dots[names(args.dots) %in%
                           c("upper", "includeLower",
                             "includeUpper", "rangesOnly")] 
@@ -641,19 +579,17 @@ setMethod("autoplot", "RleList", function(object, lower, ...,
     stop("please at least specify the value of lower, you could pass
           extra parameters to slice too")
 
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])  
+  ## args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
   args <- args[names(args) %in% c("size", "shape", "color", "alpha", "geom")]
   if(!"geom" %in% names(args))
     args$geom <- geom
   
   ## args <- c(geom = geom, args)
-  ## args.dots <- list(...)
+
   args.slice <- args[names(args) %in%
                      c("upper", "includeLower",
                        "includeUpper", "rangesOnly")]
-  ## args <- args.dots[!(names(args) %in%
-  ##                         c("upper", "includeLower",
-  ##                           "includeUpper", "rangesOnly"))]
   if(!missing(lower))
     args.slice <- c(list(x = object,
                          lower = lower), args.slice)
@@ -818,6 +754,180 @@ setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("none", "h
     df.l <- transform(objct)    
     p <- qplot(data = df.l, ...)
   }
+  p
+})
+
+
+
+##======================================================================
+##  For GenomicRangesList, for circular view
+##======================================================================
+## TODO for circular layout first
+## need to name the aes list otherwise following the order
+setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
+                                                    trackWidth,
+                                                    radius = 10,
+                                                    grid = FALSE,
+                                                    trackSkip = 1,
+                                                    layout = c("circle")){
+  
+  if(missing(trackWidth)){
+    trackWidth <- rep(5, length(object))
+    idx <- which(unlist(lapply(args, function(arg){
+      arg$geom == "link"
+    })))
+    trackWidth[1] <- 1
+  }else{
+    if(length(trackWidth) > length(object)){
+      warning("Unequal lengths of trackWidth, removing extra track width")
+      trackWidth <- trackWidth[1:length(object)]
+
+    }
+    if(length(trackWidth) < length(object)){
+      warning("Unequal lengths of trackWidth, adding default 5 to  extra track width")
+      trackWidth <- c(trackWidth, rep(5, length(object) - length(trackWidth)))
+    }
+  }
+    if(length(trackSkip) == 1){
+      trackSkip <- rep(trackSkip, length(object))
+    }else{
+      if(length(trackSkip) != length(object))
+        stop("trackSkip must be of length 1 or of the same length
+              as object")
+    }
+  
+    if(length(radius) == 1){
+      radius <- radius + c(0, cumsum(trackWidth)[-length(trackWidth)]) +
+        cumsum(trackSkip)
+    }else{
+      if(length(radius) != length(object))
+        stop("radius must be of length 1 showing innermost radius or of the same length
+              as object")
+    }
+
+  
+    if(length(grid) == 1){
+      grid <- rep(grid, length(object))
+    }else{
+      if(length(grid) != length(object))
+        stop("grid must of length 1 or of the same length
+              as object")
+    }
+  
+    p <- ggplot()
+  
+    for(i in 1:length(object)){
+      p <- p + do.call(layout_circle, c(list(data = object[[i]]), radius = radius[i],
+                                        trackWidth = trackWidth[i], grid = grid[i],
+                                        args[[i]]))
+    }
+    p
+}) 
+
+##======================================================================
+##  For VCF
+##======================================================================
+setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
+                                      type = c("geno", "info", "fixed"),
+                                      ylabel = TRUE){
+  args <- list(...)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  type <- match.arg(type)
+  hdr <- exptData(object)[["header"]]
+  if(type == "geno"){
+    nms <- rownames(geno(hdr))
+    if("GT" %in% nms){
+      message("use GT for type geno as default")
+      gt <- geno(object)[["GT"]]
+    }else{
+      nm <- nms[1]
+      message("use ", nm, " for type geno as default")
+      gt <- geno(object)[[nm]]
+    }
+    sts <- start(rowData(object))
+    idx <- !duplicated(sts)
+    if(sum(!idx))
+      warning("remove ", sum(!idx), " snp with duplicated position, only keep first one")
+    gt <- gt[idx,]
+    df <- melt(gt)
+    df$start <- start(rowData(object)[idx])
+    df$y <- as.integer(df$Var2)
+    ## df <- melt(gt)
+    .y <- unique(df$y)
+    .label <- df$Var2[match(.y, df$y)]
+    p <- qplot(data = df, ..., x = start, y = y,  fill = value, geom = "raster") +
+      scale_y_continuous(breaks = .y, label = .label)
+    
+  }
+  if(type == "info"){
+    df <- fortify(info(object))
+    if(!"y" %in% names(args.aes)){
+      hdr.i <- rownames(info(hdr))
+      if("AF" %in% hdr.i){
+        args.aes$y <- as.name("AF")
+        message("use AF for type info as default")
+      }else{
+        nm <- hdr.i[i]
+        message("use ", nm, " for type info as default")
+        args.aes$y <- as.name(nm)
+      }
+    }
+    if(!"x" %in% names(args)){
+      args.aes$x <- as.name("start")
+    }
+    if(!"color" %in% names(args)){
+      args.non$color <- "black"
+    }
+    if(!"fill" %in% names(args)){
+      args.non$fill <- "black"
+    }
+    p <- ggplot(data = df) + do.call(geom_bar, c(list(stat = "identity"),
+                                   list(do.call(aes, args.aes)),
+                                   args.non))
+  }
+  if(type == "fixed"){
+    fix <- fixed(object)
+    fix <- fix[, !colnames(values(fix)) %in% c("ALT", "REF")]
+    values(fix)$ALT <- unlist(values(alt(object))[, "ALT"])
+    idx <- width(values(fix)$ALT) > 1
+    type <- vector("character", length  = length(fix))
+    type[idx] <- "I"
+    type[!idx] <- as.character(values(fix[!idx])$ALT)
+    values(fix)$type <- type
+    id <- start(fix) < 25238400 & start(fix) > 25238100
+    if(!"color" %in% names(args.non))
+      isDNABaseColor <- TRUE
+    else
+      isDNABaseColor <- FALSE
+    baseColor <- getOption("biovizBase")$DNABasesColor
+    .i <- "black"
+    names(.i) <- "I"
+    baseColor <- c(baseColor, .i)
+    fix <- addStepping(fix)
+    id <- start(fix) < 25238400 & start(fix) > 25238100
+    ## only show SNP
+    df <- fortify(fix)
+    df$type <- factor(df$type, levels = c(names(baseColor)))
+    ylim <- range(df$stepping)
+    ylim <- scales::expand_range(ylim, mul = 0.5)
+    p <- ggplot() + geom_text(data = df,
+                         aes(x = start, label = type, color = type,  y = stepping)) +
+                          scale_color_manual(values = baseColor) +  
+                            scale_y_continuous(breaks = unique(sort(values(fix)$stepping)),
+                                               labels = unique(sort(values(fix)$stepping)),
+                                               limits = ylim)
+  }
+  if(!ylabel)
+    p <- p + scale_y_continuous(breaks = NULL)
+  if(missing(xlab))
+    xlab <- "Genomic Coordinates"
+  p <- p + ggplot2::xlab(xlab)
+  if(missing(ylab))
+    ylab <- ""
+  p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main)
   p
 })
 

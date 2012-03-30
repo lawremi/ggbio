@@ -7,19 +7,19 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
                                                geom = NULL){
 
 
+
+
   if(is.null(geom))
-    geom <- "area"
+    geom <- "line"
   data <- keepSeqlevels(data, unique(as.character(seqnames(data))))
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  args$geom <- geom  
+  args <- list(...)
+  args$facets <- facets
+  args$geom <- geom
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  ## args.facets <- args.facets[names(args.facets) != "facets"]
-  args.non <- args.non[!names(args.non) %in% c("data", "facets")]
   facet <- .buildFacetsFromArgs(data, args.facets)
   grl <- splitByFacets(data, facets)
-
   if(missing(xlim))
     xlim <- c(min(start(ranges(data))),
               max(end(ranges(data))))
@@ -27,7 +27,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
     facets <- as.formula(~seqnames)
   facets <- strip_facets_dots(facets)
   allvars <- all.vars(as.formula(facets))
-  allvars.extra <- allvars[!allvars %in% c(".", "seqnames")]
+  allvars.extra <- allvars[!allvars %in% c(".", "seqnames", "strand")]
   lst <- lapply(grl, function(dt){
     vals <- coverage(keepSeqlevels(dt, unique(as.character(seqnames(dt)))))
     if(any(is.na(seqlengths(dt)))){
@@ -53,7 +53,8 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
     else
       res <- data.frame(coverage = vals, seqs = seqs,
                         seqnames =
-                        as.character(seqnames(dt))[1])
+                        as.character(seqnames(dt))[1],
+                        strand = unique(as.character(strand(dt))))
     res[,allvars.extra] <- rep(unique(values(dt)[, allvars.extra]),
                                nrow(res))
     res
@@ -69,7 +70,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   args.res <- c(list(data = res),
                 list(aes),
                 args.non)
-  
+
   p <- do.call(stat_identity, args.res)
   p <- c(list(p) , list(facet))
   if(!missing(xlab))
@@ -92,8 +93,11 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
                                                    xlab, ylab, main,
                                                    facets = NULL, 
                                                geom = NULL){
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
+  args$facets <- facets
   args.aes <- parseArgsForAes(args)
+  if(!"y" %in% names(args.aes))
+    args.aes$y <- as.name("coverage")
   args.non <- parseArgsForNonAes(args)
   aes.res <- do.call(aes, args.aes)
   gr <- flatGrl(data)
@@ -113,3 +117,96 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
   p
 })
 
+
+setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xlim,
+                                               which,
+                                               xlab, ylab, main,
+                                               facets = NULL, 
+                                               geom = NULL,
+                                               method = c("estimate", "raw")){
+  ## which could be a granges or seqnames 
+  if(missing(which)){
+    seq.nm <- names(scanBamHeader(data)[[1]])[1]
+  }else{
+    if(is(which, "GRanges")){
+      seq.nm <- unique(as.character(seqnames(which)))
+    } else if(is(which, "character")){
+      seq.nm <- which
+    }else{
+      stop("which must be missing, GRanges or character(for seqnames)")
+    }
+  }
+  args <- list(...)
+  args$facets <- facets
+  args.aes <- parseArgsForAes(args)
+  if(!"y" %in% names(args.aes)){
+    args.aes$y <- as.name("score")
+  }else{
+    if(as.character(args.aes$y) == "coverage")
+      args.aes$y <- as.name("score")
+  }
+  if(!"x" %in% names(args.aes)){
+    args.aes$x <- as.name("midpoint")
+  }
+  args.non <- parseArgsForNonAes(args)
+  args.non <- args.non[!names(args.non) %in% c("method", "maxBinSize", "data", "which")]
+  
+  
+  if(is.null(geom))
+    geom <- "line"
+  args.non$geom <- geom
+  method <- match.arg(method)
+
+  res <- switch(method,
+                estimate = {
+                  message("Estimating coverage...")
+                  res <- estimateCoverage(data, maxBinSize = maxBinSize)
+                  message("done")
+                  res
+                },
+                raw = {
+                  stop("not implemented yet")
+                })
+
+  message("Constructing graphics...")
+  res <- res[seqnames(res) %in% seq.nm]
+  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
+  facet <- .buildFacetsFromArgs(res, args.facets)
+  res <- keepSeqlevels(res, unique(as.character(seqnames(res))))
+  if(geom == "area"){
+    grl <- splitByFacets(res, facets)
+    res <- endoapply(grl, function(gr){
+      gr <- sort(gr)
+      .gr1 <- gr[1]
+      values(.gr1)$score <- 0
+      .grn <- gr[length(gr)]
+      values(.grn)$score <- 0
+      c(gr,.gr1, .grn) 
+    })
+    res <- unlist(res)
+  }
+  res <- fortify(res)
+  aes.res <- do.call(aes, args.aes)
+  args.res <- c(list(data = res),
+                list(aes.res),
+                args.non)
+
+  p <- do.call(stat_identity, args.res)
+  
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  else
+    p <- c(p, list(ggplot2::ylab("Coverage")))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
+  if(!is.null(facet))
+    p <- c(p, list(facet))
+
+  p
+  
+})

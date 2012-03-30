@@ -6,10 +6,10 @@ setGeneric("stat_table", function(data, ...) standardGeneric("stat_table"))
 setMethod("stat_table", "GRanges", function(data, ..., xlab, ylab, main,
                                             geom = NULL, stat = NULL){
 
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
+  
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  args.non <- args.non[!names(args.non) %in% c("data", "facets", "geom", "stat")]
   
   tab <- table(paste(seqnames(data), start(data), end(data), strand(data), sep = ":"))
   key_mat <- matrix(unlist(strsplit(names(tab), ":", fixed=TRUE)), 4)
@@ -68,7 +68,8 @@ setMethod("stat_table", "GRangesList", function(data, ...,
                                                 facets = NULL, 
                                                geom = NULL){
   
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
+
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   aes.res <- do.call(aes, args.aes)

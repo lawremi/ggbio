@@ -13,24 +13,24 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   ##   geom <- "area"
   if(missing(which))
     stop("missing which is not supported yet")
-  if(missing(xlim))
-    xlim <- c(start(range(which)),
-              end(range(which)))
 
   object <- data
   geom <- match.arg(geom)
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  args$geom <- geom  
+
+  args <- list(...)
+  args$facets <- facets
+  
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  args.non <- args.non[!names(args.non) %in% c("data", "which",
-                                               "geom", "names.expr", "xlim", "facets")]
 
+  ## tweak with args.aes to overcome the problem that single tiny rectangle missed.
+  if(!"fill" %in% names(args.aes) & "fill" %in% names(args.non)){
+    args.non$fill <- "black"
+  }
   if(geom == "gene"){
     message("Aggregating TranscriptDb...")
     gr <- biovizBase:::fetch(object, which)
-    ## gr <- fetch(object, which)
     message("Constructing graphics...")
     values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
     ## drawing
@@ -39,23 +39,53 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     df <- as.data.frame(gr)
     df.cds <- df[df$type == "cds",]
     ## p <- ggplot(df.cds)
-    args.cds <- args.aes[names(args.aes) != "y"]
-    args.cds <- c(args.cds, list(xmin = substitute(start),
-                         xmax = substitute(end),
-                         ymin = substitute(stepping - 0.4),
-                         ymax = substitute(stepping + 0.4)))
-    aes.res <- do.call(aes, args.cds)
+    ## add a segment for hacking at 1pix
     if(nrow(df.cds)){
+    args.cds <- args.aes[names(args.aes) != "y"]
+    args.cds <- c(args.cds, list(x = substitute(start),
+                         xend = substitute(start),
+                         y = substitute(stepping - 0.4),
+                         yend = substitute(stepping + 0.4)))
+    aes.res <- do.call(aes, args.cds)
     args.cds.res <- c(list(data = df.cds),
                       list(aes.res),
                       args.non)
-    p <- list(do.call(ggplot2::geom_rect, args.cds.res))
+    p <- list(do.call(ggplot2::geom_segment, args.cds.res))
   }else{
     p <- NULL
   }
+    ## rect
+    if(nrow(df.cds)){
+      args.cds <- args.aes[names(args.aes) != "y"]
+      args.cds <- c(args.cds, list(xmin = substitute(start),
+                                   xmax = substitute(end),
+                                   ymin = substitute(stepping - 0.4),
+                                   ymax = substitute(stepping + 0.4)))
+      aes.res <- do.call(aes, args.cds)
+      args.cds.res <- c(list(data = df.cds),
+                        list(aes.res),
+                        args.non)
+      p <- c(p, list(do.call(ggplot2::geom_rect, args.cds.res)))
+    }else{
+      p <- NULL
+    }
     ## utrs
     df.utr <- df[df$type == "utr",]
+
+    ## add a segment for hacking at 1pix
     args.utr <- args.aes[names(args.aes) != "y"]
+    args.utr <- c(args.utr, list(x = substitute(start),
+                         xend = substitute(start),
+                         y = substitute(stepping - 0.2),
+                         yend = substitute(stepping + 0.2)))
+    aes.res <- do.call(aes, args.utr)
+    args.utr.res <- c(list(data = df.utr),
+                      list(aes.res),
+                      args.non)
+    p <- c(p, list(do.call(ggplot2::geom_segment, args.utr.res)))
+
+    args.utr <- args.aes[names(args.aes) != "y"]
+
     args.utr <- c(args.utr, list(xmin = substitute(start),
                          xmax = substitute(end),
                          ymin = substitute(stepping - 0.2),
@@ -65,6 +95,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                       list(aes.res),
                       args.non)
     p <- c(p, list(do.call(ggplot2::geom_rect, args.utr.res)))
+    
     ## p <- p + geom_rect(data = df.utr, do.call("aes", args))
     ## gaps
     df.gaps <- gr[values(gr)$type == "gap"] 
@@ -74,7 +105,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                        list(aes.res),
                        args.non)
      p <- c(p , list(do.call(geom_chevron, args.gaps.res)))
-    ## p <- p + geom_chevron(data = df.gaps, do.call("aes", args))
+
     .df.lvs <- unique(df$stepping)
     .df.sub <- df[, c("stepping", "tx_id", "tx_name", "gene_id")]
     .df.sub <- .df.sub[!duplicated(.df.sub),]
@@ -101,7 +132,6 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     ## }
     p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
                                 labels = .labels)))
-   ggplot() +  p
   }
   if(geom == "reduced_gene"){
     message("Aggregating TranscriptDb...")
@@ -151,7 +181,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     p <- c(p, list(scale_y_continuous(breaks = NULL)), list(opts(axis.text.y = theme_blank())))
   }
   if(missing(xlab)){
-    chrs <- unique(seqnames(which))
+    chrs <- unique(seqnames(gr))
     gms <- genome(object)
     gm <- unique(gms[chrs])
     chrs.tx <- paste(chrs, sep = ",")
@@ -170,6 +200,10 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   }
   if(!missing(main))
     p <- c(p, opts(title = main))
+  
+  if(missing(xlim))
+    xlim <- c(start(range(gr)),
+              end(range(gr)))
   p <- c(p, list(coord_cartesian(xlim = xlim, wise = TRUE)))
   
 })

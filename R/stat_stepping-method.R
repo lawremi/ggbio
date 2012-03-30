@@ -6,9 +6,12 @@ setMethod("stat_stepping", "GRanges", function(data, ...,
                                                geom = c("rect",
                                                  "alignment", "segment")){
 
+
   geom <- match.arg(geom)
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+  args <- list(...)
+  args$facets <- facets
   args$stat <- "stepping"
+  args$data <- data
   p <- switch(geom,
               rect = do.call(geom_rect, args),
               alignment = do.call(geom_alignment, args),
@@ -26,7 +29,7 @@ setMethod("stat_stepping", "GRanges", function(data, ...,
 
   if(!missing(main))
     p <- c(p, list(opts(title = main)))
-  
+
   p
 })
 

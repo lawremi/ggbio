@@ -2,19 +2,23 @@
 \alias{stat_coverage}
 \alias{stat_coverage,GRanges-method}
 \alias{stat_coverage,GRangesList-method}
+\alias{stat_coverage,BamFile-method}
 \title{Calculate coverage}
 \description{
   Calculate coverage.
 }
 \usage{
-% for GRanges
+# for GRanges
 \S4method{stat_coverage}{GRanges}(data, ..., xlim, xlab, ylab, main,
-              facets = NULL,
-              geom = NULL)
-% for GRangesList
+              facets = NULL, geom = NULL)
+# for GRangesList
 \S4method{stat_coverage}{GRangesList}(data, ..., xlim, xlab, ylab, main,
-              facets = NULL,
-              geom = NULL)
+              facets = NULL, geom = NULL)
+
+# for Bamfile
+\S4method{stat_coverage}{BamFile}(data, ..., maxBinSize = 2^14, xlim,
+                         which, xlab, ylab, main, facets = NULL, 
+                        geom = NULL,  method = c("estimate", "raw"))
 
 }
 \arguments{
@@ -42,6 +46,16 @@
   }
   \item{geom}{
     The geometric object to use display the data. 
+  }
+  \item{maxBinSize}{
+    maxBinSize.
+  }
+  \item{method}{
+    'estimate' for parsing estimated coverage(fast), 'raw' is slow and
+    parse the accurate coverage.
+  }
+  \item{which}{
+    \code{GRanges} which defines region to subset the results.
   }
 }
 \value{

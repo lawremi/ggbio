@@ -12,6 +12,8 @@
 \alias{autoplot,Rle-method}
 \alias{autoplot,RleList-method}
 \alias{autoplot,ExpressionSet-method}
+\alias{autoplot,GenomicRangesList-method}
+\alias{autoplot,VCF-method}
 
 
 \title{Generic autoplot function}
@@ -27,7 +29,7 @@
 \usage{
 ## For object GRanges
 \S4method{autoplot}{GRanges}(object, ..., xlab, ylab, main, 
-      legend = TRUE,  geom = NULL, stat = NULL, layout = c("linear", "stacked", "circle"))
+      legend = TRUE,  geom = NULL, stat = NULL, layout = c("linear", "karyogram", "circle"))
 
 ## For object GRangesList
 \S4method{autoplot}{GRangesList}(object, ..., xlab, ylab,
@@ -37,28 +39,20 @@
                  group.selfish = FALSE, arch.offset = 1.3)
 
 ## For object IRanges
-\S4method{autoplot}{IRanges}(object, ..., legend = TRUE,
-                 xlab, ylab, main, facets,
-                 facet, stat = c("identity", "coverage", "step"), geom
-                 = c("rect", "segment", "alignment", "line", "point",
-                 "area"), coord = "linear")
+\S4method{autoplot}{IRanges}(object, ..., xlab, ylab, main)
+
 
 ## For object GappedAlignments
-\S4method{autoplot}{GappedAlignments}(object, ..., which,
-      geom = c("gapped.pair", "full"),
-      show.junction = FALSE)
+\S4method{autoplot}{GappedAlignments}(object, ..., xlab, ylab, main, which,
+      geom = "gapped.pair", show.junction = FALSE)
 
 ## For object BamFile
-\S4method{autoplot}{BamFile}(object, ..., which, 
-      bsgenome, resize.extra = 10, show.coverage = TRUE,
-      geom = c("gapped.pair", "full",
-                 "coverage.line", "coverage.area", "mismatch.summary"))
+\S4method{autoplot}{BamFile}(object, ..., which,
+      xlab, ylab, main, bsgenome, geom = "line", stat = "coverage",
+     method = c("estimate", "raw"), resize.extra = 10, show.coverage = TRUE)
 
 ## For object character
-\S4method{autoplot}{character}(object, ..., which,
-                 bsgenome, resize.extra = 10,
-                 show.coverage = TRUE, geom = c("gapped.pair", "full",
-                 "coverage.line", "coverage.area", "mismatch.summary"))
+\S4method{autoplot}{character}(object, ..., xlab, ylab, main, asRangedData = FALSE)
 
 ## For object TranscriptDb
 \S4method{autoplot}{TranscriptDb}(object, which, ..., xlab,
@@ -95,14 +89,20 @@
                                     "mean-sd", "volcano",
                                     "NUSE", "RLE"),
                      test.method = "t")
+
+## For object GenomicRangesList
+\S4method{autoplot}{GenomicRangesList}(object, args = list(), trackWidth,
+                    radius = 10, grid = FALSE, trackSkip = 1, layout = c("circle"))
+## For object VCF
+\S4method{autoplot}{VCF}(object, ..., xlab, ylab, main,
+                    type = c("geno", "info", "fixed"),
+                    ylabel = TRUE)
+
 }
 
 \arguments{
   \item{object}{
-    A \code{\link{data.frame}}, \code{\link{matrix}},
-    \code{\link{GRanges}}, \code{\link{BSgenome}},
-    \code{\link{TranscriptDb}}, \code{\link{GappedAlignments}} object
-    or any other objects for which the autoplot method is defined.    
+    object to be plot.
   }
   \item{x}{
     x value, start/end/midpoint without quotes. e.g \code{x = start},
@@ -138,12 +138,6 @@
   not "raw", at least a lower parameters which passed to \code{slice}
   function is required.
     }
-  % \item{group.name}{
-  %   A character with quote, one of the variables in elementMetadata,
-  %   used for grouping the intervals when computing the splice summary.
-  %   e.g. grouping exons into one transcript model by calling
-  %   \code{group.name = "tx\_ed"}
-  % }
   \item{name}{
     Passed to \code{getSeq} in BSgenome package.
     
@@ -202,40 +196,79 @@
 
   For ExpreesionSet, ploting types.
 }
-\item{test.method}{test method}
+\item{args}{
+  a list of arguments list which applied to each track.
+}
+\item{trackWidth}{
+  Numeric values indicate width for each track, if it's only one value, then applied the same
+value to each track, otherwise, the track must be of the same length of
+track numbers.
+}
+\item{radius}{
+  numeric value indicate inner radius of the innermost circle.
+}
+\item{grid}{
+  logical value of length 1 or the same lengths of tracks numbers,
+indicate whether you want to adding grid background or not.
+}
+\item{trackSkip}{
+  numeric values indicate skipped region between tracks.
+}
+\item{layout}{
+  Layout including linear, circular and karyogram. for \code{GenomicRangesList}, it only supports circular layout.
+}
+\item{method}{
+  method used for parsing coverage from bam files. 'estimate' use fast
+  esitmated method  and 'raw' use relatively slow parsing method.
+}
+\item{asRangedData}{
+  when object is character, it may be imported by \code{import} function
+  in package rtracklayer, then asRangedData passed to \code{import}
+  function.  If FALSE, coerce object to \code{GRanges}.
+}
+\item{ylabel}{
+ logical value indicates to show y labels or not.
+}
+\item{test.method}{
+  test method
+}
   \item{...}{
     Extra parameters. Usually are those parameters used in autoplot to
     control aesthetics or geometries.
   }
-  \item{layout}{
-  }
   \item{main}{
+    title.
   }
   \item{stat}{
+    statistical transformation.
   }
   \item{indName}{
+    When coerce \code{GRangesList} to \code{GRanges}, names created for
+    each group.
   }
   \item{coverage.col}{
+    coverage stroke color.
   }
   \item{coverage.fill}{
+    coverage fill color.
   }
   \item{group.selfish}{
+        Passed to \code{addStepping}, control whether to show each group as
+    unique level or not. If set to \code{FALSE}, if two groups are not
+    overlapped with each other, they will probably be layout in the same
+    level to save space.
   }
   \item{arch.offset}{
-  }
-  \item{facets}{
-  }
-  \item{facet}{
-  }
-  \item{coord}{
+    arch.offset.
   }
   \item{xlim}{
+    x limits.
   }
   \item{ylim}{
-    
+    y limits.
   }
   \item{names.expr}{
-    
+    names expression used for creating labels.
   }
 }
 \value{

@@ -824,19 +824,6 @@ setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
     p
 }) 
 
-
-##======================================================================
-##  For DNAStringSet
-##======================================================================
-## setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main){
-##   args <- list(...)
-##   args.aes <- parseArgsForAes(args)
-##   args.non <- parseArgsForNonAes(args)
-  
-  
-## })
-
-
 ##======================================================================
 ##  For VCF
 ##======================================================================

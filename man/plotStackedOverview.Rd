@@ -2,8 +2,9 @@
 \alias{plotStackedOverview}
 \title{Plot stacked overview}
 \usage{
-plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
-                         cytoband = FALSE, rescale = TRUE, rescale.range = c(0, 10))
+plotStackedOverview(obj, ..., xlab, ylab, main, geom = "rect",
+                         cytoband = FALSE, rescale = TRUE,
+                         rescale.range = c(0, 10))
 }
 \description{
   Plot stacked overview for genome with or without cytoband. It's a

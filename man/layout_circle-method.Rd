@@ -6,15 +6,15 @@
   Create a circle layout.
 }
 \usage{
-\S4method{layout_circle}{GRanges}(data, ..., geom = c("point", "line",
-                                       "link", "ribbon","rect", "bar",
-                                       "segment", "rectangle", "hist", "scale", 
-                                "ideogram", "text"), linked.to,
-                          radius = 10, trackWidth = 5, 
-                          space.skip = 0.015, direction = c("clockwise", "anticlockwise"),
-                          link.fun = function(x, y, n = 30) bezier(x, y, evaluation = n),
-                   rect.inter.n = 5, rank, 
-                   scale.n = 60, scale.unit = NULL, scale.type = c("M", "B", "sci"))
+\S4method{layout_circle}{GRanges}(data, ..., geom = c("point", "line", "link", "ribbon",
+                 "rect", "bar", "segment", "hist", "scale", "ideogram",
+                 "text"), linked.to, radius = 10, trackWidth = 5,
+                 space.skip = 0.015, direction = c("clockwise",
+                 "anticlockwise"),
+                 link.fun = function(x, y, n = 30) bezier(x, y, evaluation = n),
+                 rect.inter.n = 5, rank, scale.n = 60, scale.unit = NULL,
+                 scale.type = c("M", "B", "sci"), grid.n = 5, grid.background = "gray70",
+                 grid.line = "white", grid = FALSE)
 }
 \arguments{
   \item{data}{
@@ -63,6 +63,18 @@
   }
   \item{scale.type}{
     Scale type used for 
+  }
+  \item{grid}{
+    logical value indicate showing grid background for track or not.
+  }
+  \item{grid.n}{
+    integer value indicate horizontal grid line number.
+  }
+  \item{grid.background}{
+    grid background color.
+  }
+  \item{grid.line}{
+    grid line color.
   }
 }
 \value{

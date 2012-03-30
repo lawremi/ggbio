@@ -12,8 +12,6 @@ import(biovizBase)
 import(grid)
 import(plyr)
 importFrom(gridExtra, grid.arrange)
-## VariantAnnotation
-import(VariantAnnotation) 
 ## Hmisc
 importFrom(Hmisc, bezier)
 ## GenomicRanges
@@ -41,12 +39,12 @@ importMethodsFrom(IRanges,  split,
 importClassesFrom(IRanges, Rle, RleList, IRanges)
 
 ## ## GenomicRanges
-importFrom(GenomicRanges, "seqnames<-","strand<-",
+importFrom(GenomicRanges, "seqnames<-",
            seqlevels, "seqlevels<-",
            GRanges, GRangesList, Seqinfo, seqlengths, "seqlengths<-")
 importMethodsFrom(GenomicRanges, ranges, "ranges<-",
                   start, end, width, "start<-", "end<-", "width<-",
-                  seqnames, strand, seqinfo, show, 
+                  seqnames, seqinfo, show, 
                    "elementMetadata<-", elementMetadata,
                   as.data.frame, keepSeqlevels, renameSeqlevels,
                   sort)
@@ -73,12 +71,16 @@ importFrom(GenomicFeatures,
            exonsBy,
            cdsBy)
 
+## VariantAnnotation
+importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref, "ref<-",
+                  alt, "alt<-", info, "info<-", geno, "geno<-",
+                  readVcf) 
 
 
 ## ============================================================
 ## Export
 ## ============================================================
-exportMethods(autoplot, rescale, fortify)
+exportMethods(autoplot, rescale, fortify, xlim, "xlim<-", update, reset, backup)
 
 ## geom
 exportMethods(geom_chevron,

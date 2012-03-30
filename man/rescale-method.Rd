@@ -13,7 +13,7 @@
       from = range(x, na.rm = TRUE))
 
 ## For signature ggplot
-\S4method{rescale}{ggplot}(x, xlim, ylim, sx = 1, sy = 1)
+\S4method{rescale}{ggplot}(x, xlim, ylim, sx = 1, sy = 1, wise = TRUE)
 }
 \arguments{
 \item{x}{
@@ -37,6 +37,10 @@ the range to be rescale.
 }
 \item{sy}{
   Scale fold for y-scale. Default is 1, no change.
+}
+\item{wise}{
+  wise: If 'TRUE' will wisely expand the actual range of the plot a
+       little, in the way that setting the limits on the scales does
 }
 }
 \value{

@@ -4,6 +4,7 @@
 \alias{xlim}
 \alias{xlim,Tracks-method}
 \alias{xlim,numeric-method}
+\alias{xlim<-}
 \alias{xlim<-,Tracks,numeric-method}
 \alias{xlim<-,Tracks,IRanges-method}
 \alias{xlim<-,Tracks,GRanges-method}

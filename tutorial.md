@@ -26,6 +26,8 @@ title: Tutorial
   -  [autoplot, RleList]({{site.url}}/autoplot/RleList)
   -  [autoplot, character]({{site.url}}/autoplot/character)
 
+
+
 ## Lower level API
 
 ### [Geometric object(geom)]({{site.url}}/geom) <a id = "geom"></a>
@@ -51,8 +53,7 @@ title: Tutorial
   -  [layout_karyogram]({{site.url}}/layout/layout_karyogram)
 
 ### [Tracks]({{site.url}}/tracks) <a id = "tracks"></a>
-  -  [tracks]({{site.url}}/tracks/tracks)
-  -  [align.plots]({{site.url}}/tracks/align.plots)
+  -  [tracks/align.plots]({{site.url}}/tracks/tracks)
 
 ### [Theme]({{site.url}}/theme) <a id = "theme"></a>
   -  [theme_alignment]({{site.url}}/theme/theme_alignment)

@@ -1,17 +1,18 @@
 ---
 layout: static
-title: geom_alignment
+title: geom_segment
 ---
 
 
 
 
 ### Introduction
-`geom_alignment` is lower level API for creating alignemtns for interval data,
-such as *GRanges*  and even more native *GRangesList* object. 
+`geom_segment` is lower level API for creating segments for interval data,
+such as *GRanges* object.
 
 ### Objects
   * *GRanges*
+  * *data.frame* , just like ggplot2::geom_segment
   
 ### Usage
   upcomming
@@ -27,6 +28,24 @@ require(ggbio)
 require(GenomicRanges)
 {% endhighlight %}
 
+
+
+
+When the object is a *data.frame*, it calls ggplot2::geom_segment inside, here is a
+silly example:
+
+
+{% highlight r %}
+##
+#   ======================================================================
+##  data.frame call ggplot2::geom_segment
+##
+#   ======================================================================
+ggplot() + geom_segment(data = mtcars, aes(x = mpg, 
+    y = wt, xend = mpg + 10, yend = wt + 0.2, fill = cyl))
+{% endhighlight %}
+
+![plot of chunk data.frame](http://i.imgur.com/ISSxX.png) 
 
 
 
@@ -57,12 +76,6 @@ those intervals different stepping levels as y axis to avoid overlapped
 plotting, it's a very rough exploration as first step for some interval data.
 
 
-**NOTICE** default groupping intervals based on stepping levels, which doesn't
-  make sense in mose cases! the chevron connect them doesn't make too much sense
-  too, so make sure you group them based on some meaningful values, like
-  transcript id.
-
-
 
 {% highlight r %}
 ##
@@ -70,10 +83,10 @@ plotting, it's a very rough exploration as first step for some interval data.
 ##  default
 ##
 #   ======================================================================
-ggplot() + geom_alignment(gr)
+ggplot() + geom_segment(gr)
 {% endhighlight %}
 
-![plot of chunk default](http://i.imgur.com/g8QYh.png) 
+![plot of chunk default](http://i.imgur.com/schbc.png) 
 
 
 Facetting and aesthetics mapping are supported, make sure you put your
@@ -87,12 +100,29 @@ aesthetics mapping in constructor `aes()`, and those variables are not quoted.
 ##  facetting and aesthetics
 ##
 #   ======================================================================
-ggplot() + geom_alignment(gr, facets = sample ~ 
+ggplot() + geom_segment(gr, facets = sample ~ 
     seqnames, aes(color = strand, fill = strand))
 {% endhighlight %}
 
-![plot of chunk facet_aes](http://i.imgur.com/iD1N4.png) 
+![plot of chunk facet_aes](http://i.imgur.com/s4HWn.png) 
 
+
+Stat "identity" allows you to specify a y value to use as y-axis instead of
+default stepping level.
+
+
+
+{% highlight r %}
+##
+#   ======================================================================
+##  stat:identity
+##
+#   ======================================================================
+ggplot() + geom_segment(gr, stat = "identity", 
+    aes(y = value))
+{% endhighlight %}
+
+![plot of chunk stat:identity](http://i.imgur.com/SiqFh.png) 
 
 
 `group` make sure grouped intervals are on the same levels when `stat =
@@ -107,11 +137,11 @@ intervals assigned in the same group are overlapped with each other.
 ##  stat:stepping
 ##
 #   ======================================================================
-ggplot() + geom_alignment(gr, stat = "stepping", 
-    aes(group = pair))
+ggplot() + geom_segment(gr, stat = "stepping", 
+    aes(y = value, group = pair))
 {% endhighlight %}
 
-![plot of chunk stat:stepping](http://i.imgur.com/crBm4.png) 
+![plot of chunk stat:stepping](http://i.imgur.com/YAhQb.png) 
 
 
 `group.selfish` force the grouped intervals to take unique stepping level,
@@ -119,26 +149,6 @@ ggplot() + geom_alignment(gr, stat = "stepping",
   it's disabled, the y-label will be automatically hided to avoid overlapped
   group labels as y axis.
 
-![plot of chunk group.selfish](http://i.imgur.com/kzMgt.png) 
-
-
-We allow you to change main geoms and gaps geoms too, you can always use
-eligible geoms for intervals data, for example, `geom_arrowrect` could be
-extracted to name "arrowrect" and passed to argument `main.geom`, so does
-gap.geom.
-
-
-
-{% highlight r %}
-## =======================================
-##  main/gap geom
-## =======================================
-ggplot() + geom_alignment(gr, main.geom = "arrowrect", 
-    gap.geom = "chevron")
-{% endhighlight %}
-
-![plot of chunk main_gap](http://i.imgur.com/QLvJd.png) 
-
-
+![plot of chunk group.selfish](http://i.imgur.com/mYED0.png) 
 
 

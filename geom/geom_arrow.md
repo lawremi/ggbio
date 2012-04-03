@@ -7,7 +7,7 @@ title: geom_arrow
 
 
 ### Introduction
-`geom_arrow` is lower level API for creating small arrows for interval data,
+`geom_arrow` is lower level API for creating arrows for interval data,
 such as *GRanges* object.
 
 ### Objects
@@ -17,19 +17,28 @@ such as *GRanges* object.
   upcomming
   
 ### Examples
-
-Let's generate some simulated interval data and store it as *GRanges* object.
-
+Load packages
 
 
 {% highlight r %}
 set.seed(1)
 N <- 100
-library(ggbio)
-library(GenomicRanges)
-## =======================================
+require(ggbio)
+require(GenomicRanges)
+{% endhighlight %}
+
+
+
+
+Let's generate some simulated interval data and store it as *GRanges* object.
+
+
+{% highlight r %}
+##
+#   ======================================================================
 ##  simmulated GRanges
-## =======================================
+##
+#   ======================================================================
 gr <- GRanges(seqnames = sample(c("chr1", "chr2", 
     "chr3"), size = N, replace = TRUE), IRanges(start = sample(1:300, 
     size = N, replace = TRUE), width = sample(70:75, size = N, 
@@ -42,33 +51,86 @@ gr <- GRanges(seqnames = sample(c("chr1", "chr2",
 
 
 
-Default `stat` is "stepping". 
+Default is use stat stepping, which laying out the intervals randomly and assign
+those intervals different stepping levels as y axis to avoid overlapped
+plotting, it's a very rough exploration as first step for some interval data.
+
 
 
 {% highlight r %}
+##
+#   ======================================================================
+##  default
+##
+#   ======================================================================
 ggplot() + geom_arrow(gr)
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-2](http://i.imgur.com/r6kJN.png) 
+![plot of chunk default](http://i.imgur.com/VPc6l.png) 
 
 
-Faceting and aesthetics mapping
+Facetting and aesthetics mapping are supported, make sure you put your
+aesthetics mapping in constructor `aes()`, and those variables are not quoted.
+
 
 
 {% highlight r %}
+##
+#   ======================================================================
+##  facetting and aesthetics
+##
+#   ======================================================================
 ggplot() + geom_arrow(gr, facets = sample ~ seqnames, 
-    color = "red")
+    aes(color = strand, fill = strand))
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-3](http://i.imgur.com/Zy8ac.png) 
+![plot of chunk facet_aes](http://i.imgur.com/aoJGM.png) 
 
 
-`stat = "identity"` allows you assign customized `y` value.
+Stat "identity" allows you to specify a y value to use as y-axis instead of
+default stepping level.
+
 
 
 {% highlight r %}
-ggplot() + geom_arrow(gr, stat = "identity", aes(x = start, 
-    y = value, xend = end, yend = value))
+##
+#   ======================================================================
+##  stat:identity
+##
+#   ======================================================================
+ggplot() + geom_arrow(gr, stat = "identity", aes(y = value))
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-4](http://i.imgur.com/Zife4.png) 
+![plot of chunk stat:identity](http://i.imgur.com/Xio0V.png) 
+
+
+`group` make sure grouped intervals are on the same levels when `stat =
+"stepping"`,  notice that it's could be possible that those
+intervals assigned in the same group are overlapped with each other.
+
+
+
+{% highlight r %}
+##
+#   ======================================================================
+##  stat:stepping
+##
+#   ======================================================================
+ggplot() + geom_arrow(gr, stat = "stepping", aes(group = pair))
+{% endhighlight %}
+
+![plot of chunk stat:stepping](http://i.imgur.com/R9VlM.png) 
+
+
+`group.selfish` force the grouped intervals to take unique stepping level,
+  this is useful when you want to show the labels for each group as y axis, when
+  it's disabled, the y-label will be automatically hided to avoid overlapped
+  group labels as y axis.
+
+![plot of chunk group.selfish](http://i.imgur.com/uNWzh.png) 
+
+
+There are some other options to control the appearance of arrows.
+![plot of chunk options](http://i.imgur.com/vMZmy.png) 
+
+

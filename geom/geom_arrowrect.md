@@ -19,19 +19,28 @@ strand is "\*", it's just rectangle.
   upcomming
   
 ### Examples
-
-Let's generate some simulated interval data and store it as *GRanges* object.
-
+Load packages
 
 
 {% highlight r %}
 set.seed(1)
 N <- 100
-library(ggbio)
-library(GenomicRanges)
-## =======================================
+require(ggbio)
+require(GenomicRanges)
+{% endhighlight %}
+
+
+
+
+Let's generate some simulated interval data and store it as *GRanges* object.
+
+
+{% highlight r %}
+##
+#   ======================================================================
 ##  simmulated GRanges
-## =======================================
+##
+#   ======================================================================
 gr <- GRanges(seqnames = sample(c("chr1", "chr2", 
     "chr3"), size = N, replace = TRUE), IRanges(start = sample(1:300, 
     size = N, replace = TRUE), width = sample(70:75, size = N, 
@@ -44,36 +53,86 @@ gr <- GRanges(seqnames = sample(c("chr1", "chr2",
 
 
 
-Default `stat` is "stepping"
+
+Default is use stat stepping, which laying out the intervals randomly and assign
+those intervals different stepping levels as y axis to avoid overlapped
+plotting, it's a very rough exploration as first step for some interval data.
 
 
 
 {% highlight r %}
+##
+#   ======================================================================
+##  default
+##
+#   ======================================================================
 ggplot() + geom_arrowrect(gr)
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-2](http://i.imgur.com/42Y0L.png) 
+![plot of chunk default](http://i.imgur.com/P60kK.png) 
 
 
-Facetting and aesthetics mapping
+Facetting and aesthetics mapping are supported, make sure you put your
+aesthetics mapping in constructor `aes()`, and those variables are not quoted.
+
 
 
 {% highlight r %}
+##
+#   ======================================================================
+##  facetting and aesthetics
+##
+#   ======================================================================
 ggplot() + geom_arrowrect(gr, facets = sample ~ 
-    seqnames, fill = "red")
+    seqnames, aes(color = strand, fill = strand))
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-3](http://i.imgur.com/ZX9KA.png) 
+![plot of chunk facet_aes](http://i.imgur.com/Mx89B.png) 
 
 
-`stat` "identity" is used for mapping y axis to a variable, and argument
-`rect.height` is used to control the width of the arrow body. 
+Stat "identity" allows you to specify a y value to use as y-axis instead of
+default stepping level.
 
 
 
 {% highlight r %}
+##
+#   ======================================================================
+##  stat:identity
+##
+#   ======================================================================
 ggplot() + geom_arrowrect(gr, stat = "identity", 
-    aes(y = value), rect.height = 0.1)
+    aes(y = value))
 {% endhighlight %}
 
-![plot of chunk unnamed-chunk-4](http://i.imgur.com/5KEz4.png) 
+![plot of chunk stat:identity](http://i.imgur.com/arXxX.png) 
+
+
+`group` make sure grouped intervals are on the same levels when `stat =
+"stepping"`,  notice that it's could be possible that those
+intervals assigned in the same group are overlapped with each other.
+
+
+
+{% highlight r %}
+##
+#   ======================================================================
+##  stat:stepping
+##
+#   ======================================================================
+ggplot() + geom_arrowrect(gr, stat = "stepping", 
+    aes(y = value, group = pair))
+{% endhighlight %}
+
+![plot of chunk stat:stepping](http://i.imgur.com/QBa1Z.png) 
+
+
+`group.selfish` force the grouped intervals to take unique stepping level,
+  this is useful when you want to show the labels for each group as y axis, when
+  it's disabled, the y-label will be automatically hided to avoid overlapped
+  group labels as y axis.
+
+![plot of chunk group.selfish](http://i.imgur.com/sIiJD.png) 
+
+
+

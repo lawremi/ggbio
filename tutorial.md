@@ -12,6 +12,7 @@ title: Tutorial
 <!-- - [Specialized plots](#splot) -->
 
 
+## Higher level API
 
 ### [Autoplot generic function]({{site.url}}/autoplot) <a id = "autoplot"></a>
   -  [autoplot, GRanges]({{site.url}}/autoplot/GRanges)
@@ -25,6 +26,7 @@ title: Tutorial
   -  [autoplot, RleList]({{site.url}}/autoplot/RleList)
   -  [autoplot, character]({{site.url}}/autoplot/character)
 
+## Lower level API
 
 ### [Geometric object(geom)]({{site.url}}/geom) <a id = "geom"></a>
   -  [geom_rect]({{site.url}}/geom/geom_rect)
@@ -49,8 +51,12 @@ title: Tutorial
   -  [layout_karyogram]({{site.url}}/layout/layout_karyogram)
 
 ### [Tracks]({{site.url}}/tracks) <a id = "tracks"></a>
+  -  [tracks]({{site.url}}/tracks/tracks)
+  -  [align.plots]({{site.url}}/tracks/align.plots)
 
 ### [Theme]({{site.url}}/theme) <a id = "theme"></a>
-
+  -  [theme_alignment]({{site.url}}/theme/theme_alignment)
+  -  [theme_null]({{site.url}}/theme/theme_null)
+  
 ### [Specialized plots]({{site.url}}/splots) <a id = "splots"></a>
 

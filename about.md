@@ -4,8 +4,8 @@ title: About me
 ---
 ### Authors: 
 
-  * [Tengfei Yin](http://www.tengfei.name) @ Iowa state university
-  * [Dianne Cook](http://www.stat.iastate.edu/directory/personal.php?id=dicook) @ Iowa state university
+  * [Tengfei Yin](http://www.tengfei.name) @ Iowa State University
+  * [Dianne Cook](http://www.stat.iastate.edu/directory/personal.php?id=dicook) @ Iowa State University
   * Michael Lawrence @ Genentech
 
 ### Acknowledgment:

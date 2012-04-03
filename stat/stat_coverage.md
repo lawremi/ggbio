@@ -31,6 +31,71 @@ library(ggbio)
 
 
 
+{% highlight text %}
+## Loading required package: methods
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## Loading required package: ggplot2
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## Loading required package: BiocGenerics
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## 
+## Attaching package: 'BiocGenerics'
+## 
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## The following object(s) are masked from 'package:stats':
+## 
+##     xtabs
+## 
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## The following object(s) are masked from 'package:base':
+## 
+##     anyDuplicated, cbind, colnames, duplicated, eval, Filter,
+##     Find, get, intersect, lapply, Map, mapply, mget, order, paste,
+##     pmax, pmax.int, pmin, pmin.int, Position, rbind, Reduce,
+##     rep.int, rownames, sapply, setdiff, table, tapply, union,
+##     unique
+## 
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## 
+## Attaching package: 'ggbio'
+## 
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## The following object(s) are masked from 'package:ggplot2':
+## 
+##     geom_rect, geom_segment, stat_identity, xlim
+## 
+{% endhighlight %}
+
+
+
   
 Let's generate some simulated interval data and store it as *GRanges* object.
 
@@ -44,6 +109,17 @@ Let's generate some simulated interval data and store it as *GRanges* object.
 set.seed(1)
 N <- 1000
 library(GenomicRanges)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## Loading required package: IRanges
+{% endhighlight %}
+
+
+
+{% highlight r %}
 gr <- GRanges(seqnames = sample(c("chr1", "chr2", 
     "chr3"), size = N, replace = TRUE), IRanges(start = sample(1:300, 
     size = N, replace = TRUE), width = sample(70:75, size = N, 
@@ -67,33 +143,33 @@ variable.
 ggplot() + stat_coverage(gr)
 {% endhighlight %}
 
-![plot of chunk geom](http://i.imgur.com/kAkK4.png) 
+![plot of chunk geom](http://i.imgur.com/kHy67.png) 
 
 {% highlight r %}
 ggplot() + stat_coverage(gr, geom = "point")
 {% endhighlight %}
 
-![plot of chunk geom](http://i.imgur.com/0qeqQ.png) 
+![plot of chunk geom](http://i.imgur.com/xLVqY.png) 
 
 {% highlight r %}
 ggplot() + stat_coverage(gr, aes(y = ..coverage..), 
     geom = "histogram")
 {% endhighlight %}
 
-![plot of chunk geom](http://i.imgur.com/VlD2B.png) 
+![plot of chunk geom](http://i.imgur.com/Vwu1S.png) 
 
 {% highlight r %}
 ggplot() + stat_coverage(gr, aes(y = ..coverage..), 
     geom = "area")
 {% endhighlight %}
 
-![plot of chunk geom](http://i.imgur.com/0UG3j.png) 
+![plot of chunk geom](http://i.imgur.com/8RviU.png) 
 
 {% highlight r %}
 ggplot() + stat_coverage(gr, geom = "smooth")
 {% endhighlight %}
 
-![plot of chunk geom](http://i.imgur.com/HiL2q.png) 
+![plot of chunk geom](http://i.imgur.com/ExBIt.png) 
 
 
 Facetting, column for `seqnames` is requried.
@@ -104,7 +180,7 @@ ggplot() + stat_coverage(gr, geom = "line", facets = sample ~
     seqnames)
 {% endhighlight %}
 
-![plot of chunk facet:sample](http://i.imgur.com/gEtpV.png) 
+![plot of chunk facet:sample](http://i.imgur.com/fkCLi.png) 
 
 
 Faceted by strand help you understand coverage from different sequencing direction. 
@@ -115,7 +191,7 @@ ggplot() + stat_coverage(gr, geom = "line", facets = strand ~
     seqnames)
 {% endhighlight %}
 
-![plot of chunk facet:strand](http://i.imgur.com/HSl9E.png) 
+![plot of chunk facet:strand](http://i.imgur.com/uwpTF.png) 
 
 
 Let's create a *GRangesList* object.
@@ -140,7 +216,7 @@ For *GRangesList* object, default is coerce it to *GRanges*.
 ggplot() + stat_coverage(grl)
 {% endhighlight %}
 
-![plot of chunk grl:default](http://i.imgur.com/KbKW3.png) 
+![plot of chunk grl:default](http://i.imgur.com/hHPBn.png) 
 
 
 Internal variable `..grl_name..` added to keep a track for grouping information,
@@ -152,7 +228,7 @@ ggplot() + stat_coverage(grl, geom = "area", facets = ..grl_name.. ~
     seqnames, aes(fill = ..grl_name..))
 {% endhighlight %}
 
-![plot of chunk grl:facet](http://i.imgur.com/fvH1o.png) 
+![plot of chunk grl:facet](http://i.imgur.com/mQYG2.png) 
 
 
 Load a RNA-seq data

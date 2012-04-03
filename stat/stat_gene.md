@@ -45,7 +45,7 @@ p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"],
 tracks(p1, p2, heights = c(3, 1))
 {% endhighlight %}
 
-![plot of chunk tracks](http://i.imgur.com/46blb.png) 
+![plot of chunk tracks](http://i.imgur.com/6A9hx.png) 
 
 
   

@@ -7,10 +7,10 @@ Generates summaries on the specified windows
 }
 \usage{
 % for GRanges
-\S4method{stat_aggregate}{GRanges}(data, xlab, ylab,
+\S4method{stat_aggregate}{GRanges}(data, ..., xlab, ylab,
                main, by, FUN, start = NULL,
                end = NULL, width = NULL,  y = NULL, frequency = NULL,
-               delta = NULL, ..., simplify = TRUE,
+               delta = NULL,  simplify = TRUE,
                window = NULL, facets = NULL, 
                type = c("mean", "median","max",
                "min", "sum", "count", "identity"),
@@ -19,6 +19,9 @@ Generates summaries on the specified windows
 \arguments{
   \item{data}{
     A \code{GRanges} or \code{data.frame} object.
+  }
+  \item{...}{
+    Arguments passed to plot function. such as aes() and color.
   }
   \item{xlab}{
     Label for x
@@ -63,9 +66,6 @@ Generates summaries on the specified windows
   
   \item{delta}{
    Optional arguments that specify the sampling increment within the window.    
-  }
-  \item{...}{
-    Arguments passed to plot function. such as aes() and color.
   }
   \item{simplify}{
     A logical value specifying whether or not the

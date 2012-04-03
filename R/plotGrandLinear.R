@@ -28,8 +28,6 @@ plotGrandLinear <- function(obj, y, facets,
   chrs <- unique(as.character(df$seqnames))
   if(missing(y))
     stop("need to provide y")
-  ## ggplot2::qplot(data = df, x = midpoint, y = GenVar, geom = "point", facets = category ~ .)
-  ## ggplot2::qplot(data = df, x = midpoint, y = GenVar, geom = "point")
   if(color.type %in% c("seqnames", "twocolor")){
     args <- list(data = df, geom = geom,
                  x = substitute(midpoint),

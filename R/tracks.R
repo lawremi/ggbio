@@ -1,7 +1,6 @@
 setOldClass("ggplot")
 setOldClass("options")
 setOldClass("unit")
-setClassUnion("characterORNULL", c("character", "NULL"))
 setClassUnion("optionsORNULL", c("options", "NULL"))
 setClassUnion("numericORunit", c("numeric", "unit"))
 setClass("ggplotGrobList", prototype = prototype(elementType = "ggplot"),

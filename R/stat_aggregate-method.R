@@ -1,13 +1,14 @@
 setGeneric("stat_aggregate", function(data, ...) standardGeneric("stat_aggregate"))
 
-setMethod("stat_aggregate", "GRanges", function(data, xlab, ylab, main, by, FUN, start = NULL,
+setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by, FUN, start = NULL,
                                                       end = NULL, width = NULL,  y = NULL,
                                                       frequency = NULL, delta = NULL,
-                                                      ..., simplify = TRUE,
+                                                       simplify = TRUE,
                                                       window = NULL, facets = NULL, 
                                                       type = c("mean", "median","max",
                                                         "min", "sum", "count", "identity"),
                                                       geom = NULL){
+
 
 
 
@@ -20,15 +21,13 @@ setMethod("stat_aggregate", "GRanges", function(data, xlab, ylab, main, by, FUN,
 
   args <- list(...)
   args$facets <- facets
-  args$geom <- geom  
+  args$geom <- geom
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
 
   if(!("scales" %in% names(args.facets)))
     args.facets$scales <- "free_x"
-  
-  args.non <- args.non[!names(args.non) %in% c("data", "facets", "y", "x")]
   facet <- .buildFacetsFromArgs(data, args.facets)
   grl <- splitByFacets(data, facets)
 
@@ -37,6 +36,7 @@ setMethod("stat_aggregate", "GRanges", function(data, xlab, ylab, main, by, FUN,
                                         "simplify", "type", "geom", "window")]
 
   type <- match.arg(type)
+
 
   if(geom %in% c("boxplot"))
     type <- "identity"
@@ -128,7 +128,6 @@ setMethod("stat_aggregate", "GRanges", function(data, xlab, ylab, main, by, FUN,
   })
 
   res <- do.call(rbind, lst)
-  head(res)
   if(!geom %in% c("boxplot", "histogram", "bar")){
     args.aes$x <- substitute(.mid)
     args.aes$y <- substitute(.value)

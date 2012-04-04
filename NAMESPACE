@@ -3,6 +3,7 @@
 ## ============================================================
 ## ggplot2
 import(methods)
+importFrom(stats4, summary, update)
 import(BiocGenerics)
 import(biovizBase)
 import(grid)

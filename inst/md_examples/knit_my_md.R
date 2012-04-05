@@ -1,7 +1,7 @@
 args <- commandArgs(TRUE)
 library(knitr)
 .back <- getwd()
-base.url <- tools::file_path_as_absolute("../../../../gh-pages/ggbio/")
+base.url <- tools::file_path_as_absolute("/home/tengfei/Codes/gitrepos/ggbio/gh-pages/ggbio/")
 dirs <- setdiff(list.dirs(".", full.names = FALSE), ".")
 if(length(args)){
 if(!all(args %in% dirs))

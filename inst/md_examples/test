@@ -1,0 +1,34 @@
+
+R Under development (unstable) (2012-02-19 r58417)
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> args <- commandArgs()
+> library(knitr)
+> .back <- getwd()
+> base.url <- tools::file_path_as_absolute("../../../../gh-pages/ggbio/")
+> dirs <- setdiff(list.dirs(".", full.names = FALSE), ".")
+> 
+> if(length(args)){
++ if(!all(args %in% dirs))
++   stop(args, "must in ", dirs)
++ else
++   dirs <- args
++ }
+Error: /usr/local/lib/R/bin/exec/R-fknit_my_md.R--restore--save--no-readlinemust in ./geom./stat./theme./tracks
+Execution halted

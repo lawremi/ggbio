@@ -135,6 +135,8 @@ isFacetByOnlySeq <- function(facets){
     if(allvars[1] != "."){
       if(!allvars[1] %in% c(colnames(values(object)), "strand"))
         stop(allvars[1]," doesn't exists in data columns")
+      if(allvars[2] != "seqnames")
+        stop("Column of facets formula can only be seqnames, such as . ~ seqnames, in default restrict mode, you can only change row varaibles")
     }
   }
 }

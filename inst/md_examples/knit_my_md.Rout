@@ -1,0 +1,737 @@
+
+R Under development (unstable) (2012-02-19 r58417)
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(knitr)
+> .back <- getwd()
+> base.url <- tools::file_path_as_absolute("../../../../gh-pages/ggbio/")
+> dirs <- setdiff(list.dirs(".", full.names = FALSE), ".")
+> for(d in dirs){
++   dir.nm <- basename(d)
++   setwd(.back)
++   dir.den <- file.path(base.url, dir.nm)
++   dir.cur <- tools::file_path_as_absolute(d)
++   fls <- grep("\\_knit_.md$",list.files(dir.cur, full.names = TRUE),value = TRUE)
++   for(fl.cur in fls){
++     fl.cur <- tools::file_path_as_absolute(fl.cur)
++     setwd(dir.den)
++     tryCatch(knit(fl.cur), error = function(e){
++       print(paste("error produced by kniting", fl.cur))
++       print("keep going ...")
++     })
++   }
++ }
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_alignment_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>>                                                             |   6%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>                                                         |  12%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>                                                      |  18%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>                                                  |  24%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>                                              |  29%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>                                          |  35%
+label: simul (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>                                      |  41%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                                  |  47%
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_alignment_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_arch_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>>>>                                                           |   9%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>                                                     |  18%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>                                               |  27%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>                                         |  36%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                                   |  45%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                              |  55%
+label: simul (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                        |  64%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                  |  73%
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_arch_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_arrow_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>                                                              |   5%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>                                                          |  11%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>                                                       |  16%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>                                                   |  21%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>                                                |  26%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>                                            |  32%
+label: simul (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>                                         |  37%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>                                      |  42%
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_arrow_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_arrowrect_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>>                                                             |   6%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>                                                         |  12%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>                                                      |  18%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>                                                  |  24%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>                                              |  29%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>                                          |  35%
+label: simul (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>                                      |  41%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                                  |  47%
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_arrowrect_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_chevron_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>                                                               |   3%
+  ordinary text without R code
+
+  |                                                                         |>>>>                                                             |   7%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>                                                          |  10%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>                                                        |  14%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>                                                      |  17%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>                                                    |  21%
+label: simul (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>                                                 |  24%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>                                               |  28%
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_chevron_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_rect_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>                                                              |   5%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>                                                          |  11%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>                                                       |  16%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>                                                   |  21%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>                                                |  26%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>                                            |  32%
+label: data.frame (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: data.frame (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_rect_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_segment_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>                                                              |   5%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>                                                          |  11%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>                                                       |  16%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>                                                   |  21%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>                                                |  26%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>                                            |  32%
+label: data.frame (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: data.frame (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/geom/geom_segment_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/stat/stat_coverage_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>                                                              |   4%
+  ordinary text without R code
+
+  |                                                                         |>>>>>                                                            |   8%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>                                                         |  12%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>                                                       |  16%
+label: load (with options) 
+List of 2
+ $ message: logi TRUE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>                                                    |  20%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>                                                 |  24%
+label: simul (with options) 
+List of 2
+ $ message: logi TRUE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>                                               |  28%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>                                            |  32%
+label: geom (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: geom (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/stat/stat_coverage_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/stat/stat_gene_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>>>>>>>                                                        |  14%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>                                              |  29%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>                                     |  43%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                            |  57%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                   |  71%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>         |  86%
+label: tracks (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: tracks (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/stat/stat_gene_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/stat/stat_identity_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>                                                              |   5%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>                                                          |  11%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>                                                       |  16%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>                                                   |  21%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>                                                |  26%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>                                            |  32%
+label: simul (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>                                         |  37%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>                                      |  42%
+label: geom_point_start (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: geom_point_start (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/stat/stat_identity_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/stat/stat_mismatch_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>>>                                                            |   8%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>                                                       |  15%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>                                                  |  23%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>                                             |  31%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>                                        |  38%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                                   |  46%
+label: load_bam (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                              |  54%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                         |  62%
+label: BamFile (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: BamFile (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/stat/stat_mismatch_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/stat/stat_stepping_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>>                                                             |   6%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>                                                         |  12%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>                                                      |  18%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>                                                  |  24%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>                                              |  29%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>                                          |  35%
+label: simul (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>                                      |  41%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                                  |  47%
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/stat/stat_stepping_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/stat/stat_table_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>                                           |  33%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                      |  67%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>| 100%
+  ordinary text without R code
+
+
+output file: /home/tengfei/Codes/gitrepos/ggbio/gh-pages/ggbio/stat/stat_table.md
+
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/theme/theme_alignment_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>>>>>                                                          |  11%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>                                                   |  22%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>                                           |  33%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                                    |  44%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                             |  56%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                      |  67%
+label: theme:default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: theme:default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/theme/theme_alignment_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/theme/theme_null_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>>>>                                                           |   9%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>                                                     |  18%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>                                               |  27%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>                                         |  36%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                                   |  45%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                              |  55%
+label: simul (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                        |  64%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                  |  73%
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: default (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/theme/theme_null_knit_.md"
+[1] "keep going ..."
+
+
+processing file: /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/tracks/tracks_knit_.md
+  |                                                                         |                                                                 |   0%  |                                                                         |>>>>                                                             |   7%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>                                                        |  13%
+label: setup (with options) 
+List of 3
+ $ message: logi FALSE
+ $ echo   : logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>                                                    |  20%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>                                                |  27%
+label: load (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>                                           |  33%
+  ordinary text without R code
+
+  |                                                                         |>>>>>>>>>>>>>>>>>>>>>>>>>>                                       |  40%
+label: tracks (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+label: tracks (with options) 
+List of 2
+ $ message: logi FALSE
+ $ warning: logi FALSE
+
+
+[1] "error produced by kniting /home/tengfei/Codes/gitrepos/ggbio/master/ggbio/inst/md_examples/tracks/tracks_knit_.md"
+[1] "keep going ..."
+> 
+> proc.time()
+   user  system elapsed 
+ 73.204   0.720  84.957 

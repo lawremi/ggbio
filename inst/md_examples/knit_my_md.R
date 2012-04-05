@@ -1,7 +1,15 @@
+args <- commandArgs(TRUE)
 library(knitr)
 .back <- getwd()
 base.url <- tools::file_path_as_absolute("../../../../gh-pages/ggbio/")
 dirs <- setdiff(list.dirs(".", full.names = FALSE), ".")
+if(length(args)){
+if(!all(args %in% dirs))
+  stop(args, "must in ", dirs)
+else
+  dirs <- args
+}
+  
 for(d in dirs){
   dir.nm <- basename(d)
   setwd(.back)

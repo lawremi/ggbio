@@ -45,16 +45,23 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
       seqs <- c(seqs[1], seqs, seqs[length(seqs)])
       vals <- c(0, vals, 0)
     }
-    if(length(unique(values(dt)$.id.name)))                
+    if(length(unique(values(dt)$.id.name))){                
       res <- data.frame(coverage = vals, seqs = seqs,
                         seqnames =
                         as.character(seqnames(dt))[1],
                         .id.name = unique(values(dt)$.id.name))
-    else
-      res <- data.frame(coverage = vals, seqs = seqs,
-                        seqnames =
-                        as.character(seqnames(dt))[1],
-                        strand = unique(as.character(strand(dt))))
+    }else{
+      if("strand" %in% all.vars(facets))
+        res <- data.frame(coverage = vals, seqs = seqs,
+                          seqnames =
+                          as.character(seqnames(dt))[1],
+                          strand = unique(as.character(strand(dt))))
+      else
+        res <- data.frame(coverage = vals, seqs = seqs,
+                          seqnames =
+                          as.character(seqnames(dt))[1])
+
+    }
     res[,allvars.extra] <- rep(unique(values(dt)[, allvars.extra]),
                                nrow(res))
     res
@@ -99,6 +106,8 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
   if(!"y" %in% names(args.aes))
     args.aes$y <- as.name("coverage")
   args.non <- parseArgsForNonAes(args)
+  if(!is.null(geom))
+    args.non$geom <- geom
   aes.res <- do.call(aes, args.aes)
   gr <- flatGrl(data)
   args.non$data <- gr
@@ -161,13 +170,16 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                 estimate = {
                   message("Estimating coverage...")
                   res <- estimateCoverage(data, maxBinSize = maxBinSize)
-                  message("done")
                   res
                 },
                 raw = {
-                  stop("not implemented yet")
+                  if(missing(which))
+                    stop("method 'raw' require which argument")
+                  message("Parsing raw coverage...")
+                  res <- biovizBase:::fetch(data, which = which)
                 })
 
+  if(method == "estimate"){
   message("Constructing graphics...")
   res <- res[seqnames(res) %in% seq.nm]
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
@@ -192,7 +204,11 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                 args.non)
 
   p <- do.call(stat_identity, args.res)
-  
+}
+  if(method == "raw"){
+    p <- stat_coverage(res, ..., geom = geom, facets = facets)
+  }
+
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))
   else
@@ -204,9 +220,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
     p <- c(p, list(ggplot2::ylab("Coverage")))
   if(!missing(main))
     p <- c(p, list(opts(title = main)))
-  if(!is.null(facet))
-    p <- c(p, list(facet))
-
+  
   p
   
 })

@@ -34,7 +34,9 @@ grl <- endoapply(grl, function(gr){
   values(gr) <- values(gr)[nms]
   gr
 })
-grl
+
+autoplot(gr, facets = strand ~ seqnames, stat = "coverage", geom = "area",
+         aes(fill = strand))
 ## ======================================================================
 ##      LOWER  LEVEL API(test)
 ## ======================================================================
@@ -44,7 +46,9 @@ grl
 ## sta_identity()
 
 ## transform to a normal data.frame and do it as free
+
 ggplot() + stat_identity(gr, aes(x = start, y = value), geom = "point")
+
 ## yes, geom: alignment, rect,
 ## FIXME
 ## ggplot() + stat_identity(gr, aes(xmin = start, xmax = end,
@@ -60,6 +64,14 @@ ggplot() + stat_identity(gr, aes(x = midpoint, y = value),  geom = "line")
 ggplot() + stat_identity(gr, aes(y = value), geom = "rect")
 ggplot() + stat_identity(gr, aes(y = value), geom = "segment")
 ## stat_stepping()
+myfun <- function(data, ...){
+  ggplot() + stat_identity(data, ...)
+}
+
+
+myfun(gr, aes(y = value), geom = "segment", facets = sample ~ seqnames)
+
+
 ggplot() + stat_stepping(gr)
 ggplot() + stat_stepping(gr, aes(color = strand))
 ggplot() + stat_stepping(gr, aes(color = strand, fill = strand))
@@ -70,6 +82,56 @@ ggplot() + stat_stepping(gr, aes(group = pair),geom = "alignment")
 ggplot() + stat_stepping(gr, geom = "alignment")
 
 ggplot() + stat_stepping(gr, facets = sample ~ seqnames)
+
+myfun <- function(data, ..., facets){
+  ggplot() + stat_stepping(data = data, ..., facets = facets)
+}
+
+myfun(data = gr, facets = sample ~ seqnames, color = "red", main = "main", aes(fill = score))
+myfun(gr, geom = "alignment")
+
+rm("foo")
+setGeneric("foo", function(x, ...) standardGeneric("foo"))
+setMethod("foo", "numeric", function(x, ..., drop){
+  as.list(match.call())[-1]
+})
+
+setMethod("foo", "character", function(x, ..., drop){
+  as.list(match.call())[-1]
+})
+
+myfun <- function(x, ..., drop){
+  foo(x, ..., drop)
+}
+
+foo(1, drop = FALSE)
+foo("1", drop = TRUE)
+myfun(1, drop = FALSE)
+myfun("2", drop = TRUE)
+myfun("2",  i =2, drop = TRUE)
+myfun(2,  i =2, drop = TRUE)
+
+rm("foo")
+setGeneric("foo", function(x, ...) standardGeneric("foo"))
+setMethod("foo", "numeric", function(x, ..., drop){
+  as.list(match.call(call = sys.call(sys.parent(2))))[-1]
+})
+
+setMethod("foo", "character", function(x, ..., drop){
+  as.list(match.call(call = sys.call(sys.parent(2))))[-1]
+})
+
+myfun <- function(x, ..., drop){
+  foo(x, ..., drop)
+}
+
+foo(1, drop = FALSE)
+foo("1", drop = TRUE)
+myfun(1, i = 2, drop = FALSE)
+myfun("2", i = 2, drop = TRUE)
+
+
+
 ## stat_coverage
 ggplot() + stat_coverage(gr, geom = "point")
 ggplot() + stat_coverage(gr, aes(y = ..coverage..), geom = "point")
@@ -90,13 +152,24 @@ ggplot() + stat_coverage(grl, geom = "area", facets = ..grl_name.. ~ seqnames,
 ggplot() + stat_coverage(grl, geom = "area", 
                          aes(fill = ..grl_name..))
 
+myfun <- function(data, ...){
+  ggplot() + stat_stepping(data, ...)
+}
+myfun(gr, geom = "alignment")
+
+
 ## stat_table, GRanges
 ggplot() + stat_table(gr)
 ggplot() + stat_table(gr, geom = "segment", aes(y = ..score.., color = ..score..))
 ## FIXME
 ggplot() + stat_table(gr, aes(color = factor(score)))
-ggplot() + stat_table(gr, rect.height = 0.1, geom = "rect")
+## ggplot() + stat_table(gr, rect.height = 0.1, geom = "rect")
 ggplot() + stat_table(gr, geom = "segment")
+myfun <- function(data, ...){
+  ggplot() + stat_table(data, ...)
+}
+myfun(grl, geom = "segment", aes(y = ..score.., color = ..score..))
+
 ## ggplot() + stat_table(gr, rect.height = 0.1, geom = "5poly")
 ## fix this could be just aes(y = ..score..)
 ## Maybe confused about stat
@@ -127,6 +200,10 @@ ggplot() + stat_aggregate(gr, window = 100, aes(y = value), geom = "boxplot")
 ggplot() + stat_aggregate(gr, window = 100, aes(y = value),
                           geom = "boxplot", facets =  sample ~ seqnames)
 
+myfun <- function(data, ...){
+  ggplot() + stat_aggregate(data, ...)
+}
+myfun(gr, window = 20, y = "value", fill = "gray40", geom = "bar")
 
 ## stat_mismatch
 require(ggbio)
@@ -143,10 +220,16 @@ ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE)
 ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE)
 ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE, geom = "bar")
 
+myfun <- function(data, ...){
+  ggplot() + stat_mismatch(data, ...)
+}
+myfun(pgr.match, show.coverage = FALSE, geom = "bar")
 ## ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE) +
 ##   coord_cartesian(xlim = c(6134000, 6135000),wise = TRUE) + theme_bw()
 
 bf <- BamFile(bamfile)
+myfun(bf, which = genesymbol["RBM17"],bsgenome = Hsapiens,show.coverage = TRUE)
+
 ggplot() + stat_mismatch(bf, which = genesymbol["RBM17"],
                          bsgenome = Hsapiens,show.coverage = TRUE) +
   coord_cartesian(xlim = c(6134000, 6135000), wise = TRUE) + theme_bw()
@@ -207,6 +290,14 @@ ggplot() + geom_chevron(gr[idx], offset = 0) #just segment
 ggplot() + geom_chevron(gr[idx], offset = 0, color = "red") #just segment
 ggplot() + geom_chevron(gr[idx], stat = "identity",
                         aes(x = start, xend = end, y = value, yend = value))
+
+myfun <- function(data, ...){
+  ggplot() + geom_chevron(data, ...)
+}
+
+myfun(gr[idx], stat = "identity",
+                        aes(x = start, xend = end, y = value, yend = value),
+      facets = sample ~ seqnames)
 ## geom_arch
 ggplot() + geom_arch(gr[idx])
 ggplot() + geom_arch(gr[idx], max.height = 100)
@@ -220,12 +311,25 @@ ggplot() + geom_arch(gr[idx], aes(color = value, height = value, size = value),
                      alpha = 0.2, facets = sample ~ seqnames)
 
 
+myfun <- function(data, ...){
+  ggplot() + geom_arch(data, ...)
+}
+myfun(gr[idx], aes(color = value, height = value, size = value),
+                     alpha = 0.2, facets = sample ~ seqnames)
+
 ## geom_arrow
 library(grid)
 ggplot() + geom_arrow(gr[idx])
 ggplot() + geom_arrow(gr[idx], facets = sample ~ seqnames, color = "red")
 ggplot() + geom_arrow(gr[idx], stat = "identity", aes(x = start, y = value,
                                         xend = end, yend = value))
+
+myfun <- function(data, ...){
+  ggplot() + geom_arrow(data, ...)
+}
+myfun(gr[idx], stat = "identity", aes(x = start, y = value,
+                                        xend = end, yend = value),
+      facets = sample ~ seqnames)
 ## ggplot() + geom_arrow(gr[idx], facets = sample ~ seqnames, color = "red",
 ##                       aes(x = start, y = value, xend = end, yend = value),
 ##                       stat = "identity")
@@ -240,12 +344,32 @@ ggplot() + geom_arrowrect(gr[idx], facets = sample ~ seqnames, fill = "red",
                       aes(x = start, y = value, xend = end, yend = value),
                       stat = "identity",  rect.height = 0.2)
 
+myfun <- function(data, ...){
+  ggplot() + geom_arrowrect(data, ...)
+}
+
+myfun(gr[idx], facets = sample ~ seqnames, fill = "red",
+                      aes(x = start, y = value, xend = end, yend = value),
+                      stat = "identity",  rect.height = 0.2)
 ## geom_rect
+## for data.frame
+ggplot() + geom_rect(data = mtcars, aes(xmin = mpg, ymin = wt,
+                       xmax = mpg + 10, ymax = wt + 10))
 ggplot() + geom_rect(gr)
 ggplot() + geom_rect(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
 ggplot() + geom_rect(gr, stat = "identity", aes(y = value))
 ggplot() + geom_rect(gr, facets = sample ~ seqnames, aes(y = value,color = strand, fill = strand),
                      stat = "identity")
+
+myfun <- function(data, ..., facets = NULL){
+  ggplot() + geom_rect(data,..., facets = facets)
+}
+myfun(data = mtcars, aes(xmin = mpg, ymin = wt,
+        xmax = mpg + 10, ymax = wt + 10), facets = .~cyl)
+myfun(gr)
+myfun(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
+myfun(gr, geom = "alignment")
+library(biovizBase)
 
 ## geom_segment
 ggplot() + geom_segment(gr)
@@ -257,6 +381,10 @@ ggplot() + geom_segment(gr, facets = sample ~ seqnames,
                      stat = "identity")
 
 
+myfun <- function(data, ..., facets = NULL){
+  ggplot() + geom_segment(data,..., facets = facets)
+}
+myfun(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
 ## geom_chevron
 ggplot() + geom_chevron(gr)
 ##  check later
@@ -278,6 +406,10 @@ ggplot() + geom_alignment(gr[idx], main.geom = "arrowrect", aes(group  = pair))
 ggplot() + geom_alignment(gr[idx], main.geom = "arrowrect", gap.geom = "arrow")
 ggplot() + geom_alignment(gr[idx], facets = sample ~ seqnames, aes(color = strand, fill = strand))
 
+myfun <- function(data, ..., facets = NULL){
+  ggplot() + geom_alignment(data,..., facets = facets)
+}
+myfun(gr[idx], facets = sample ~ seqnames, aes(color = strand, fill = strand), color = "red", xlab = "xlab")
 ## ======================================================================
 ##           HIGHER LEVEL API
 ## ======================================================================
@@ -342,15 +474,6 @@ values(gaps2)$size <- c(10, 1000)
 gr.g <- GRangesList(r1 = gaps1,
                     r2 = gaps2)
 
-## sample reads
-## this is faceted by samples, might not be a general case
-## see next example below
-flatGrl <- function(object, indName = ".grl.name"){
-  idx <- togroup(object)
-  gr <- stack(object, indName)
-  values(gr) <-   cbind(values(gr), values(object)[idx,,drop = FALSE])
-  gr
-}
 
 N.r <- 1000
 p.r1 <- c(0.45, 0.45, 0.1)
@@ -1375,3 +1498,33 @@ data
 window = 4
 
 
+## broken code
+varsToEval <- c("main", "xlim", "ylim")
+
+fun <- function(x, ...) {  
+  mc <- as.list(match.call()[-1])
+  missingSym <- alist(foo=)
+  catcherArgNames <- c(setdiff(names(mc), varsToEval), "...")
+  catcherArgs <- structure(rep(missingSym, length(catcherArgNames)),
+                           names = catcherArgNames)
+  catcher <- as.function(c(catcherArgs, quote(list(...))))
+  catcher(...)
+}
+
+fun_broken <- function(x, ...) {
+  list(...)[varsToEval]
+}
+
+fun_broken2 <- function(x, ...) {
+  mc <- as.list(match.call()[-1])
+  lapply(mc[varsToEval], eval)
+}
+
+call_fun <- function(f = fun) {
+  main <- "plot title"
+  f(x, color = score, linetype = strand, main = main)
+}
+
+call_fun() # works
+call_fun(fun_broken) # cannot find the quoted arguments
+call_fun(fun_broken2) # cannot find the other arguments, like 'main'

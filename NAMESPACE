@@ -3,13 +3,13 @@
 ## ============================================================
 ## ggplot2
 import(methods)
+importFrom(stats4, summary, update)
+import(BiocGenerics)
+import(biovizBase)
+import(grid)
 import(ggplot2)
 import(reshape2)
 import(scales)
-import(BiocGenerics)
-import(Biobase)
-import(biovizBase)
-import(grid)
 import(plyr)
 importFrom(gridExtra, grid.arrange)
 ## Hmisc
@@ -30,13 +30,11 @@ importMethodsFrom(IRanges,  split,
                   unlist, psetdiff,
                   range,
                   as.data.frame,
-                  length,
-                  ## "%in%",
+                  length, as.list, lapply, 
                   "[","[<-","[[", "[[<-","$",
-                  show,
-                  as.list)
+                  show)
 
-importClassesFrom(IRanges, Rle, RleList, IRanges)
+importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL)
 
 ## ## GenomicRanges
 importFrom(GenomicRanges, "seqnames<-",
@@ -62,7 +60,6 @@ importClassesFrom(Rsamtools, BamFile)
 
 ## ## ## BSgenome
 importClassesFrom(BSgenome, BSgenome)
-## importMethodsFrom(BSgenome, getSeq)
 
 ## ## ## GenomicFeatures
 importClassesFrom(GenomicFeatures,TranscriptDb)
@@ -72,9 +69,9 @@ importFrom(GenomicFeatures,
            cdsBy)
 
 ## VariantAnnotation
+importClassesFrom(VariantAnnotation, VCF)
 importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref, "ref<-",
-                  alt, "alt<-", info, "info<-", geno, "geno<-",
-                  readVcf) 
+                  alt, "alt<-", info, "info<-", geno, "geno<-",  readVcf) 
 
 
 ## ============================================================
@@ -117,3 +114,4 @@ export(tracks,
 
 export(theme_null, theme_alignment)
 
+ 

@@ -88,8 +88,6 @@ setMethod("autoplot", "GRanges", function(object, ...,
   p
 })
 
-
-
 ## ======================================================================
 ##        For "GRangesList"
 ## ======================================================================
@@ -853,7 +851,6 @@ setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
     df <- melt(gt)
     df$start <- start(rowData(object)[idx])
     df$y <- as.integer(df$Var2)
-    ## df <- melt(gt)
     .y <- unique(df$y)
     .label <- df$Var2[match(.y, df$y)]
     p <- qplot(data = df, ..., x = start, y = y,  fill = value, geom = "raster") +

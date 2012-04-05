@@ -1,0 +1,5 @@
+data(hg19IdeogramCyto, package = "biovizBase")
+library(grid)
+vp <- viewport(width = 1, height = 0.14)
+p <- plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
+print(p, vp = vp)

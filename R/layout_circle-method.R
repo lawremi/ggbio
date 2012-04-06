@@ -23,15 +23,15 @@ setMethod("layout_circle",  "GRanges",
 
   drawGrid <- function(){
     data <- getIdeoGR(data)
-    res <- rectInter(data, y = character(),
+    res <- transformToRectInCircle(data, y = character(),
                      space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                      direction = direction, n = rect.inter.n, mul = 0)
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
     df <- df[idx, ]
     args.aes <-   args.non <- list()
-    args.aes$y <- as.name(".biovizBase.y")
-    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$y <- as.name(".circle.y")
+    args.aes$x <- as.name(".circle.x")
     args.aes$group <- as.name(".biovizBase.group")
     args.non$fill <- args.non$color <- grid.background
     args.tot <- c(list(data = df), list(do.call(aes, args.aes)),args.non)
@@ -39,13 +39,13 @@ setMethod("layout_circle",  "GRanges",
     p <- list(res)
     data <- rep(data, grid.n)
     values(data)$.grid.level <- rep(1:grid.n, each = length(data)/grid.n)
-    res <- segInter(data, y = ".grid.level",
+    res <- transformToSegInCircle(data, y = ".grid.level",
                     space.skip = space.skip, trackWidth = trackWidth,
                     radius = radius, direction = direction)
     df <- as.data.frame(res)
     args.aes <-   args.non <- list()    
-    args.aes$y <- as.name(".biovizBase.y")
-    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$y <- as.name(".circle.y")
+    args.aes$x <- as.name(".circle.x")
     args.aes$group <- as.name(".biovizBase.group")    
     aes <- do.call("aes", args.aes)
     args.non$color <- grid.line  
@@ -58,15 +58,15 @@ setMethod("layout_circle",  "GRanges",
   ## idoegram parse seqlengths
   if(geom == "ideogram"){
     data <- getIdeoGR(data)
-    res <- rectInter(data, y = as.character(args.aes$y),
+    res <- transformToRectInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                     direction = direction, n = rect.inter.n)
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
     df <- df[idx, ]
     args.aes <- args.aes[names(args.aes) != "label"]
-    args.aes$y <- as.name(".biovizBase.y")
-    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$y <- as.name(".circle.y")
+    args.aes$x <- as.name(".circle.x")
     args.aes$group <- as.name(".biovizBase.group")
 
     
@@ -99,24 +99,24 @@ setMethod("layout_circle",  "GRanges",
     ## compute angle
     if("angle" %in% names(args.aes)){
       ags <- eval(args.aes$angle, data)
-      ags <-  - values(obj)$.biovizBase.angle * 180 / pi + ags
+      ags <-  - values(obj)$.circle.angle * 180 / pi + ags
       values(obj)$.processed.angle <- ags
       args.aes$angle <- as.name(".processed.angle")      
     }else{
-      ags <-  - values(obj)$.biovizBase.angle * 180/pi 
+      ags <-  - values(obj)$.circle.angle * 180/pi 
       values(obj)$.processed.angle <- ags
       args.aes$angle <- as.name(".processed.angle")      
     }
     if("angle" %in% names(dots)){
-      ags <-  - values(obj)$.biovizBase.angle * 180 / pi +
+      ags <-  - values(obj)$.circle.angle * 180 / pi +
         as.numeric(paste(as.character(dots$angle), collapse = ""))
       values(obj)$.processed.angle <- ags
       args.aes$angle <- as.name(".processed.angle")      
     }
 
     df <- as.data.frame(obj)
-    args.aes$y <- as.name(".biovizBase.y")
-    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$y <- as.name(".circle.y")
+    args.aes$x <- as.name(".circle.x")
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_text, args.tot)
@@ -135,8 +135,8 @@ setMethod("layout_circle",  "GRanges",
     obj <- gr2circle(obj, y = .y, radius= radius, width = trackWidth,
                      direction = direction)
     df <- as.data.frame(obj)
-    args.aes$y <- as.name(".biovizBase.y")
-    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$y <- as.name(".circle.y")
+    args.aes$x <- as.name(".circle.x")
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_point, args.tot)
@@ -150,8 +150,8 @@ setMethod("layout_circle",  "GRanges",
     obj <- gr2circle(obj, y = as.character(args.aes$y), radius= radius, width = trackWidth,
                      direction = direction)
     df <- as.data.frame(obj)
-    args.aes$y <- as.name(".biovizBase.y")
-    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$y <- as.name(".circle.y")
+    args.aes$x <- as.name(".circle.x")
     args.aes$group <- as.name("seqnames")
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = df, aes), args.non)
@@ -160,12 +160,12 @@ setMethod("layout_circle",  "GRanges",
   }
   
   if(geom == "segment"){
-    res <- segInter(data, y = as.character(args.aes$y),
+    res <- transformToSegInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth,
                     radius = radius, direction = direction)
     df <- as.data.frame(res)
-    args.aes$y <- as.name(".biovizBase.y")
-    args.aes$x <- as.name(".biovizBase.x")
+    args.aes$y <- as.name(".circle.y")
+    args.aes$x <- as.name(".circle.x")
     args.aes$group <- as.name(".biovizBase.group")    
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = df), list(aes), args.non)
@@ -190,21 +190,21 @@ setMethod("layout_circle",  "GRanges",
     df <- df[idx, ]
     N <- nrow(df)
     res <- df[seq(1, N-1, by = 2),]
-    res[,c(".biovizBase.xend", ".biovizBase.yend")] <-
-      df[seq(2, N, by = 2), c(".biovizBase.x", ".biovizBase.y")]
-    args.aes$y <- as.name(".biovizBase.y")
-    args.aes$x <- as.name(".biovizBase.x")
-    args.aes$yend <- as.name(".biovizBase.yend")
-    args.aes$xend <- as.name(".biovizBase.xend")
+    res[,c(".circle.xend", ".circle.yend")] <-
+      df[seq(2, N, by = 2), c(".circle.x", ".circle.y")]
+    args.aes$y <- as.name(".circle.y")
+    args.aes$x <- as.name(".circle.x")
+    args.aes$yend <- as.name(".circle.yend")
+    args.aes$xend <- as.name(".circle.xend")
     ## aes <- do.call("aes", args.aes)
     args.aes.text <- args.aes[!names(args.aes) %in% c("xend", "yend")]
     if("angle" %in% names(args.aes)){
       ags <- eval(args.aes$angle, data)
-      ags <- 90 - res$.biovizBase.angle * 180 / pi + ags
+      ags <- 90 - res$.circle.angle * 180 / pi + ags
       res$.processed.angle <- ags
       args.aes.text$angle <- as.name(".processed.angle")      
     }else{
-      ags <- 90 - res$.biovizBase.angle * 180/pi 
+      ags <- 90 - res$.circle.angle * 180/pi 
       res$.processed.angle <- ags
       args.aes.text$angle <- as.name(".processed.angle")      
     }
@@ -223,15 +223,15 @@ setMethod("layout_circle",  "GRanges",
   }
 
   if(geom == "rect"){
-    res <- rectInter(data, y = as.character(args.aes$y),
+    res <- transformToRectInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                     direction = direction, n = rect.inter.n)
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
     df <- df[idx, ]
     args.aes.p <- args.aes
-    args.aes.p$y <- as.name(".biovizBase.y")
-    args.aes.p$x <- as.name(".biovizBase.x")
+    args.aes.p$y <- as.name(".circle.y")
+    args.aes.p$x <- as.name(".circle.x")
     args.aes.p$group <- as.name(".biovizBase.group")
     aes.p <- do.call("aes", args.aes.p)
     if(!"color" %in% names(args.aes) & !"color" %in% names(args.non)){
@@ -247,7 +247,7 @@ setMethod("layout_circle",  "GRanges",
   }
   
   if(geom == "bar"){
-    res <- barInter(data, y = as.character(args.aes$y),
+    res <- transformToBarInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                     direction = direction)
     df <- as.data.frame(res)
@@ -255,12 +255,12 @@ setMethod("layout_circle",  "GRanges",
     df <- df[idx, ]
     N <- nrow(df)
     res <- df[seq(1, N-1, by = 2),]
-    res[,c(".biovizBase.xend", ".biovizBase.yend")] <-
-      df[seq(2, N, by = 2), c(".biovizBase.x", ".biovizBase.y")]
-    args.aes$y <- as.name(".biovizBase.y")
-    args.aes$x <- as.name(".biovizBase.x")
-    args.aes$yend <- as.name(".biovizBase.yend")
-    args.aes$xend <- as.name(".biovizBase.xend")
+    res[,c(".circle.xend", ".circle.yend")] <-
+      df[seq(2, N, by = 2), c(".circle.x", ".circle.y")]
+    args.aes$y <- as.name(".circle.y")
+    args.aes$x <- as.name(".circle.x")
+    args.aes$yend <- as.name(".circle.yend")
+    args.aes$xend <- as.name(".circle.xend")
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_segment, args.tot)
@@ -268,7 +268,7 @@ setMethod("layout_circle",  "GRanges",
   }
   
   if(geom == "link"){
-    res <- linkInter(data, space.skip = space.skip, linked.to = linked.to,
+    res <- transformToLinkInCircle(data, space.skip = space.skip, linked.to = linked.to,
                      link.fun = link.fun, trackWidth = trackWidth, radius = radius,
                      direction = direction)
     args.aes$y <- as.name("y")

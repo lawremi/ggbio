@@ -52,8 +52,9 @@ setMethod("autoplot", "GRanges", function(object, ...,
   ##   get the right function
   ## ------------------------------
     
-    .fun <- getDrawFunFromGeomStat(geom, stat)    
-    p <- list(do.call(.fun, args))    
+    .fun <- getDrawFunFromGeomStat(geom, stat)
+    p <- list(.fun(data = object, ...))
+    ## p <- list(do.call(.fun, args))    
     if(!legend)
       p <- c(p, list(opts(legend.position = "none")))
     

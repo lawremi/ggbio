@@ -20,7 +20,6 @@ plotGrandLinear <- function(obj, y, facets,
     args.dots <- c(group = substitute(seqnames),
                    args.dots)
   color.type <- match.arg(color.type)
-  ## adding extra spacing for compact view
   df <- transformGRangesToDfWithTicks(obj)$df
   ticks <- transformGRangesToDfWithTicks(obj)$ticks
   idx <- order(df$midpoint)

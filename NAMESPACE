@@ -12,8 +12,6 @@ import(reshape2)
 import(scales)
 import(plyr)
 importFrom(gridExtra, grid.arrange)
-## Hmisc
-importFrom(Hmisc, bezier)
 ## GenomicRanges
 ## IRanges
 importFrom(IRanges, IRanges,  disjointBins,
@@ -78,6 +76,7 @@ importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref, "ref<-",
 ## Export
 ## ============================================================
 exportMethods(autoplot, rescale, fortify, xlim, "xlim<-", update, reset, backup)
+
 
 ## geom
 exportMethods(geom_chevron,

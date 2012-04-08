@@ -5,6 +5,9 @@ formals.facet_grid <- getFormalNames(facet_grid)
 formals.facet_wrap <- getFormalNames(facet_wrap)
 formals.facets <- union(formals.facet_grid, formals.facet_wrap)
 
+.ggbio.geom <- c("rect", "chevron", "alignment", "arrowrect", "arrow", "segment", "arch")
+.ggbio.stat <- c("identity", "coverage", "stepping", "aggregate", "table",
+                 "gene", "mismatch")
 
 ## ======================================================================
 ##        For "Granges"
@@ -22,8 +25,6 @@ setMethod("autoplot", "GRanges", function(object, ...,
                    "xlab", "ylab", "main")
 
   args <- list(...)
-  .ggbio.geom <- c("rect", "chevron", "alignment", "arrowrect", "arrow", "segment")
-  .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate", "table")
 
   ## ------------------------------
   ## geom/stat check
@@ -41,14 +42,15 @@ setMethod("autoplot", "GRanges", function(object, ...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
 
-  if(geom %in% .ggbio.geom){
-      args.non$data <- object
+  if((!is.null(geom) && geom %in% .ggbio.geom) |
+     (!is.null(stat) && stat %in% .ggbio.stat)){
+     args.non$data <- object
   }else{
     args.non$data <- fortify(object)
     if(!"x" %in% names(args.aes))
       args.aes$x <- as.name("midpoint")
   }
-  
+
   ## ------------------------------
   ## layout check
   ## ------------------------------

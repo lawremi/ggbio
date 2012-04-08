@@ -25,7 +25,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
               max(end(ranges(data))))
   if(!length(facets))
     facets <- as.formula(~seqnames)
-  facets <- strip_facets_dots(facets)
+  facets <- strip_formula_dots(facets)
   allvars <- all.vars(as.formula(facets))
   allvars.extra <- allvars[!allvars %in% c(".", "seqnames", "strand")]
   lst <- lapply(grl, function(dt){

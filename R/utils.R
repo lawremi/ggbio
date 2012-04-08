@@ -172,7 +172,7 @@ getDrawFunFromGeomStat <- function(geom, stat){
 .buildFacetsFromArgs <- function(object, args){
   isOneSeq <- length(unique(as.character(seqnames(object)))) == 1
   args.facets <- args
-  args.facets$facets <- biovizBase:::strip_facets_dots(args$facets)
+  args.facets$facets <- strip_formula_dots(args$facets)
   facets <- args.facets$facets
   if(length(facets)){
     ## allvars <- all.vars(as.formula(facets))

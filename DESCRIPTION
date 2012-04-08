@@ -41,4 +41,3 @@ Collate: utils.R
 	 plotFragLength-method.R
 	 plotSpliceSum-method.R
 	 rescale-method.R
-	 ggbio.R

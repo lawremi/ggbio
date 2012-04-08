@@ -8,6 +8,7 @@ library(ggbio)
 set.seed(1)
 N <- 1000
 library(GenomicRanges)
+
 gr <- GRanges(seqnames = 
               sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),
@@ -27,18 +28,32 @@ idx <- sample(1:length(gr), size = 200)
 ## @knitr default
 autoplot(gr)
 
-## FIXME:
 autoplot(gr, geom = "point", aes(y = score))
+
+## fixme:
+autoplot(gr, geom = "point", y = score)
 
 ## @knitr geom/aes/facet
 autoplot(gr, fill = "red")
 autoplot(gr, aes(fill = value))
 autoplot(gr, facets = sample ~ seqnames)
-autoplot(gr, geom = "chevron", facets = sample ~ seqnames, aes(color = value), size = 3)
+autoplot(gr[idx], geom = "chevron", offset = 1)
+ggplot() + geom_chevron(data = gr[idx])
+autoplot(gr, geom = "chevron", facets = sample ~ seqnames, aes(color = value))
 autoplot(gr[idx], geom = "arrowrect", facets = sample ~ seqnames)
 autoplot(gr[idx], geom = "arrow", facets = sample ~ seqnames)
 autoplot(gr[idx], geom = "alignment", aes(group = pair), group.selfish = TRUE)
 
+gra <- GRanges("chr1", IRanges(c(1,7,20), end = c(4,9,30)), group = c("a", "a", "b"))
+autoplot(gra, aes(fill = group), geom = "alignment")
+autoplot(gra, aes(fill = group, group = group), geom = "alignment")
+autoplot(gra, aes(fill = group, group = group), geom = "alignment", group.selfish = FALSE)
+autoplot(gra, aes(fill = group), geom = "alignment", group.selfish = FALSE)
+
+
+autoplot(gr[idx], geom = "alignment", aes(group = pair), group.selfish = FALSE)
+
+library(biovizBase)
 
 autoplot(gr[idx], geom = "alignment", facets = sample ~ seqnames)
 autoplot(gr[idx], geom = "alignment", aes(group = pair))

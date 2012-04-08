@@ -51,6 +51,7 @@ old.chrs <- seqnames(seqinfo(darned_hg19_subset500))
 new.chrs <- gsub("chr", "", old.chrs)
 ## lst <- as.list(new.chrs)
 names(new.chrs) <- old.chrs
+new.chrs <- new.chrs[order(as.numeric(new.chrs))]
 darned_hg19_subset500 <- renameSeqlevels(darned_hg19_subset500, new.chrs)
 dn <- darned_hg19_subset500
 ggplot() + layout_karyogram(new.ideo, cytoband = FALSE) +
@@ -105,10 +106,19 @@ ss <- sapply(values(dn)$seqReg, function(s){
     return("Exon")
 })
 values(dn)$seqReg <- ss
+data("hg19Ideogram", package = "biovizBase")
+
+.seql <- seqlengths(hg19Ideogram)
+.chrs <- paste("chr", names(seqlengths(dn)), sep = "")
+.seql.new <- .seql[.chrs]
+names(.seql.new) <- gsub("chr", "", names(.seql.new))
+idx <- end(dn) < .seql.new[as.character(seqnames(dn))]
+dn <- dn[idx]
+seqlengths(dn) <- .seql.new
 autoplot(dn, layout = "karyogram", aes(color = seqReg, fill = seqReg)) + xlab("Genomic Coordinates")
 ## FIXME:
 autoplot(new.ideo, layout = "karyogram", cytoband = TRUE) + xlab("")
-ggsave("~/Desktop/ideo.pdf")
+ggsave("~/Desktop/stacked_darn.pdf")
 
 ## plotSingleChrom API
 plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")

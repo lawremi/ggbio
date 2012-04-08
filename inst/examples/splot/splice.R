@@ -1,6 +1,7 @@
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 library(ggbio)
+
 ## try a gene structure view
 
 extdatadir <- system.file("extdata", 
@@ -13,14 +14,11 @@ names(files) <- tools::file_path_sans_ext(basename(files))
 res <- ggbio:::splicefun(files[1], txdb, id = "226")
 res <- splicefun(files, txdb, id = "226")
 
-
 ## other ways to just plot gene stucture
 data(genesymbol, package = "biovizBase")
 ## which is a GRanges object to specify a viewd range
 autoplot(txdb, which = genesymbol["RBM17"], geom = "gene")
 autoplot(txdb, which = genesymbol["RBM17"], geom = "reduced_gene")
-
-
 
 library(devtools)
 load_all("~/Codes/gitrepos/ggbio")
@@ -53,7 +51,6 @@ novel_track <- autoplot(res$uniq_novel_splices, geom = "arch",
                         ylab = "coverage") +
           stat_coverage(res$both_uniq)
 tracks(novel_track, tx_track, heights = c(4, 1))
-
 
 ## Michael's code
 

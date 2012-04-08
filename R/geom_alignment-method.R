@@ -71,7 +71,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
     args.aes <- args.aes[names(args.aes) != "group"]
     ## plot gaps
 
-    gps <- suppressWarnings(getGap(res, group.name = gpn, facets))
+    gps <- getGaps(res, group.name = gpn, facets)
     if(length(gps)){
     gps <- keepSeqlevels(gps, names(seqlengths(res)))
     args.gaps <- args.aes[!names(args.aes) %in% c("x", "y",

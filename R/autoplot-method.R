@@ -17,14 +17,11 @@ setMethod("autoplot", "GRanges", function(object, ...,
                                           stat = NULL,
                                           layout = c("linear", "karyogram", "circle")
                                           ){
+
   formals.cur <- c("object", "stat", "geom", "legend",
                    "xlab", "ylab", "main")
+
   args <- list(...)
-
-  ## args.facets <- args[names(args) %in% formals.facets]
-  args <- args[!(names(args) %in% formals.cur)]
-  args$data <- object
-
   .ggbio.geom <- c("rect", "chevron", "alignment", "arrowrect", "arrow", "segment")
   .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate", "table")
 
@@ -41,20 +38,32 @@ setMethod("autoplot", "GRanges", function(object, ...,
       }
   }
 
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
 
+  if(geom %in% .ggbio.geom){
+      args.non$data <- object
+  }else{
+    args.non$data <- fortify(object)
+    if(!"x" %in% names(args.aes))
+      args.aes$x <- as.name("midpoint")
+  }
+  
   ## ------------------------------
   ## layout check
   ## ------------------------------
   layout <- match.arg(layout)
+  ## use the default x
   ## since some of the geom or stat are not fully supported by all layout
   if(layout == "linear"){
   ## ------------------------------
   ##   get the right function
   ## ------------------------------
-    
+    aes.res <- do.call(aes, args.aes)
+    args.res <- c(list(aes.res), args.non)
     .fun <- getDrawFunFromGeomStat(geom, stat)
-    p <- list(.fun(data = object, ...))
-    ## p <- list(do.call(.fun, args))    
+    p <- list(do.call(.fun, args.res))
+
     if(!legend)
       p <- c(p, list(opts(legend.position = "none")))
     

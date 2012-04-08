@@ -15,6 +15,9 @@ formals.facets <- union(formals.facet_grid, formals.facet_wrap)
 
 setMethod("autoplot", "GRanges", function(object, ...,
                                           xlab, ylab, main,
+                                          truncate.gaps = FALSE,
+                                          truncate.fun = NULL,
+                                          ratio = 0.0025, 
                                           legend = TRUE,
                                           geom = NULL,
                                           stat = NULL,
@@ -26,6 +29,16 @@ setMethod("autoplot", "GRanges", function(object, ...,
 
   args <- list(...)
 
+  ## truncate
+  if(truncate.gaps){
+    if(is.null(truncate.fun)){
+      object.s <- reduce(object, ignore.strand = TRUE)
+      truncate.fun <- shrinkageFun(gaps(object.s, min(start(object.s)), max(end(object.s))),
+                                   maxGap(gaps(object.s, min(start(object.s)), max(end(object.s))),
+                                          ratio = ratio))
+    }
+    object <- truncate.fun(object)
+  }
   ## ------------------------------
   ## geom/stat check
   ## ------------------------------
@@ -50,7 +63,6 @@ setMethod("autoplot", "GRanges", function(object, ...,
     if(!"x" %in% names(args.aes))
       args.aes$x <- as.name("midpoint")
   }
-
   ## ------------------------------
   ## layout check
   ## ------------------------------
@@ -96,6 +108,12 @@ setMethod("autoplot", "GRanges", function(object, ...,
   }
   if(layout == "circle"){
     p <- ggplot() + layout_circle(object, ..., geom = geom)
+  }
+  ## test scale
+  if(is_coord_truncate_gaps(object)){
+    ss <- getXScale(object)
+    p <- p + scale_x_continuous(breaks = ss$breaks,
+                                labels = ss$labels)
   }
   p
 })
@@ -324,15 +342,25 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
 ## ======================================================================
 setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                xlab, ylab, main,
-                                               xlim, ylim, 
+                                               truncate.gaps = FALSE,
+                                               truncate.fun = NULL,
+                                               ratio = 0.0025, 
                                                geom = c("gene", "reduced_gene"),
                                                names.expr = expression(paste(tx_name,
                                                    "(", gene_id,")", sep = ""))){
   geom <- match.arg(geom)
-  args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  args <- args[!names(args) %in% c("object", "xlab", "ylab", "main")]
-  args$data <- object
-  p <- ggplot() + do.call(stat_gene, args)
+  args <- list(...)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  args.non$data <- object  
+  args.non$truncate.gaps <- truncate.gaps
+  args.non$truncate.fun <- truncate.fun
+  args.non$ratio <- ratio
+  if(!missing(which))
+    args.non$which <- which
+  aes.res <- do.call(aes, args.aes)
+  args.res <- c(args.non,list(aes.res))
+  p <- ggplot() + do.call(stat_gene, args.res)
   if(!missing(xlab))
     p <- p + xlab(xlab)
   if(!missing(ylab))
@@ -357,8 +385,6 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  args.non <- args.non[!names(args.non) %in% c("object", "which", "xlab", "ylab", "main",
-                                               "geom")]
   seqs <- getSeq(object, which, as.character = TRUE)
   seqs <- IRanges:::safeExplode(seqs)
   xs <- seq(start(which), length.out = width(which))

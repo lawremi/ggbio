@@ -1,6 +1,9 @@
 ## FIXME: more flexible name.expr arguments
 setGeneric("stat_gene", function(data, ...) standardGeneric("stat_gene"))
-setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim, 
+setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
+                                                truncate.gaps = FALSE,
+                                                truncate.fun = NULL,
+                                                ratio = 0.0025, 
                                                 xlab, ylab, main,
                                                 facets = NULL,
                                                 geom = c("gene", "reduced_gene"),
@@ -30,7 +33,9 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   }
   if(geom == "gene"){
     message("Aggregating TranscriptDb...")
-    gr <- biovizBase:::fetch(object, which)
+    gr <- biovizBase:::fetch(object, which, truncate.gaps = truncate.gaps,
+                             truncate.fun = truncate.fun, ratio = ratio)
+
     message("Constructing graphics...")
     values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
     ## drawing
@@ -98,7 +103,9 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     
     ## p <- p + geom_rect(data = df.utr, do.call("aes", args))
     ## gaps
-    df.gaps <- gr[values(gr)$type == "gap"] 
+    ## df.gaps <- gr[values(gr)$type == "gap"]
+    df.gaps <- getGaps(c(gr[values(gr)$type %in% c("utr", "cds")]),
+                       group.name = "tx_id")
     args.aes.gaps <- args.aes[!(names(args.aes) %in% c("x", "y", "fill"))]
     aes.res <- do.call(aes, args.aes.gaps)
     args.gaps.res <- c(list(data = df.gaps),
@@ -135,7 +142,9 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   }
   if(geom == "reduced_gene"){
     message("Aggregating TranscriptDb...")
-    gr <- biovizBase:::fetch(object, which, type = "single")
+    gr <- biovizBase:::fetch(object, which, type = "single",
+                             truncate.gaps = truncate.gaps,
+                             truncate.fun = truncate.fun, ratio = ratio)
     ## gr <- fetch(object, which, type = "single")
     message("Constructing graphics...")
     values(gr)$stepping <-  1
@@ -201,9 +210,17 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   if(!missing(main))
     p <- c(p, opts(title = main))
   
-  if(missing(xlim))
-    xlim <- c(start(range(gr)),
-              end(range(gr)))
+  if(!missing(xlim)){
+    ## xlim <- c(start(range(gr)),
+    ##           end(range(gr)))
   p <- c(p, list(coord_cartesian(xlim = xlim, wise = TRUE)))
-  
+  }
+  ## test scale
+  if(is_coord_truncate_gaps(gr)){
+    gr <- gr[values(gr)$type %in% c("utr", "cds")]
+    ss <- getXScale(gr)
+    p <- c(p, list(scale_x_continuous(breaks = ss$breaks,
+                                labels = ss$labels)))
+  }
+  p  
 })

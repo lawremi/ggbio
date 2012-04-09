@@ -4,12 +4,10 @@ idx <- mut$Tumor_Sample_Barcode == "CRC-1-Tumor" &
 
 mut1 <- mut[idx, ]
 library(GenomicRanges)
-head(mut1[,1:10])
-
 mut.gr <- with(mut1,GRanges(Chromosome, IRanges(Start_position, End_position)))
 mut.gr
 
-
+install.packages("xlsx")
 library(xlsx)
 rearr <- read.xlsx("/home/tengfei/Datas/circle/ng.936-S3.xlsx", sheetIndex = 1, rowIndex = 20:702)
 rearr.bk <- rearr

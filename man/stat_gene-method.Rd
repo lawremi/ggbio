@@ -6,12 +6,13 @@
   Calculate gene structure.
 }
 \usage{
-\S4method{stat_gene}{TranscriptDb}(data, ..., which, xlim,
-          xlab, ylab, main,
-          facets = NULL,          
-          geom = c("gene", "reduced_gene"),
-          names.expr = expression(paste(tx_name,
-                    "(", gene_id,")", sep = "")))
+\S4method{stat_gene}{TranscriptDb}(data, ..., which, xlim, truncate.gaps = FALSE,
+                 truncate.fun = NULL, ratio = 0.0025, xlab, ylab, main,
+                 facets = NULL, geom = c("gene", "reduced_gene"),
+                 names.expr = expression(paste(tx_name, "(", gene_id,
+                 ")", sep = "")))
+
+
 }
 \arguments{
   \item{data}{
@@ -26,6 +27,15 @@
   }
   \item{xlim}{
     Limits for x, to subset the \code{TranscriptDb} object.
+  }
+  \item{truncate.gaps}{
+    logical value indicate to truncate gaps or not.
+  }
+  \item{truncate.fun}{
+    shrinkage function. Please see \code{shrinkagefun} in package biovizBase.
+  }
+  \item{ratio}{
+    used in \code{maxGap}.
   }
   \item{xlab}{
     Label for x

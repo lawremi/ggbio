@@ -8,4 +8,9 @@ txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], fill = "gray40", geom = "gene")
 p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "reduced_gene")
 tracks(p1, p2, heights = c(3, 1))
-
+library(biovizBase)
+p3 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "gene",
+                           truncate.gaps = TRUE)
+p3
+autoplot(txdb, which = genesymbol["RBM17"], geom = "gene",
+                           truncate.gaps = TRUE)

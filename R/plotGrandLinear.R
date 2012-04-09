@@ -1,49 +1,32 @@
-plotGrandLinear <- function(obj, y, facets, 
-                            size, shape, color, alpha,
-                            ...,                            
-                            geom = c("point", "line"),
+plotGrandLinear <- function(obj, y, ..., facets, space.skip = 0.01, geom = NULL,
                             color.type = c("twocolor", "identity", "seqnames"),
                             two.color = c("#0080FF", "#4CC4FF"),
-                            cutoff = NULL,
-                            cutoff.color = "red",
-                            cutoff.size = 1,
-                            legend = FALSE,
-                            xlim, ylim, 
+                            cutoff = NULL, cutoff.color = "red",
+                            cutoff.size = 1, legend = FALSE, xlim, ylim, 
                             xlab = "Genomic Coordinates",
-                            ylab = substitute(y),
-                            main,
-                            theme){
+                            ylab = substitute(y), main, theme){
 
-  geom <- match.arg(geom)
-  args.dots <- as.list(match.call(call = sys.call(sys.parent()))[-1])
-  if(geom == "line")
-    args.dots <- c(group = substitute(seqnames),
-                   args.dots)
+  if(is.null(geom))
+    geom <- "point"
+  args <- list(...)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
   color.type <- match.arg(color.type)
-  df <- transformGRangesToDfWithTicks(obj)$df
-  ticks <- transformGRangesToDfWithTicks(obj)$ticks
-  idx <- order(df$midpoint)
-  df <- df[idx,]
-  chrs <- unique(as.character(df$seqnames))
   if(missing(y))
     stop("need to provide y")
+  else
+    args.aes$y <- as.name(deparse(substitute(y)))
+  args.non$coord <- "genome"
+  args.non$space.skip <- space.skip
+  args.non$geom <- geom
+  args.non$object <- obj
   if(color.type %in% c("seqnames", "twocolor")){
-    args <- list(data = df, geom = geom,
-                 x = substitute(midpoint),
-                 y = substitute(y), 
-                 color = substitute(seqnames))
-    args.s <- args.dots[names(args.dots) %in% c("size", "color", "alpha", "shape")]
-    args <- c(args, args.s)
-    p <- do.call(qplot, args)
+    args.aes$color <- substitute(.ori.seqnames)
+    aes.res <- do.call(aes, args.aes)
+      p <- do.call(autoplot, c(list(aes.res), args.non))
   }else{
-    args.s <- args.dots[names(args.dots) %in% c("size", "color", "alpha", "shape")]
-    args <- list(data = df, geom = geom,
-                 x = substitute(midpoint),
-                 y = substitute(y))
-    args <- c(args, args.s)
-    p <- do.call(qplot, args)
-    ## p + facet_grid(category ~ .)
-    ## p + facet_grid( . ~ category)
+        aes.res <- do.call(aes, args.aes)    
+      p <- do.call(autoplot, c(list(aes.res), args.non))
   }
   if(!missing(theme))
     p <- p + theme
@@ -54,7 +37,8 @@ plotGrandLinear <- function(obj, y, facets,
   if(!is.null(cutoff))
     p <-  p + geom_hline(yintercept = cutoff, color = cutoff.color,
                          size = cutoff.size)
-  
+
+  chrs <- names(seqlengths(obj))
   if(color.type == "twocolor"){
     N <- length(chrs)
     id1 <- seq(from = 1, by = 2, to = N)
@@ -65,21 +49,13 @@ plotGrandLinear <- function(obj, y, facets,
     names(cols) <- c(chrs[id1], chrs[id2])
     p <- p + scale_color_manual(values = cols)
   }
-  ## if(!missing(title))
-  ##   p <- p + opts(title = title)
   if(!missing(facets)){
-    args.facets <- args.dots[names(args.dots) %in%
-                            c("margins", "scales", "space",
-                              "labeller", "as.table")]
-    args.facets <- c(facets = facets,
-                    args.facets)
-    p <- p + do.call(facet_grid, args.facets)
+    args$facets <- facets
+  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
+  facet <- .buildFacetsFromArgs(obj, args.facets)
+  p <- p + facet
   }
-  p <- p +  scale_x_continuous(name = xlab,
-                               breaks = ticks,
-                               labels = names(ticks))
-  p <- p +  opts(panel.background=theme_blank(), 
-                   panel.grid.minor=theme_blank())
+  p <- p +  opts(panel.grid.minor=theme_blank())
   if(!missing(main))
     p <- p + opts(title = main)
   if(!missing(xlim))

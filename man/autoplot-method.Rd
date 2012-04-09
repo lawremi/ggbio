@@ -28,15 +28,19 @@
 
 \usage{
 ## For object GRanges
-\S4method{autoplot}{GRanges}(object, ..., xlab, ylab, main, 
-      legend = TRUE,  geom = NULL, stat = NULL, layout = c("linear", "karyogram", "circle"))
+\S4method{autoplot}{GRanges}(object, ..., xlab, ylab, main, truncate.gaps = FALSE,
+                 truncate.fun = NULL, ratio = 0.0025, space.skip = 0.1,
+                 legend = TRUE, geom = NULL, stat = NULL, coord =
+                 c("default", "genome", "truncate_gaps"), layout =
+                 c("linear", "karyogram", "circle"))
+
 
 ## For object GRangesList
-\S4method{autoplot}{GRangesList}(object, ..., xlab, ylab,
-                 main, indName = ".grl.name",
+\S4method{autoplot}{GRangesList}(object, ..., xlab, ylab, main, indName = "grl_name",
                  geom = NULL, stat = NULL, type = c("none", "sashimi"),
                  coverage.col = "gray50", coverage.fill = coverage.col,
                  group.selfish = FALSE, arch.offset = 1.3)
+
 
 ## For object IRanges
 \S4method{autoplot}{IRanges}(object, ..., xlab, ylab, main)
@@ -55,11 +59,13 @@
 \S4method{autoplot}{character}(object, ..., xlab, ylab, main, asRangedData = FALSE)
 
 ## For object TranscriptDb
-\S4method{autoplot}{TranscriptDb}(object, which, ..., xlab,
-                 ylab, main, xlim, ylim,
-                 geom = c("gene", "reduced_gene"),
-                 names.expr =
-                 expression(paste(tx_name, "(", gene_id, ")", sep = "")))
+\S4method{autoplot}{TranscriptDb}(object, which, ..., xlab, ylab, main, truncate.gaps =
+                 FALSE, truncate.fun = NULL, ratio = 0.0025, geom =
+                 c("gene", "reduced_gene"), names.expr =
+                 expression(paste(tx_name, "(", gene_id, ")", sep =
+                 "")))
+
+
 
 ## For object BSgenome
 \S4method{autoplot}{BSgenome}(object, which, ...,
@@ -132,6 +138,21 @@
   \item{alpha}{
     Alpha blending. Could equal a column name or a fixed
     number. When it's fixed, please use \code{I()} to wrap the value.
+  }
+  \item{truncate.gaps}{
+    logical value indicate to truncate gaps or not.
+  }
+  \item{truncate.fun}{
+    shrinkage function. Please see \code{shrinkagefun} in package biovizBase.
+  }
+  \item{ratio}{
+    used in \code{maxGap}.
+  }
+  \item{space.skip}{
+    space ratio between chromosome spaces in coordate genome.
+  }
+  \item{coord}{
+    Coodinate system.
   }
   \item{lower}{
     When object is Rle/RleList, and use other types of methods which is

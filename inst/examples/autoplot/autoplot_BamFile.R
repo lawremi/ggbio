@@ -1,15 +1,25 @@
+## @knitr load
 library(ggbio)
 library(GenomicRanges)
 library(Rsamtools)
 bamfile <- "~/Datas/seqs/ENCODE/caltech/single/wgEncodeCaltechRnaSeqK562R1x75dAlignsRep1V2.bam"
 bf <- BamFile(bamfile)
 
-## library(devtools)
-## load_all("~/Codes/gitrepos/ggbio")
-##  GRanges
-set.seed(1)
-N <- 1000
+## @knitr coverage_est
+p1 <- autoplot(bamfile, geom = "line", method = "estimate")
 
-ggplot() + stat_coverage(bf, geom = "point")
-autoplot(bf, stat = "coverage")
+## @knitr coverage_raw
+data(genesymbol, package = "biovizBase")
+p2 <- autoplot(bamfile,  method = "raw", which = genesymbol["ALDOA"])
 
+## @knitr mismatch
+library(BSgenome.Hsapiens.UCSC.hg19)
+autoplot(bf, stat = "mismatch", which = genesymbol["ALDOA"], bsgenome = Hsapiens)
+
+## Fixme
+autoplot(bf, geom = "gapped.pair", which = genesymbol["ALDOA"])
+
+## @knitr other
+library(biovizBase)
+autoplot(bf, geom = "segment", stat = "stepping", which = genesymbol["ALDOA"])
+autoplot(bf, geom = "segment", stat = "stepping", which = genesymbol["ALDOA"])

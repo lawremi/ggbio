@@ -3,7 +3,6 @@
 ## ============================================================
 ## ggplot2
 import(methods)
-importFrom(stats4, summary, update)
 import(BiocGenerics)
 import(biovizBase)
 import(grid)
@@ -21,14 +20,14 @@ importFrom(IRanges, IRanges,  disjointBins,
            "values", "values<-",
            ranges, "ranges<-", 
            isTRUEorFALSE, coverage, slice,
-           elementLengths,   endoapply,
+           elementLengths,  
            reduce, punion, pgap, gaps, "%in%")
 
 importMethodsFrom(IRanges,  split, 
                   unlist, psetdiff,
-                  range,
+                  range, endoapply,
                   as.data.frame,
-                  length, as.list, lapply, 
+                  length, as.list,
                   "[","[<-","[[", "[[<-","$",
                   show)
 

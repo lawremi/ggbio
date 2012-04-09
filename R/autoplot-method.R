@@ -17,17 +17,24 @@ setMethod("autoplot", "GRanges", function(object, ...,
                                           xlab, ylab, main,
                                           truncate.gaps = FALSE,
                                           truncate.fun = NULL,
-                                          ratio = 0.0025, 
+                                          ratio = 0.0025,
+                                          space.skip = 0.1,
                                           legend = TRUE,
                                           geom = NULL,
                                           stat = NULL,
+                                          coord = c("default", "genome", "truncate_gaps"),
                                           layout = c("linear", "karyogram", "circle")
                                           ){
 
+  coord <- match.arg(coord)
+  args <- list(...)
+  
+  if(coord == "genome"){
+    object <- transformToGenome(object, space.skip = space.skip)
+  }
+  
   formals.cur <- c("object", "stat", "geom", "legend",
                    "xlab", "ylab", "main")
-
-  args <- list(...)
 
   ## truncate
   if(truncate.gaps){
@@ -63,6 +70,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
     if(!"x" %in% names(args.aes))
       args.aes$x <- as.name("midpoint")
   }
+  
   ## ------------------------------
   ## layout check
   ## ------------------------------
@@ -77,7 +85,6 @@ setMethod("autoplot", "GRanges", function(object, ...,
     args.res <- c(list(aes.res), args.non)
     .fun <- getDrawFunFromGeomStat(geom, stat)
     p <- list(do.call(.fun, args.res))
-
     if(!legend)
       p <- c(p, list(opts(legend.position = "none")))
     
@@ -110,7 +117,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
     p <- ggplot() + layout_circle(object, ..., geom = geom)
   }
   ## test scale
-  if(is_coord_truncate_gaps(object)){
+  if(is_coord_truncate_gaps(object) | is_coord_genome(object)){
     ss <- getXScale(object)
     p <- p + scale_x_continuous(breaks = ss$breaks,
                                 labels = ss$labels)
@@ -123,7 +130,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
 ## ======================================================================
 setMethod("autoplot", "GRangesList", function(object, ...,
                                               xlab, ylab, main,
-                                              indName = ".grl.name",
+                                              indName = "grl_name",
                                               geom = NULL, stat = NULL,
                                               type = c("none", "sashimi"),
                                               coverage.col = "gray50",
@@ -137,8 +144,7 @@ setMethod("autoplot", "GRangesList", function(object, ...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
 
-  if(!"group.selfish" %in% names(args.non))
-    args.non$group.selfish <- group.selfish
+  args.non$group.selfish <- group.selfish
   if(type == "none")  {
     ## geom <- match.arg(geom)
     if(is.null(geom) & is.null(stat))
@@ -148,7 +154,7 @@ setMethod("autoplot", "GRangesList", function(object, ...,
     ## default or not?
     ## args.aes$group <- substitute(.grl.name)
     if(!"group" %in% names(args.aes))
-      args.aes$group <- substitute(.grl.name)
+      args.aes$group <- as.name(indName)
     aes.res <- do.call(aes, args.aes)
     args.non$object <- gr
     args.res <- c(args.non, list(aes.res))
@@ -184,7 +190,10 @@ setMethod("autoplot", "GRangesList", function(object, ...,
 
 setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
   ## ok, for simple impmlementation, let's make it a GRanges.....:)
+  df <- values(object)
+  values(object) <- NULL
   gr <- GRanges("chr_non", object)
+  values(gr) <- df
   p <- autoplot(gr, ...)
   if(!missing(xlab))
     p <- p + ggplot2::xlab(xlab)
@@ -194,7 +203,7 @@ setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
     p <- p + opts(title = main) +
-        opts(strip.background = theme_rect(colour = 'NA', fill = 'NA'))+ 
+      opts(strip.background = theme_rect(colour = 'NA', fill = 'NA'))+ 
         opts(strip.text.y = theme_text(colour = 'white')) 
   p
 })
@@ -217,7 +226,7 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
     gr <- biovizBase:::fetch(object)
   if(geom == "gapped.pair"){
     gr.junction <- gr[values(gr)$junction == TRUE]
-    gr.gaps <- getGap(gr.junction, "qname")
+    gr.gaps <- getGaps(gr.junction, "qname")
     gr.read <- gr  
     df.read <- as.data.frame(gr.read)
     df.gaps <- as.data.frame(gr.gaps)
@@ -284,11 +293,14 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
                                   use.name = TRUE)
     message("plotting...")
     args.ga <- args[names(args) %in% "show.junction"]
-    args <- c(args.ga, list(data = ga))
+    args <- c(args.ga, list(object = ga))
     p <- do.call(autoplot, args)
   }else{
     if(stat == "coverage"){
-      p <- ggplot() + stat_coverage(bf, ..., method = method, geom  =  geom)
+      if(!missing(which))
+        p <- ggplot() + stat_coverage(bf, ..., method = method, geom  =  geom, which = which)
+      else
+        p <- ggplot() + stat_coverage(bf, ..., method = method, geom  =  geom)
     }else if(stat == "mismatch"){
       p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which)
     }else{
@@ -533,11 +545,17 @@ setMethod("autoplot", "Rle", function(object, lower, ...,
           extra parameters to slice too")
   
   ## args.dots <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
-  args.dots <- list(...)
-  args.slice <- args.dots[names(args.dots) %in%
+  args <- list(...)
+  args.slice <- args[names(args) %in%
                           c("upper", "includeLower",
-                            "includeUpper", "rangesOnly")] 
-  args <- args.dots[names(args.dots) %in% c("size", "shape", "color", "alpha", "geom")]
+                            "includeUpper", "rangesOnly")]
+  args <- args[!names(args) %in%
+                          c("upper", "includeLower",
+                            "includeUpper", "rangesOnly")]
+
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  
   if(!"geom" %in% names(args))
     args$geom <- geom  
   if(!missing(lower))
@@ -581,6 +599,7 @@ setMethod("autoplot", "Rle", function(object, lower, ...,
                    y = 0,
                    yend = substitute(y)),
               args)
+
   else
     args <- c(list(data = df,
                    x = substitute(x),

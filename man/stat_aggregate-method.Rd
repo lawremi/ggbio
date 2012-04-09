@@ -7,14 +7,12 @@ Generates summaries on the specified windows
 }
 \usage{
 % for GRanges
-\S4method{stat_aggregate}{GRanges}(data, xlab, ylab,
-               main, by, FUN, start = NULL,
-               end = NULL, width = NULL,  y = NULL, frequency = NULL,
-               delta = NULL, ..., simplify = TRUE,
-               window = NULL, facets = NULL, 
-               type = c("mean", "median","max",
-               "min", "sum", "count", "identity"),
-               geom = NULL)
+\S4method{stat_aggregate}{GRanges}(data, ..., xlab, ylab, main, by, FUN, start = NULL,
+                 end = NULL, width = NULL, y = NULL, frequency = NULL,
+                 delta = NULL, simplify = TRUE, window = NULL, facets =
+                 NULL, type = c("mean", "median", "max", "min", "sum",
+                 "count", "identity"), geom = NULL)
+
 }
 \arguments{
   \item{data}{

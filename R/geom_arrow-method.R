@@ -41,16 +41,14 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
       res <- unlist(res)
       data <- res
       df <- as.data.frame(data)
-      ## rest?
       lst <- apply(df, 1, function(x){
         x <- as.data.frame(t(x))
         x.s <- as.numeric(as.character(x$start))
         x.e <- as.numeric(as.character(x$end))
         N <- (x.e - x.s) %/% arrow.r
         N <- ifelse(N <= 2, 2, N )
-        tryres <- try(res <- approx(c(x.s, x.e),
-                      rep(as.numeric(as.character(x$stepping)), 2),n = N))
-        if(inherits(tryres, "try-error")) browser()
+        res <- approx(c(x.s, x.e),
+                      rep(as.numeric(as.character(x$stepping)), 2),n = N)
         res.df <- do.call(rbind,lapply(1:N, function(i){
           x
         }))
@@ -60,6 +58,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
         .res
       })
       res <- do.call(rbind,lst)
+      res$stepping <- as.numeric(res$stepping)
       args.aes$x <- as.name("temp.x")
       args.aes$xend <- as.name("temp.x2")
       args.aes$y <- args.aes$yend <- as.name("stepping")

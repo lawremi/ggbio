@@ -214,13 +214,18 @@ align.plots <- function (..., vertical = TRUE,
 
   if (!vertical) stop("only vertical alignment implemented")
   dots0 <- list(...)
+  dots0 <- lapply(dots0, function(.g){
+    if(!"y" %in% names(.g$options$labels)){
+      .g$options$labels$y <- ""
+    }
+    .g
+  })
   nrow <- length(dots0)
   dots <- lapply(dots0, ggplotGrob)
   legend.pos <- lapply(dots0,
                        function(x) {
                          if (is.null(x$options$legend.pos)) "right"
                          else x$options$legend.pos })
-
 
   ytitles <- lapply(dots, function(.g){
     grob.y.text <- getGrob(.g, "axis.title.y.text", grep = TRUE)
@@ -237,7 +242,6 @@ align.plots <- function (..., vertical = TRUE,
     else
       ggplot2:::zeroGrob()
   })
-  
 
   legends <- lapply(dots0,function(.g){
     gt <- ggplot_gtable(ggplot_build(.g))

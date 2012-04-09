@@ -11,13 +11,13 @@ single nucleotide polymorphism. So higher the value, more stronger the
 association they are.
 }
 \usage{
-plotGrandLinear(obj, y, facets, size, shape, color, alpha, ..., geom =
-                 c("point", "line"), color.type = c("twocolor",
-                 "identity", "seqnames"), two.color = c("#0080FF",
-                 "#4CC4FF"), cutoff = NULL, cutoff.color = "red",
-                 cutoff.size = 1, legend = FALSE, xlim, ylim, xlab =
-                 "Genomic Coordinates", ylab = substitute(y), main,
-                 theme)
+plotGrandLinear(obj, y, ..., facets, space.skip = 0.01, geom = NULL,
+                            color.type = c("twocolor", "identity", "seqnames"),
+                            two.color = c("#0080FF", "#4CC4FF"),
+                            cutoff = NULL, cutoff.color = "red",
+                            cutoff.size = 1, legend = FALSE, xlim, ylim, 
+                            xlab = "Genomic Coordinates",
+                            ylab = substitute(y), main, theme)
 
 }
 \arguments{
@@ -27,37 +27,22 @@ plotGrandLinear(obj, y, facets, size, shape, color, alpha, ..., geom =
     to -log10(p).
   }
   \item{y}{
-    Unevaluated name which should be one the of the column names
+    unevaluated name which should be one the of the column names
     indicating the p-value Or other score used as y value in the plot.
     This is required field.
   }
-  \item{size}{
-    Size for point or lines. Could equal a column name or a fixed
-    number. When it's fixed, please use \code{I()} to wrap the value.
-  }
-  \item{shape}{
-    Shape for point or lines. Could equal a column name or a fixed
-    number. When it's fixed, please use \code{I()} to wrap the value.
-  }
-  \item{color}{
-    Color for point for lines. Could equal a column name or a fixed
-    character. When it's fixed, please use \code{I()} to wrap the value.
-  }
-  \item{alpha}{
-    Alpha blending. Could equal a column name or a fixed
-    number. When it's fixed, please use \code{I()} to wrap the value.
-  }
   \item{...}{
-    Extra arguments passed. Will be automatically dispatched to the
-    right place, such as scales, space. When you try to use a faceted
-    seqnames, you need to specify \code{scales = "free"} and \code{space
-      = "free"}, if you want a free scaled x-scale.
+    extra arguments passed. such as color, size, alpha.
+  }
+  \item{facets}{
+    facets formula, such as group ~ .
+  }
+  \item{space.skip}{
+    numeric value for skip ratio, between chromosome spaces.default is 0.01.
   }
   \item{geom}{
-    "point"(default) or "line". When it's line, it will make sure the
-    line is not connect cross different chromosomes.
+    geometric object, defualt is "point".
   }
-  
   \item{color.type}{
     "identity" use single color for all points, when it's enabled, you
     can specify color in the arguments to equal a character or an
@@ -84,21 +69,23 @@ plotGrandLinear(obj, y, facets, size, shape, color, alpha, ..., geom =
     A logical value indicate whether to show legend or not. Default is
     FALSE which disabled the legend.
   }
+  \item{xlim}{
+    limits for x scale.
+  }
+  \item{ylim}{
+    limits for y scale.
+  }
   \item{xlab}{
     Label for xscale.
   }
   \item{ylab}{
     Label for yscale.
   }
-  \item{facets}{
-  }
-  \item{xlim}{
-  }
-  \item{ylim}{
-  }
   \item{main}{
+    title.
   }
   \item{theme}{
+    theme options.
   }
 }
 \value{
@@ -116,9 +103,10 @@ data(hg19IdeogramCyto, package = "biovizBase")
 data(hg19Ideogram, package = "biovizBase")
 chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
 seqlths <- seqlengths(hg19Ideogram)[chrs]
+seqlths <- round(seqlths/1000)
 set.seed(1)
 nchr <- length(chrs)
-nsnps <- 1000
+nsnps <- 100
 gr.snp <- GRanges(rep(chrs,each=nsnps),
                   IRanges(start = do.call(c, lapply(chrs, function(chr){
                     N <- seqlths[chr]
@@ -139,36 +127,48 @@ gr.snp <- renameSeqlevels(gr.snp, nms.new)
 ## compact view
 ## no facet by samples, but make sure you want it that way
 ## default is two color
-plotGrandLinear(gr.snp, y = pvalue, geom = "point")
+plotGrandLinear(gr.snp, y = pvalue)
+plotGrandLinear(gr.snp, y = pvalue, space.skip = 0.1)
+
+## sort chromosomes
+gr.snp <- keepSeqlevels(gr.snp, c(1:22, "X", "Y"))
+plotGrandLinear(gr.snp, y = pvalue)
+
+## tweak with seqlengths
+nms <- names(seqlengths(gr.snp))
+seqs <- rep(3e5, length(nms))
+names(seqs) <- nms
+seqlengths(gr.snp) <- seqs
+plotGrandLinear(gr.snp, y = pvalue)
+
 ## facet by samples, comparison across groups
-plotGrandLinear(gr.snp, y = pvalue, geom = "point",
-                facet = group ~ .,  color.type = "twocolor")
+plotGrandLinear(gr.snp, y = pvalue, 
+                facets = group ~ .,  color.type = "twocolor")
 ## change two color
-plotGrandLinear(gr.snp, y = pvalue, geom = "point",
+plotGrandLinear(gr.snp, y = pvalue, 
                 facet = group ~ .,  color.type = "twocolor",
                 two.color = c("red", "blue"))
+
+
+
 ## geom line
 plotGrandLinear(gr.snp, y = pvalue,
                 geom = "line", facet = group ~ .)  
 
 
 ## add size and change color
-plotGrandLinear(gr.snp, y = pvalue, size = pvalue,geom = "point",
+plotGrandLinear(gr.snp, y = pvalue, size = 5,
                 facet = group ~ .,  color.type = "seqnames")
 
-plotGrandLinear(gr.snp, y = pvalue, size = I(0.05),
-                geom = "point", facet = group ~ .)
+plotGrandLinear(gr.snp, y = pvalue, aes(size = pvalue),
+                facet = group ~ .,  color.type = "seqnames")
 
-plotGrandLinear(gr.snp, y = pvalue, color = group, geom = "point",
+plotGrandLinear(gr.snp, y = pvalue, color = group,
                 facet = group ~ .,
                 color.type = "identity")
 
-plotGrandLinear(gr.snp, y = pvalue, color = I("blue"), geom = "point", facet = group ~ .,
+plotGrandLinear(gr.snp, y = pvalue, color = "blue", facet = group ~ .,
                 color.type = "identity")
-
-## facet by seqnames, slower
-plotGrandLinear(gr.snp, y = pvalue,geom = "point", 
-                facet = group ~ seqnames, scales = "free", space = "free")
 
 }
 }

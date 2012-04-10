@@ -78,7 +78,7 @@ obj <- tracks(p1, p2, heights = c(3, 1))
 obj
 {% endhighlight %}
 
-![plot of chunk tracks](tracks-tracks.png) 
+![plot of chunk tracks](http://tengfei.github.com/ggbio/tracks/tracks-tracks.png) 
 
 
 `align.plots` simply align the plots based on x axis
@@ -91,7 +91,7 @@ without modifying any other attributes about the plots.
 align.plots(p1, p2)
 {% endhighlight %}
 
-![plot of chunk align.plots](tracks-align.plots.png) 
+![plot of chunk align.plots](http://tengfei.github.com/ggbio/tracks/tracks-align.plots.png) 
 
 
 `reset` and `backup` help you play with options and appearance of the tracks,
@@ -126,7 +126,7 @@ obj <- reset(obj)
 obj
 {% endhighlight %}
 
-![plot of chunk reset](tracks-reset.png) 
+![plot of chunk reset](http://tengfei.github.com/ggbio/tracks/tracks-reset.png) 
 
 
 `summary` give you meta information about tracks, and `update` allow you to
@@ -164,7 +164,7 @@ summary(obj)
 update(obj, xlim = c(6130000, 6150000))
 {% endhighlight %}
 
-![plot of chunk utils](tracks-utils.png) 
+![plot of chunk utils](http://tengfei.github.com/ggbio/tracks/tracks-utils.png) 
 
 {% highlight text %}
 ## NULL
@@ -187,7 +187,7 @@ be applied to every plot in the tracks.
 obj + theme_bw()
 {% endhighlight %}
 
-![plot of chunk opts](tracks-opts.png) 
+![plot of chunk opts](http://tengfei.github.com/ggbio/tracks/tracks-opts.png) 
 
 
 

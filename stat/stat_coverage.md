@@ -44,6 +44,38 @@ library(ggbio)
 
 
 {% highlight text %}
+## 
+## Attaching package: 'ggbio'
+## 
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## The following object(s) are masked from 'package:ggplot2':
+## 
+##     geom_rect, geom_segment, stat_identity, xlim
+## 
+{% endhighlight %}
+
+
+
+  
+Let's generate some simulated interval data and store it as *GRanges* object.
+
+
+{% highlight r %}
+## ======================================================================
+## simmulated GRanges
+## ======================================================================
+set.seed(1)
+N <- 1000
+library(GenomicRanges)
+{% endhighlight %}
+
+
+
+{% highlight text %}
 ## Loading required package: BiocGenerics
 {% endhighlight %}
 
@@ -80,53 +112,18 @@ library(ggbio)
 
 
 {% highlight text %}
-## 
-## Attaching package: 'ggbio'
-## 
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## The following object(s) are masked from 'package:ggplot2':
-## 
-##     geom_rect, geom_segment, stat_identity, xlim
-## 
-{% endhighlight %}
-
-
-
-  
-Let's generate some simulated interval data and store it as *GRanges* object.
-
-
-{% highlight r %}
-##
-#   ======================================================================
-##  simmulated GRanges
-##
-#   ======================================================================
-set.seed(1)
-N <- 1000
-library(GenomicRanges)
-{% endhighlight %}
-
-
-
-{% highlight text %}
 ## Loading required package: IRanges
 {% endhighlight %}
 
 
 
 {% highlight r %}
-gr <- GRanges(seqnames = sample(c("chr1", "chr2", 
-    "chr3"), size = N, replace = TRUE), IRanges(start = sample(1:300, 
-    size = N, replace = TRUE), width = sample(70:75, size = N, 
-    replace = TRUE)), strand = sample(c("+", "-", "*"), size = N, 
-    replace = TRUE), value = rnorm(N, 10, 3), score = rnorm(N, 
-    100, 30), sample = sample(c("Normal", "Tumor"), size = N, 
-    replace = TRUE), pair = sample(letters, size = N, replace = TRUE))
+gr <- GRanges(seqnames = sample(c("chr1", "chr2", "chr3"), size = N, 
+    replace = TRUE), IRanges(start = sample(1:300, size = N, replace = TRUE), 
+    width = sample(70:75, size = N, replace = TRUE)), strand = sample(c("+", 
+    "-", "*"), size = N, replace = TRUE), value = rnorm(N, 10, 3), score = rnorm(N, 
+    100, 30), sample = sample(c("Normal", "Tumor"), size = N, replace = TRUE), 
+    pair = sample(letters, size = N, replace = TRUE))
 {% endhighlight %}
 
 
@@ -143,55 +140,51 @@ variable.
 ggplot() + stat_coverage(gr)
 {% endhighlight %}
 
-![plot of chunk geom](http://i.imgur.com/kHy67.png) 
+![plot of chunk geom](stat_coverage-geom1.png) 
 
 {% highlight r %}
 ggplot() + stat_coverage(gr, geom = "point")
 {% endhighlight %}
 
-![plot of chunk geom](http://i.imgur.com/xLVqY.png) 
+![plot of chunk geom](stat_coverage-geom2.png) 
 
 {% highlight r %}
-ggplot() + stat_coverage(gr, aes(y = ..coverage..), 
-    geom = "histogram")
+ggplot() + stat_coverage(gr, aes(y = ..coverage..), geom = "histogram")
 {% endhighlight %}
 
-![plot of chunk geom](http://i.imgur.com/Vwu1S.png) 
+![plot of chunk geom](stat_coverage-geom3.png) 
 
 {% highlight r %}
-ggplot() + stat_coverage(gr, aes(y = ..coverage..), 
-    geom = "area")
+ggplot() + stat_coverage(gr, aes(y = ..coverage..), geom = "area")
 {% endhighlight %}
 
-![plot of chunk geom](http://i.imgur.com/8RviU.png) 
+![plot of chunk geom](stat_coverage-geom4.png) 
 
 {% highlight r %}
 ggplot() + stat_coverage(gr, geom = "smooth")
 {% endhighlight %}
 
-![plot of chunk geom](http://i.imgur.com/ExBIt.png) 
+![plot of chunk geom](stat_coverage-geom5.png) 
 
 
 Facetting, column for `seqnames` is requried.
 
 
 {% highlight r %}
-ggplot() + stat_coverage(gr, geom = "line", facets = sample ~ 
-    seqnames)
+ggplot() + stat_coverage(gr, geom = "line", facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk facet:sample](http://i.imgur.com/fkCLi.png) 
+![plot of chunk facet:sample](stat_coverage-facet:sample.png) 
 
 
 Faceted by strand help you understand coverage from different sequencing direction. 
 
 
 {% highlight r %}
-ggplot() + stat_coverage(gr, geom = "line", facets = strand ~ 
-    seqnames)
+ggplot() + stat_coverage(gr, geom = "line", facets = strand ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk facet:strand](http://i.imgur.com/uwpTF.png) 
+![plot of chunk facet:strand](stat_coverage-facet:strand.png) 
 
 
 Let's create a *GRangesList* object.
@@ -216,7 +209,7 @@ For *GRangesList* object, default is coerce it to *GRanges*.
 ggplot() + stat_coverage(grl)
 {% endhighlight %}
 
-![plot of chunk grl:default](http://i.imgur.com/hHPBn.png) 
+![plot of chunk grl:default](stat_coverage-grl:default.png) 
 
 
 Internal variable `..grl_name..` added to keep a track for grouping information,
@@ -228,7 +221,7 @@ ggplot() + stat_coverage(grl, geom = "area", facets = ..grl_name.. ~
     seqnames, aes(fill = ..grl_name..))
 {% endhighlight %}
 
-![plot of chunk grl:facet](http://i.imgur.com/mQYG2.png) 
+![plot of chunk grl:facet](stat_coverage-grl:facet.png) 
 
 
 Load a RNA-seq data

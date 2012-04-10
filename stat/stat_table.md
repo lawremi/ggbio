@@ -1,7 +1,13 @@
 ---
 layout: static
-title: stat_gene
+title: stat_table
 ---
+
+
+
+{% highlight text %}
+## Error: cannot open the connection
+{% endhighlight %}
 
 
 

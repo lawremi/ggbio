@@ -11,20 +11,21 @@ title: Tutorial
 <!-- - [theme](#theme) -->
 <!-- - [Specialized plots](#splot) -->
 
+Index
 
 ## Higher level API
 
 ### [Autoplot generic function]({{site.url}}/autoplot) <a id = "autoplot"></a>
-  -  [autoplot, GRanges]({{site.url}}/autoplot/GRanges)
-  -  [autoplot, GRangesList]({{site.url}}/autoplot/GRangesList)
-  -  [autoplot, IRanges]({{site.url}}/autoplot/IRanges)
-  -  [autoplot, TranscriptDb]({{site.url}}/autoplot/TranscriptDb)
-  -  [autoplot, BamFile]({{site.url}}/autoplot/BamFile)
-  -  [autoplot, GappedAlignment]({{site.url}}/autoplot/GappedAlignment)
-  -  [autoplot, BSgenome]({{site.url}}/autoplot/BSgenome)
-  -  [autoplot, Rle]({{site.url}}/autoplot/Rle)
-  -  [autoplot, RleList]({{site.url}}/autoplot/RleList)
-  -  [autoplot, character]({{site.url}}/autoplot/character)
+  -  [autoplot, GRanges]({{site.url}}/autoplot/autoplot_GRanges)
+  -  [autoplot, GRangesList]({{site.url}}/autoplot/autoplot_GRangesList)
+  -  [autoplot, IRanges]({{site.url}}/autoplot/autoplot_IRanges)
+  -  [autoplot, TranscriptDb]({{site.url}}/autoplot/autoplot_TranscriptDb)
+  -  [autoplot, BamFile]({{site.url}}/autoplot/autoplot_BamFile)
+  -  [autoplot, GappedAlignment]({{site.url}}/autoplot/autoplot_GappedAlignment)
+  -  [autoplot, BSgenome]({{site.url}}/autoplot/autoplot_BSgenome)
+  -  [autoplot, Rle]({{site.url}}/autoplot/autoplot_Rle)
+  -  [autoplot, RleList]({{site.url}}/autoplot/autoplot_RleList)
+  -  [autoplot, character]({{site.url}}/autoplot/autoplot_character)
 
 
 
@@ -33,11 +34,11 @@ title: Tutorial
 ### [Geometric object(geom)]({{site.url}}/geom) <a id = "geom"></a>
   -  [geom_rect]({{site.url}}/geom/geom_rect)
   -  [geom_chevron]({{site.url}}/geom/geom_chevron)
-  -  [geom_arrow]({{site.url}}/geom/geom_arrow)
-  -  [geom_arrowrect]({{site.url}}/geom/geom_arrowrect)
   -  [geom_arch]({{site.url}}/geom/geom_arch)
   -  [geom_alignment]({{site.url}}/geom/geom_alignment)
-
+  -  [geom_arrow]({{site.url}}/geom/geom_arrow)
+  -  [geom_arrowrect]({{site.url}}/geom/geom_arrowrect)
+  -  [geom_segment]({{site.url}}/geom/geom_segment)
 
 ### [Statistical transformation(stat)]({{site.url}}/stat) <a id = "stat"></a>
   -  [stat_identity]({{site.url}}/stat/stat_identity)
@@ -46,6 +47,7 @@ title: Tutorial
   -  [stat_gene]({{site.url}}/stat/stat_gene)
   -  [stat_mismatch]({{site.url}}/stat/stat_mismatch)
   -  [stat_table]({{site.url}}/stat/stat_table)  
+  -  [stat_aggregate]({{site.url}}/stat/stat_aggregate)    
 
 
 ### [Layout]({{site.url}}/layout) <a id = "layout"></a>

@@ -40,8 +40,7 @@ Load example bam file
 
 
 {% highlight r %}
-bamfile <- system.file("extdata", "SRR027894subRBM17.bam", 
-    package = "biovizBase")
+bamfile <- system.file("extdata", "SRR027894subRBM17.bam", package = "biovizBase")
 library(Rsamtools)
 bf <- BamFile(bamfile)
 {% endhighlight %}
@@ -54,12 +53,12 @@ mismatch summary.
 
 
 {% highlight r %}
-ggplot() + stat_mismatch(bf, which = genesymbol["RBM17"], 
-    bsgenome = Hsapiens, show.coverage = TRUE) + coord_cartesian(xlim = c(6134000, 
-    6135000), wise = TRUE) + theme_bw()
+ggplot() + stat_mismatch(bf, which = genesymbol["RBM17"], bsgenome = Hsapiens, 
+    show.coverage = TRUE) + coord_cartesian(xlim = c(6134000, 6135000), wise = TRUE) + 
+    theme_bw()
 {% endhighlight %}
 
-![plot of chunk BamFile](http://i.imgur.com/TgA52.png) 
+![plot of chunk BamFile](stat_mismatch-BamFile.png) 
 
 
 Sometimes bam file and *BSgenome* object might have a different naming schema
@@ -74,8 +73,7 @@ mismatch summary.
 {% highlight r %}
 library(biovizBase)
 pgr <- pileupAsGRanges(bamfile, region = genesymbol["RBM17"])
-pgr.match <- pileupGRangesAsVariantTable(pgr, 
-    genome = Hsapiens)
+pgr.match <- pileupGRangesAsVariantTable(pgr, genome = Hsapiens)
 {% endhighlight %}
 
 
@@ -88,28 +86,25 @@ And directly plot the mismatch *GRanges* object.
 ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE)
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/T2DSp.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v1.png) 
 
 {% highlight r %}
 ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE)
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/4B3kW.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v2.png) 
 
 {% highlight r %}
-ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE, 
-    geom = "bar")
+ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE, geom = "bar")
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/3t24Q.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v3.png) 
 
 {% highlight r %}
 
 
-## ggplot() + stat_mismatch(pgr.match, show.coverage =
-#   TRUE) +
-## coord_cartesian(xlim = c(6134000, 6135000),wise =
-#   TRUE) + theme_bw()
+## ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE) +
+## coord_cartesian(xlim = c(6134000, 6135000),wise = TRUE) + theme_bw()
 library(ggbio)
 library(Rsamtools)
 bamfile <- "~/Datas/1000genome/HG00096.chrom20.ILLUMINA.bwa.GBR.low_coverage.20101123.bam"
@@ -143,11 +138,9 @@ svp_all <- ScanVcfParam(which = rng)
 vcf <- readVcf("~/Datas/1000genome/ALL.chr20.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz", 
     genome = "hg19", svp_all)
 p.v <- autoplot(vcf, type = "fixed") + coord_cartesian(ylim = c(0.6, 
-    1.4), wise = TRUE) + scale_y_continuous(breaks = NULL) + 
-    opts(legend.position = "none")
+    1.4), wise = TRUE) + scale_y_continuous(breaks = NULL) + opts(legend.position = "none")
 
-ggplot() + stat_mismatch(bf, which = rng, bsgenome = Hsapiens, 
-    show.coverage = TRUE)
+ggplot() + stat_mismatch(bf, which = rng, bsgenome = Hsapiens, show.coverage = TRUE)
 {% endhighlight %}
 
 
@@ -159,8 +152,7 @@ ggplot() + stat_mismatch(bf, which = rng, bsgenome = Hsapiens,
 
 
 {% highlight r %}
-coord_cartesian(xlim = c(6134000, 6135000), wise = TRUE) + 
-    theme_bw()
+coord_cartesian(xlim = c(6134000, 6135000), wise = TRUE) + theme_bw()
 {% endhighlight %}
 
 
@@ -175,11 +167,9 @@ coord_cartesian(xlim = c(6134000, 6135000), wise = TRUE) +
 
 
 ##
-gr.t <- GRanges("chr16", IRanges(30080000, 30080000 + 
-    2000))
-p0 <- ggplot() + stat_mismatch(bf, which = gr.t, 
-    bsgenome = Hsapiens, show.coverage = TRUE, geom = "bar") + 
-    ylab("Coverage") + ## coord_cartesian(ylim = c(0, 200), wise = TRUE) +
+gr.t <- GRanges("chr16", IRanges(30080000, 30080000 + 2000))
+p0 <- ggplot() + stat_mismatch(bf, which = gr.t, bsgenome = Hsapiens, 
+    show.coverage = TRUE, geom = "bar") + ylab("Coverage") + ## coord_cartesian(ylim = c(0, 200), wise = TRUE) +
 theme_bw()
 {% endhighlight %}
 
@@ -198,8 +188,7 @@ pgr <- pileupAsGRanges(bamfile, region = rng)
 nms <- "chr20"
 names(nms) <- "20"
 pgr <- renameSeqlevels(pgr, nms)
-pgr.match <- pileupGRangesAsVariantTable(pgr, 
-    genome = Hsapiens)
+pgr.match <- pileupGRangesAsVariantTable(pgr, genome = Hsapiens)
 pgr.match
 {% endhighlight %}
 
@@ -303,7 +292,7 @@ pgr.match
 p.v
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/tOBuV.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v4.png) 
 
 {% highlight r %}
 p1 <- ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE) + 
@@ -311,25 +300,25 @@ p1 <- ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE) +
 p.v
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/NrLSk.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v5.png) 
 
 {% highlight r %}
 p3 <- autoplot(Hsapiens, which = rng.ori) + opts(legend.position = "none")
 p3
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/stqRd.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v6.png) 
 
 {% highlight r %}
-obj <- tracks(p1, p.v, p3, heights = c(4, 0.9, 
-    1), xlim = c(25235400, 25236100))
+obj <- tracks(p1, p.v, p3, heights = c(4, 0.9, 1), xlim = c(25235400, 
+    25236100))
 
-obj <- tracks(p1, p.v, p3, heights = c(4, 0.9, 
-    1), xlim = c(25235720, 25235850))
+obj <- tracks(p1, p.v, p3, heights = c(4, 0.9, 1), xlim = c(25235720, 
+    25235850))
 obj
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/WrDmR.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v7.png) 
 
 {% highlight r %}
 pdf("~/Desktop/mismatch.pdf", 18.3, 5.98)
@@ -337,7 +326,7 @@ obj
 dev.off()
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/HfMFE.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v8.png) 
 
 {% highlight text %}
 ## pdf 
@@ -351,13 +340,13 @@ dev.off()
 obj
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/zGvbT.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v9.png) 
 
 {% highlight r %}
 update(obj, xlim = c(25238120, 25238470))
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/v4Aki.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v10.png) 
 
 {% highlight text %}
 ## NULL
@@ -369,7 +358,7 @@ update(obj, xlim = c(25238120, 25238470))
 update(obj, xlim = c(25235400, 25236100))
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/NHA0V.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v11.png) 
 
 {% highlight text %}
 ## NULL
@@ -381,17 +370,16 @@ update(obj, xlim = c(25235400, 25236100))
 ggbio:::reset(obj)
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/pATAZ.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v12.png) 
 
 {% highlight r %}
 
-p2 <- autoplot(Hsapiens, which = gr.t, geom = "text") + 
-    theme_bw() + opts(legend.position = "none") + xlim(c(30080800 + 
-    20, 30080800 + 100))
+p2 <- autoplot(Hsapiens, which = gr.t, geom = "text") + theme_bw() + 
+    opts(legend.position = "none") + xlim(c(30080800 + 20, 30080800 + 100))
 
 pdf("~/Desktop/mismatch.pdf", 13.1, 5.8)
-tracks(p0, p1, p2, heights = c(4, 4, 1.5), xlim = c(30080800 + 
-    20, 30080800 + 100))
+tracks(p0, p1, p2, heights = c(4, 4, 1.5), xlim = c(30080800 + 20, 
+    30080800 + 100))
 {% endhighlight %}
 
 
@@ -406,7 +394,7 @@ tracks(p0, p1, p2, heights = c(4, 4, 1.5), xlim = c(30080800 +
 dev.off()
 {% endhighlight %}
 
-![plot of chunk pag_v](http://i.imgur.com/s3uQc.png) 
+![plot of chunk pag_v](stat_mismatch-pag_v13.png) 
 
 {% highlight text %}
 ## pdf 
@@ -420,8 +408,7 @@ pg.sub <- pgr.match[!values(pgr.match)$match]
 pg.s <- start(pg.sub)
 vcf.s <- start(alt(vcf))
 ss <- pg.s[!is.na(match(pg.s, vcf.s))]
-as.character(unlist(values(alt(vcf)[start(alt(vcf)) == 
-    25238173])$ALT))
+as.character(unlist(values(alt(vcf)[start(alt(vcf)) == 25238173])$ALT))
 {% endhighlight %}
 
 
@@ -433,9 +420,8 @@ as.character(unlist(values(alt(vcf)[start(alt(vcf)) ==
 
 
 {% highlight r %}
-as.character(unlist(values(alt(vcf)[match(ss, 
-    vcf.s)])$ALT)) == values(pg.sub[!is.na(match(pg.s, vcf.s)), 
-    "read"])[, 1]
+as.character(unlist(values(alt(vcf)[match(ss, vcf.s)])$ALT)) == values(pg.sub[!is.na(match(pg.s, 
+    vcf.s)), "read"])[, 1]
 {% endhighlight %}
 
 
@@ -455,8 +441,7 @@ as.character(unlist(values(alt(vcf)[match(ss,
 
 
 {% highlight r %}
-as.data.frame(pg.sub[!is.na(match(pg.s, vcf.s)), 
-    "read"])
+as.data.frame(pg.sub[!is.na(match(pg.s, vcf.s)), "read"])
 {% endhighlight %}
 
 

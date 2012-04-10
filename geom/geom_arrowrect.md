@@ -36,18 +36,15 @@ Let's generate some simulated interval data and store it as *GRanges* object.
 
 
 {% highlight r %}
-##
-#   ======================================================================
-##  simmulated GRanges
-##
-#   ======================================================================
-gr <- GRanges(seqnames = sample(c("chr1", "chr2", 
-    "chr3"), size = N, replace = TRUE), IRanges(start = sample(1:300, 
-    size = N, replace = TRUE), width = sample(70:75, size = N, 
-    replace = TRUE)), strand = sample(c("+", "-", "*"), size = N, 
-    replace = TRUE), value = rnorm(N, 10, 3), score = rnorm(N, 
-    100, 30), sample = sample(c("Normal", "Tumor"), size = N, 
-    replace = TRUE), pair = sample(letters, size = N, replace = TRUE))
+## ======================================================================
+## simmulated GRanges
+## ======================================================================
+gr <- GRanges(seqnames = sample(c("chr1", "chr2", "chr3"), size = N, 
+    replace = TRUE), IRanges(start = sample(1:300, size = N, replace = TRUE), 
+    width = sample(70:75, size = N, replace = TRUE)), strand = sample(c("+", 
+    "-", "*"), size = N, replace = TRUE), value = rnorm(N, 10, 3), score = rnorm(N, 
+    100, 30), sample = sample(c("Normal", "Tumor"), size = N, replace = TRUE), 
+    pair = sample(letters, size = N, replace = TRUE))
 {% endhighlight %}
 
 
@@ -61,15 +58,13 @@ plotting, it's a very rough exploration as first step for some interval data.
 
 
 {% highlight r %}
-##
-#   ======================================================================
-##  default
-##
-#   ======================================================================
+## ======================================================================
+## default
+## ======================================================================
 ggplot() + geom_arrowrect(gr)
 {% endhighlight %}
 
-![plot of chunk default](http://i.imgur.com/P60kK.png) 
+![plot of chunk default](geom_arrowrect-default.png) 
 
 
 Facetting and aesthetics mapping are supported, make sure you put your
@@ -78,16 +73,14 @@ aesthetics mapping in constructor `aes()`, and those variables are not quoted.
 
 
 {% highlight r %}
-##
-#   ======================================================================
-##  facetting and aesthetics
-##
-#   ======================================================================
-ggplot() + geom_arrowrect(gr, facets = sample ~ 
-    seqnames, aes(color = strand, fill = strand))
+## ======================================================================
+## facetting and aesthetics
+## ======================================================================
+ggplot() + geom_arrowrect(gr, facets = sample ~ seqnames, aes(color = strand, 
+    fill = strand))
 {% endhighlight %}
 
-![plot of chunk facet_aes](http://i.imgur.com/Mx89B.png) 
+![plot of chunk facet_aes](geom_arrowrect-facet_aes.png) 
 
 
 Stat "identity" allows you to specify a y value to use as y-axis instead of
@@ -96,16 +89,13 @@ default stepping level.
 
 
 {% highlight r %}
-##
-#   ======================================================================
-##  stat:identity
-##
-#   ======================================================================
-ggplot() + geom_arrowrect(gr, stat = "identity", 
-    aes(y = value))
+## ======================================================================
+## stat:identity
+## ======================================================================
+ggplot() + geom_arrowrect(gr, stat = "identity", aes(y = value))
 {% endhighlight %}
 
-![plot of chunk stat:identity](http://i.imgur.com/arXxX.png) 
+![plot of chunk stat:identity](geom_arrowrect-stat:identity.png) 
 
 
 `group` make sure grouped intervals are on the same levels when `stat =
@@ -115,16 +105,13 @@ intervals assigned in the same group are overlapped with each other.
 
 
 {% highlight r %}
-##
-#   ======================================================================
-##  stat:stepping
-##
-#   ======================================================================
-ggplot() + geom_arrowrect(gr, stat = "stepping", 
-    aes(y = value, group = pair))
+## ======================================================================
+## stat:stepping
+## ======================================================================
+ggplot() + geom_arrowrect(gr, stat = "stepping", aes(y = value, group = pair))
 {% endhighlight %}
 
-![plot of chunk stat:stepping](http://i.imgur.com/QBa1Z.png) 
+![plot of chunk stat:stepping](geom_arrowrect-stat:stepping.png) 
 
 
 `group.selfish` force the grouped intervals to take unique stepping level,
@@ -132,7 +119,7 @@ ggplot() + geom_arrowrect(gr, stat = "stepping",
   it's disabled, the y-label will be automatically hided to avoid overlapped
   group labels as y axis.
 
-![plot of chunk group.selfish](http://i.imgur.com/sIiJD.png) 
+![plot of chunk group.selfish](geom_arrowrect-group.selfish.png) 
 
 
 

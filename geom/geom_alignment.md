@@ -34,18 +34,15 @@ Let's generate some simulated interval data and store it as *GRanges* object.
 
 
 {% highlight r %}
-##
-#   ======================================================================
-##  simmulated GRanges
-##
-#   ======================================================================
-gr <- GRanges(seqnames = sample(c("chr1", "chr2", 
-    "chr3"), size = N, replace = TRUE), IRanges(start = sample(1:300, 
-    size = N, replace = TRUE), width = sample(70:75, size = N, 
-    replace = TRUE)), strand = sample(c("+", "-", "*"), size = N, 
-    replace = TRUE), value = rnorm(N, 10, 3), score = rnorm(N, 
-    100, 30), sample = sample(c("Normal", "Tumor"), size = N, 
-    replace = TRUE), pair = sample(letters, size = N, replace = TRUE))
+## ======================================================================
+## simmulated GRanges
+## ======================================================================
+gr <- GRanges(seqnames = sample(c("chr1", "chr2", "chr3"), size = N, 
+    replace = TRUE), IRanges(start = sample(1:300, size = N, replace = TRUE), 
+    width = sample(70:75, size = N, replace = TRUE)), strand = sample(c("+", 
+    "-", "*"), size = N, replace = TRUE), value = rnorm(N, 10, 3), score = rnorm(N, 
+    100, 30), sample = sample(c("Normal", "Tumor"), size = N, replace = TRUE), 
+    pair = sample(letters, size = N, replace = TRUE))
 {% endhighlight %}
 
 
@@ -65,15 +62,13 @@ plotting, it's a very rough exploration as first step for some interval data.
 
 
 {% highlight r %}
-##
-#   ======================================================================
-##  default
-##
-#   ======================================================================
+## ======================================================================
+## default
+## ======================================================================
 ggplot() + geom_alignment(gr)
 {% endhighlight %}
 
-![plot of chunk default](http://i.imgur.com/g8QYh.png) 
+![plot of chunk default](geom_alignment-default.png) 
 
 
 Facetting and aesthetics mapping are supported, make sure you put your
@@ -82,16 +77,14 @@ aesthetics mapping in constructor `aes()`, and those variables are not quoted.
 
 
 {% highlight r %}
-##
-#   ======================================================================
-##  facetting and aesthetics
-##
-#   ======================================================================
-ggplot() + geom_alignment(gr, facets = sample ~ 
-    seqnames, aes(color = strand, fill = strand))
+## ======================================================================
+## facetting and aesthetics
+## ======================================================================
+ggplot() + geom_alignment(gr, facets = sample ~ seqnames, aes(color = strand, 
+    fill = strand))
 {% endhighlight %}
 
-![plot of chunk facet_aes](http://i.imgur.com/iD1N4.png) 
+![plot of chunk facet_aes](geom_alignment-facet_aes.png) 
 
 
 
@@ -102,16 +95,13 @@ intervals assigned in the same group are overlapped with each other.
 
 
 {% highlight r %}
-##
-#   ======================================================================
-##  stat:stepping
-##
-#   ======================================================================
-ggplot() + geom_alignment(gr, stat = "stepping", 
-    aes(group = pair))
+## ======================================================================
+## stat:stepping
+## ======================================================================
+ggplot() + geom_alignment(gr, stat = "stepping", aes(group = pair))
 {% endhighlight %}
 
-![plot of chunk stat:stepping](http://i.imgur.com/crBm4.png) 
+![plot of chunk stat:stepping](geom_alignment-stat:stepping.png) 
 
 
 `group.selfish` force the grouped intervals to take unique stepping level,
@@ -119,7 +109,7 @@ ggplot() + geom_alignment(gr, stat = "stepping",
   it's disabled, the y-label will be automatically hided to avoid overlapped
   group labels as y axis.
 
-![plot of chunk group.selfish](http://i.imgur.com/kzMgt.png) 
+![plot of chunk group.selfish](geom_alignment-group.selfish.png) 
 
 
 We allow you to change main geoms and gaps geoms too, you can always use
@@ -130,14 +120,12 @@ gap.geom.
 
 
 {% highlight r %}
+## ======================================= main/gap geom
 ## =======================================
-##  main/gap geom
-## =======================================
-ggplot() + geom_alignment(gr, main.geom = "arrowrect", 
-    gap.geom = "chevron")
+ggplot() + geom_alignment(gr, main.geom = "arrowrect", gap.geom = "chevron")
 {% endhighlight %}
 
-![plot of chunk main_gap](http://i.imgur.com/QLvJd.png) 
+![plot of chunk main_gap](geom_alignment-main_gap.png) 
 
 
 

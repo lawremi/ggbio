@@ -31,15 +31,12 @@ Simulate an inteval set.
 
 
 {% highlight r %}
-##
-#   ======================================================================
-##  simmulated GRanges
-##
-#   ======================================================================
-gr <- GRanges(seqnames = "chr1", IRanges(start = sample(1:300, 
-    size = N, replace = TRUE), width = sample(70:75, size = N, 
-    replace = TRUE)), strand = sample(c("+", "-", "*"), size = N, 
-    replace = TRUE))
+## ======================================================================
+## simmulated GRanges
+## ======================================================================
+gr <- GRanges(seqnames = "chr1", IRanges(start = sample(1:300, size = N, 
+    replace = TRUE), width = sample(70:75, size = N, replace = TRUE)), strand = sample(c("+", 
+    "-", "*"), size = N, replace = TRUE))
 {% endhighlight %}
 
 
@@ -54,7 +51,7 @@ Default theme is with gray background, it's actually a preset theme in
 autoplot(gr)
 {% endhighlight %}
 
-![plot of chunk default](http://i.imgur.com/tzUTA.png) 
+![plot of chunk default](theme_null-default.png) 
 
 
 Compare to `theme_gray`, here is how we make blank theme with `theme_null`.
@@ -64,5 +61,5 @@ Compare to `theme_gray`, here is how we make blank theme with `theme_null`.
 autoplot(gr) + theme_null()
 {% endhighlight %}
 
-![plot of chunk theme_null](http://i.imgur.com/9KcYO.png) 
+![plot of chunk theme_null](theme_null-theme_null.png) 
 

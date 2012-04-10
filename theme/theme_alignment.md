@@ -38,7 +38,7 @@ p <- autoplot(txdb, which = genesymbol["RBM17"])
 p
 {% endhighlight %}
 
-![plot of chunk theme:default](http://i.imgur.com/23vDy.png) 
+![plot of chunk theme:default](theme_alignment-theme:default.png) 
 
 
 Compare to `theme_gray`, here is how we make flexible tweak with themes with
@@ -48,9 +48,8 @@ reason I called it `theme_alignment`.
 
 
 {% highlight r %}
-p + theme_alignment(border = TRUE, grid = FALSE, 
-    label = TRUE)
+p + theme_alignment(border = TRUE, grid = FALSE, label = TRUE)
 {% endhighlight %}
 
-![plot of chunk theme:alignment](http://i.imgur.com/B9KdA.png) 
+![plot of chunk theme:alignment](theme_alignment-theme:alignment.png) 
 

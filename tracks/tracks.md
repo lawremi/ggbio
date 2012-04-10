@@ -49,11 +49,8 @@ Load packages required for getting gene features.
 
 
 {% highlight r %}
-##
-#   ==========================================================
-## Load packages
-##
-#   ==========================================================
+## ========================================================== Load
+## packages ==========================================================
 ## Load gene features for human
 library(ggbio)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
@@ -69,25 +66,19 @@ tracks.
 
 
 {% highlight r %}
-##
-#   ==========================================================
-## Create tracks
-##
-#   ==========================================================
-## create two tracks
-## full gene model
-p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], 
-    geom = "gene")
+## ========================================================== Create
+## tracks ==========================================================
+## create two tracks full gene model
+p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "gene")
 ## reduced gene model
-p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], 
-    geom = "reduced_gene")
+p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "reduced_gene")
 ## building tracks
 obj <- tracks(p1, p2, heights = c(3, 1))
 ## showing
 obj
 {% endhighlight %}
 
-![plot of chunk tracks](http://i.imgur.com/3HDxM.png) 
+![plot of chunk tracks](tracks-tracks.png) 
 
 
 `align.plots` simply align the plots based on x axis
@@ -95,15 +86,12 @@ without modifying any other attributes about the plots.
 
 
 {% highlight r %}
-##
-#   ==========================================================
-## align.plots
-##
-#   ==========================================================
+## ========================================================== align.plots
+## ==========================================================
 align.plots(p1, p2)
 {% endhighlight %}
 
-![plot of chunk align.plots](http://i.imgur.com/Utlh5.png) 
+![plot of chunk align.plots](tracks-align.plots.png) 
 
 
 `reset` and `backup` help you play with options and appearance of the tracks,
@@ -112,20 +100,15 @@ by calling `reset`.
 
 
 {% highlight r %}
-##
-#   ==========================================================
-## test reset/backup
-##
-#   ==========================================================
+## ========================================================== test
+## reset/backup ==========================================================
 ## create tracks
 obj <- tracks(p1, p2, heights = c(3, 1))
 ## show it
 obj
-## three ways to change x limits,
-#   IRanges/GRanges/numeric
+## three ways to change x limits, IRanges/GRanges/numeric
 xlim(obj) <- IRanges(start = 6145000, end = 6150000)
-xlim(obj) <- GRanges("chr1", c(start = 6145000, 
-    end = 6150000))
+xlim(obj) <- GRanges("chr1", c(start = 6145000, end = 6150000))
 xlim(obj) <- c(6145000, 6150000)
 ## show it
 obj
@@ -133,9 +116,8 @@ obj
 obj <- reset(obj)
 ## get back
 obj
-## we could save a statue of the tracks to backup and
-#   then
-## reset will get that copy back
+## we could save a statue of the tracks to backup and then reset will get
+## that copy back
 xlim(obj) <- c(6145000, 6150000)
 obj <- backup(obj)
 obj@xlim <- c(6135000, 6150000)
@@ -144,7 +126,7 @@ obj <- reset(obj)
 obj
 {% endhighlight %}
 
-![plot of chunk reset](http://i.imgur.com/cqqIr.png) 
+![plot of chunk reset](tracks-reset.png) 
 
 
 `summary` give you meta information about tracks, and `update` allow you to
@@ -154,12 +136,9 @@ and print it again.
 
 
 {% highlight r %}
-##
-#   ==========================================================
-## utils
-##
-#   ==========================================================
-## summary information about a track
+## ========================================================== utils
+## ========================================================== summary
+## information about a track
 summary(obj)
 {% endhighlight %}
 
@@ -180,13 +159,12 @@ summary(obj)
 
 
 {% highlight r %}
-## update a x limits on the fly, this is useful when
-#   you try to
-## keep the view open and tweak with limits on the fly.
+## update a x limits on the fly, this is useful when you try to keep the
+## view open and tweak with limits on the fly.
 update(obj, xlim = c(6130000, 6150000))
 {% endhighlight %}
 
-![plot of chunk utils](http://i.imgur.com/yrTET.png) 
+![plot of chunk utils](tracks-utils.png) 
 
 {% highlight text %}
 ## NULL
@@ -202,18 +180,14 @@ be applied to every plot in the tracks.
 
 
 {% highlight r %}
-##
-#   ==========================================================
-## options
-##
-#   ==========================================================
-## To make it easy, you could just apply any *options*
-#   by using '+'
-## and this will apply it to every plot in the track.
+## ========================================================== options
+## ========================================================== To make it
+## easy, you could just apply any *options* by using '+' and this will
+## apply it to every plot in the track.
 obj + theme_bw()
 {% endhighlight %}
 
-![plot of chunk opts](http://i.imgur.com/ICEHE.png) 
+![plot of chunk opts](tracks-opts.png) 
 
 
 

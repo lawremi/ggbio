@@ -215,27 +215,7 @@ library(BSgenome.Hsapiens.UCSC.hg19)
 autoplot(bf, stat = "mismatch", which = genesymbol["ALDOA"], bsgenome = Hsapiens)
 {% endhighlight %}
 
-![plot of chunk mismatch](http://tengfei.github.com/ggbio/autoplot/autoplot_BamFile-mismatch1.png) 
-
-{% highlight r %}
-
-## Fixme
-autoplot(bf, geom = "gapped.pair", which = genesymbol["ALDOA"])
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Read GappedAlignments from BamFile...
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## plotting...
-{% endhighlight %}
-
-![plot of chunk mismatch](http://tengfei.github.com/ggbio/autoplot/autoplot_BamFile-mismatch2.png) 
+![plot of chunk mismatch](http://tengfei.github.com/ggbio/autoplot/autoplot_BamFile-mismatch.png) 
 
 
 If you specify other geom and stat, this will simply parse a set of short reads

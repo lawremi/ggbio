@@ -62,7 +62,7 @@ plotting.
 ggplot() + geom_chevron(gr)
 {% endhighlight %}
 
-![plot of chunk default](geom_chevron-default.png) 
+![plot of chunk default](http://tengfei.github.com/ggbio/geom/geom_chevron-default.png) 
 
 
 Facetting and aesthetics mapping are supported, make sure you put your
@@ -77,7 +77,7 @@ aesthetics mapping in constructor `aes()`, and those variables are not quoted.
 ggplot() + geom_chevron(gr, facets = sample ~ seqnames, aes(color = strand))
 {% endhighlight %}
 
-![plot of chunk facet_aes](geom_chevron-facet_aes.png) 
+![plot of chunk facet_aes](http://tengfei.github.com/ggbio/geom/geom_chevron-facet_aes.png) 
 
 
 Stat "identity" allows you to specify a y value to use as y-axis instead of
@@ -92,7 +92,7 @@ default stepping level.
 ggplot() + geom_chevron(gr, stat = "identity", aes(y = value))
 {% endhighlight %}
 
-![plot of chunk stat:identity](geom_chevron-stat:identity.png) 
+![plot of chunk stat:identity](http://tengfei.github.com/ggbio/geom/geom_chevron-stat:identity.png) 
 
 
 `group` make sure grouped intervals are on the same levels when `stat =
@@ -108,7 +108,7 @@ intervals assigned in the same group are overlapped with each other.
 ggplot() + geom_chevron(gr, stat = "stepping", aes(group = pair))
 {% endhighlight %}
 
-![plot of chunk stat:stepping](geom_chevron-stat:stepping.png) 
+![plot of chunk stat:stepping](http://tengfei.github.com/ggbio/geom/geom_chevron-stat:stepping.png) 
 
 
 `group.selfish` force the grouped intervals to take unique stepping level,
@@ -116,7 +116,7 @@ ggplot() + geom_chevron(gr, stat = "stepping", aes(group = pair))
   it's disabled, the y-label will be automatically hided to avoid overlapped
   group labels as y axis.
 
-![plot of chunk group.selfish](geom_chevron-group.selfish.png) 
+![plot of chunk group.selfish](http://tengfei.github.com/ggbio/geom/geom_chevron-group.selfish.png) 
 
 
 `offset` controls the height of the chevron, notice the default rectangle height
@@ -125,21 +125,21 @@ is always 0.4*2.
 
 
 
-![plot of chunk offset:default](geom_chevron-offset:default.png) 
+![plot of chunk offset:default](http://tengfei.github.com/ggbio/geom/geom_chevron-offset:default.png) 
 
 
-![plot of chunk offset:0](geom_chevron-offset:0.png) 
+![plot of chunk offset:0](http://tengfei.github.com/ggbio/geom/geom_chevron-offset:0.png) 
 
 
-![plot of chunk offset:0.4](geom_chevron-offset:0.4.png) 
+![plot of chunk offset:0.4](http://tengfei.github.com/ggbio/geom/geom_chevron-offset:0.4.png) 
 
 
 `chevron.height` is useful to rescale the offset when you specify the offset as
 one the the variables.
-![plot of chunk chevron.height:default](geom_chevron-chevron.height:default.png) 
+![plot of chunk chevron.height:default](http://tengfei.github.com/ggbio/geom/geom_chevron-chevron.height:default.png) 
 
 
-![plot of chunk chevron.height](geom_chevron-chevron.height.png) 
+![plot of chunk chevron.height](http://tengfei.github.com/ggbio/geom/geom_chevron-chevron.height.png) 
 
 
 

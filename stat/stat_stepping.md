@@ -60,7 +60,7 @@ Default is use `geom_rect`, it's a very rough exploration as first step for some
 ggplot() + stat_stepping(gr)
 {% endhighlight %}
 
-![plot of chunk default](stat_stepping-default.png) 
+![plot of chunk default](http://tengfei.github.com/ggbio/stat/stat_stepping-default.png) 
 
 
 Facetting and aesthetics mapping are supported, make sure you put your
@@ -73,7 +73,7 @@ ggplot() + stat_stepping(gr, aes(color = strand, fill = strand),
     facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk facet_aes](stat_stepping-facet_aes.png) 
+![plot of chunk facet_aes](http://tengfei.github.com/ggbio/stat/stat_stepping-facet_aes.png) 
 
 
 Use different geom, such as `segment`.
@@ -84,7 +84,7 @@ ggplot() + stat_stepping(gr, aes(color = strand), geom = "segment",
     xlab = "Genomic coord", ylab = "y", main = "hello")
 {% endhighlight %}
 
-![plot of chunk geom_segment](stat_stepping-geom_segment.png) 
+![plot of chunk geom_segment](http://tengfei.github.com/ggbio/stat/stat_stepping-geom_segment.png) 
 
 
 geom `alignment`
@@ -94,7 +94,7 @@ geom `alignment`
 ggplot() + stat_stepping(gr, geom = "alignment")
 {% endhighlight %}
 
-![plot of chunk geom_alignment](stat_stepping-geom_alignment.png) 
+![plot of chunk geom_alignment](http://tengfei.github.com/ggbio/stat/stat_stepping-geom_alignment.png) 
 
 
 geom `alignment` with group 
@@ -104,6 +104,6 @@ geom `alignment` with group
 ggplot() + stat_stepping(gr, aes(group = pair), geom = "alignment")
 {% endhighlight %}
 
-![plot of chunk geom_alignment_group](stat_stepping-geom_alignment_group.png) 
+![plot of chunk geom_alignment_group](http://tengfei.github.com/ggbio/stat/stat_stepping-geom_alignment_group.png) 
 
 

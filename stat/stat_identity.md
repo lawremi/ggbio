@@ -59,7 +59,7 @@ Geom *point*.
 ggplot() + stat_identity(gr, aes(x = start, y = value), geom = "point")
 {% endhighlight %}
 
-![plot of chunk geom_point_start](stat_identity-geom_point_start.png) 
+![plot of chunk geom_point_start](http://tengfei.github.com/ggbio/stat/stat_identity-geom_point_start.png) 
 
 
 Geom *point*, with x set to `midpoint`, which doesn't exists in original data.
@@ -69,7 +69,7 @@ Geom *point*, with x set to `midpoint`, which doesn't exists in original data.
 ggplot() + stat_identity(gr, aes(x = midpoint, y = value), geom = "point")
 {% endhighlight %}
 
-![plot of chunk geom_point_midpoint](stat_identity-geom_point_midpoint.png) 
+![plot of chunk geom_point_midpoint](http://tengfei.github.com/ggbio/stat/stat_identity-geom_point_midpoint.png) 
 
 
 Geom *rect*, need to specify `xmin`, `xmax`, `ymin`, `ymax`.
@@ -96,7 +96,7 @@ Geom *rect*, or just specify a `y` use default for boundary.
 ggplot() + stat_identity(gr, aes(y = value), geom = "rect")
 {% endhighlight %}
 
-![plot of chunk geom_rect_y](stat_identity-geom_rect_y.png) 
+![plot of chunk geom_rect_y](http://tengfei.github.com/ggbio/stat/stat_identity-geom_rect_y.png) 
 
 
 Geom *line*
@@ -106,7 +106,7 @@ Geom *line*
 ggplot() + stat_identity(gr, aes(x = start, y = value), geom = "line")
 {% endhighlight %}
 
-![plot of chunk geom_line](stat_identity-geom_line.png) 
+![plot of chunk geom_line](http://tengfei.github.com/ggbio/stat/stat_identity-geom_line.png) 
 
 
 Geom *segment*
@@ -116,7 +116,7 @@ Geom *segment*
 ggplot() + stat_identity(gr, aes(y = value), geom = "segment")
 {% endhighlight %}
 
-![plot of chunk geom_segment](stat_identity-geom_segment.png) 
+![plot of chunk geom_segment](http://tengfei.github.com/ggbio/stat/stat_identity-geom_segment.png) 
 
 
 

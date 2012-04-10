@@ -83,7 +83,7 @@ default is use geom "rect".
 autoplot(gr)
 {% endhighlight %}
 
-![plot of chunk default](autoplot_GRanges-default.png) 
+![plot of chunk default](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-default.png) 
 
 
 Facetting, some combination of geom/stat
@@ -93,49 +93,49 @@ Facetting, some combination of geom/stat
 autoplot(gr, geom = "point", aes(y = score))
 {% endhighlight %}
 
-![plot of chunk geom/aes/facet](autoplot_GRanges-geom/aes/facet1.png) 
+![plot of chunk geom/aes/facet](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-geom/aes/facet1.png) 
 
 {% highlight r %}
 autoplot(gr, fill = "red")
 {% endhighlight %}
 
-![plot of chunk geom/aes/facet](autoplot_GRanges-geom/aes/facet2.png) 
+![plot of chunk geom/aes/facet](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-geom/aes/facet2.png) 
 
 {% highlight r %}
 autoplot(gr, aes(fill = value))
 {% endhighlight %}
 
-![plot of chunk geom/aes/facet](autoplot_GRanges-geom/aes/facet3.png) 
+![plot of chunk geom/aes/facet](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-geom/aes/facet3.png) 
 
 {% highlight r %}
 autoplot(gr, facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk geom/aes/facet](autoplot_GRanges-geom/aes/facet4.png) 
+![plot of chunk geom/aes/facet](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-geom/aes/facet4.png) 
 
 {% highlight r %}
 autoplot(gr[idx], geom = "chevron", offset = 1)
 {% endhighlight %}
 
-![plot of chunk geom/aes/facet](autoplot_GRanges-geom/aes/facet5.png) 
+![plot of chunk geom/aes/facet](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-geom/aes/facet5.png) 
 
 {% highlight r %}
 autoplot(gr[idx], geom = "arrowrect", facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk geom/aes/facet](autoplot_GRanges-geom/aes/facet6.png) 
+![plot of chunk geom/aes/facet](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-geom/aes/facet6.png) 
 
 {% highlight r %}
 autoplot(gr[idx], geom = "arrow", facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk geom/aes/facet](autoplot_GRanges-geom/aes/facet7.png) 
+![plot of chunk geom/aes/facet](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-geom/aes/facet7.png) 
 
 {% highlight r %}
 autoplot(gr[idx], geom = "alignment", aes(group = pair), group.selfish = TRUE)
 {% endhighlight %}
 
-![plot of chunk geom/aes/facet](autoplot_GRanges-geom/aes/facet8.png) 
+![plot of chunk geom/aes/facet](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-geom/aes/facet8.png) 
 
 
 Group need to be specified in `aes()` use aesthetics `group`, this help to
@@ -153,7 +153,7 @@ gra <- GRanges("chr1", IRanges(c(1, 7, 20), end = c(4, 9, 30)), group = c("a",
 autoplot(gra, aes(fill = group), geom = "alignment")
 {% endhighlight %}
 
-![plot of chunk group](autoplot_GRanges-group1.png) 
+![plot of chunk group](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-group1.png) 
 
 {% highlight r %}
 ## when use group method, gaps only computed for grouped intervals.
@@ -162,7 +162,7 @@ autoplot(gra, aes(fill = group), geom = "alignment")
 autoplot(gra, aes(fill = group, group = group), geom = "alignment")
 {% endhighlight %}
 
-![plot of chunk group](autoplot_GRanges-group2.png) 
+![plot of chunk group](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-group2.png) 
 
 {% highlight r %}
 ## group.selfish = FALSE, save space
@@ -170,14 +170,14 @@ autoplot(gra, aes(fill = group, group = group), geom = "alignment",
     group.selfish = FALSE)
 {% endhighlight %}
 
-![plot of chunk group](autoplot_GRanges-group3.png) 
+![plot of chunk group](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-group3.png) 
 
 {% highlight r %}
 ## without group method
 autoplot(gra, aes(fill = group), geom = "alignment", group.selfish = FALSE)
 {% endhighlight %}
 
-![plot of chunk group](autoplot_GRanges-group4.png) 
+![plot of chunk group](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-group4.png) 
 
 
 more example
@@ -187,7 +187,7 @@ more example
 autoplot(gr[idx], geom = "alignment", aes(group = pair), group.selfish = FALSE)
 {% endhighlight %}
 
-![plot of chunk group-more](autoplot_GRanges-group-more.png) 
+![plot of chunk group-more](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-group-more.png) 
 
 
 
@@ -199,7 +199,7 @@ autoplot(gr, stat = "coverage", geom = "area", facets = strand ~
     seqnames, aes(fill = strand))
 {% endhighlight %}
 
-![plot of chunk facet:strand](autoplot_GRanges-facet:strand1.png) 
+![plot of chunk facet:strand](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-facet:strand1.png) 
 
 {% highlight r %}
 
@@ -208,25 +208,25 @@ library(biovizBase)
 autoplot(gr[idx], geom = "alignment", facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk facet:strand](autoplot_GRanges-facet:strand2.png) 
+![plot of chunk facet:strand](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-facet:strand2.png) 
 
 {% highlight r %}
 autoplot(gr[idx], geom = "alignment", aes(group = pair))
 {% endhighlight %}
 
-![plot of chunk facet:strand](autoplot_GRanges-facet:strand3.png) 
+![plot of chunk facet:strand](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-facet:strand3.png) 
 
 {% highlight r %}
 autoplot(gr[idx], geom = "alignment", aes(group = pair), group.selfish = FALSE)
 {% endhighlight %}
 
-![plot of chunk facet:strand](autoplot_GRanges-facet:strand4.png) 
+![plot of chunk facet:strand](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-facet:strand4.png) 
 
 {% highlight r %}
 autoplot(gr[idx], geom = "alignment", aes(group = pair), group.selfish = TRUE)
 {% endhighlight %}
 
-![plot of chunk facet:strand](autoplot_GRanges-facet:strand5.png) 
+![plot of chunk facet:strand](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-facet:strand5.png) 
 
 
 More stats
@@ -236,19 +236,19 @@ More stats
 autoplot(gr, stat = "coverage", facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk stat](autoplot_GRanges-stat1.png) 
+![plot of chunk stat](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-stat1.png) 
 
 {% highlight r %}
 autoplot(gr[idx], stat = "stepping", facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk stat](autoplot_GRanges-stat2.png) 
+![plot of chunk stat](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-stat2.png) 
 
 {% highlight r %}
 autoplot(gr, stat = "aggregate", y = "value")
 {% endhighlight %}
 
-![plot of chunk stat](autoplot_GRanges-stat3.png) 
+![plot of chunk stat](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-stat3.png) 
 
 {% highlight r %}
 ## for boxplot, y need to be in aes()
@@ -256,7 +256,7 @@ autoplot(gr, stat = "aggregate", aes(y = value), geom = "boxplot",
     facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk stat](autoplot_GRanges-stat4.png) 
+![plot of chunk stat](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-stat4.png) 
 
 {% highlight r %}
 
@@ -264,32 +264,32 @@ autoplot(gr, stat = "aggregate", aes(y = value), geom = "boxplot",
 autoplot(gr, stat = "coverage", facets = sample ~ seqnames, geom = "point")
 {% endhighlight %}
 
-![plot of chunk stat](autoplot_GRanges-stat5.png) 
+![plot of chunk stat](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-stat5.png) 
 
 {% highlight r %}
 autoplot(gr, stat = "table")
 {% endhighlight %}
 
-![plot of chunk stat](autoplot_GRanges-stat6.png) 
+![plot of chunk stat](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-stat6.png) 
 
 {% highlight r %}
 autoplot(gr, stat = "table", rect.height = 0.2)
 {% endhighlight %}
 
-![plot of chunk stat](autoplot_GRanges-stat7.png) 
+![plot of chunk stat](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-stat7.png) 
 
 {% highlight r %}
 autoplot(gr, stat = "table", rect.height = 0.2, fill = "red")
 {% endhighlight %}
 
-![plot of chunk stat](autoplot_GRanges-stat8.png) 
+![plot of chunk stat](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-stat8.png) 
 
 {% highlight r %}
 
 autoplot(gr, stat = "boxplot", aes(y = score))
 {% endhighlight %}
 
-![plot of chunk stat](autoplot_GRanges-stat9.png) 
+![plot of chunk stat](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-stat9.png) 
 
 {% highlight r %}
 
@@ -297,7 +297,7 @@ autoplot(gr, stat = "boxplot", aes(y = score))
 autoplot(gr[idx], stat = "stepping", facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk stat](autoplot_GRanges-stat10.png) 
+![plot of chunk stat](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-stat10.png) 
 
 {% highlight r %}
 
@@ -305,7 +305,7 @@ autoplot(gr[idx], stat = "stepping", facets = sample ~ seqnames)
 autoplot(gr, stat = "aggregate", aes(y = value), geom = "boxplot")
 {% endhighlight %}
 
-![plot of chunk stat](autoplot_GRanges-stat11.png) 
+![plot of chunk stat](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-stat11.png) 
 
 {% highlight r %}
 ## FIXME: aggregate error
@@ -381,7 +381,7 @@ is useful for grand linear view as Manhattan plot or circular view.
 autoplot(gr, coord = "genome")
 {% endhighlight %}
 
-![plot of chunk coord:genome](autoplot_GRanges-coord:genome.png) 
+![plot of chunk coord:genome](http://tengfei.github.com/ggbio/autoplot/autoplot_GRanges-coord:genome.png) 
 
 
 Layout circle is another special transformation.

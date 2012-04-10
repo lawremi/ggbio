@@ -58,7 +58,7 @@ ggplot() + stat_mismatch(bf, which = genesymbol["RBM17"], bsgenome = Hsapiens,
     theme_bw()
 {% endhighlight %}
 
-![plot of chunk BamFile](stat_mismatch-BamFile.png) 
+![plot of chunk BamFile](http://tengfei.github.com/ggbio/stat/stat_mismatch-BamFile.png) 
 
 
 Sometimes bam file and *BSgenome* object might have a different naming schema
@@ -86,19 +86,19 @@ And directly plot the mismatch *GRanges* object.
 ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE)
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v1.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v1.png) 
 
 {% highlight r %}
 ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE)
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v2.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v2.png) 
 
 {% highlight r %}
 ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE, geom = "bar")
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v3.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v3.png) 
 
 {% highlight r %}
 
@@ -292,7 +292,7 @@ pgr.match
 p.v
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v4.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v4.png) 
 
 {% highlight r %}
 p1 <- ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE) + 
@@ -300,14 +300,14 @@ p1 <- ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE) +
 p.v
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v5.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v5.png) 
 
 {% highlight r %}
 p3 <- autoplot(Hsapiens, which = rng.ori) + opts(legend.position = "none")
 p3
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v6.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v6.png) 
 
 {% highlight r %}
 obj <- tracks(p1, p.v, p3, heights = c(4, 0.9, 1), xlim = c(25235400, 
@@ -318,7 +318,7 @@ obj <- tracks(p1, p.v, p3, heights = c(4, 0.9, 1), xlim = c(25235720,
 obj
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v7.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v7.png) 
 
 {% highlight r %}
 pdf("~/Desktop/mismatch.pdf", 18.3, 5.98)
@@ -326,7 +326,7 @@ obj
 dev.off()
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v8.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v8.png) 
 
 {% highlight text %}
 ## pdf 
@@ -340,13 +340,13 @@ dev.off()
 obj
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v9.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v9.png) 
 
 {% highlight r %}
 update(obj, xlim = c(25238120, 25238470))
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v10.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v10.png) 
 
 {% highlight text %}
 ## NULL
@@ -358,7 +358,7 @@ update(obj, xlim = c(25238120, 25238470))
 update(obj, xlim = c(25235400, 25236100))
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v11.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v11.png) 
 
 {% highlight text %}
 ## NULL
@@ -370,7 +370,7 @@ update(obj, xlim = c(25235400, 25236100))
 ggbio:::reset(obj)
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v12.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v12.png) 
 
 {% highlight r %}
 
@@ -394,7 +394,7 @@ tracks(p0, p1, p2, heights = c(4, 4, 1.5), xlim = c(30080800 + 20,
 dev.off()
 {% endhighlight %}
 
-![plot of chunk pag_v](stat_mismatch-pag_v13.png) 
+![plot of chunk pag_v](http://tengfei.github.com/ggbio/stat/stat_mismatch-pag_v13.png) 
 
 {% highlight text %}
 ## pdf 

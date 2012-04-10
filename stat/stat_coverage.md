@@ -140,31 +140,31 @@ variable.
 ggplot() + stat_coverage(gr)
 {% endhighlight %}
 
-![plot of chunk geom](stat_coverage-geom1.png) 
+![plot of chunk geom](http://tengfei.github.com/ggbio/stat/stat_coverage-geom1.png) 
 
 {% highlight r %}
 ggplot() + stat_coverage(gr, geom = "point")
 {% endhighlight %}
 
-![plot of chunk geom](stat_coverage-geom2.png) 
+![plot of chunk geom](http://tengfei.github.com/ggbio/stat/stat_coverage-geom2.png) 
 
 {% highlight r %}
 ggplot() + stat_coverage(gr, aes(y = ..coverage..), geom = "histogram")
 {% endhighlight %}
 
-![plot of chunk geom](stat_coverage-geom3.png) 
+![plot of chunk geom](http://tengfei.github.com/ggbio/stat/stat_coverage-geom3.png) 
 
 {% highlight r %}
 ggplot() + stat_coverage(gr, aes(y = ..coverage..), geom = "area")
 {% endhighlight %}
 
-![plot of chunk geom](stat_coverage-geom4.png) 
+![plot of chunk geom](http://tengfei.github.com/ggbio/stat/stat_coverage-geom4.png) 
 
 {% highlight r %}
 ggplot() + stat_coverage(gr, geom = "smooth")
 {% endhighlight %}
 
-![plot of chunk geom](stat_coverage-geom5.png) 
+![plot of chunk geom](http://tengfei.github.com/ggbio/stat/stat_coverage-geom5.png) 
 
 
 Facetting, column for `seqnames` is requried.
@@ -174,7 +174,7 @@ Facetting, column for `seqnames` is requried.
 ggplot() + stat_coverage(gr, geom = "line", facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk facet:sample](stat_coverage-facet:sample.png) 
+![plot of chunk facet:sample](http://tengfei.github.com/ggbio/stat/stat_coverage-facet:sample.png) 
 
 
 Faceted by strand help you understand coverage from different sequencing direction. 
@@ -184,7 +184,7 @@ Faceted by strand help you understand coverage from different sequencing directi
 ggplot() + stat_coverage(gr, geom = "line", facets = strand ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk facet:strand](stat_coverage-facet:strand.png) 
+![plot of chunk facet:strand](http://tengfei.github.com/ggbio/stat/stat_coverage-facet:strand.png) 
 
 
 Let's create a *GRangesList* object.
@@ -209,7 +209,7 @@ For *GRangesList* object, default is coerce it to *GRanges*.
 ggplot() + stat_coverage(grl)
 {% endhighlight %}
 
-![plot of chunk grl:default](stat_coverage-grl:default.png) 
+![plot of chunk grl:default](http://tengfei.github.com/ggbio/stat/stat_coverage-grl:default.png) 
 
 
 Internal variable `..grl_name..` added to keep a track for grouping information,
@@ -221,7 +221,7 @@ ggplot() + stat_coverage(grl, geom = "area", facets = ..grl_name.. ~
     seqnames, aes(fill = ..grl_name..))
 {% endhighlight %}
 
-![plot of chunk grl:facet](stat_coverage-grl:facet.png) 
+![plot of chunk grl:facet](http://tengfei.github.com/ggbio/stat/stat_coverage-grl:facet.png) 
 
 
 Load a RNA-seq data

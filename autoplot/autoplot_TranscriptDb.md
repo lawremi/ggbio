@@ -89,7 +89,7 @@ p2 <- ggplot() + stat_gene(txdb, which = genesymbol["ALDOA"], geom = "reduced_ge
 tracks(p1, p2, heights = c(3, 1))
 {% endhighlight %}
 
-![plot of chunk tracks](autoplot_TranscriptDb-tracks.png) 
+![plot of chunk tracks](http://tengfei.github.com/ggbio/autoplot/autoplot_TranscriptDb-tracks.png) 
 
 
 `which` argument also accept gene id.
@@ -102,6 +102,6 @@ p3 <- autoplot(txdb, which = list(gene_id = aldoa_eg))
 p3
 {% endhighlight %}
 
-![plot of chunk id](autoplot_TranscriptDb-id.png) 
+![plot of chunk id](http://tengfei.github.com/ggbio/autoplot/autoplot_TranscriptDb-id.png) 
 
 

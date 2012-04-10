@@ -215,7 +215,7 @@ library(BSgenome.Hsapiens.UCSC.hg19)
 autoplot(bf, stat = "mismatch", which = genesymbol["ALDOA"], bsgenome = Hsapiens)
 {% endhighlight %}
 
-![plot of chunk mismatch](autoplot_BamFile-mismatch1.png) 
+![plot of chunk mismatch](http://tengfei.github.com/ggbio/autoplot/autoplot_BamFile-mismatch1.png) 
 
 {% highlight r %}
 
@@ -235,7 +235,7 @@ autoplot(bf, geom = "gapped.pair", which = genesymbol["ALDOA"])
 ## plotting...
 {% endhighlight %}
 
-![plot of chunk mismatch](autoplot_BamFile-mismatch2.png) 
+![plot of chunk mismatch](http://tengfei.github.com/ggbio/autoplot/autoplot_BamFile-mismatch2.png) 
 
 
 If you specify other geom and stat, this will simply parse a set of short reads
@@ -248,7 +248,7 @@ library(biovizBase)
 autoplot(bf, geom = "segment", stat = "stepping", which = genesymbol["ALDOA"])
 {% endhighlight %}
 
-![plot of chunk other](autoplot_BamFile-other.png) 
+![plot of chunk other](http://tengfei.github.com/ggbio/autoplot/autoplot_BamFile-other.png) 
 
 
 

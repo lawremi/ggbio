@@ -64,6 +64,6 @@ p4 <- autoplot(ga, geom = "line", stat = "coverage")
 tracks(p1, p2, p3, p4)
 {% endhighlight %}
 
-![plot of chunk exp](autoplot_GappedAlignments-exp.png) 
+![plot of chunk exp](http://tengfei.github.com/ggbio/autoplot/autoplot_GappedAlignments-exp.png) 
 
 

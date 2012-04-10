@@ -44,7 +44,7 @@ p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "reduced_ge
 tracks(p1, p2, heights = c(3, 1))
 {% endhighlight %}
 
-![plot of chunk tracks](stat_gene-tracks1.png) 
+![plot of chunk tracks](http://tengfei.github.com/ggbio/stat/stat_gene-tracks1.png) 
 
 {% highlight r %}
 library(biovizBase)
@@ -53,13 +53,13 @@ p3 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "gene",
 p3
 {% endhighlight %}
 
-![plot of chunk tracks](stat_gene-tracks2.png) 
+![plot of chunk tracks](http://tengfei.github.com/ggbio/stat/stat_gene-tracks2.png) 
 
 {% highlight r %}
 autoplot(txdb, which = genesymbol["RBM17"], geom = "gene", truncate.gaps = TRUE)
 {% endhighlight %}
 
-![plot of chunk tracks](stat_gene-tracks3.png) 
+![plot of chunk tracks](http://tengfei.github.com/ggbio/stat/stat_gene-tracks3.png) 
 
 
   

@@ -82,37 +82,37 @@ aesthetics mapping works for those extra information too.
 autoplot(ir)
 {% endhighlight %}
 
-![plot of chunk exp](autoplot_IRanges-exp1.png) 
+![plot of chunk exp](http://tengfei.github.com/ggbio/autoplot/autoplot_IRanges-exp1.png) 
 
 {% highlight r %}
 autoplot(ir, aes(fill = pair))
 {% endhighlight %}
 
-![plot of chunk exp](autoplot_IRanges-exp2.png) 
+![plot of chunk exp](http://tengfei.github.com/ggbio/autoplot/autoplot_IRanges-exp2.png) 
 
 {% highlight r %}
 autoplot(ir, stat = "coverage", geom = "line")
 {% endhighlight %}
 
-![plot of chunk exp](autoplot_IRanges-exp3.png) 
+![plot of chunk exp](http://tengfei.github.com/ggbio/autoplot/autoplot_IRanges-exp3.png) 
 
 {% highlight r %}
 autoplot(ir, stat = "coverage", geom = "point")
 {% endhighlight %}
 
-![plot of chunk exp](autoplot_IRanges-exp4.png) 
+![plot of chunk exp](http://tengfei.github.com/ggbio/autoplot/autoplot_IRanges-exp4.png) 
 
 {% highlight r %}
 autoplot(ir, stat = "coverage", geom = "line", facets = sample ~ 
     .)
 {% endhighlight %}
 
-![plot of chunk exp](autoplot_IRanges-exp5.png) 
+![plot of chunk exp](http://tengfei.github.com/ggbio/autoplot/autoplot_IRanges-exp5.png) 
 
 {% highlight r %}
 autoplot(ir, stat = "boxplot", aes(y = score, x = sample))
 {% endhighlight %}
 
-![plot of chunk exp](autoplot_IRanges-exp6.png) 
+![plot of chunk exp](http://tengfei.github.com/ggbio/autoplot/autoplot_IRanges-exp6.png) 
 
 

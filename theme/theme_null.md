@@ -51,7 +51,7 @@ Default theme is with gray background, it's actually a preset theme in
 autoplot(gr)
 {% endhighlight %}
 
-![plot of chunk default](theme_null-default.png) 
+![plot of chunk default](http://tengfei.github.com/ggbio/theme/theme_null-default.png) 
 
 
 Compare to `theme_gray`, here is how we make blank theme with `theme_null`.
@@ -61,5 +61,5 @@ Compare to `theme_gray`, here is how we make blank theme with `theme_null`.
 autoplot(gr) + theme_null()
 {% endhighlight %}
 
-![plot of chunk theme_null](theme_null-theme_null.png) 
+![plot of chunk theme_null](http://tengfei.github.com/ggbio/theme/theme_null-theme_null.png) 
 

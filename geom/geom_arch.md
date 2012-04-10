@@ -66,7 +66,7 @@ get gaps intervals to show the links between exons.
 ggplot() + geom_arch(gr)
 {% endhighlight %}
 
-![plot of chunk default](geom_arch-default.png) 
+![plot of chunk default](http://tengfei.github.com/ggbio/geom/geom_arch-default.png) 
 
 
 Facetting and aesthetics mapping are supported, make sure you put your
@@ -81,7 +81,7 @@ ggplot() + geom_arch(gr, aes(color = value, height = value, size = value),
     alpha = 0.2, facets = sample ~ seqnames)
 {% endhighlight %}
 
-![plot of chunk facet_aes](geom_arch-facet_aes.png) 
+![plot of chunk facet_aes](http://tengfei.github.com/ggbio/geom/geom_arch-facet_aes.png) 
 
 
 

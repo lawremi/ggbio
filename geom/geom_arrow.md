@@ -61,7 +61,7 @@ plotting, it's a very rough exploration as first step for some interval data.
 ggplot() + geom_arrow(gr)
 {% endhighlight %}
 
-![plot of chunk default](geom_arrow-default.png) 
+![plot of chunk default](http://tengfei.github.com/ggbio/geom/geom_arrow-default.png) 
 
 
 Facetting and aesthetics mapping are supported, make sure you put your
@@ -77,7 +77,7 @@ ggplot() + geom_arrow(gr, facets = sample ~ seqnames, aes(color = strand,
     fill = strand))
 {% endhighlight %}
 
-![plot of chunk facet_aes](geom_arrow-facet_aes.png) 
+![plot of chunk facet_aes](http://tengfei.github.com/ggbio/geom/geom_arrow-facet_aes.png) 
 
 
 Stat "identity" allows you to specify a y value to use as y-axis instead of
@@ -92,7 +92,7 @@ default stepping level.
 ggplot() + geom_arrow(gr, stat = "identity", aes(y = value))
 {% endhighlight %}
 
-![plot of chunk stat:identity](geom_arrow-stat:identity.png) 
+![plot of chunk stat:identity](http://tengfei.github.com/ggbio/geom/geom_arrow-stat:identity.png) 
 
 
 `group` make sure grouped intervals are on the same levels when `stat =
@@ -108,7 +108,7 @@ intervals assigned in the same group are overlapped with each other.
 ggplot() + geom_arrow(gr, stat = "stepping", aes(group = pair))
 {% endhighlight %}
 
-![plot of chunk stat:stepping](geom_arrow-stat:stepping.png) 
+![plot of chunk stat:stepping](http://tengfei.github.com/ggbio/geom/geom_arrow-stat:stepping.png) 
 
 
 `group.selfish` force the grouped intervals to take unique stepping level,
@@ -116,10 +116,10 @@ ggplot() + geom_arrow(gr, stat = "stepping", aes(group = pair))
   it's disabled, the y-label will be automatically hided to avoid overlapped
   group labels as y axis.
 
-![plot of chunk group.selfish](geom_arrow-group.selfish.png) 
+![plot of chunk group.selfish](http://tengfei.github.com/ggbio/geom/geom_arrow-group.selfish.png) 
 
 
 There are some other options to control the appearance of arrows.
-![plot of chunk options](geom_arrow-options.png) 
+![plot of chunk options](http://tengfei.github.com/ggbio/geom/geom_arrow-options.png) 
 
 

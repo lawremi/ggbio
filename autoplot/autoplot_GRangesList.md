@@ -77,19 +77,19 @@ separately controlled.
 autoplot(grl)
 {% endhighlight %}
 
-![plot of chunk exp](autoplot_GRangesList-exp1.png) 
+![plot of chunk exp](http://tengfei.github.com/ggbio/autoplot/autoplot_GRangesList-exp1.png) 
 
 {% highlight r %}
 autoplot(grl, group.selfish = TRUE)
 {% endhighlight %}
 
-![plot of chunk exp](autoplot_GRangesList-exp2.png) 
+![plot of chunk exp](http://tengfei.github.com/ggbio/autoplot/autoplot_GRangesList-exp2.png) 
 
 {% highlight r %}
 autoplot(grl, group.selfish = TRUE, main.geom = "arrowrect", gap.geom = "segment")
 {% endhighlight %}
 
-![plot of chunk exp](autoplot_GRangesList-exp3.png) 
+![plot of chunk exp](http://tengfei.github.com/ggbio/autoplot/autoplot_GRangesList-exp3.png) 
 
 
 Internal variable `grl_name` added to keep a track for grouping information, you
@@ -103,7 +103,7 @@ that it's interval variables.
 autoplot(grl, aes(fill = ..grl_name..))
 {% endhighlight %}
 
-![plot of chunk grl_name](autoplot_GRangesList-grl_name.png) 
+![plot of chunk grl_name](http://tengfei.github.com/ggbio/autoplot/autoplot_GRangesList-grl_name.png) 
 
 {% highlight r %}
 ## equal to autoplot(grl, aes(fill = grl_name))

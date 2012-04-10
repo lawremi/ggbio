@@ -68,7 +68,7 @@ plotting, it's a very rough exploration as first step for some interval data.
 ggplot() + geom_alignment(gr)
 {% endhighlight %}
 
-![plot of chunk default](geom_alignment-default.png) 
+![plot of chunk default](http://tengfei.github.com/ggbio/geom/geom_alignment-default.png) 
 
 
 Facetting and aesthetics mapping are supported, make sure you put your
@@ -84,7 +84,7 @@ ggplot() + geom_alignment(gr, facets = sample ~ seqnames, aes(color = strand,
     fill = strand))
 {% endhighlight %}
 
-![plot of chunk facet_aes](geom_alignment-facet_aes.png) 
+![plot of chunk facet_aes](http://tengfei.github.com/ggbio/geom/geom_alignment-facet_aes.png) 
 
 
 
@@ -101,7 +101,7 @@ intervals assigned in the same group are overlapped with each other.
 ggplot() + geom_alignment(gr, stat = "stepping", aes(group = pair))
 {% endhighlight %}
 
-![plot of chunk stat:stepping](geom_alignment-stat:stepping.png) 
+![plot of chunk stat:stepping](http://tengfei.github.com/ggbio/geom/geom_alignment-stat:stepping.png) 
 
 
 `group.selfish` force the grouped intervals to take unique stepping level,
@@ -109,7 +109,7 @@ ggplot() + geom_alignment(gr, stat = "stepping", aes(group = pair))
   it's disabled, the y-label will be automatically hided to avoid overlapped
   group labels as y axis.
 
-![plot of chunk group.selfish](geom_alignment-group.selfish.png) 
+![plot of chunk group.selfish](http://tengfei.github.com/ggbio/geom/geom_alignment-group.selfish.png) 
 
 
 We allow you to change main geoms and gaps geoms too, you can always use
@@ -125,7 +125,7 @@ gap.geom.
 ggplot() + geom_alignment(gr, main.geom = "arrowrect", gap.geom = "chevron")
 {% endhighlight %}
 
-![plot of chunk main_gap](geom_alignment-main_gap.png) 
+![plot of chunk main_gap](http://tengfei.github.com/ggbio/geom/geom_alignment-main_gap.png) 
 
 
 

@@ -44,16 +44,16 @@ setMethod("geom_arch", "data.frame", function(data, ...,
   xx<-c(1,xx,rev(-xx),-1)
   yy<-c(0,yy,rev(yy), 0)
   ##SETS UP DATAFRAME TO KEEP TRACK OF ALL POINTS TO DRAW ALL ARCHES
-  apoint<-data.frame()
-  jump<-abs(endX-startX)
-  jumpAdj <- max(jump)/max(abs(h))
-  for(i in 1:length(startX)){
-    temp<-data.frame(xx = xx*(abs(startX[i]-endX[i])/2)+(startX[i]+endX[i])/2,
-                     yy=yy*h[i]+y[i],
-                     junc = i,
-                     s=((abs(h[i])-jump[i]/jumpAdj))/max(jump))
-    apoint<-rbind(apoint,temp)	
-  }
+  junc <- rep(seq_along(startX), each = length(xx))
+  startX <- rep(startX, each = length(xx))
+  endX <- rep(endX, each = length(xx))
+  h <- rep(h, each = length(xx))
+  y <- rep(y, each = length(xx))
+  jump <- abs(endX - startX)
+  jumpAdj <- max(jump) / max(abs(h))
+  apoint <- data.frame(xx = xx * (abs(startX - endX) / 2) + (startX + endX) / 2,
+                       yy = yy * h + y, junc,
+                       s = ((abs(h) - jump / jumpAdj)) / max(jump))
   data$junc <- seq_len(nrow(data))
   apoint <- merge(apoint, data, by = "junc")
   args.aes <- list(x = as.name("xx"),

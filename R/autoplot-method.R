@@ -88,17 +88,12 @@ setMethod("autoplot", "GRanges", function(object, ...,
     if(!legend)
       p <- c(p, list(opts(legend.position = "none")))
     
-    if(missing(xlab)){
+    if(missing(xlab)) {
       chrs <- unique(seqnames(object))
       gms <- genome(object)
-      gm <- unique(gms[chrs])
-      chrs.tx <- paste(chrs, sep = ",")    
-      if(is.na(gm)){
-        xlab <- chrs.tx
-      }else{
-        gm.tx <- paste(gm)
-        xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
-      }
+      gm <- gms[chrs]
+      xlab <- paste(ifelse(is.na(gm), chrs, paste0(gm, "::", chrs)),
+                    collapse = ",")
     }
     p <- c(p, list(xlab(xlab)))
     ## tweak with default y lab

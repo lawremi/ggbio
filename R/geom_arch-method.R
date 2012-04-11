@@ -62,10 +62,14 @@ setMethod("geom_arch", "data.frame", function(data, ...,
                   group = as.name("junc"))
   
   aesres <- do.call(aes, c(args.aes, args.aes2))
-  reslst <- c(list(data = apoint), list(aesres),args.non)
-  do.call(geom_line, reslst)
+  if(nrow(apoint)){
+    reslst <- c(list(data = apoint), list(aesres),args.non)
+    p <- do.call(geom_line, reslst)
+  }else{
+    p <- NULL
+  }
+  p
 })
-
 
 ## that means span the range of two end 
 setMethod("geom_arch", "GRanges", function(data, ..., facets = NULL, rect.height = 0.4,
@@ -95,13 +99,15 @@ setMethod("geom_arch", "GRanges", function(data, ..., facets = NULL, rect.height
     df$.y <- rep(0, nrow(df)) + rect.height * signs
     args.aes$y <- substitute(.y)
   }
-
-
-  args.res <- c(list(data = df),
-                args.non,
-                list(do.call(aes, args.aes)))
-  p <- do.call(geom_arch, args.res)
-  p <- c(list(p) , list(facet))            
+  if(nrow(df)){
+    args.res <- c(list(data = df),
+                  args.non,
+                  list(do.call(aes, args.aes)))
+    p <- do.call(geom_arch, args.res)
+    p <- c(list(p) , list(facet))
+  }else{
+    p <- NULL
+  }
   p
 })
 

@@ -50,10 +50,11 @@ setMethod("geom_arch", "data.frame", function(data, ...,
   h <- rep(h, each = length(xx))
   y <- rep(y, each = length(xx))
   jump <- abs(endX - startX)
-  jumpAdj <- max(jump) / max(abs(h))
+  jumpAdj <- if (length(jump)) max(jump) / max(abs(h)) else NA
   apoint <- data.frame(xx = xx * (abs(startX - endX) / 2) + (startX + endX) / 2,
                        yy = yy * h + y, junc,
-                       s = ((abs(h) - jump / jumpAdj)) / max(jump))
+                       s = ((abs(h) - jump / jumpAdj)) /
+                           if (length(jump)) max(jump) else NA)
   data$junc <- seq_len(nrow(data))
   apoint <- merge(apoint, data, by = "junc")
   args.aes <- list(x = as.name("xx"),

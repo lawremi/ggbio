@@ -1,5 +1,5 @@
 ---
-layout: portfolio
+layout: post
 title: How to process your data and manupulate a GRanges object
 category: blog
 ---

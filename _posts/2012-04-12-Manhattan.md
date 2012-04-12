@@ -52,7 +52,7 @@ gr <- GRanges(rep(c("chr1", "chr2"), each = 5), IRanges(start = rep(seq(1,
 autoplot(gr)
 {% endhighlight %}
 
-![plot of chunk simul_gr](http://tengfei.github.com/ggbio/_posts/manhattan-simul_gr.png) 
+![plot of chunk simul_gr](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-simul_gr.png) 
 
 
 What if we specify the coordinate system to be "genome" in `autoplot`, there is
@@ -75,7 +75,7 @@ original one, you could use this for aesthetics mapping. Extra arguments called
 autoplot(gr, coord = "genome")
 {% endhighlight %}
 
-![plot of chunk coord:genome](http://tengfei.github.com/ggbio/_posts/manhattan-coord:genome.png) 
+![plot of chunk coord:genome](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-coord:genome.png) 
 
 {% highlight r %}
 gr.t <- transformToGenome(gr)
@@ -204,7 +204,7 @@ autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue),
     space.skip = 0.01)
 {% endhighlight %}
 
-![plot of chunk unorder](http://tengfei.github.com/ggbio/_posts/manhattan-unorder.png) 
+![plot of chunk unorder](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-unorder.png) 
 
 
 That's probably not what you want, if you want to change to specific order, just
@@ -217,7 +217,7 @@ autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue),
     space.skip = 0.01)
 {% endhighlight %}
 
-![plot of chunk sort](http://tengfei.github.com/ggbio/_posts/manhattan-sort.png) 
+![plot of chunk sort](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-sort.png) 
 
 
 **NOTICE**, the data now doesn't have information about lengths of each
@@ -265,7 +265,7 @@ autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue),
     space.skip = 0.01)
 {% endhighlight %}
 
-![plot of chunk with_seql](http://tengfei.github.com/ggbio/_posts/manhattan-with_seql.png) 
+![plot of chunk with_seql](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-with_seql.png) 
 
 
 In `autoplot`, argument `coord` is just used to transform the data, after that,
@@ -278,7 +278,7 @@ autoplot(gr.snp, coord = "genome", geom = "line", aes(y = pvalue,
     group = .ori.seqnames, color = .ori.seqnames))
 {% endhighlight %}
 
-![plot of chunk line](http://tengfei.github.com/ggbio/_posts/manhattan-line.png) 
+![plot of chunk line](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-line.png) 
 
 
 ## Step 4: Convenient `plotGrandLinear` function <a id = "s4"></a>
@@ -315,32 +315,32 @@ Color mapping is automatically figured out by *ggbio* following the rules
 plotGrandLinear(gr.snp, aes(y = pvalue))
 {% endhighlight %}
 
-![plot of chunk morecolor](http://tengfei.github.com/ggbio/_posts/manhattan-morecolor1.png) 
+![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor1.png) 
 
 {% highlight r %}
 plotGrandLinear(gr.snp, aes(y = pvalue, color = seqnames))
 {% endhighlight %}
 
-![plot of chunk morecolor](http://tengfei.github.com/ggbio/_posts/manhattan-morecolor2.png) 
+![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor2.png) 
 
 {% highlight r %}
 plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue"))
 {% endhighlight %}
 
-![plot of chunk morecolor](http://tengfei.github.com/ggbio/_posts/manhattan-morecolor3.png) 
+![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor3.png) 
 
 {% highlight r %}
 plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue", 
     "red"))
 {% endhighlight %}
 
-![plot of chunk morecolor](http://tengfei.github.com/ggbio/_posts/manhattan-morecolor4.png) 
+![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor4.png) 
 
 {% highlight r %}
 plotGrandLinear(gr.snp, aes(y = pvalue), color = "red")
 {% endhighlight %}
 
-![plot of chunk morecolor](http://tengfei.github.com/ggbio/_posts/manhattan-morecolor5.png) 
+![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor5.png) 
 
 
 You can also add cutoff line
@@ -351,7 +351,7 @@ plotGrandLinear(gr.snp, aes(y = pvalue), cutoff = 3, cutoff.color = "blue",
     cutoff.size = 4)
 {% endhighlight %}
 
-![plot of chunk cutoff](http://tengfei.github.com/ggbio/_posts/manhattan-cutoff.png) 
+![plot of chunk cutoff](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-cutoff.png) 
 
 
 This is equivalent to 
@@ -362,7 +362,7 @@ plotGrandLinear(gr.snp, aes(y = pvalue)) + geom_hline(yintercept = 3,
     color = "blue", size = 4)
 {% endhighlight %}
 
-![plot of chunk cutoff-low](http://tengfei.github.com/ggbio/_posts/manhattan-cutoff-low.png) 
+![plot of chunk cutoff-low](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-cutoff-low.png) 
 
 
 Sometimes the names of chromosomes maybe very long, you may want to rotate them
@@ -373,7 +373,7 @@ plotGrandLinear(gr.snp, aes(y = pvalue)) + opts(axis.text.x = theme_text(angle =
     hjust = 0))
 {% endhighlight %}
 
-![plot of chunk rotate](http://tengfei.github.com/ggbio/_posts/manhattan-rotate.png) 
+![plot of chunk rotate](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-rotate.png) 
 
 all utilities works for *ggplot2* will work for *ggbio* too.
 

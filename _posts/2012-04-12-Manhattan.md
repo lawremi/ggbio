@@ -88,16 +88,16 @@ head(gr.t)
 ## GRanges with 6 ranges and 1 elementMetadata col:
 ##       seqnames     ranges strand |      .ori
 ##          <Rle>  <IRanges>  <Rle> | <GRanges>
-##   [1]   genome [ 30,  79]      * |  ########
-##   [2]   genome [ 54, 103]      * |  ########
-##   [3]   genome [ 79, 128]      * |  ########
-##   [4]   genome [104, 153]      * |  ########
-##   [5]   genome [129, 178]      * |  ########
-##   [6]   genome [209, 258]      * |  ########
+##   [1]   genome [  1,  50]      * |  ########
+##   [2]   genome [ 25,  74]      * |  ########
+##   [3]   genome [ 50,  99]      * |  ########
+##   [4]   genome [ 75, 124]      * |  ########
+##   [5]   genome [100, 149]      * |  ########
+##   [6]   genome [179, 228]      * |  ########
 ##   ---
 ##   seqlengths:
 ##    genome
-##       357
+##       327
 {% endhighlight %}
 
 
@@ -430,12 +430,13 @@ sessionInfo()
 ## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
-## [1] methods   stats     graphics  grDevices utils     datasets  base     
+## [1] grid      methods   stats     graphics  grDevices utils     datasets 
+## [8] base     
 ## 
 ## other attached packages:
-## [1] ggbio_1.3.0         ggplot2_0.9.0       rtracklayer_1.16.0 
-## [4] biovizBase_1.3.0    GenomicRanges_1.8.3 IRanges_1.14.2     
-## [7] BiocGenerics_0.2.0  knitr_0.4          
+## [1] gridExtra_0.9       ggbio_1.3.0         ggplot2_0.9.0      
+## [4] rtracklayer_1.16.0  biovizBase_1.3.0    GenomicRanges_1.8.3
+## [7] IRanges_1.14.2      BiocGenerics_0.2.0  knitr_0.4          
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] AnnotationDbi_1.18.0    Biobase_2.16.0         
@@ -445,21 +446,20 @@ sessionInfo()
 ##  [9] colorspace_1.1-1        DBI_0.2-5              
 ## [11] dichromat_1.2-4         digest_0.5.2           
 ## [13] evaluate_0.4.2          formatR_0.4            
-## [15] GenomicFeatures_1.8.1   grid_2.16.0            
-## [17] gridExtra_0.9           highlight_0.3.1        
-## [19] Hmisc_3.9-3             lattice_0.20-6         
-## [21] MASS_7.3-17             Matrix_1.0-6           
-## [23] memoise_0.1             munsell_0.3            
-## [25] parser_0.0-14           plyr_1.7.1             
-## [27] proto_0.3-9.2           RColorBrewer_1.0-5     
-## [29] Rcpp_0.9.10             RCurl_1.91-1           
-## [31] reshape2_1.2.1          Rsamtools_1.8.0        
-## [33] RSQLite_0.11.1          scales_0.2.0           
-## [35] snpStats_1.6.0          splines_2.16.0         
-## [37] stats4_2.16.0           stringr_0.6            
-## [39] survival_2.36-12        tools_2.16.0           
-## [41] VariantAnnotation_1.2.5 XML_3.9-4              
-## [43] zlibbioc_1.2.0         
+## [15] GenomicFeatures_1.8.1   highlight_0.3.1        
+## [17] Hmisc_3.9-3             lattice_0.20-6         
+## [19] MASS_7.3-17             Matrix_1.0-6           
+## [21] memoise_0.1             munsell_0.3            
+## [23] parser_0.0-14           plyr_1.7.1             
+## [25] proto_0.3-9.2           RColorBrewer_1.0-5     
+## [27] Rcpp_0.9.10             RCurl_1.91-1           
+## [29] reshape2_1.2.1          Rsamtools_1.8.0        
+## [31] RSQLite_0.11.1          scales_0.2.0           
+## [33] snpStats_1.6.0          splines_2.16.0         
+## [35] stats4_2.16.0           stringr_0.6            
+## [37] survival_2.36-12        tools_2.16.0           
+## [39] VariantAnnotation_1.2.5 XML_3.9-4              
+## [41] zlibbioc_1.2.0         
 {% endhighlight %}
 
 

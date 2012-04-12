@@ -230,37 +230,7 @@ autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue),
 
 {% highlight r %}
 names(seqlths) <- gsub("chr", "", names(seqlths))
-seqlths
-{% endhighlight %}
-
-
-
-{% highlight text %}
-##         1        10        11        12        13        14        15 
-## 249250621 135534747 135006516 133851895 115169878 107349540 102531392 
-##        16        17        18        19         2        20        21 
-##  90354753  81195210  78077248  59128983 243199373  63025520  48129895 
-##        22         3         4         5         6         7         8 
-##  51304566 198022430 191154276 180915260 171115067 159138663 146364022 
-##         9         X         Y 
-## 141213431 155270560  59373566 
-{% endhighlight %}
-
-
-
-{% highlight r %}
-seqlengths(gr.snp) <- seqlths
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Error: when the supplied 'seqlengths' vector is named, the names must match the seqnames
-{% endhighlight %}
-
-
-
-{% highlight r %}
+seqlengths(gr.snp) <- seqlths[names(seqlengths(gr.snp))]
 autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), 
     space.skip = 0.01)
 {% endhighlight %}
@@ -289,16 +259,10 @@ convenient to use. Here for *Manhattan plot*, we have a function called
 
 
 {% highlight r %}
-plotGrandLinear(gr.snp, y = pvalue)
+plotGrandLinear(gr.snp, aes(y = pvalue))
 {% endhighlight %}
 
-
-
-{% highlight text %}
-## Error: object 'pvalue' not found
-{% endhighlight %}
-
-
+![plot of chunk plotGrandLinear](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-plotGrandLinear.png) 
 
 
 Color mapping is automatically figured out by *ggbio* following the rules
@@ -312,35 +276,29 @@ Color mapping is automatically figured out by *ggbio* following the rules
 
 
 {% highlight r %}
-plotGrandLinear(gr.snp, aes(y = pvalue))
+plotGrandLinear(gr.snp, aes(y = pvalue, color = seqnames))
 {% endhighlight %}
 
 ![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor1.png) 
 
 {% highlight r %}
-plotGrandLinear(gr.snp, aes(y = pvalue, color = seqnames))
-{% endhighlight %}
-
-![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor2.png) 
-
-{% highlight r %}
 plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue"))
 {% endhighlight %}
 
-![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor3.png) 
+![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor2.png) 
 
 {% highlight r %}
 plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue", 
     "red"))
 {% endhighlight %}
 
-![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor4.png) 
+![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor3.png) 
 
 {% highlight r %}
 plotGrandLinear(gr.snp, aes(y = pvalue), color = "red")
 {% endhighlight %}
 
-![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor5.png) 
+![plot of chunk morecolor](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-morecolor4.png) 
 
 
 You can also add cutoff line
@@ -384,13 +342,13 @@ seqlengths(gr.snp)
 
 {% highlight text %}
 ##  chr000001  chr000002  chr000003  chr000004  chr000005  chr000006 
-##         NA         NA         NA         NA         NA         NA 
+##  249250621  243199373  198022430  191154276  180915260  171115067 
 ##  chr000007  chr000008  chr000009 chr0000010 chr0000011 chr0000012 
-##         NA         NA         NA         NA         NA         NA 
+##  159138663  146364022  141213431  135534747  135006516  133851895 
 ## chr0000013 chr0000014 chr0000015 chr0000016 chr0000017 chr0000018 
-##         NA         NA         NA         NA         NA         NA 
+##  115169878  107349540  102531392   90354753   81195210   78077248 
 ## chr0000019 chr0000020 chr0000021 chr0000022  chr00000X  chr00000Y 
-##         NA         NA         NA         NA         NA         NA 
+##   59128983   63025520   48129895   51304566  155270560   59373566 
 {% endhighlight %}
 
 

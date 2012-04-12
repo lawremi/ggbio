@@ -87,9 +87,10 @@ setMethod("autoplot", "GRanges", function(object, ...,
     p <- list(do.call(.fun, args.res))
     if(!legend)
       p <- c(p, list(opts(legend.position = "none")))
-    
+
+
     if(missing(xlab)) {
-      chrs <- unique(seqnames(object))
+      chrs <- unique(as.character(seqnames(object)))
       gms <- genome(object)
       gm <- gms[chrs]
       xlab <- paste(ifelse(is.na(gm), chrs, paste0(gm, "::", chrs)),

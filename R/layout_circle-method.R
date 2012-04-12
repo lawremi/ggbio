@@ -86,15 +86,16 @@ setMethod("layout_circle",  "GRanges",
     
   }
   if(geom == "text"){
+    obj <- transformToGenome(data, space.skip)        
     if("label" %in% names(args.aes)){
       lbs <- as.character(args.aes$label)
-      if(!lbs %in% c(colnames(values(data)),"start", "end", "seqnames","width"))
+      if(!lbs %in% c(colnames(fortify(obj[1,])),"start", "end", "seqnames","width"))
         stop("label must be one of column names")
     }else{
       stop("missing label argument in aes()")
     }
-    obj <- gr2newLinear(data, space.skip)    
-    obj <- gr2circle(obj, y = as.character(args.aes$y), radius= radius, width = trackWidth,
+    obj <- transformToCircle(obj, y = as.character(args.aes$y), radius= radius,
+                             trackWidth = trackWidth,
                      direction = direction)
     ## compute angle
     if("angle" %in% names(args.aes)){
@@ -125,14 +126,14 @@ setMethod("layout_circle",  "GRanges",
   }
 
   if(geom == "point"){
-    obj <- gr2newLinear(data, space.skip)
+    obj <- transformToGenome(data, space.skip)
     if(!"y" %in% names(args.aes)){
       .y <- 1
       warning("y is missing in aes(), use equal y")
     }else{
       .y <- as.character(args.aes$y)
     }
-    obj <- gr2circle(obj, y = .y, radius= radius, width = trackWidth,
+    obj <- transformToCircle(obj, y = .y, radius= radius, trackWidth = trackWidth,
                      direction = direction)
     df <- as.data.frame(obj)
     args.aes$y <- as.name(".circle.y")
@@ -146,8 +147,9 @@ setMethod("layout_circle",  "GRanges",
   if(geom == "line"){
     if(!"y" %in% names(args.aes))
       stop("y is missing in aes()")
-    obj <- gr2newLinear(data, space.skip)    
-    obj <- gr2circle(obj, y = as.character(args.aes$y), radius= radius, width = trackWidth,
+    obj <- transformToGenome(data, space.skip)    
+    obj <- transformToCircle(obj, y = as.character(args.aes$y),
+                             radius= radius, trackWidth = trackWidth,
                      direction = direction)
     df <- as.data.frame(obj)
     args.aes$y <- as.name(".circle.y")
@@ -182,8 +184,8 @@ setMethod("layout_circle",  "GRanges",
     values(res0)$scale.y <- 0
     values(res0)$.biovizBase.group <- seq_len(length(res0))
     res <- c(res, res0)
-    res <- gr2newLinear(res, space.skip)    
-    res <- gr2circle(res, y = "scale.y", radius= radius, width = trackWidth,
+    res <- transformToGenome(res, space.skip)    
+    res <- transformToCircle(res, y = "scale.y", radius= radius, trackWidth = trackWidth,
                      direction = direction)
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group)

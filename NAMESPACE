@@ -11,6 +11,7 @@ import(reshape2)
 import(scales)
 import(plyr)
 importFrom(gridExtra, grid.arrange)
+importFrom(Hmisc, bezier)
 ## GenomicRanges
 ## IRanges
 importFrom(IRanges, IRanges,  disjointBins,

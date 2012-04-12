@@ -1,22 +1,32 @@
+## @knitr maf
 mut <- read.csv("/home/tengfei/Datas/circle/CRC9.genomic.v3.maf", sep = "\t")
-idx <- mut$Tumor_Sample_Barcode == "CRC-1-Tumor" &
-       mut$Variant_Classification == "Missense"
 
-mut1 <- mut[idx, ]
-library(GenomicRanges)
-mut.gr <- with(mut1,GRanges(Chromosome, IRanges(Start_position, End_position)))
-mut.gr
+## @knitr subset
+idx <- mut$Tumor_Sample_Barcode == "CRC-1-Tumor" &   mut$Variant_Classification == "Missense"
+crc1 <- mut[idx, 1:13]
+write.csv(crc1, file = "~/Codes/svnrepos/devel/biovizBase/inst/extdata/crc1-missense.csv",
+          row.names = FALSE)
 
-install.packages("xlsx")
+
+## @knitr read.xlsx
 library(xlsx)
 rearr <- read.xlsx("/home/tengfei/Datas/circle/ng.936-S3.xlsx", sheetIndex = 1, rowIndex = 20:702)
-rearr.bk <- rearr
-rearr <- rearr.bk
+
+## rearr.bk <- rearr
+## rearr <- rearr.bk
+## @knitr chr22
 rearr <- rearr[!rearr$chr1 %in% c(23, 24) & !rearr$chr2 %in% c(23, 24), ]
-nms <- colnames(rearr)
+write.csv(rearr, file = "~/Codes/svnrepos/devel/biovizBase/inst/extdata/crc-rearrangment.csv",
+          row.names = FALSE)
+
+dim(rearr)
+print(object.size(rearr), unit = "Mb")
+
+
 library(GenomicRanges)
 gr1 <- with(rearr, GRanges(chr1, IRanges(pos1, width = 1)))
 gr2 <- with(rearr, GRanges(chr2, IRanges(pos2, width = 1)))
+nms <- colnames(rearr)
 .extra.nms <- setdiff(nms, c("chr1", "chr2", "pos1", "pos2"))
 values(gr1) <- rearr[,.extra.nms]
 data("hg19Ideogram", package = "biovizBase")
@@ -42,8 +52,7 @@ start(hg19cyto) <- start(hg19cyto) + 1
 hg19cyto <- keepSeqlevels(hg19cyto, .nms)
 hg19cyto <- renameSeqlevels(hg19cyto, .nm.new)
 seqlengths(hg19cyto) <- seqlengths(hg19Ideo)
-## gr1 <- keepSeqlevels(gr1, .nms)
-## gr2 <- keepSeqlevels(gr2, .nms)
+
 
 seqs <- as.character(seqnames(gr1))
 .mx <- seqlengths(hg19Ideo)[seqs]
@@ -97,22 +106,23 @@ gg = editGrob(getGrob(g, gPath("guide-box"),
 
 p1 
 ## save the legend
+
+
+## lst <- lapply(grl, function(gr.cur){
+##   print(unique(values(gr.cur)$individual))
+## p <- ggplot() + layout_circle(gr.cur, geom = "link", linked.to = "to.gr",
+##                          aes(color = rearrangements), radius = 7.1) +
+##   ## layout_circle(gr.cur, geom = "rect", trackWidth = 1, radius = 9) +
+##                            layout_circle(hg19Ideo, geom = "ideo", trackWidth = 2,
+##                          color = "steelblue", fill = "gray70") +
+##   layout_circle(hg19Ideo, geom = "text", trackWidth = 2,
+##                 aes(label = seqnames),
+##                 color = "white", size = 4) +
+##   layout_circle(hg19Ideo, geom = "scale", trackWidth = 0.5, radius = 12, size = 2.6) +
+##   opts(title = (unique(values(gr.cur)$individual)), legend.position = "none") 
+## })
+
 grl <- split(gr, values(gr)$individual)
-
-lst <- lapply(grl, function(gr.cur){
-  print(unique(values(gr.cur)$individual))
-p <- ggplot() + layout_circle(gr.cur, geom = "link", linked.to = "to.gr",
-                         aes(color = rearrangements), radius = 7.1) +
-  ## layout_circle(gr.cur, geom = "rect", trackWidth = 1, radius = 9) +
-                           layout_circle(hg19Ideo, geom = "ideo", trackWidth = 2,
-                         color = "steelblue", fill = "gray70") +
-  layout_circle(hg19Ideo, geom = "text", trackWidth = 2,
-                aes(label = seqnames),
-                color = "white", size = 4) +
-  layout_circle(hg19Ideo, geom = "scale", trackWidth = 0.5, radius = 12, size = 2.6) +
-  opts(title = (unique(values(gr.cur)$individual)), legend.position = "none") 
-})
-
 lst2 <- lapply(grl, function(gr.cur){
   print(unique(values(gr.cur)$individual))
 cols <- RColorBrewer::brewer.pal(3, "Set2")[2:1]
@@ -140,8 +150,8 @@ grid.arrange(lst[[1]], lst[[2]], ncol = 2)
 widthDetails.legendGrob <- function(x) unit(2, "cm")
 
 
-res.lst <- c(lst2, list(legend = gg))
-do.call(grid.arrange, res.lst)
+## res.lst <- c(lst2, list(legend = gg))
+## do.call(grid.arrange, res.lst)
 
 l.g <- lapply(lst2, ggplotGrob)
 square <- do.call(arrangeGrob, l.g)

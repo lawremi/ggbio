@@ -5,9 +5,10 @@ title: tracks
 <!--roptions dev='png', fig.width=8, fig.height=8, fig.path = "tracks-" -->
 <!--begin.rcode setup, message = FALSE, echo = FALSE, warning = FALSE
     render_jekyll()
-    opts_knit$set(upload.fun = function(file) 
-       imgur_upload(file, key = "7733c9b660907f0975935cc9ba657413"))
-    dir.path <- "~/Codes/gitrepos/ggbio/master/ggbio/inst/examples/tracks/"
+##    opts_knit$set(upload.fun = function(file) 
+##       imgur_upload(file, key = "7733c9b660907f0975935cc9ba657413"))
+    opts_knit$set(base.url='http://tengfei.github.com/ggbio/tracks/')
+    dir.path <- "/home/tengfei/Codes/svnrepos/devel/ggbio/inst/examples/tracks"
     fl<- file.path(dir.path, "tracks.R")
     read_chunk(fl)
 end.rcode-->

@@ -35,3 +35,11 @@ ggplot() + geom_arch(gr)
 ggplot() + geom_arch(gr, aes(color = value, height = value, size = value),
                      alpha = 0.2, facets = sample ~ seqnames)
 
+## @knitr NULL
+grn <- GRanges()
+ggplot() + geom_arch(grn)
+p <- qplot(data = mtcars, x = mpg, y = wt)
+p
+p + NULL
+p + geom_arch(gr)
+autoplot(grn)

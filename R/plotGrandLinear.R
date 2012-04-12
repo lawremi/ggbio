@@ -1,6 +1,4 @@
-plotGrandLinear <- function(obj, y, ..., facets, space.skip = 0.01, geom = NULL,
-                            color.type = c("twocolor", "identity", "seqnames"),
-                            two.color = c("#0080FF", "#4CC4FF"),
+plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
                             cutoff = NULL, cutoff.color = "red",
                             cutoff.size = 1, legend = FALSE, xlim, ylim, 
                             xlab = "Genomic Coordinates",
@@ -8,26 +6,45 @@ plotGrandLinear <- function(obj, y, ..., facets, space.skip = 0.01, geom = NULL,
 
   if(is.null(geom))
     geom <- "point"
+
+
+  
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  color.type <- match.arg(color.type)
-  if(missing(y))
+  two.color <- c("#0080FF", "#4CC4FF")
+  .is.seq <- FALSE
+  if(!"colour" %in% names(args.aes)){
+    if(!any(c("color", "colour") %in% names(args.non))){
+      .color <- two.color
+      args.aes$color <- as.name(".ori.seqnames")
+       .is.seq <- TRUE      
+    }else{
+      if(length(args.non$color) > 1){
+        .color <- args.non$color
+        args.aes$color <- as.name(".ori.seqnames")
+       .is.seq <- TRUE
+        args.non <- args.non[!names(args.non) %in% c("colour", "color")]
+      }
+    }
+  }else{
+    if(as.character(args.aes$colour) == "seqnames")
+      args.aes$colour <- as.name(".ori.seqnames")
+  }
+
+
+  if(!"y" %in% names(args.aes))
     stop("need to provide y")
-  else
-    args.aes$y <- as.name(deparse(substitute(y)))
+  
   args.non$coord <- "genome"
   args.non$space.skip <- space.skip
   args.non$geom <- geom
   args.non$object <- obj
-  if(color.type %in% c("seqnames", "twocolor")){
-    args.aes$color <- substitute(.ori.seqnames)
-    aes.res <- do.call(aes, args.aes)
-      p <- do.call(autoplot, c(list(aes.res), args.non))
-  }else{
-        aes.res <- do.call(aes, args.aes)    
-      p <- do.call(autoplot, c(list(aes.res), args.non))
-  }
+
+
+  aes.res <- do.call(aes, args.aes)
+  p <- do.call(autoplot, c(list(aes.res), args.non))
+
   if(!missing(theme))
     p <- p + theme
   if(!legend)
@@ -39,16 +56,13 @@ plotGrandLinear <- function(obj, y, ..., facets, space.skip = 0.01, geom = NULL,
                          size = cutoff.size)
 
   chrs <- names(seqlengths(obj))
-  if(color.type == "twocolor"){
+  if(.is.seq){
     N <- length(chrs)
-    id1 <- seq(from = 1, by = 2, to = N)
-    id2 <- seq(from = 2, by = 2, to = N)
-    color1 <- two.color[1]
-    color2 <- two.color[2]
-    cols <- c(rep(color1, length(id1)), rep(color2, length(id2)))
-    names(cols) <- c(chrs[id1], chrs[id2])
+    cols <- rep(.color, round(N/length(.color)) + 1)[1:N]
+    names(cols) <- chrs
     p <- p + scale_color_manual(values = cols)
   }
+  
   if(!missing(facets)){
     args$facets <- facets
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)

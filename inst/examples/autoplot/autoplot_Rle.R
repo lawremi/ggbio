@@ -10,7 +10,7 @@ xVector <- rpois(1e4, lambda)
 xRle <- Rle(xVector)
 xRleList <- RleList(xRle, 2L * xRle)
 
-
+## @knitr NULL
 autoplot(xRle)
 autoplot(xRle, geom = "line")
 autoplot(xRle, geom = "segment")

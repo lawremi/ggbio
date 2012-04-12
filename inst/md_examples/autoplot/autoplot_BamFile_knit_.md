@@ -5,9 +5,10 @@ title: autoplot_BamFile
 <!--roptions dev='png', fig.width=8, fig.height=8, fig.keep = "all", fig.path = "autoplot_BamFile-" -->
 <!--begin.rcode setup, message = FALSE, echo = FALSE, warning = FALSE
     render_jekyll()
-##    opts_knit$set(upload.fun = function(file) 
-##       imgur_upload(file, key = "7733c9b660907f0975935cc9ba657413"))
-    dir.path <- "~/Codes/gitrepos/ggbio/master/ggbio/inst/examples/stat/"
+#    opts_knit$set(upload.fun = function(file) 
+#       imgur_upload(file, key = "7733c9b660907f0975935cc9ba657413"))
+    opts_knit$set(base.url='http://tengfei.github.com/ggbio/autoplot/')
+    dir.path <- "/home/tengfei/Codes/svnrepos/devel/ggbio/inst/examples/autoplot"
     fl<- file.path(dir.path, "autoplot_BamFile.R")
     read_chunk(fl)
 end.rcode-->
@@ -36,7 +37,7 @@ for now.
   upcomming
 
 ### Examples
-Load packages and read a example bam file
+Load packages and read an example bam file
 <!--begin.rcode load, message = TRUE, warning = FALSE
 end.rcode-->
 

@@ -7,7 +7,8 @@ title: autoplot_GRangesList
     render_jekyll()
 ##    opts_knit$set(upload.fun = function(file) 
 ##       imgur_upload(file, key = "7733c9b660907f0975935cc9ba657413"))
-    dir.path <- "~/Codes/gitrepos/ggbio/master/ggbio/inst/examples/stat/"
+    opts_knit$set(base.url='http://tengfei.github.com/ggbio/autoplot/')
+    dir.path <- "/home/tengfei/Codes/svnrepos/devel/ggbio/inst/examples/autoplot"
     fl<- file.path(dir.path, "autoplot_GRangesList.R")
     read_chunk(fl)
 end.rcode-->

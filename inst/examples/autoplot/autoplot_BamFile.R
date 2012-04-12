@@ -16,10 +16,10 @@ p2 <- autoplot(bamfile,  method = "raw", which = genesymbol["ALDOA"])
 library(BSgenome.Hsapiens.UCSC.hg19)
 autoplot(bf, stat = "mismatch", which = genesymbol["ALDOA"], bsgenome = Hsapiens)
 
-## Fixme
+## @knitr NULL (fixme)
 autoplot(bf, geom = "gapped.pair", which = genesymbol["ALDOA"])
 
 ## @knitr other
 library(biovizBase)
 autoplot(bf, geom = "segment", stat = "stepping", which = genesymbol["ALDOA"])
-autoplot(bf, geom = "segment", stat = "stepping", which = genesymbol["ALDOA"])
+

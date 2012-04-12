@@ -365,7 +365,38 @@ plotGrandLinear(gr.snp, aes(y = pvalue)) + geom_hline(yintercept = 3,
 ![plot of chunk cutoff-low](https://github.com/tengfei/ggbio/raw/gh-pages/_posts/manhattan-cutoff-low.png) 
 
 
-Sometimes the names of chromosomes maybe very long, you may want to rotate them
+
+
+Sometimes the names of chromosomes maybe very long, you may want to rotate them, 
+let's make a longer name first
+
+
+{% highlight r %}
+## let's make a long name
+nms <- seqnames(seqinfo(gr.snp))
+nms.new <- paste("chr00000", nms, sep = "")
+names(nms.new) <- nms
+gr.snp <- renameSeqlevels(gr.snp, nms.new)
+seqlengths(gr.snp)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+##  chr000001  chr000002  chr000003  chr000004  chr000005  chr000006 
+##         NA         NA         NA         NA         NA         NA 
+##  chr000007  chr000008  chr000009 chr0000010 chr0000011 chr0000012 
+##         NA         NA         NA         NA         NA         NA 
+## chr0000013 chr0000014 chr0000015 chr0000016 chr0000017 chr0000018 
+##         NA         NA         NA         NA         NA         NA 
+## chr0000019 chr0000020 chr0000021 chr0000022  chr00000X  chr00000Y 
+##         NA         NA         NA         NA         NA         NA 
+{% endhighlight %}
+
+
+
+
+Then rotate it!
 
 
 {% highlight r %}

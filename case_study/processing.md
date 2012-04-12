@@ -1,10 +1,8 @@
 ---
 layout: portfolio
 title: How to process your data and manupulate a GRanges object
-category: portfolio
+category: blog
 ---
-
-
 
 
 
@@ -189,6 +187,13 @@ seqs <- seqlengths(seqs.gr)
 simple way for human hg19 genome, we have a built-in data you can use
 
 
+{% highlight r %}
+data("hg19Ideogram", package = "biovizBase")
+seqs <- seqlengths(hg19Ideogram)
+{% endhighlight %}
+
+
+
 
 
 ## Step 4: Subset your data based on chromosomes you need
@@ -230,9 +235,22 @@ head(seqlengths(hg19Ideogram), 22)
 
 
 {% highlight text %}
-## Error: error in evaluating the argument 'x' in selecting a method for function 'head': Error in seqlengths(hg19Ideogram) : 
-##   error in evaluating the argument 'x' in selecting a method for function 'seqlengths': Error: object 'hg19Ideogram' not found
-## 
+##                 chr1 chr1_gl000191_random chr1_gl000192_random 
+##            249250621               106433               547496 
+##                 chr2                 chr3                 chr4 
+##            243199373            198022430            191154276 
+##       chr4_ctg9_hap1 chr4_gl000193_random chr4_gl000194_random 
+##               590426               189789               191469 
+##                 chr5                 chr6        chr6_apd_hap1 
+##            180915260            171115067              4622290 
+##        chr6_cox_hap2        chr6_dbb_hap3       chr6_mann_hap4 
+##              4795371              4610396              4683263 
+##        chr6_mcf_hap5        chr6_qbl_hap6       chr6_ssto_hap7 
+##              4833398              4611984              4928567 
+##                 chr7 chr7_gl000195_random                 chr8 
+##            159138663               182896            146364022 
+## chr8_gl000196_random 
+##                38914 
 {% endhighlight %}
 
 
@@ -244,10 +262,14 @@ head(seqlengths(keepSeqlevels(hg19Ideogram, chr.sub)), 22)
 
 
 {% highlight text %}
-## Error: error in evaluating the argument 'x' in selecting a method for function 'head': Error in seqlengths(keepSeqlevels(hg19Ideogram, chr.sub)) : 
-##   error in evaluating the argument 'x' in selecting a method for function 'seqlengths': Error in keepSeqlevels(hg19Ideogram, chr.sub) : 
-##   error in evaluating the argument 'x' in selecting a method for function 'keepSeqlevels': Error: object 'hg19Ideogram' not found
-## 
+##      chr1      chr2      chr3      chr4      chr5      chr6      chr7 
+## 249250621 243199373 198022430 191154276 180915260 171115067 159138663 
+##      chr8      chr9     chr10     chr11     chr12     chr13     chr14 
+## 146364022 141213431 135534747 135006516 133851895 115169878 107349540 
+##     chr15     chr16     chr17     chr18     chr19     chr20     chr21 
+## 102531392  90354753  81195210  78077248  59128983  63025520  48129895 
+##     chr22 
+##  51304566 
 {% endhighlight %}
 
 

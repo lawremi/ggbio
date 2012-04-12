@@ -6,13 +6,19 @@ category: blog
 
 
 
-### Introduction
+- [Step 0: Introduction](#s0)
+- [Step 1: Import](#s1)
+- [Step 2: Coercion to `GRanges` object](#s2)
+- [Step 3: Getting seqlegnths for genome](#s3)
+- [Step 4: Subset your data based on chromosomes you need](#s4)
+
+## Step 0: Introduction <a id = "s0"></a>
 Processing and manipulation of our raw data into objects that *ggbio* expected
 is important, not only for visualization purpose but also for analysis in a
 pipeline. It's worth writing a simple tutorial for most useful cases. So in this
 section, we are going to go over a case study about manipulation of your raw data.
 
-## Step 1: Import 
+## Step 1: Import <a id = "s1"></a>
 Most time the data you get could be in various file format, including csv, txt,
 maf, xlsx etc. So the first step is to import your raw data into format that
 *ggbio* expected, which is *GRanges* in most cases. 
@@ -21,7 +27,7 @@ Let's use an example data sets in package *biovizBase* as our raw data, this
 data set contains a subset of somatic mutation, and it is stored in "csv"
 format, and in *R* , `read.csv` help you import a "csv" file as `data.frame`
 object. The data used in this study is from this
-[paper](http://www.nature.com.proxy.lib.iastate.edu:2048/ng/journal/v43/n10/full/ng.936.html)
+[paper](http://www.nature.com/ng/journal/v43/n10/full/ng.936.html)
 , and original data is
 [here](http://www.broadinstitute.org/~lawrence/crc/CRC9.genomic.v3.maf).
 
@@ -64,7 +70,7 @@ head(crc1)
 Please also check `read.table`, `scan` in *R* base, and `read.xlsx` in package
 *xlsx*, to make sure you are using the most proper tools for importing your raw data.
 
-## Step 2: Coercion to `GRanges` object.
+## Step 2: Coercion to `GRanges` object.<a id = "s2"></a>
 Next we coerce a `data.frame` to `GRanges` object. The column names of your data
 could be different from what `GRanges` required:
 
@@ -108,7 +114,7 @@ mut.gr <- transformDfToGr(crc1, seqnames = "Chromosome", start = "Start_position
 
 
 
-## Step 3: Getting seqlegnths for genome
+## Step 3: Getting seqlegnths for genome <a id = "s3"></a>
 `seqlengths` tell the lengths of each chromosomes, if you didn't specify it in
 the `GRanges` function, you will get just `NA` for all of them.  This fine for
 most analysis, but for visualization it's **important** to add this information to
@@ -196,7 +202,7 @@ seqs <- seqlengths(hg19Ideogram)
 
 
 
-## Step 4: Subset your data based on chromosomes you need
+## Step 4: Subset your data based on chromosomes you need <a id = "s4"></a>
 For visualization purpose, it's **important** that you just keep the chromosomes
 you need to a reasonable number, otherwise it's going to be less informative if
 you try to plot too many chromosomes at one time. Pay attention to that **ggbio

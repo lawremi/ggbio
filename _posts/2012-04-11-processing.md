@@ -429,6 +429,47 @@ head(mut.gr.new)
 sessionInfo
 
 
+{% highlight r %}
+sessionInfo()
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## R Under development (unstable) (2012-04-07 r58925)
+## Platform: x86_64-unknown-linux-gnu (64-bit)
+## 
+## locale:
+##  [1] LC_CTYPE=zh_CN.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=C                 LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+## [1] methods   stats     graphics  grDevices utils     datasets  base     
+## 
+## other attached packages:
+## [1] rtracklayer_1.16.0  biovizBase_1.3.0    GenomicRanges_1.8.3
+## [4] IRanges_1.14.2      BiocGenerics_0.2.0  knitr_0.4          
+## 
+## loaded via a namespace (and not attached):
+##  [1] AnnotationDbi_1.18.0  Biobase_2.16.0        biomaRt_2.12.0       
+##  [4] Biostrings_2.24.1     bitops_1.0-4.1        BSgenome_1.24.0      
+##  [7] cluster_1.14.2        codetools_0.2-8       colorspace_1.1-1     
+## [10] DBI_0.2-5             dichromat_1.2-4       digest_0.5.2         
+## [13] evaluate_0.4.2        formatR_0.4           GenomicFeatures_1.8.1
+## [16] grid_2.16.0           highlight_0.3.1       Hmisc_3.9-3          
+## [19] lattice_0.20-6        munsell_0.3           parser_0.0-14        
+## [22] plyr_1.7.1            RColorBrewer_1.0-5    Rcpp_0.9.10          
+## [25] RCurl_1.91-1          Rsamtools_1.8.0       RSQLite_0.11.1       
+## [28] scales_0.2.0          stats4_2.16.0         stringr_0.6          
+## [31] tools_2.16.0          XML_3.9-4             zlibbioc_1.2.0       
+{% endhighlight %}
+
+
+
 
 
 

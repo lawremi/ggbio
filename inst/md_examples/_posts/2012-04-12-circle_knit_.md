@@ -187,9 +187,6 @@ Start to creating plots for each sample.
 <!--begin.rcode arrangement, message = FALSE, warning = FALSE
 end.rcode-->
 
-Use package *gridExtra* to arrange them and add legend to the right.
-<!--begin.rcode 9-circle, message = FALSE, warning = FALSE
-end.rcode-->
 
 Use package *gridExtra* to arrange them and add legend to the right.
 <!--begin.rcode 9-circle, message = FALSE, warning = FALSE, eval = FALSE

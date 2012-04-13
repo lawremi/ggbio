@@ -61,3 +61,6 @@ ggplot() + geom_arrow(gr, stat = "stepping", aes(y = value, group = pair),
                       arrow.rate = 0.01, legnth = unit(0.3, "cm"), agnle = 45,
                       group.selfish = FALSE)
 
+## @knitr NULLL
+ggplot() + geom_rect(gr) + geom_arrow(GRanges(),xlab = "xlab", ylab = "ylab", main = "main")
+

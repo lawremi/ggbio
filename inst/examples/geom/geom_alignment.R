@@ -51,3 +51,6 @@ ggplot() + geom_alignment(gr, stat = "stepping", aes(group = pair), group.selfis
 ##  main/gap geom
 ## =======================================
 ggplot() + geom_alignment(gr, main.geom = "arrowrect", gap.geom = "chevron")
+
+## @knitr NULLL
+ggplot() + geom_rect(gr) + geom_alignment(GRanges(),xlab = "xlab", ylab = "ylab", main = "main")

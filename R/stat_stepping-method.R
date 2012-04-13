@@ -12,11 +12,14 @@ setMethod("stat_stepping", "GRanges", function(data, ...,
   args$facets <- facets
   args$stat <- "stepping"
   args$data <- data
-  p <- switch(geom,
-              rect = do.call(geom_rect, args),
-              alignment = do.call(geom_alignment, args),
-              segment = do.call(geom_segment, args))
-
+  if(length(data)){
+    p <- switch(geom,
+                rect = do.call(geom_rect, args),
+                alignment = do.call(geom_alignment, args),
+                segment = do.call(geom_segment, args))
+  }else{
+    p <- NULL
+  }
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))
   else

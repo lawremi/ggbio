@@ -72,7 +72,9 @@ setMethod("geom_arch", "data.frame", function(data, ...,
 })
 
 ## that means span the range of two end 
-setMethod("geom_arch", "GRanges", function(data, ..., facets = NULL, rect.height = 0.4,
+setMethod("geom_arch", "GRanges", function(data, ...,
+                                           xlab, ylab, main,
+                                           facets = NULL, rect.height = 0,
                                               n = 25, max.height = 10
                                               ){
 
@@ -108,6 +110,14 @@ setMethod("geom_arch", "GRanges", function(data, ..., facets = NULL, rect.height
   }else{
     p <- NULL
   }
+  if(!missing(xlab))
+    p <- c(p, list(ggplot2::xlab(xlab)))
+  else
+    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+  if(!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+  if(!missing(main))
+    p <- c(p, list(opts(title = main)))
   p
 })
 

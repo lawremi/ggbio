@@ -5,6 +5,13 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome, which,
                                                      geom = c("segment", "bar"),
                                                      show.coverage = TRUE){
   geom <- match.arg(geom)
+  args <- list(...)
+
+  ## args <- force(args)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
+  
   isPileupSum <- function(obj){
     if(is(obj, "GRanges")){
       all(c("read", "ref", "count", "depth", "match") %in% colnames(values(obj)))
@@ -14,6 +21,7 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome, which,
       FALSE
     }
   }
+  if(length(data)){
   if(!isPileupSum(data))
     stop("For geom mismatch summary, data must returned from
                         biovizBase::pileupGRangesAsVariantTable function. Or is a GRanges
@@ -21,12 +29,6 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome, which,
                         match")
 
 
-  args <- list(...)
-
-  ## args <- force(args)
-  args.aes <- parseArgsForAes(args)
-  args.non <- parseArgsForNonAes(args)
-  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
 
   
   ## df <- as.data.frame(data)
@@ -96,6 +98,9 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome, which,
            list(scale_color_manual(values = DNABasesColor)),
            list(scale_fill_manual(values = DNABasesColor)))
   }
+}else{
+  p <- NULL
+}
   ## p <- c(p, list(xlab("Genomic Coordinates")), list(ylab("Counts")))
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))
@@ -127,12 +132,15 @@ setMethod("stat_mismatch", "BamFile", function(data, ...,  bsgenome, which,
     }
     data <- data$path
     args <- list(...)
-
     pgr <- pileupAsGRanges(data, region = which)
+    if(length(pgr)){    
     pgr.match <- pileupGRangesAsVariantTable(pgr, bsgenome)
     args$show.coverage <- show.coverage
     args$data <- pgr.match
     p <- do.call(stat_mismatch, args)
+  }else{
+    p <- NULL
+  }
     if(!missing(xlab))
       p <- c(p, list(ggplot2::xlab(xlab)))
     else

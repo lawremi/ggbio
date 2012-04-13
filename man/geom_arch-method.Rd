@@ -11,8 +11,9 @@
 \S4method{geom_arch}{data.frame}(data, ..., n = 25, max.height = 10)
 
 % for GRanges
-\S4method{geom_arch}{GRanges}(data, ..., facets = NULL, rect.height = 0.4,
-          n = 25, max.height = 10)
+\S4method{geom_arch}{GRanges}(data, ..., xlab, ylab, main, facets = NULL,
+                 rect.height = 0, n = 25, max.height = 10)
+
 }
 \arguments{
   \item{data}{
@@ -26,6 +27,15 @@
       \item{xend}{end of the arches}
       \item{height}{height of arches}
     }
+  }
+  \item{xlab}{
+    Label for x
+  }
+  \item{ylab}{
+    Label for y
+  }
+  \item{main}{
+    Title for plot.
   }
   \item{n}{
     Integer values at which interpolation takes place to create 'n'

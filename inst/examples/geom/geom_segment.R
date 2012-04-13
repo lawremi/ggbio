@@ -61,3 +61,5 @@ ggplot() + geom_segment(gr, stat = "stepping", aes(y = value, group = pair))
 ggplot() + geom_segment(gr, stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
 
 
+## @knitr NULLL
+ggplot() + geom_rect(gr) + geom_segment(GRanges(),xlab = "xlab", ylab = "ylab", main = "main")

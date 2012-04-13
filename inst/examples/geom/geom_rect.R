@@ -60,3 +60,6 @@ ggplot() + geom_rect(gr, stat = "stepping", aes(y = value, group = pair))
 ## ======================================================================
 ggplot() + geom_rect(gr, stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
 
+
+## @knitr NULLL
+ggplot() + geom_rect(gr) + geom_rect(GRanges(),xlab = "xlab", ylab = "ylab", main = "main")

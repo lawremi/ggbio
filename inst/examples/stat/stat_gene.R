@@ -14,3 +14,8 @@ p3 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "gene",
 p3
 autoplot(txdb, which = genesymbol["RBM17"], geom = "gene",
                            truncate.gaps = TRUE)
+
+## @knitr NULLL
+p1 <- ggplot() + stat_gene(txdb, which = GRanges("chr1", IRanges(1, 100)), fill = "gray40", geom = "reduced_gene")
+
+p2 <- ggplot() + stat_gene(txdb, which = GRanges("chr1", IRanges(1, 100)), fill = "gray40", geom = "gene")

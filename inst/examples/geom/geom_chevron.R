@@ -83,3 +83,7 @@ ggplot() + geom_rect(gr2) + geom_chevron(gr2.p, offset = "score")
 ## @knitr chevron.height
 ggplot() + geom_rect(gr2) + geom_chevron(gr2.p, offset = "score",
                                          chevron.height.rescale = c(0.4, 10))
+
+
+## @knitr NULLL
+ggplot() + geom_rect(gr) + geom_chevron(GRanges(),xlab = "xlab", ylab = "ylab", main = "main")

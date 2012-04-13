@@ -16,7 +16,7 @@ setMethod("geom_chevron", "GRanges",
             args.non <- parseArgsForNonAes(args)
             args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
             facet <- .buildFacetsFromArgs(data, args.facets)
-
+            if(length(data)){
             getY <- function(n){
               switch(n,
                      {
@@ -144,6 +144,8 @@ setMethod("geom_chevron", "GRanges",
               p <- c(list(do.call(ggplot2::geom_segment, args.res)),
                      list(ggplot2::ylab("")))
 
+            }}else{
+              p <- NULL
             }
             p <- c(list(p) , list(facet))            
             if(!missing(xlab))

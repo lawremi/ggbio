@@ -39,10 +39,10 @@ ggplot() + stat_aggregate(gr, window = 20, y = "value", fill = "gray40", geom = 
 ggplot() + stat_aggregate(gr, window = 20, y = "value", fill = "gray40", geom = "area")
 ggplot() + stat_aggregate(gr, window = 100, aes(y = value), geom = "boxplot")
 
-## debug
+## @knitr NULL
 ggplot() + stat_aggregate(gr, window = 100, aes(y = value),
-                          geom = "boxplot", facets =  sample ~ seqnames)
-
+                          geom = "boxplot", facets =  sample ~ seqnames) +
+  ggplot() + stat_aggregate(gr, y = "value",fill = "gray40")
 
 ggplot() + stat_aggregate(gr, window = 100, aes(y = value), geom = "boxplot")
 

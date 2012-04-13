@@ -19,7 +19,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
   stat <- match.arg(stat)
 
   rect.height <- force(rect.height)
-  
+  if(length(data)){
   if(stat == "stepping"){
     ## if(rect.height <= 0 | rect.height >= 0.5)
     ##   stop("rect.height must be a value in (0,0.5)")
@@ -85,6 +85,8 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
                   args.non)
     p <- list(do.call(ggplot2::geom_segment,args.res))
     p <- .changeStrandColor(p, args.aes)
+  }}else{
+    p <- NULL
   }
   p <- c(list(p) , list(facet))
   if(!missing(xlab))

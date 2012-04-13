@@ -1,6 +1,6 @@
 ## @knitr load
 set.seed(1)
-N <- 50
+N <- 100
 require(ggbio)
 require(GenomicRanges)
 ## @knitr simul
@@ -21,28 +21,16 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
-## @knitr geom_point_start
-ggplot() + stat_identity(gr, aes(x = start, y = value), geom = "point")
+gr <- c(gr[seqnames(gr) == "chr1"][sample(1:10, size = 1e4, replace = TRUE)],gr)
 
-## @knitr geom_point_midpoint
-ggplot() + stat_identity(gr, aes(x = midpoint, y = value), geom = "point")
-
-## @knitr geom_rect_all
-ggplot() + stat_identity(gr, aes(xmin = start, xmax = end,
-                                 ymin = value - 0.5, ymax = value + 0.5),
-                           geom = "rect")
-
-## @knitr geom_rect_y
-ggplot() + stat_identity(gr, aes(y = value), geom = "rect")
-
-## @knitr geom_line
-ggplot() + stat_identity(gr, aes(x = start, y = value),  geom = "line")
-
-## @knitr geom_segment
-ggplot() + stat_identity(gr, aes(y = value), geom = "segment")
+## @knitr default
+ggplot() + stat_table(gr)
+ggplot() + stat_table(gr, geom = "segment", aes(y = ..score.., color = ..score..))
+## FIXME
+ggplot() + stat_table(gr, aes(color = factor(score)))
+## ggplot() + stat_table(gr, rect.height = 0.1, geom = "rect")
+ggplot() + stat_table(gr, geom = "segment")
 
 
-## @knitr NULLL
-ggplot() + stat_identity(gr, aes(y = value), geom = "segment") +
-  stat_identity(GRanges(), aes(y = value), geom = "segment", xlab = "xlab", ylab = "lab",
-                main = "main")
+## @knitr NULL
+ggplot() + stat_table(gr) + stat_table(GRanges(), xlab = "xlab", ylab = "ylab", main = "main")

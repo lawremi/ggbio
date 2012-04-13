@@ -8,7 +8,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
 
 
 
-
+  
   if(is.null(geom))
     geom <- "line"
   data <- keepSeqlevels(data, unique(as.character(seqnames(data))))
@@ -19,6 +19,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(data, args.facets)
+  if(length(data)){
   grl <- splitByFacets(data, facets)
   if(missing(xlim))
     xlim <- c(min(start(ranges(data))),
@@ -79,6 +80,9 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
                 args.non)
 
   p <- do.call(stat_identity, args.res)
+}else{
+  p <- NULL
+}
   p <- c(list(p) , list(facet))
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))

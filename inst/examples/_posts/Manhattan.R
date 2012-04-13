@@ -58,8 +58,7 @@ autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip =
 
 ## @knitr with_seql
 names(seqlths) <- gsub("chr", "", names(seqlths))
-seqlths
-seqlengths(gr.snp) <- seqlths
+seqlengths(gr.snp) <- seqlths[names(seqlengths(gr.snp))]
 autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
 
 ## @knitr line
@@ -69,10 +68,9 @@ autoplot(gr.snp, coord = "genome", geom = "line", aes(y = pvalue, group = .ori.s
 
 
 ## @knitr plotGrandLinear
-plotGrandLinear(gr.snp, y = pvalue)
+plotGrandLinear(gr.snp, aes(y = pvalue))
 
 ## @knitr morecolor
-plotGrandLinear(gr.snp, aes(y = pvalue))
 plotGrandLinear(gr.snp, aes(y = pvalue, color = seqnames))
 plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue"))
 plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue", "red"))

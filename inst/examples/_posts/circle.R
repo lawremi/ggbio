@@ -127,12 +127,13 @@ p0 <- ggplot() + layout_circle(gr.crc1, geom = "link", linked.to = "to.gr",
 p0
 
 ## @knitr legend
+library(gridExtra)
 g = ggplotGrob(p0)
 gg = editGrob(getGrob(g, gPath("guide-box"), 
   grep=TRUE), vp=viewport())
 
 
-## @knitr arrangment
+## @knitr arrangement
 grl <- split(gr, values(gr)$individual)
 ## need "unit", load grid
 library(grid)
@@ -153,7 +154,6 @@ square <- do.call(arrangeGrob, l.g)
 
 
 ## @knitr 9-circle
-library(gridExtra)
 grid.arrange(square, gg, ncol = 2, widths = c(4/5, 1/5))
 
 ## @knitr sessionInfo

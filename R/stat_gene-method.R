@@ -35,7 +35,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     message("Aggregating TranscriptDb...")
     gr <- biovizBase:::fetch(object, which, truncate.gaps = truncate.gaps,
                              truncate.fun = truncate.fun, ratio = ratio)
-
+    if(length(gr)){
     message("Constructing graphics...")
     values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
     ## drawing
@@ -76,7 +76,6 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     }
     ## utrs
     df.utr <- df[df$type == "utr",]
-
     ## add a segment for hacking at 1pix
     args.utr <- args.aes[names(args.aes) != "y"]
     args.utr <- c(args.utr, list(x = substitute(start),
@@ -139,12 +138,17 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     ## }
     p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
                                 labels = .labels)))
+  }else{
+    p <- NULL
+  }
   }
   if(geom == "reduced_gene"){
     message("Aggregating TranscriptDb...")
     gr <- biovizBase:::fetch(object, which, type = "single",
                              truncate.gaps = truncate.gaps,
                              truncate.fun = truncate.fun, ratio = ratio)
+
+    if(length(gr)){
     ## gr <- fetch(object, which, type = "single")
     message("Constructing graphics...")
     values(gr)$stepping <-  1
@@ -187,9 +191,13 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                   list(aes.res),
                   args.non)
     p <- c(p, list(do.call(geom_chevron, args.res)))
+  }else{
+    p <- NULL
+  }
     p <- c(p, list(scale_y_continuous(breaks = NULL)), list(opts(axis.text.y = theme_blank())))
   }
   if(missing(xlab)){
+    if(length(gr)){
     chrs <- unique(seqnames(gr))
     gms <- genome(object)
     gm <- unique(gms[chrs])
@@ -199,6 +207,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     }else{
       gm.tx <- paste(gm)
       xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
+    }}else{
+      xlab <- ""
     }
   }
   p <- c(p, list(xlab(xlab)))

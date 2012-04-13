@@ -6,6 +6,7 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
                                                   rect.height = 0.4,
                                                   arrow.head = 0.06,
                                                   group.selfish = TRUE){
+
   stat <- match.arg(stat)
   ## shape <- match.arg(shape)
   args <- list(...)
@@ -16,6 +17,7 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
 
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(data, args.facets)
+  if(length(data)){  
     if(stat == "stepping"){
       grl <- splitByFacets(data, facets)
       res <- endoapply(grl,
@@ -45,6 +47,8 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
       args.aes$group <- as.name(".id")      
       aes.temp <- do.call(aes, args.aes)                    
       p <- do.call(geom_polygon, c(list(data = df), list(aes.temp), args.non))
+    }}else{
+      p <- NULL
     }
     p <- c(list(p) , list(facet))
   if(!missing(xlab))

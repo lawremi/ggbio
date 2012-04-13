@@ -44,6 +44,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                       geom_segment
                     }
                     )
+  if(length(data)){
   if(stat == "stepping"){
     args.aes <- args.aes[!(names(args.aes) %in% c("xmin", "xmax", "ymin", "ymax", "data"))]
     args.non <- args.non[!(names(args.non) %in% c("xmin", "xmin", "ymin", "ymax", "data"))]
@@ -114,6 +115,8 @@ setMethod("geom_alignment", "GRanges", function(data,...,
   
   if(stat == "identity"){
    stop("stat identity is nor supported for geom alignment") 
+  }}else{
+    p <- NULL
   }
     p <- c(list(p) , list(ggplot2::ylab("")), list(facet))
   if(!missing(xlab))

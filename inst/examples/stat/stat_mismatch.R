@@ -23,6 +23,12 @@ ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE)
 ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE)
 ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE, geom = "bar")
 
+## @knitr NULLL
+ggplot() + stat_mismatch(bf, which = GRanges("chr1", IRanges(1, 2)),
+                         bsgenome = Hsapiens,show.coverage = TRUE)
+
+ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE) +
+  stat_mismatch(GRanges(), xlab = "xlab", ylab = "ylab", main = "main")
 
 ## ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE) +
 ##   coord_cartesian(xlim = c(6134000, 6135000),wise = TRUE) + theme_bw()

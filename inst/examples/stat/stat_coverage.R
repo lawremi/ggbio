@@ -69,3 +69,5 @@ ggplot() + stat_coverage(bf, geom = "line", which = gr.wh, method = "raw")
 
 
 
+## @knitr NULLL
+ggplot() + stat_coverage(gr) + stat_coverage(GRanges())

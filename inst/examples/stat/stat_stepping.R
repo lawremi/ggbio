@@ -39,3 +39,7 @@ ggplot() + stat_stepping(gr, geom = "alignment")
 ## @knitr geom_alignment_group
 ggplot() + stat_stepping(gr, aes(group = pair),geom = "alignment")
 
+
+## @knitr NULLL
+ggplot() + stat_stepping(gr) + stat_stepping(GRanges(), xlab = "xlab", ylab = "ylab",
+                                             main = "main")

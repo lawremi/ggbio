@@ -21,7 +21,8 @@ setMethod("geom_rect", "GRanges", function(data,...,
   stat <- match.arg(stat)
 
   rect.height <- force(rect.height)
-  
+
+  if(length(data)){
   if(stat == "stepping"){
     
     grl <- splitByFacets(data, facets)
@@ -124,6 +125,8 @@ setMethod("geom_rect", "GRanges", function(data,...,
     p <- .changeStrandColor(p, args.aes)
     if(!missing(ylab))
         p <- c(p, list(ggplot2::ylab(ylab)))
+  }}else{
+    p <- NULL
   }
   p <- c(list(p) , list(facet))
 

@@ -11,6 +11,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
                                             group.selfish = TRUE){
 
 
+
   ## remove width = 1
   idx <- width(data) > 1
   data <- data[idx]
@@ -27,6 +28,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(data, args.facets)
 
+  if(length(data)){
     ## small arrow
     if(stat == "stepping"){
       grl <- splitByFacets(data, facets)
@@ -164,6 +166,9 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
         p
       })
     }
+  }else{
+    p <- NULL
+  }
     p <- c(list(p) , list(facet))
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))

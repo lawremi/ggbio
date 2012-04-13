@@ -52,3 +52,6 @@ ggplot() + geom_arrowrect(gr, stat = "stepping", aes(y = value, group = pair))
 ## ======================================================================
 ggplot() + geom_arrowrect(gr, stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
 
+
+## @knitr NULLL
+ggplot() + geom_rect(gr) + geom_arrowrect(GRanges(),xlab = "xlab", ylab = "ylab", main = "main")

@@ -59,12 +59,15 @@
 \S4method{autoplot}{character}(object, ..., xlab, ylab, main, asRangedData = FALSE)
 
 ## For object TranscriptDb
-\S4method{autoplot}{TranscriptDb}(object, which, ..., xlab, ylab, main, truncate.gaps =
-                 FALSE, truncate.fun = NULL, ratio = 0.0025, geom =
-                 c("gene", "reduced_gene"), names.expr =
-                 expression(paste(tx_name, "(", gene_id, ")", sep =
-                 "")))
-
+\S4method{autoplot}{TranscriptDb}(object, which, ...,
+                                  xlab, ylab, main,
+                                  truncate.gaps = FALSE,
+                                  truncate.fun = NULL,
+                                  ratio = 0.0025, 
+                                  geom = c("gene"),
+                                  stat = c("identity", "reduce"),
+                                  names.expr = expression(paste(tx_name,
+                                  "(", gene_id,")", sep = "")))
 
 
 ## For object BSgenome

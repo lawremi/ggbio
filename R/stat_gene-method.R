@@ -6,10 +6,16 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                                                 ratio = 0.0025, 
                                                 xlab, ylab, main,
                                                 facets = NULL,
-                                                geom = c("gene", "reduced_gene"),
+                                                geom = "gene",
+                                                stat = c("identity", "reduce"),
                                                 names.expr = expression(paste(tx_name,
                                                "(", gene_id,")", sep = ""))){
 
+
+  stat <- match.arg(stat)
+  
+  if(stat == "reduce")
+    geom <- "reduced_gene"
 
   ## need to test facets = gene
   ## if(is.null(geom))
@@ -18,7 +24,6 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     stop("missing which is not supported yet")
 
   object <- data
-  geom <- match.arg(geom)
 
   args <- list(...)
   args$facets <- facets

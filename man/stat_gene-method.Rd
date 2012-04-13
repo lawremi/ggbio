@@ -6,11 +6,14 @@
   Calculate gene structure.
 }
 \usage{
-\S4method{stat_gene}{TranscriptDb}(data, ..., which, xlim, truncate.gaps = FALSE,
-                 truncate.fun = NULL, ratio = 0.0025, xlab, ylab, main,
-                 facets = NULL, geom = c("gene", "reduced_gene"),
-                 names.expr = expression(paste(tx_name, "(", gene_id,
-                 ")", sep = "")))
+\S4method{stat_gene}{TranscriptDb}(data, ..., which,xlim,
+                     truncate.gaps = FALSE, truncate.fun = NULL,
+                     ratio = 0.0025, xlab, ylab, main,
+                     facets = NULL, geom = c("gene"),
+                     stat = c("identity", "reduce"),
+                     names.expr = expression(paste(tx_name,
+                    "(", gene_id,")", sep = "")))
+
 
 
 }
@@ -50,9 +53,10 @@
     Faceting formula to use.
   }
   \item{geom}{
-    The geometric object to use display the data. 'gene' shows full gene
-    model with 5'-utr, 3'-utr and cds. "reduced_gene" shos reduced
-    single gene structure.
+    geometric object. only support "gene" now.
+  }
+  \item{stat}{
+    defualt "identity" give full gene model and "reduce" for reduced model.
   }
   \item{names.expr}{
     Expression for showing y label.

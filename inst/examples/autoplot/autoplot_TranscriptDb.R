@@ -5,8 +5,8 @@ data(genesymbol, package = "biovizBase")
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 
 ## @knitr tracks
-p1 <- ggplot() + stat_gene(txdb, which = genesymbol["ALDOA"])
-p2 <- ggplot() + stat_gene(txdb, which = genesymbol["ALDOA"], geom = "reduced_gene")
+p1 <- autoplot(txdb, which = genesymbol["ALDOA"])
+p2 <- autoplot(txdb, which = genesymbol["ALDOA"], stat = "reduce")
 tracks(p1, p2, heights = c(3, 1))
 
 

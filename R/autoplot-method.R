@@ -26,6 +26,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
                                           layout = c("linear", "karyogram", "circle")
                                           ){
 
+
   coord <- match.arg(coord)
   args <- list(...)
   
@@ -62,6 +63,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
 
+
   if((!is.null(geom) && geom %in% .ggbio.geom) |
      (!is.null(stat) && stat %in% .ggbio.stat)){
      args.non$data <- object
@@ -70,7 +72,10 @@ setMethod("autoplot", "GRanges", function(object, ...,
     if(!"x" %in% names(args.aes))
       args.aes$x <- as.name("midpoint")
   }
-  
+
+  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
+  facet <- .buildFacetsFromArgs(object, args.facets)
+
   ## ------------------------------
   ## layout check
   ## ------------------------------
@@ -118,6 +123,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
     p <- p + scale_x_continuous(breaks = ss$breaks,
                                 labels = ss$labels)
   }
+  p <- p + facet
   p
 })
 
@@ -353,10 +359,14 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                truncate.gaps = FALSE,
                                                truncate.fun = NULL,
                                                ratio = 0.0025, 
-                                               geom = c("gene", "reduced_gene"),
+                                               geom = c("gene"),
+                                               stat = c("identity", "reduce"),
                                                names.expr = expression(paste(tx_name,
                                                    "(", gene_id,")", sep = ""))){
-  geom <- match.arg(geom)
+
+  stat <- match.arg(stat)
+  if(stat == "reduce")
+    geom <- "reduced_gene"
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)

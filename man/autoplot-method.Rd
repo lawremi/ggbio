@@ -159,18 +159,6 @@
   not "raw", at least a lower parameters which passed to \code{slice}
   function is required.
     }
-  \item{name}{
-    Passed to \code{getSeq} in BSgenome package.
-    
-    A character vector containing the names of the sequences in
-    'x' where to get the subsequences from, or a GRanges object,
-    or a RangedData object, or a named RangesList object, or a
-    named Ranges object.  The RangesList or Ranges object must be
-    named according to the sequences in 'x' where to get the
-    subsequences from.
-
-    If 'names' is missing, then 'seqnames(x)' is used.
-  }
   \item{legend}{
     A logical value indicates whether to show legend or not. Default is
     \code{TRUE}
@@ -281,12 +269,6 @@ indicate whether you want to adding grid background or not.
   }
   \item{arch.offset}{
     arch.offset.
-  }
-  \item{xlim}{
-    x limits.
-  }
-  \item{ylim}{
-    y limits.
   }
   \item{names.expr}{
     names expression used for creating labels.

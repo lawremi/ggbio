@@ -13,8 +13,9 @@ association they are.
 \usage{
 plotGrandLinear(obj, ..., facets, space.skip = 0.01, geom = NULL,
                  cutoff = NULL, cutoff.color = "red", cutoff.size = 1,
-                 legend = FALSE, xlim, ylim, xlab = "Genomic
-                 Coordinates", ylab = substitute(y), main, theme)
+                 legend = FALSE, xlim, ylim,
+                 xlab = "Genomic Coordinates",
+                 ylab = substitute(y), main, theme)
 }
 \arguments{
   \item{obj}{

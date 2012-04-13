@@ -132,7 +132,8 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
     args.aes$x <- substitute(.mid)
     args.aes$y <- substitute(.value)
   }else{
-    args.aes$x <- substitute(as.factor(.mid))
+    ## args.aes$x <- substitute(as.factor(.mid))
+    args.aes$x <- substitute(.mid)
     if(geom == "boxplot"){
     if(!"y" %in% names(args.aes))
       stop("for geom boxplot, y must be provied in aes()")

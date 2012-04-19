@@ -7,7 +7,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                                                    stat = c("stepping", "identity"),
                                                    main.geom = c("rect", "arrowrect"),
                                                    gap.geom = c("chevron", "arrow", "segment"),
-                                                   rect.height = 0.4,
+                                                   rect.height = NULL,
                                                 group.selfish = TRUE){
    
 
@@ -20,7 +20,9 @@ setMethod("geom_alignment", "GRanges", function(data,...,
   facet <- .buildFacetsFromArgs(data, args.facets)
 
   ## rect.height <- force(rect.height)
-
+  if(is.null(rect.height))
+    rect.height <- 0.4
+  args.non$rect.height <- rect.height
   main.geom <- match.arg(main.geom)
   gap.geom <- match.arg(gap.geom)
   

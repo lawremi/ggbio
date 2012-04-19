@@ -48,7 +48,7 @@
 
 ## For object GappedAlignments
 \S4method{autoplot}{GappedAlignments}(object, ..., xlab, ylab, main, which,
-      geom = "gapped.pair", show.junction = FALSE)
+      geom = NULL, stat = NULL)
 
 ## For object BamFile
 \S4method{autoplot}{BamFile}(object, ..., which,
@@ -56,7 +56,7 @@
      method = c("estimate", "raw"), resize.extra = 10, show.coverage = TRUE)
 
 ## For object character
-\S4method{autoplot}{character}(object, ..., xlab, ylab, main, asRangedData = FALSE)
+\S4method{autoplot}{character}(object, ..., xlab, ylab, main, which, asRangedData = FALSE)
 
 ## For object TranscriptDb
 \S4method{autoplot}{TranscriptDb}(object, which, ...,
@@ -171,10 +171,7 @@
     A \code{\link{GRanges}} object to subset the result, usually passed
     to the \code{\link{ScanBamParam}} function.
   }
-  \item{show.junction}{
-    A logical value indicates whether to show the line between junction reads or
-    not.
-  }
+
   \item{show.coverage}{
     A logical value indicates whether to show coverage or not. This is
   used for geom "mismatch.summary".
@@ -360,12 +357,6 @@ indicate whether you want to adding grid background or not.
   \item{tx}{
     For \code{TranscripDb} object, showing transcirpts isoforms.
   }
-  \item{gapped.pair}{
-    Show \code{GappedAlignments} as special stepping plots, it make sure
-  all the reads of the same pair or qname shown in the same level and
-  nothing falls in between. Then you can use \code{show.junction}
-  arguments show the junction as lines between junction reads if any.
-}
 \item{mismatch.summary}{
   Showing color coded mismatched stacked bar to indicate the proportion
   of mismatching at each position, the reference is set to gray.
@@ -398,33 +389,15 @@ Faceting in ggbio package is a little differnt from ggplot2 in several ways
 }
 }
 }
-
-
 \author{Tengfei Yin}
-
 \examples{
-\dontrun{
 library(ggbio)
-
-## overide autoplot
-autoplot(data = mtcars, mpg, cyl)
-autoplot(1:3)
-autoplot(volcano)
-autoplot(c(1, 2.2, 3.3))
-ggplot2::autoplot(1:3)
-ggplot2::autoplot(c(1, 2.2, 3.3))
-ggplot2::autoplot(volcano)
-
-
-##  GRanges
 set.seed(1)
-N <- 1000
+N <- 200
 library(GenomicRanges)
-gr <- GRanges(seqnames = 
-              sample(c("chr1", "chr2", "chr3"),
+gr <- GRanges(seqnames = sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),
-              IRanges(
-                      start = sample(1:300, size = N, replace = TRUE),
+              IRanges(start = sample(1:300, size = N, replace = TRUE),
                       width = sample(70:75, size = N,replace = TRUE)),
               strand = sample(c("+", "-", "*"), size = N, 
                 replace = TRUE),
@@ -433,111 +406,37 @@ gr <- GRanges(seqnames =
                 size = N, replace = TRUE),
               pair = sample(letters, size = N, 
                 replace = TRUE))
-
 autoplot(gr)
-autoplot(gr, geom = "full")
 autoplot(gr, geom = "segment")
-autoplot(gr, geom = "line", y = value)
-autoplot(gr, geom = "point", y = value)
-autoplot(gr, geom = "coverage.line")
-autoplot(gr, geom = "coverage.polygon")
+autoplot(gr, geom = "arrowrect")
+autoplot(gr, geom = "line", aes(y = value))
+autoplot(gr, geom = "point", aes(y = value))
 
-gr.sub <- gr[seqnames(gr) == "chr1"] #or 
-p1 <- autoplot(gr.sub, geom = "full") + opts(title = "full")
-p2 <- autoplot(gr.sub, geom = "point", y = value) + opts(title = "point")
-p3 <- autoplot(gr.sub, geom = "line", y = value) + opts(title = "line")
-p4 <- autoplot(gr.sub, geom = "coverage.line") + opts(title = "coverage.line")   
-p5 <- autoplot(gr.sub, geom = "coverage.polygon") + opts(title = "coverage.polygon")   
-library(gridExtra)
-grid.arrange(p1, p2, p3, p4, p5, ncol = 2)
-
-autoplot(gr, ncol = 2)
-## faceting, use facets not facet
 autoplot(gr, facets = group ~ seqnames)
-autoplot(gr, geom = "segment", facets = group ~ seqnames)
-autoplot(gr, geom = "line", y = value, facets = group ~ seqnames)
-autoplot(gr, geom = "point", y = value, facets = group ~ seqnames)
-autoplot(gr, geom = "coverage.line", facets = group ~ seqnames)
-autoplot(gr, geom = "coverage.polygon", facets = group ~ seqnames)
 
-## facet gr
-gr.region <- GRanges(c("chr1", "chr2", "chr3"), 
-                     IRanges(c(100, 200, 250), 
-                             width = 70))
-## facet_grid
-autoplot(gr, facet_gr = gr.region)
-## facet_wrap
-autoplot(gr, facet_gr = gr.region, nrow = 2) + 
-  scale_y_continuous(limits = c(0, 90))
+set.seed(123)
+gr.b <- GRanges(seqnames = "chr1", IRanges(start = seq(1, 100, by = 10),
+                  width = sample(4:9, size = 10, replace = TRUE)),
+                score = rnorm(10, 10, 3), value = runif(10, 1, 100))
+gr.b2 <- GRanges(seqnames = "chr2", IRanges(start = seq(1, 100, by = 10),
+                  width = sample(4:9, size = 10, replace = TRUE)),
+                score = rnorm(10, 10, 3), value = runif(10, 1, 100))
+gr.b <- c(gr.b, gr.b2)
+## default use score as y
+autoplot(gr.b, geom = "bar", aes(fill = value))
+autoplot(gr.b, geom = "bar", aes(y = value))
+ggplot() + layout_circle(gr.b, geom = "bar")
 
+## character
+## @knitr bed
+library(rtracklayer)
+test_path <- system.file("tests", package = "rtracklayer")
+test_bed <- file.path(test_path, "test.bed")
+wh <- GRanges("chr7", IRanges(127472000, 127473000))
+autoplot(test_bed)
+autoplot(test_bed, aes(fill = score), geom  = "rect")
+autoplot(test_bed, aes(fill = name))
+autoplot(test_bed, aes(fill = name), which = wh)
 
-## checvron
-gr <- GRanges("chr1", IRanges(c(100, 200, 300), width = 50))
-p <- autoplot(gr)
-gr.gaps <- gaps(gr)[-1]
-values(gr.gaps)$score <- c(1, 100)
-p1 <- p + geom_chevron(gr.gaps)
-p2 <- p + geom_chevron(gr.gaps, aes(size = score), offset = "score",
-                 chevron.height = c(0.1, 0.2))
-p3 <- p + geom_chevron(gr.gaps, offset = -0.1)
-tracks(p1, p2, p3)
-
-## GRangesList
-library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-data(genesymbol)
-txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
-exons.tx <- exonsBy(txdb, by = "tx")
-exons.rbm17 <- subsetByOverlaps(exons.tx, genesymbol["RBM17"])
-nms <- names(exons.rbm17)
-freqs <- c(100, 200, 300)
-names(freqs) <- nms
-p.splice1 <- autoplot(exons.rbm17)
-## when turning on frequency 
-p.splice <- autoplot(exons.rbm17, freq = freqs, show.label = TRUE, label.type = "count",
-      scale.size = c(1, 5), label.size = 3)
-p.splice2 <- autoplot(exons.rbm17, freq = freqs, show.label = TRUE, offset = 0.05,
-                   label.type = "count")
-print(p.splice1)
-print(p.splice2)
-
-ir <- IRanges(c(10, 20, 30) ,width  = 15)
-autoplot(ir)
-ir <- ranges(gr[seqnames(gr) == "chr1"])[1:40]
-p1 <- autoplot(ir) + opts(title = "full")
-p2 <- autoplot(ir, geom = "segment")+ opts(title = "segment")
-p3 <- autoplot(ir, geom = "coverage.line")+ opts(title = "coverage.line")
-p4 <- autoplot(ir, geom = "coverage.polygon")+ opts(title = "coverage.polygon")
-library(gridExtra)
-grid.arrange(p1, p2, p3, p4, ncol = 2)
-
-library(IRanges)
-set.seed(1)
-lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
-            seq(10, 0.001, length = 500))
-xVector <- rpois(1e4, lambda)
-xRle <- Rle(xVector)
-xRleList <- RleList(xRle, 2L * xRle)
-
-
-autoplot(xRle)
-autoplot(xRle, geom = "line")
-autoplot(xRle, geom = "segment")
-autoplot(xRle, type = "viewMaxs", lower = 5)
-autoplot(xRle, type = "viewMins", lower = 5)
-autoplot(xRle, type = "viewMeans", lower = 5)
-autoplot(xRle, type = "viewSums", lower = 5)
-
-autoplot(xRleList)
-autoplot(xRleList, geom = "segment")
-autoplot(xRleList, geom = "line")
-autoplot(xRleList, type = "viewMaxs", lower = 5)
-autoplot(xRleList, type = "viewMaxs", lower = 5, geom = "line")
-autoplot(xRleList, type = "viewSums", lower = 5, geom = "segment",
-      facetByRow = FALSE, color = I("red"), size = I(5))
-autoplot(xRle, size = y)
-autoplot(xRle, type = "viewSums", lower = 5)
-
-autoplot(xRle, type = "viewSums", lower = 5, size = I(10), color = I("red"),
-      alpha = y)
-}
+## more object supported, please check the on-line documentation.
 }

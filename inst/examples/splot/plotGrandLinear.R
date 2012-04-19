@@ -32,7 +32,7 @@ gr.snp <- renameSeqlevels(gr.snp, nms.new)
 ## compact view
 ## no facet by samples, but make sure you want it that way
 ## default is two color
-plotGrandLinear(gr.snp, y = pvalue)
+plotGrandLinear(gr.snp, aes(y = pvalue))
 plotGrandLinear(gr.snp, y = pvalue, space.skip = 0.1)
 
 ## sort chromosomes

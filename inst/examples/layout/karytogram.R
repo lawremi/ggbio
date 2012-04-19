@@ -1,11 +1,8 @@
-## TODO:
-## 1. tracks margin fix
-## 2. exons labels for plotRangesLinkedToData
+## @knitr load
 library(ggbio)
 library(GenomicRanges)
-## library(devtools)
-## load_all("~/Codes/gitrepos/ggbio")
-##  GRanges
+
+## @knitr simul
 set.seed(1)
 N <- 1000
 

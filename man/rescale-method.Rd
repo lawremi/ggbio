@@ -53,13 +53,12 @@ object, it first try to estimate current x limits and y limits of the ggplot
 object, then rescale based on those information.
 }
 \examples{
-\dontrun{
 library(ggbio)
 head(mtcars)
 range(mtcars$mpg)
 p <- qplot(data = mtcars, x = mpg, y = disp, geom = "point")
 p.new <- rescale(p, xlim = c(20, 25))
-}
+p.new
 }
 \author{Tengfei Yin}
 

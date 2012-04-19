@@ -71,6 +71,8 @@ importClassesFrom(VariantAnnotation, VCF)
 importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref, "ref<-",
                   alt, "alt<-", info, "info<-", geno, "geno<-",  readVcf) 
 
+## rtracklayer
+importMethodsFrom(rtracklayer, import)
 
 ## ============================================================
 ## Export
@@ -85,6 +87,7 @@ exportMethods(geom_chevron,
               geom_arrow,
               geom_arrowrect,
               geom_rect,
+              geom_bar,              
               geom_segment)
 
 ## stat

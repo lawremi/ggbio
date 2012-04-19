@@ -3,7 +3,7 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
                                                   xlab, ylab, main,
                                                 facets = NULL,
                                                   stat = c("stepping", "identity"),
-                                                  rect.height = 0.4,
+                                                  rect.height = NULL,
                                                   arrow.head = 0.06,
                                                   group.selfish = TRUE){
 
@@ -19,6 +19,9 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
   facet <- .buildFacetsFromArgs(data, args.facets)
   if(length(data)){  
     if(stat == "stepping"){
+    if(is.null(rect.height))
+      rect.height <- 0.4
+      
       grl <- splitByFacets(data, facets)
       res <- endoapply(grl,
                        function(dt){
@@ -40,6 +43,9 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
     if(stat == "identity"){
       if(!"y" %in% names(args.aes))
         stop("aes(y = ) is requried for stat identity")
+      if(is.null(rect.height)){
+         rect.height <- diff(range(values(data)[,as.character(args.aes$y)]))/20
+      }
       df <- breakGrTo5polyDf(data, y = as.character(args.aes$y), rect.height = rect.height,
                              arrow.head = arrow.head)
       args.aes$x <- as.name(".temp.x")

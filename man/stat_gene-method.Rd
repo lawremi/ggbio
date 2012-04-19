@@ -6,16 +6,11 @@
   Calculate gene structure.
 }
 \usage{
-\S4method{stat_gene}{TranscriptDb}(data, ..., which,xlim,
-                     truncate.gaps = FALSE, truncate.fun = NULL,
-                     ratio = 0.0025, xlab, ylab, main,
-                     facets = NULL, geom = c("gene"),
-                     stat = c("identity", "reduce"),
-                     names.expr = expression(paste(tx_name,
-                    "(", gene_id,")", sep = "")))
-
-
-
+\S4method{stat_gene}{TranscriptDb}(data, ..., which, xlim, truncate.gaps = FALSE,
+                 truncate.fun = NULL, ratio = 0.0025, xlab, ylab, main,
+                 facets = NULL, geom = "gene", stat = c("identity",
+                 "reduce"), names.expr = expression(paste(tx_name, "(",
+                 gene_id, ")", sep = "")))
 }
 \arguments{
   \item{data}{
@@ -72,8 +67,8 @@ data(genesymbol, package = "biovizBase")
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 
 ## @knitr tracks
-p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], fill = "gray40", geom = "gene")
-p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "reduced_gene")
+p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"])
+p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], stat = "reduce")
 tracks(p1, p2, heights = c(3, 1))
 }
 \author{Tengfei Yin}

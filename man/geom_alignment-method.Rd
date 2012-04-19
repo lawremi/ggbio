@@ -11,7 +11,7 @@
                facets = NULL, stat = c("stepping", "identity"),
                main.geom = c("rect", "arrowrect"),
                gap.geom = c("chevron", "arrow", "segment"),
-               rect.height = 0.4,  group.selfish = TRUE)
+               rect.height = NULL,  group.selfish = TRUE)
 }
 \arguments{
   \item{data}{

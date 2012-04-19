@@ -134,7 +134,6 @@ xlim(x) <- value
  A \code{Tracks} object.
 }
 \examples{
-\dontrun{
 ## @knitr load
 ## ==========================================================
 ## Load packages
@@ -209,7 +208,6 @@ update(obj, xlim  = c(6130000, 6150000))
 ## To make it easy, you could just apply any *options* by using "+"
 ## and this will apply it to every plot in the track.
 obj + theme_bw()
-}
 }
 \author{Tengfei Yin}
 

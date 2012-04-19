@@ -6,15 +6,25 @@
   coordinates plot which represting the data in elementeMetadata.
 }
 \usage{
-plotRangesLinkedToData(data, stat.col, stat.label, stat.ylab, sig, sig.col =
-                 c("black", "red"), stat.coord.trans = coord_trans(),
-                 solid.size = 1.3, ..., annotation = list(),
-                 width.ratio = 0.8, track.skip = -1, theme.stat =
-                 theme_grey(), theme.align = theme_grey(), heights)
+plotRangesLinkedToData(data, ..., stat.col, stat.label,
+                                   stat.ylab,
+                                   sig, sig.col = c("black", "red"),
+                                   stat.coord.trans = coord_trans(),
+                                   annotation = list(),
+                                   width.ratio = 0.8,
+                                   track.skip = -1,
+                                   theme.stat = theme_grey(),
+                                   theme.align = theme_gray(),
+                                   linetype = 3, 
+                                   heights)
+
 }
 \arguments{
   \item{data}{
     GRanges object with a DataFrame as elementMetadata.
+  }
+  \item{...}{
+    Parameters passed to control lines in top plot.
   }
   \item{stat.col}{
     integer (variable position starting in DataFrame of data, start from
@@ -27,19 +37,16 @@ plotRangesLinkedToData(data, stat.col, stat.label, stat.ylab, sig, sig.col =
     y label for stat track(the top track).
   }
   \item{sig}{
-    
+    a character of element meta data column of logical value, indicates
+    which row is signficant. and will be shown in link lines and rectangle.
   }
   \item{sig.col}{
-    
+    colors for significant, valid when you specify "sig" argument, the
+    first color indicates \code{FALSE}, non-significant, the second
+    color indicates \code{TRUE}.
   }
   \item{stat.coord.trans}{
-    
-  }
-  \item{solid.size}{
-    
-  }
-  \item{...}{
-    Parameters passed to qplot.
+    transformation used for top plot.
   }
   \item{annotation}{
     A list of ggplot object.
@@ -48,13 +55,16 @@ plotRangesLinkedToData(data, stat.col, stat.label, stat.ylab, sig, sig.col =
     Control the segment length of statistic layer.
   }
   \item{track.skip}{
-    
+    skip between tracks.
   }
   \item{theme.stat}{
-    
+    top plot theme.
   }
   \item{theme.align}{
-    
+    alignment themes.
+  }
+  \item{linetype}{
+    linetype
   }
   \item{heights}{
     Heights of each track.
@@ -91,8 +101,9 @@ ggplot object.
 \examples{
 \dontrun{
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-data(genesymbol)
-txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
+library(ggbio)
+data(genesymbol, package = "biovizBase")
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 model <- exonsBy(txdb, by = "tx")
 model17 <- subsetByOverlaps(model, genesymbol["RBM17"])
 exons <- exons(txdb)
@@ -104,9 +115,16 @@ exon.new <- reduce(exon17)
 values(exon.new)$sample1 <- rnorm(length(exon.new), 10, 3)
 values(exon.new)$sample2 <- rnorm(length(exon.new), 10, 10)
 values(exon.new)$score <- rnorm(length(exon.new))
+values(exon.new)$significant <- sample(c(T,F), size =
+length(exon.new),replace = TRUE)
 plotRangesLinkedToData(exon.new, stat.col = c("sample1", "sample2"))
 plotRangesLinkedToData(exon.new, stat.col = 1:2)
-plotRangesLinkedToData(exon.new, stat.col = 1:2, annotation = list(p))
+plotRangesLinkedToData(exon.new, stat.col = 1:2, size = 3, linetype = 4)
+plotRangesLinkedToData(exon.new, stat.col = 1:2, size = 3, linetype = 4,
+                       sig = "significant")
+plotRangesLinkedToData(exon.new, stat.col = 1:2, size = 3, linetype = 4,
+                       sig = "significant", sig.col = c("red",
+"gray90"))
 }
 }
 \author{Tengfei Yin}

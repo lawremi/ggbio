@@ -12,7 +12,6 @@
 % for GRanges
 \S4method{geom_segment}{GRanges}(data,..., xlab, ylab, main,
           facets = NULL, stat = c("stepping", "identity"),
-          rect.height = 0.4,
           group.selfish = TRUE)
 }
 \arguments{
@@ -38,9 +37,6 @@
     Character vector specifying statistics to use. "stepping" with
     randomly assigned stepping levels as y varialbe. "identity" allow
     users to specify \code{y} value in \code{aes}.
-  }
-  \item{rect.height}{
-    Half height of the arrow body. 
   }
   \item{group.selfish}{
     Passed to \code{addStepping}, control whether to show each group as

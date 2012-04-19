@@ -2,13 +2,15 @@ setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
 setMethod("geom_rect", "data.frame", function(data, ...){
   ggplot2::geom_rect(data = data, ...)
 })
+
 ## alignment should be convenient toggle with chevron...
 setMethod("geom_rect", "GRanges", function(data,...,
                                            xlab, ylab, main,
                                            facets = NULL,
                                            stat = c("stepping", "identity"),
-                                           rect.height = 0.4,
+                                           rect.height = NULL,
                                            group.selfish = TRUE){
+
 
   ## make this by hand
   args <- list(...)
@@ -17,14 +19,11 @@ setMethod("geom_rect", "GRanges", function(data,...,
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(data, args.facets)
-  
   stat <- match.arg(stat)
-
-  rect.height <- force(rect.height)
-
   if(length(data)){
   if(stat == "stepping"){
-    
+    if(is.null(rect.height))
+      rect.height <- 0.4
     grl <- splitByFacets(data, facets)
     res <- endoapply(grl,
                      function(dt){
@@ -86,13 +85,23 @@ setMethod("geom_rect", "GRanges", function(data,...,
   }
   
   if(stat == "identity"){
+    
     if(!"y" %in% names(args.aes)){
       if(!all(c("ymin","ymax", "xmin", "xmax") %in% names(args.aes))){
         stop("aes(xmin =, xmax= , ymin =, ymax= ) is required for stat 'identity',
               you could also specify aes(y =) only as alternative")
+      }else{
+        args.aes.seg <- args.aes
+        args.aes.seg$x <- args.aes$xmin
+        args.aes.seg$xend <- args.aes$xmax
+        args.aes.seg$y <- args.aes$ymin
+        args.aes.seg$yend <- args.aes$ymax
       }
     }else{
       .y <- args.aes$y
+      if(is.null(rect.height)){
+         rect.height <- diff(range(values(data)[,as.character(.y)]))/20
+      }
       args.aes.seg <- args.aes
       args.aes.seg$x <- as.name("start")
       args.aes.seg$xend <- as.name("start")

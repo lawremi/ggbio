@@ -9,7 +9,7 @@ plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
   args.non <- parseArgsForNonAes(args)
   facets <- seqnames ~ .
   if(missing(obj)){
-    obj <- getIdeogram(cytoband = cytoband)
+    obj <- getIdeogram(cytobands = cytobands)
     cat("-------get following seqnames------\n")
     message(paste(seqnames(seqinfo(obj)), collapse = "\n"))
     ## obj <- keepSeqlevels(obj, unique(seqnames()))
@@ -28,9 +28,12 @@ plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
 
   }}
   p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, facets = facets)
-  if(!cytoband)
-    p <- p + layout_karyogram(data = obj, do.call(aes, args.aes),
-                         facets = facets, geom = geom)
+  args.non$geom <- geom
+  args.non$facets <- facets
+  if(!cytoband){
+    args.res <- c(list(data = obj), list(do.call(aes, args.aes)),args.non)
+    p <- p + do.call(layout_karyogram,args.res)
+  }
 }
   if(!missing(xlab))
     p <- p + xlab(xlab)

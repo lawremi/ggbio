@@ -5,7 +5,8 @@ formals.facet_grid <- getFormalNames(facet_grid)
 formals.facet_wrap <- getFormalNames(facet_wrap)
 formals.facets <- union(formals.facet_grid, formals.facet_wrap)
 
-.ggbio.geom <- c("rect", "chevron", "alignment", "arrowrect", "arrow", "segment", "arch")
+.ggbio.geom <- c("rect", "chevron", "alignment", "arrowrect", "arrow", "segment", "arch",
+                 "bar")
 .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate", "table",
                  "gene", "mismatch")
 
@@ -32,24 +33,32 @@ setMethod("autoplot", "GRanges", function(object, ...,
   
   if(coord == "genome"){
     object <- transformToGenome(object, space.skip = space.skip)
+    object <- biovizBase:::rescaleGr(object)
   }
-  
   formals.cur <- c("object", "stat", "geom", "legend",
                    "xlab", "ylab", "main")
-
   ## truncate
   if(truncate.gaps){
     if(is.null(truncate.fun)){
-      object.s <- reduce(object, ignore.strand = TRUE)
-      truncate.fun <- shrinkageFun(gaps(object.s, min(start(object.s)), max(end(object.s))),
-                                   maxGap(gaps(object.s, min(start(object.s)), max(end(object.s))),
-                                          ratio = ratio))
+      grl <- split(object, seqnames(object))
+      lst <- endoapply(grl, function(gr){
+        object.s <- reduce(gr, ignore.strand = TRUE)
+        gps <- gaps(object.s, min(start(object.s)), max(end(object.s)))
+        gps <- gps[strand(gps) == "*"]
+        truncate.fun <- shrinkageFun(gps, maxGap(gps, ratio = ratio))
+        res <- truncate.fun(gr)
+        res
+      })
+      object <- unlist(lst)
+    }else{
+      object <- truncate.fun(object)
     }
-    object <- truncate.fun(object)
   }
   ## ------------------------------
   ## geom/stat check
   ## ------------------------------
+  ## if(is.null(geom) & layout = "circle")
+  ##   geom <- "ideo"
   if(is.null(stat)){
     if(is.null(geom)){
       geom <- .ggbio.geom[1]
@@ -63,7 +72,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
 
-
+  
   if((!is.null(geom) && geom %in% .ggbio.geom) |
      (!is.null(stat) && stat %in% .ggbio.stat)){
      args.non$data <- object
@@ -74,12 +83,19 @@ setMethod("autoplot", "GRanges", function(object, ...,
   }
 
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  facet <- .buildFacetsFromArgs(object, args.facets)
-
   ## ------------------------------
   ## layout check
   ## ------------------------------
   layout <- match.arg(layout)
+  ## treak with facet
+  if(layout == "linear")
+      facet <- .buildFacetsFromArgs(object, args.facets)
+  else
+    facet <- NULL
+  
+  if(layout == "linear" & coord == "genome")
+    facet <- facet_null()
+  
   ## use the default x
   ## since some of the geom or stat are not fully supported by all layout
   if(layout == "linear"){
@@ -94,28 +110,22 @@ setMethod("autoplot", "GRanges", function(object, ...,
       p <- c(p, list(opts(legend.position = "none")))
 
 
-    if(missing(xlab)) {
-      chrs <- unique(as.character(seqnames(object)))
-      gms <- genome(object)
-      gm <- gms[chrs]
-      xlab <- paste(ifelse(is.na(gm), chrs, paste0(gm, "::", chrs)),
-                    collapse = ",")
-    }
+    if(missing(xlab)) 
+      xlab <- getXLab(object)
     p <- c(p, list(xlab(xlab)))
     ## tweak with default y lab
     if(!missing(ylab))
       p <- c(p,list(ylab(ylab)))
     if(!missing(main))
       p <- c(p, list(opts(title = main)))
-    
-    p <- ggplot() + p
+     p <- ggplot() + p
   }  
   if(layout == "karyogram"){
     p <- plotStackedOverview(object, ...,  geom = geom)
     ## FIXME: xlab/ylab/main
   }
   if(layout == "circle"){
-    p <- ggplot() + layout_circle(object, ..., geom = geom)
+    p <- ggplot() + layout_circle(object, ..., geom = geom, space.skip = space.skip)
   }
   ## test scale
   if(is_coord_truncate_gaps(object) | is_coord_genome(object)){
@@ -142,10 +152,8 @@ setMethod("autoplot", "GRangesList", function(object, ...,
 
   type <- match.arg(type)
   args <- list(...)
-
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-
   args.non$group.selfish <- group.selfish
   if(type == "none")  {
     ## geom <- match.arg(geom)
@@ -164,6 +172,7 @@ setMethod("autoplot", "GRangesList", function(object, ...,
     p
   }
   if(type == "sashimi"){
+    message("type:sashimi will be dropped in next release of bioc")
     gps <- psetdiff(unlist(range(object), use.names=FALSE), object)
     ## coverage
     gr <- flatGrl(object, indName)
@@ -177,8 +186,11 @@ setMethod("autoplot", "GRangesList", function(object, ...,
       do.call(stat_coverage, c(list(data = gr),
                                list(fill = coverage.fill, color = coverage.col)))
   }
-  if(!missing(xlab))
-    p <- p + xlab(xlab)
+  ## if(!missing(xlab))
+  ##   p <- p + xlab(xlab)
+  if(missing(xlab)) 
+    xlab <- getXLab(object)
+  p <- p + ggplot2::xlab(xlab)
   if(!missing(ylab))
     p <- p + ylab(ylab)
   if(!missing(main))
@@ -217,55 +229,56 @@ setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
 setMethod("autoplot", "GappedAlignments", function(object, ...,
                                                    xlab, ylab, main,
                                                    which,
-                                                   geom = "gapped.pair",
-                                                   show.junction = FALSE
+                                                   geom = NULL, stat = NULL
                                                    ){
 
   args <- list(...)
-  if(!missing(which))
-    gr <- biovizBase:::fetch(object, which)
-  else
-    gr <- biovizBase:::fetch(object)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
+  facet <- .buildFacetsFromArgs(object, args.facets)
+  if(is.null(stat)){
+  if(is.null(geom))
+    geom <- "alignment"
+  #### going to be droped next release of bioc
+  if("show.junction" %in% names(args.non)){
+    message("show.junction is going to be dropped, geom:alignment will contain gaps")
+  show.junction <- args.non$show.junction
+  if(show.junction){
+    geom <- "alignment"
+  }else{
+    geom <- "rect"
+  }}
+  ####
   if(geom == "gapped.pair"){
-    gr.junction <- gr[values(gr)$junction == TRUE]
-    gr.gaps <- getGaps(gr.junction, "qname")
-    gr.read <- gr  
-    df.read <- as.data.frame(gr.read)
-    df.gaps <- as.data.frame(gr.gaps)
-    p <- ggplot(df.read)
-    strandColor <- getOption("biovizBase")$strandColor
-    if(!("color" %in% names(args))){
-      if("fill" %in% names(args))
-        args <- c(args, list(color = substitute(fill)))
-      else
-        args <- c(args, list(color = substitute(strand),
-                             fill = substitute(strand)))
-    }
-    args <- c(args, list(xmin = substitute(start),
-                         xmax = substitute(end),
-                         ymin = substitute(stepping - 0.4),
-                         ymax = substitute(stepping + 0.4)))
-    p <- p + ggplot2::geom_rect(do.call("aes", args))+
-      scale_color_manual(values = strandColor) +
-        scale_fill_manual(values = strandColor)
-    ## mapped read
-    if(show.junction){
-      args <- args[!(names(args) %in% c("x", "y"))]
-      args <- c(args, list(x = substitute(start), xend = substitute(end),
-                           y = substitute(stepping),
-                           yend = substitute(stepping)))
-      p <- p + ggplot2::geom_segment(data = df.gaps, do.call("aes", args), color = "red")
-    }}else{
-    p <- autoplot(gr, ..., geom = geom)
+    message("geom:gapped.pair is going to be dropped next release,
+             if geom = NULL, it's going to use grglist(object) and show as
+             alignemnts")
+    geom <- "alignment"
+  }}else{
+    args.non$stat <- stat
+    args.non$geom <- geom
   }
-  if(!missing(xlab))
-    p <- p + ggplot2::xlab(xlab)
-  else
-    p <- p + ggplot2::xlab("Genomic Coordinate")
+  aes.res <- do.call(aes, args.aes)  
+  if(!is.null(geom)  && geom == "alignment"){
+    args.non$object <- grglist(object)
+    p <- do.call(autoplot, c(list(aes.res), args.non))
+  }else{
+    if(!missing(which))
+      gr <- biovizBase:::fetch(object, which)
+    else
+      gr <- biovizBase:::fetch(object)
+    args.non$object <- gr
+    p <- do.call(autoplot, c(list(aes.res), args.non))
+  }
+  if(missing(xlab)) 
+    xlab <- getXLab(object)
+  p <- p + ggplot2::xlab(xlab)
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main) 
+    p <- p + opts(title = main)
+  p <- p + facet
   p
 })
 
@@ -329,7 +342,12 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
 ##  For "character" need to check if it's path including bamfile or not
 ## ======================================================================
 setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
+                                            which,
                                             asRangedData = FALSE){
+  args <- list(...)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+
   .ext <- tools::file_ext(object)
   if(.ext == "bam"){
     message("reading in as Bamfile")
@@ -337,12 +355,26 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
   }else{
     message("reading in")
     obj <- import(object, asRangedData = asRangedData)
+    if(!missing(which) && is(which, "GRanges"))
+      obj <- subsetByOverlaps(obj, which)
   }
-  p <- autoplot(obj,  ...)
-  if(!missing(xlab))
-    p <- p + ggplot2::xlab(xlab)
-  else
-    p <- p + ggplot2::xlab("Genomic Coordinate")
+  if(is(obj, "GRanges")){
+    if(missing(xlab))
+      xlab <- getXLab(obj)
+    if(!"geom" %in% names(args.non)){
+    if("y" %in% names(args.aes) | "score" %in% colnames(values(obj))){
+      args.non$geom <- "bar"
+    }else{
+      args.non$geom <- "rect"
+    }}
+  }else{
+    if(missing(xlab))
+      xlab <- "Genomic Coordinate"
+  }
+  args.non$object <- obj
+  aes.res <- do.call(aes, args.aes)
+  p <- do.call(autoplot, c(list(aes.res), args.non))
+  p <- p + ggplot2::xlab(xlab)
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
@@ -365,8 +397,6 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                    "(", gene_id,")", sep = ""))){
 
   stat <- match.arg(stat)
-  if(stat == "reduce")
-    geom <- "reduced_gene"
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
@@ -374,6 +404,8 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
   args.non$truncate.gaps <- truncate.gaps
   args.non$truncate.fun <- truncate.fun
   args.non$ratio <- ratio
+  args.non$geom <- geom
+  args.non$stat <- stat
   if(!missing(which))
     args.non$which <- which
   aes.res <- do.call(aes, args.aes)
@@ -818,6 +850,54 @@ setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("none", "h
   p
 })
 
+getNR <- function(x, type = c("NUSE", "RLE"),range = 0, ...){
+  compute.nuse <- function(which) {
+    nuse <- apply(x@weights[[1]][which, ], 2, sum)
+    1/sqrt(nuse)
+  }
+
+  type <- match.arg(type)
+  model <- x@model.description$modelsettings$model
+
+  if (type == "NUSE") {
+    if (x@model.description$R.model$which.parameter.types[3] == 
+        1 & x@model.description$R.model$which.parameter.types[1] == 
+        0) {
+      grp.rma.se1.median <- apply(se(x), 1, median, 
+                                  na.rm = TRUE)
+      res <- grp.rma.rel.se1.mtx <- sweep(se(x), 1, grp.rma.se1.median, 
+                                          FUN = "/")
+
+    }
+    else {
+      which <- indexProbesProcessed(x)
+      ses <- matrix(0, length(which), 4)
+      if (x@model.description$R.model$response.variable == 
+          1) {
+        for (i in 1:length(which)) ses[i, ] <- compute.nuse(which[[i]])
+      }
+      else {
+        stop("Sorry I can't currently impute NUSE values for this PLMset object")
+      }
+      grp.rma.se1.median <- apply(ses, 1, median)
+      res <- grp.rma.rel.se1.mtx <- sweep(ses, 1, grp.rma.se1.median, 
+                                          FUN = "/")
+      
+    }
+  }
+  if(type == "RLE"){
+    if (x@model.description$R.model$which.parameter.types[3] == 
+        1) {
+      medianchip <- apply(coefs(x), 1, median)
+      res <- sweep(coefs(x), 1, medianchip, FUN = "-")
+    }
+    else {
+      stop("It doesn't appear that a model with sample effects was used.")
+    }  
+  }
+  res
+}
+
 
 
 ##======================================================================
@@ -831,7 +911,10 @@ setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
                                                     grid = FALSE,
                                                     trackSkip = 1,
                                                     layout = c("circle")){
-  
+
+  layout <- match.arg(layout)
+  message("Take 'genome' coordinate transformation")
+  if(layout == "circle"){
   if(missing(trackWidth)){
     trackWidth <- rep(5, length(object))
     idx <- which(unlist(lapply(args, function(arg){
@@ -881,7 +964,7 @@ setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
       p <- p + do.call(layout_circle, c(list(data = object[[i]]), radius = radius[i],
                                         trackWidth = trackWidth[i], grid = grid[i],
                                         args[[i]]))
-    }
+    }}
     p
 }) 
 

@@ -28,7 +28,6 @@
   A 'Layer'.
 }
 \examples{
-\dontrun{
 ## @knitr load
 set.seed(1)
 N <- 50
@@ -71,7 +70,6 @@ ggplot() + stat_identity(gr, aes(x = start, y = value),  geom = "line")
 
 ## @knitr geom_segment
 ggplot() + stat_identity(gr, aes(y = value), geom = "segment")
-}
 }
 \author{Tengfei Yin}
 

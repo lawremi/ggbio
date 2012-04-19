@@ -6,7 +6,6 @@ setMethod("geom_segment", "data.frame", function(data, ...){
 setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
                                            facets = NULL,
                                            stat = c("stepping", "identity"),
-                                           rect.height = 0.4,
                                            group.selfish = TRUE){
 
   args <- list(...)
@@ -18,12 +17,8 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
   
   stat <- match.arg(stat)
 
-  rect.height <- force(rect.height)
   if(length(data)){
   if(stat == "stepping"){
-    ## if(rect.height <= 0 | rect.height >= 0.5)
-    ##   stop("rect.height must be a value in (0,0.5)")
-    
     grl <- splitByFacets(data, facets)
     res <- endoapply(grl,
                      function(dt){

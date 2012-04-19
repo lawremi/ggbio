@@ -82,7 +82,6 @@ plotGrandLinear(obj, ..., facets, space.skip = 0.01, geom = NULL,
   
 }
 \examples{
-\dontrun{
 ## @knitr load
 library(ggbio)
 data(hg19IdeogramCyto, package = "biovizBase")
@@ -147,8 +146,8 @@ seqlengths(gr.snp) <- seqlths[names(seqlengths(gr.snp))]
 autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
 
 ## @knitr line
-autoplot(gr.snp, coord = "genome", geom = "line", aes(y = pvalue, group = .ori.seqnames,
-                                     color = .ori.seqnames))
+autoplot(gr.snp, coord = "genome", geom = "line", aes(y = pvalue, group = seqnames,
+                                     color = seqnames))
 
 
 
@@ -180,7 +179,5 @@ plotGrandLinear(gr.snp, aes(y = pvalue)) + opts(axis.text.x=theme_text(angle=-90
 
 ## @knitr sessionInfo
 sessionInfo()
-
-}
 }
 \author{Tengfei Yin}

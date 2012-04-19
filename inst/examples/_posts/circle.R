@@ -44,7 +44,7 @@ p <- p + layout_circle(hg19Ideo, geom = "scale", size = 2, radius = 35, trackWid
 p
 
 ## @knitr lower-text-track
-p <- p + layout_circle(hg19Ideo, geom = "text", aes(label = .ori.seqnames), vjust = 0,
+p <- p + layout_circle(hg19Ideo, geom = "text", aes(label = seqnames), vjust = 0,
                        radius = 38, trackWidth = 7)
 p
 
@@ -103,7 +103,12 @@ p
 
 
 ## @knitr autoplot
-grl <- GenomicRangesList(gr.crc1,  gr.crc1, mut.gr, hg19Ideo,  hg19Ideo, hg19Ideo)
+grl <- GenomicRangesList(gr.crc = gr.crc1,  gr.crc = gr.crc1,
+                         mut.gr = mut.gr,
+                         hg19Ideo = hg19Ideo,
+                         hg19Ideo = hg19Ideo,
+                         hg19Ideo = hg19Ideo)
+
 autoplot(grl, args = list(list(geom = "link" , linked.to = "to.gr", aes(color = rearrangements)),
                            list(geom = "point", aes(y = score, size = tumreads), color = "red"),
                            list(geom = "rect", fill = "steelblue",
@@ -159,3 +164,8 @@ grid.arrange(square, gg, ncol = 2, widths = c(4/5, 1/5))
 ## @knitr sessionInfo
 sessionInfo()
 
+## @knitr NULL
+example(GRanges)
+
+ggplot() + layout_circle(gr, geom = "ideo")
+ggplot() + layout_circle(gr, geom = "bar")

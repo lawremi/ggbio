@@ -8,7 +8,6 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
     geom <- "point"
 
 
-  
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
@@ -17,19 +16,19 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
   if(!"colour" %in% names(args.aes)){
     if(!any(c("color", "colour") %in% names(args.non))){
       .color <- two.color
-      args.aes$color <- as.name(".ori.seqnames")
+      args.aes$color <- as.name("seqnames")
        .is.seq <- TRUE      
     }else{
       if(length(args.non$color) > 1){
         .color <- args.non$color
-        args.aes$color <- as.name(".ori.seqnames")
+        args.aes$color <- as.name("seqnames")
        .is.seq <- TRUE
         args.non <- args.non[!names(args.non) %in% c("colour", "color")]
       }
     }
   }else{
     if(as.character(args.aes$colour) == "seqnames")
-      args.aes$colour <- as.name(".ori.seqnames")
+      args.aes$colour <- as.name("seqnames")
   }
 
 

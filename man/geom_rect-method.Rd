@@ -12,7 +12,7 @@
 ## For GRanges
 \S4method{geom_rect}{GRanges}(data,..., xlab, ylab, main,
           facets = NULL, stat = c("stepping", "identity"),
-          rect.height = 0.4,
+          rect.height = NULL,
           group.selfish = TRUE)
 }
 \arguments{

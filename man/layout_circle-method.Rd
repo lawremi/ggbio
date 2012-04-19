@@ -10,11 +10,12 @@
                  "rect", "bar", "segment", "hist", "scale", "ideogram",
                  "text"), linked.to, radius = 10, trackWidth = 5,
                  space.skip = 0.015, direction = c("clockwise",
-                 "anticlockwise"),
-                 link.fun = function(x, y, n = 30) bezier(x, y, evaluation = n),
-                 rect.inter.n = 5, rank, scale.n = 60, scale.unit = NULL,
-                 scale.type = c("M", "B", "sci"), grid.n = 5, grid.background = "gray70",
+                 "anticlockwise"), link.fun = function(x, y, n = 30)
+                 bezier(x, y, evaluation = n), rect.inter.n = 60, rank,
+                 scale.n = 60, scale.unit = NULL, scale.type = c("M",
+                 "B", "sci"), grid.n = 5, grid.background = "gray70",
                  grid.line = "white", grid = FALSE)
+
 }
 \arguments{
   \item{data}{
@@ -81,60 +82,34 @@
   A 'Layer'.
 }
 \examples{
-\dontrun{
-## make a sample data?
-library(GenomicRanges)
-data(hg19Ideogram, package = "biovizBase")
-obj <- hg19Ideogram
-obj <- keepSeqlevels(obj, paste("chr", c(1:22, "X", "Y"), sep = ""))
+N <- 100
+require(ggbio)
+require(GenomicRanges)
+## @knitr simul
+## ======================================================================
+##  simmulated GRanges
+## ======================================================================
+gr <- GRanges(seqnames = 
+              sample(c("chr1", "chr2", "chr3"),
+                     size = N, replace = TRUE),
+              IRanges(
+                      start = sample(1:300, size = N, replace = TRUE),
+                      width = sample(70:75, size = N,replace = TRUE)),
+              strand = sample(c("+", "-", "*"), size = N, 
+                replace = TRUE),
+              value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
+              sample = sample(c("Normal", "Tumor"), 
+                size = N, replace = TRUE),
+              pair = sample(letters, size = N, 
+                replace = TRUE))
 
-## define a set of data points
-set.seed(1)
-seqs <- seqlengths(obj)
-N <- 20
-lst <- lapply(1:length(seqs), function(i){
-  seq <- seqs[i]
-  pos <- runif(N, max = seq)
-  score <- rnorm(N)
-  GRanges(names(seq), IRanges(pos, width = 100))
-})
-res <- do.call(c, lst)
-width(res) <- round(rnorm(N, mean = 1e7, sd = 10))
-## seqlengths *MUST* be consistency
-seqlengths(res) <- seqlengths(obj)
-## adding some scores
-values(res)$score <- rnorm(N)
-
-## let's adding a link!
-## simulate some data
-lst <- lapply(1:length(seqs), function(i){
-  seq <- seqs[i]
-  pos <- runif(N, max = seq)
-  score <- rnorm(N)
-  GRanges(names(seq), IRanges(pos, width = 1))
-})
-to.gr <- do.call(c, lst)
-## don't forget to add seqlengths for GRanges object
-seqlengths(to.gr) <- seqlengths(obj)
-width(to.gr) <- round(rnorm(N, mean = 1e3, sd = 10))
-to.gr <- to.gr[sample(1:length(to.gr), size = length(to.gr))]
-values(res)$to <- to.gr
-
-## edit text label
-values(obj)$label <- sub("chr", "", as.character(seqnames(obj)))
-library(Hmisc)
-library(ggbio)
-ggplot() +
-  layout_circle(res, geom = "link", rank = 0, linked.to = "to",
-                         alpha = 0.4, aes(color = score) ) +
-  layout_circle(res, geom = "ideogram", fill = "gray80", rank = 1) +
-  layout_circle(obj, geom = "text", aes(label = label), rank = 2) +
-  layout_circle(res, aes(y = score), geom = "point", rank = 3, size = 0.5) +
-    layout_circle(res, aes(y = score), geom = "line", rank = 4) +
-       layout_circle(res, geom = "rect", rank = 5) +
-          layout_circle(res, geom = "segment", rank = 6) +
-         layout_circle(res, geom = "scale", rank = 7)
-}
+seqlengths(gr) <- c(400, 500, 700)
+values(gr)$to.gr <- gr[sample(1:length(gr), size = length(gr))]
+ggplot() + layout_circle(gr, geom = "ideo", fill = "gray70", radius = 7, trackWidth = 3) +
+  layout_circle(gr, geom = "bar", radius = 10, trackWidth = 4, aes(fill = score, y = score)) +
+  layout_circle(gr, geom = "point", color = "red", radius = 14,
+                trackWidth = 3, grid = TRUE, aes(y = score)) +
+    layout_circle(gr, geom = "link", linked.to = "to.gr", radius = 6, trackWidth = 1)
 }
 \author{Tengfei Yin}
 

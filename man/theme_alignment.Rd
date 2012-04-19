@@ -33,7 +33,6 @@ theme_alignment(label = FALSE, base_size = 12,
   Return a options list.
 }
 \examples{
-\dontrun{
 ## @knitr load
 library(ggbio)
 data(genesymbol, package = "biovizBase")
@@ -46,7 +45,6 @@ p
 
 ## @knitr theme:tweak
 p + theme_alignment(border = TRUE, grid = FALSE, label = TRUE)
-}
 }
 \author{Tengfei Yin}
 

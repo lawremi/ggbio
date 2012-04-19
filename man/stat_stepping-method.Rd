@@ -39,7 +39,6 @@
   A 'Layer'.
 }
 \examples{
-\dontrun{
 ## @knitr load
 set.seed(1)
 N <- 50
@@ -80,7 +79,6 @@ ggplot() + stat_stepping(gr, geom = "alignment")
 
 ## @knitr geom_alignment_group
 ggplot() + stat_stepping(gr, aes(group = pair),geom = "alignment")
-}
 }
 \author{Tengfei Yin}
 

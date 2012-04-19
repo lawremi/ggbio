@@ -236,3 +236,49 @@ ggplot() +
 
 
 autoplot(res, geom = "ideogram", layout = "circle", fill = "blue")
+
+## NULL
+library(ggbio)
+data(hg19IdeogramCyto, package = "biovizBase")
+data(hg19Ideogram, package = "biovizBase")
+## get seqlengths
+obj <- hg19IdeogramCyto
+library(GenomicRanges)
+seqlengths(obj) <- seqlengths(hg19Ideogram)[names(seqlengths(obj))]
+values(obj)$score <- rnorm(length(obj), 10, 5)
+values(obj)$to.gr <- obj[sample(1:length(obj), size = length(obj))]
+ggplot() + layout_circle(obj, geom = "ideo", fill = "gray70", radius = 7, trackWidth = 3) +
+  layout_circle(obj, geom = "bar", radius = 11, trackWidth = 5, aes(y = score)) +
+   layout_circle(obj, geom = "link", radius = 6, trackWidth = 1, linked.to = "to.gr",
+                 n = 10)
+
+
+N <- 100
+require(ggbio)
+require(GenomicRanges)
+## @knitr simul
+## ======================================================================
+##  simmulated GRanges
+## ======================================================================
+gr <- GRanges(seqnames = 
+              sample(c("chr1", "chr2", "chr3"),
+                     size = N, replace = TRUE),
+              IRanges(
+                      start = sample(1:300, size = N, replace = TRUE),
+                      width = sample(70:75, size = N,replace = TRUE)),
+              strand = sample(c("+", "-", "*"), size = N, 
+                replace = TRUE),
+              value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
+              sample = sample(c("Normal", "Tumor"), 
+                size = N, replace = TRUE),
+              pair = sample(letters, size = N, 
+                replace = TRUE))
+
+
+seqlengths(gr) <- c(400, 500, 700)
+values(gr)$to.gr <- gr[sample(1:length(gr), size = length(gr))]
+ggplot() + layout_circle(gr, geom = "ideo", fill = "gray70", radius = 7, trackWidth = 3) +
+  layout_circle(gr, geom = "bar", radius = 10, trackWidth = 4, aes(fill = score, y = score)) +
+  layout_circle(gr, geom = "point", color = "red", radius = 14,
+                trackWidth = 3, grid = TRUE, aes(y = score)) +
+    layout_circle(gr, geom = "link", linked.to = "to.gr", radius = 6, trackWidth = 1)

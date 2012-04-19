@@ -9,7 +9,7 @@
 \S4method{geom_arrowrect}{GRanges}(data, ...,
                           xlab, ylab, main, facets = NULL,
                           stat = c("stepping", "identity"),
-                          rect.height = 0.4,
+                          rect.height = NULL,
                           arrow.head = 0.06,
                           group.selfish = TRUE)
 }

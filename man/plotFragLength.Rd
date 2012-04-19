@@ -59,7 +59,7 @@
 data(genesymbol)
 bamfile <- system.file("extdata", "SRR027894subRBM17.bam", package="biovizBase")
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 model <- exonsBy(txdb, by = "tx")
 model.new <- subsetByOverlaps(model, genesymbol["RBM17"])
 exons.rbm17 <- subsetByOverlaps(exons(txdb), genesymbol["RBM17"])

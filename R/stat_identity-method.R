@@ -4,7 +4,6 @@ setMethod("stat_identity", "data.frame", function(data, ...){
 })
 
 setMethod("stat_identity", "GRanges", function(data, ..., geom = NULL){
-  browser()
   args <- list(...)
   gr.geoms <- c("chevron", "arrow", "arrowrect", "segment", "rect", "alignment")
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
@@ -22,7 +21,7 @@ setMethod("stat_identity", "GRanges", function(data, ..., geom = NULL){
     args$data <- data
     p <- do.call(.geom.fun, args)
   }
-  p <- p + facet
+  p <- c(list(p), list(facet))
   p
 })
 

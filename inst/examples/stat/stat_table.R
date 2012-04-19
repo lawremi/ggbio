@@ -26,11 +26,7 @@ gr <- c(gr[seqnames(gr) == "chr1"][sample(1:10, size = 1e4, replace = TRUE)],gr)
 ## @knitr default
 ggplot() + stat_table(gr)
 ggplot() + stat_table(gr, geom = "segment", aes(y = ..score.., color = ..score..))
-## FIXME
-ggplot() + stat_table(gr, aes(color = factor(score)))
-## ggplot() + stat_table(gr, rect.height = 0.1, geom = "rect")
-ggplot() + stat_table(gr, geom = "segment")
-
+ggplot() + stat_table(gr, aes(color = score))
 
 ## @knitr NULL
 ggplot() + stat_table(gr) + stat_table(GRanges(), xlab = "xlab", ylab = "ylab", main = "main")

@@ -53,7 +53,7 @@
 \dontrun{
 bamfile <- system.file("extdata", "SRR027894subRBM17.bam", package="biovizBase")
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-txdb <- Hsapiens_UCSC_hg19_knownGene_TxDb
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 data(genesymbol)
 exons <- exonsBy(txdb, by = "tx")
 exons.rbm17 <- subsetByOverlaps(exons, genesymbol["RBM17"])

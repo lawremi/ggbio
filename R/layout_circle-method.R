@@ -6,7 +6,7 @@ setMethod("layout_circle",  "GRanges",
                           radius = 10, trackWidth = 5, 
                           space.skip = 0.015, direction = c("clockwise", "anticlockwise"),
                           link.fun = function(x, y, n = 30) bezier(x, y, evaluation = n),
-                   rect.inter.n = 5, rank, 
+                   rect.inter.n = 60, rank, 
                    scale.n = 60, scale.unit = NULL, scale.type = c("M", "B", "sci"),
                    grid.n = 5, grid.background = "gray70", grid.line = "white",
                    grid = FALSE){
@@ -41,6 +41,7 @@ setMethod("layout_circle",  "GRanges",
     values(data)$.grid.level <- rep(1:grid.n, each = length(data)/grid.n)
     res <- transformToSegInCircle(data, y = ".grid.level",
                     space.skip = space.skip, trackWidth = trackWidth,
+                                  n = rect.inter.n,
                     radius = radius, direction = direction)
     df <- as.data.frame(res)
     args.aes <-   args.non <- list()    
@@ -187,6 +188,7 @@ setMethod("layout_circle",  "GRanges",
     res <- transformToGenome(res, space.skip)    
     res <- transformToCircle(res, y = "scale.y", radius= radius, trackWidth = trackWidth,
                      direction = direction)
+    names(res) <- NULL
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group)
     df <- df[idx, ]
@@ -242,7 +244,6 @@ setMethod("layout_circle",  "GRanges",
     if(!"fill" %in% names(args.aes) & !"fill" %in% names(args.non)){
       args.non$fill <- "black"
     }
-    
     args.tot <- c(list(data = df, aes.p), args.non)
     res <- do.call(geom_polygon, args.tot)
     p <- list(res)
@@ -251,21 +252,23 @@ setMethod("layout_circle",  "GRanges",
   if(geom == "bar"){
     res <- transformToBarInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
-                    direction = direction)
+                    direction = direction, n = rect.inter.n)
     df <- as.data.frame(res)
-    idx <- order(df$.biovizBase.group)
+    idx <- order(df$.biovizBase.group, df$.int.id)
     df <- df[idx, ]
-    N <- nrow(df)
-    res <- df[seq(1, N-1, by = 2),]
-    res[,c(".circle.xend", ".circle.yend")] <-
-      df[seq(2, N, by = 2), c(".circle.x", ".circle.y")]
-    args.aes$y <- as.name(".circle.y")
-    args.aes$x <- as.name(".circle.x")
-    args.aes$yend <- as.name(".circle.yend")
-    args.aes$xend <- as.name(".circle.xend")
-    aes <- do.call("aes", args.aes)
-    args.tot <- c(list(data = df, aes), args.non)
-    res <- do.call(geom_segment, args.tot)
+    args.aes.p <- args.aes
+    args.aes.p$y <- as.name(".circle.y")
+    args.aes.p$x <- as.name(".circle.x")
+    args.aes.p$group <- as.name(".biovizBase.group")
+    aes.p <- do.call("aes", args.aes.p)
+    if(!"color" %in% names(args.aes) & !"color" %in% names(args.non)){
+      args.non$color <- "black"
+    }
+    if(!"fill" %in% names(args.aes) & !"fill" %in% names(args.non)){
+      args.non$fill <- "black"
+    }
+    args.tot <- c(list(data = df, aes.p), args.non)
+    res <- do.call(geom_polygon, args.tot)
     p <- list(res)
   }
   

@@ -13,6 +13,7 @@ autoplot(gr)
 
 ## @knitr coord:genome
 autoplot(gr, coord = "genome")
+autoplot(gr, coord = "genome", aes(fill = seqnames))
 gr.t <- transformToGenome(gr)
 head(gr.t)
 
@@ -62,8 +63,8 @@ seqlengths(gr.snp) <- seqlths[names(seqlengths(gr.snp))]
 autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
 
 ## @knitr line
-autoplot(gr.snp, coord = "genome", geom = "line", aes(y = pvalue, group = .ori.seqnames,
-                                     color = .ori.seqnames))
+autoplot(gr.snp, coord = "genome", geom = "line", aes(y = pvalue, group = seqnames,
+                                     color = seqnames))
 
 
 
@@ -95,3 +96,11 @@ plotGrandLinear(gr.snp, aes(y = pvalue)) + opts(axis.text.x=theme_text(angle=-90
 
 ## @knitr sessionInfo
 sessionInfo()
+
+## @knitr NULL
+p1 <- autoplot(gr.snp, aes(y = pvalue), geom = "point")
+p2 <- plotGrandLinear(gr.snp, aes(y = pvalue))
+pdf("~/Desktop/man.pdf", 13, 10)
+grid.arrange(p1, p2)
+dev.off()
+

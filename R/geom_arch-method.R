@@ -121,31 +121,55 @@ setMethod("geom_arch", "GRanges", function(data, ...,
   p
 })
 
-## setMethod("geom_arch", "GRangesList", function(data, ..., rect.height = 0.4,
-##                                               n = 25, max.height = 10
-##                                               ){
 
-##   args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+
+## setMethod("geom_arch", "GRangesList", function(data, ..., 
+##                                                xlab, ylab, main,
+##                                                facets = NULL, rect.height = 0,
+##                                                n = 25, max.height = 10
+##                                                ){
+
+##   if(any(elementLengths(data) != 2))
+##     stop("geom_arch only accept GRangesList which elementLengths is 2, represent
+##           linked intervals.")
+##   args <- list(...)  
+##   args$facets <- facets
 ##   args.aes <- parseArgsForAes(args)
 ##   args.non <- parseArgsForNonAes(args)
-##   args.non <- args.non[!names(args.non) %in% c("data", "n", "rect.height",
-##                                                "stat")]            
 ##   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-##   facet <- .buildFacetsFromArgs(data, args.facets)
-  
-##   ## we require GRangesList elementLengths is always 2 to sepcify two end point now
-##   if(!all(elementLengths(data) == 2))
-##     stop("Element lengths of the data must be of 2 now.")
-##   gr <- stack(data)
-##   DF <- as.data.frame(values(data))
-##   lst <- lapply(seq_len(nrow(DF)),function(i){
-##     rbind(DF[i,,drop = FALSE],DF[i,,drop = FALSE])
-##   })
-##   df <- do.call(rbind,lst)
-##   values(gr) <- cbind(as.data.frame(values(gr)), df)
-##   args.new <- list(data = gr, n = n,
-##                    max.height = max.height, list(do.call(args.aes)))
-##   do.call(geom_arch, args.new)  
+##   ## facet <- .buildFacetsFromArgs(data, args.facets)
+##   if(length(data)){
+##       if(!biovizBase:::is_homo(data)){
+##         data.new <- transformToGenome(data)
+##         grl <- split(data.new, values(data.new)$.group)
+##         data.new <- unlist(endoapply(grl, function(gr){
+##           res <- GRanges("genome", gaps(ranges(gr)))
+##           seqlengths(res) <- seqlengths(gr)
+##           res
+##       }))
+##       }else{
+##         data.new <- unlist(endoapply(data, function(gr){
+##           gps <- gaps(gr, start = start(gr), end = end(gr))
+##           gps <- gps[strand(gps)  == "*"]
+##         }))
+##       }
+##     p <- geom_arch(data.new, ..., rect.height = rect.height, n = n, max.height = max.height)
+##   }else{
+##     p <- NULL
+##   }
+##   if(!missing(xlab))
+##     p <- c(p, list(ggplot2::xlab(xlab)))
+##   else
+##     p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+##   if(!missing(ylab))
+##     p <- c(p, list(ggplot2::ylab(ylab)))
+##   if(!missing(main))
+##     p <- c(p, list(opts(title = main)))
+##   if(is_coord_truncate_gaps(data.new) | is_coord_genome(data.new)){
+##     ss <- getXScale(data.new)
+##     p <- c(p, list(scale_x_continuous(breaks = ss$breaks,
+##                                 labels = ss$labels)))
+##   }
+
+##   p
 ## })
-
-

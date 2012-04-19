@@ -11,7 +11,6 @@ theme_null()
   Return a options list.
 }
 \examples{
-\dontrun{
 ## @knitr load
 set.seed(1)
 N <- 50
@@ -32,7 +31,6 @@ autoplot(gr)
 
 ## @knitr theme_null
 autoplot(gr) + theme_null()
-}
 }
 \author{Tengfei Yin}
 

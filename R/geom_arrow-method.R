@@ -64,10 +64,9 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
       args.aes$x <- as.name("temp.x")
       args.aes$xend <- as.name("temp.x2")
       args.aes$y <- args.aes$yend <- as.name("stepping")
-
       ## need to split to two direction/maybe three?
       p <- by(res, res$strand, function(x){
-        s <- unique(x$strand)
+        s <- unique(as.character(x$strand))
         p <- switch(s,
                     "+" = {
                       args.non$arrow <- arrow(length = length, ends = "last",
@@ -88,19 +87,6 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
                     })
         p
       })
-    ## if("group" %in% names(args.aes))
-    ##   gpn <- as.character(args.aes$group)
-    ## else
-    ##   gpn <- "stepping"
-    ## .df.lvs <- unique(res$stepping)
-    ## .df.sub <- res[, c("stepping", gpn)]
-    ## .df.sub <- .df.sub[!duplicated(.df.sub$stepping),]
-    ## if(gpn != "stepping" & group.selfish){
-    ##   p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
-    ##                                      labels = as.character(.df.sub[, gpn]))))
-    ## }else{
-    ##   p <- c(p, list(scale_y_continuous(breaks = NULL)))
-    ## }
     }
     if(stat == "identity"){
     if(!"y" %in% names(args.aes)){
@@ -115,10 +101,8 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
       args.aes$y <-  args.aes$yend <- .y
     }
       
-      ## if(!all(names(args.aes) %in% c("x", "xend", "y", "yend")))
-      ##   stop("aes(x =, y =, xend = , yend = ) is required when stat is 'identity'")
       df <- as.data.frame(data)
-      ## rest?
+
       lst <- apply(df, 1, function(x){
 
         x <- as.data.frame(t(x), stringsAsFactors = FALSE)
@@ -144,7 +128,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
       res <- do.call(rbind,lst)
 
       p <- by(res, res$strand, function(x){
-        s <- unique(x$strand)
+        s <- unique(as.character(x$strand))        
         p <- switch(s,
                     "+" = {
                       args.non$arrow <- arrow(length = length, ends = "last",

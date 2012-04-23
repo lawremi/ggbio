@@ -38,7 +38,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
   formals.cur <- c("object", "stat", "geom", "legend",
                    "xlab", "ylab", "main")
   ## truncate
-  if(truncate.gaps){
+  if(truncate.gaps | coord == "truncate_gaps"){
     if(is.null(truncate.fun)){
       grl <- split(object, seqnames(object))
       lst <- endoapply(grl, function(gr){
@@ -1025,7 +1025,7 @@ setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
     if(!"fill" %in% names(args)){
       args.non$fill <- "black"
     }
-    p <- ggplot(data = df) + do.call(geom_bar, c(list(stat = "identity"),
+    p <- ggplot(data = df) + do.call(ggplot2::geom_bar, c(list(stat = "identity"),
                                    list(do.call(aes, args.aes)),
                                    args.non))
   }

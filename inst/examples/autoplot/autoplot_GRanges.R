@@ -213,10 +213,12 @@ autoplot(crc1.grl)
 ##
 grs <- GRanges("chr1", IRanges(start = c(1, 70, 120), width = c(30, 30, 30)),
                strand = c("-", "*", "+"))
-p1 <- autoplot(grs, aes(fill = strand)) + ylab("")
-p2 <- autoplot(grs, aes(color = strand), geom = "segment") + ylab("")
-p3 <- autoplot(grs, aes(color = strand), geom = "chevron") + ylab("")
-p4 <- autoplot(grs, aes(color = strand), geom = "arch") + opts(legend.position = "none") + ylab("") 
+strandColor <- getOption("biovizBase")$strandColor
+
+p1 <- autoplot(grs, aes(fill = strand)) + ylab("") + opts(legend.position = "none")
+p2 <- autoplot(grs, aes(color = strand), geom = "segment") + ylab("")+ opts(legend.position = "none")
+p3 <- autoplot(grs, aes(color = strand), geom = "chevron") + ylab("") + scale_color_manual(values = strandColor) + opts(legend.position = "none")
+p4 <- autoplot(grs, aes(color = strand), geom = "arch") + opts(legend.position = "none") + ylab("")  + scale_color_manual(values = strandColor)  + opts(legend.position = "none")
 p5 <- autoplot(grs, geom = "arrow") + ylab("")
 p6 <- autoplot(grs, geom = "arrowrect") + ylab("")
 p7 <- autoplot(grs, geom = "alignment") + ylab("")

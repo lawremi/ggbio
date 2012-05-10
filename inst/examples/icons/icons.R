@@ -78,12 +78,13 @@ ggplot() + stat_identity(gr1[1:6], aes(y = score), geom = "rect") + theme_null()
 dev.off()
 ## mismatch
 ## simulated
-df <- data.frame(x = c(rep(3, 10), rep(5, 20)),
-                 type = c(rep("A", 5), rep("C", 5), rep("T", 6), rep("G", 14)))
-cols <- strandColor <- getOption("biovizBase")$DNABasesColor
+x0 <- seq(-5, 5, length = 1000)
+y0 <- -x0^2 + 25
+df0 <- data.frame(x0 = c(min(x0), x0, max(x0)), y0 = c(0, y0, 0))
+df <- data.frame(x = c(0), y  = c(15))
 dev.fun("stat_mismatch", w, h)
-ggplot() +   geom_bar(data = df, aes(x = factor(x), fill = type)) +
-  scale_fill_manual(values = cols) +
+ggplot() +  geom_area(data = df0, aes(x = x0, y = y0), fill = "gray70") + 
+  geom_bar(data = df, aes(x = x, y = y), stat = "identity", fill = "red") +
  theme_null() + opts(legend.position = "none")
 dev.off()
 
@@ -97,49 +98,60 @@ dev.off()
 
 ## table
 dev.fun("stat_table", w, h)
-grs2 <-  GRanges("chr1", IRanges(start = c(1, rep(30, 10)), width = c(10, rep(30, 10))))
-ggplot() + stat_table(grs2, aes(y = score, fill = score), stat = "identity", geom = "rect") + theme_null() + opts(legend.position = "none")
+grs2 <-  GRanges("chr1", IRanges(start = c(1, rep(15, 4)), width = c(10, rep(10, 4))))
+p1 <- autoplot(grs2)+ theme_null()
+p2 <- ggplot() + stat_table(grs2) + scale_fill_continuous(space = "Lab") + theme_null() + opts(legend.position = "none")
+tracks(p1, p2, heights = c(3, 1))
 dev.off()
 ## default
+grco <- GRanges(c("1", "1", "2", "2"),
+                IRanges(c(1, 5, 1, 5), width = 10))
 dev.fun("coord_linear", w, h)
-autoplot(gr2[1:50])
+autoplot(grco) + theme_alignment(grid = FALSE)+
+  opts(strip.background = theme_rect(fill = 'black')) + opts(axis.text.x = theme_blank(),
+                                       axis.ticks = theme_blank()) + xlab("") + ylim(c(0, 3))
+
 dev.off()
 ## coord_genome
-gr2 <- gr[seqnames(gr) != "chr3"]
-gr2 <- keepSeqlevels(gr2, paste("chr", 1:2, sep = ""))
-seqlengths(gr2) <- c(400, 500)
-gr2
 dev.fun("coord_genome", w, h)
-plotGrandLinear(gr, aes(y = score), color = c("red", "blue", "orange"), size = 4) + 
-  opts(legend.position = "none")
+autoplot(grco, coord = "genome") + theme_alignment(grid = FALSE) +
+    opts(strip.background = theme_rect(fill = 'black')) + opts(axis.text.x = theme_blank(),
+                                       axis.ticks = theme_blank()) + xlab("") + ylim(c(0, 3))
+
 dev.off()
 ## coord_truncate
+grs <- GRanges("1", IRanges(c(1, 100), width = 20))
 dev.fun("coord_truncate_gaps", w, h)
-autoplot(grs, coord = "truncate_gaps", ratio = 0)
+p1 <- autoplot(grs)
+p2 <- autoplot(grs, coord = "truncate_gaps", ratio = 0.2, truncate.gaps = TRUE)
+tracks(p1, p2) + theme_null()
 dev.off()
 
+
+## layout default
+grc <- GRanges(c("chr1", "chr2", "chr3"),
+               IRanges(start = c(30, 50, 70),
+                       width = 5))
+
+seqlengths(grc) <- c(100, 200, 300)
+
+dev.fun("layout_default", w, h)
+autoplot(grc)+  theme_alignment(grid = FALSE)  +
+  opts(strip.background = theme_rect(fill = 'black')) + opts(axis.text.x = theme_blank(),
+                                       axis.ticks = theme_blank()) + xlab("") + ylim(c(-1, 3))
+
+dev.off()
 ## layout karyogram
-data("hg19Ideogram", package = "biovizBase")
-data("hg19IdeogramCyto", package = "biovizBase")
-
-seqlengths(hg19IdeogramCyto) <- seqlengths(hg19Ideogram)[names(seqlengths(hg19IdeogramCyto))]
 dev.fun("layout_karyogram", w, h)
-df <- keepSeqlevels(hg19IdeogramCyto, c(paste("chr", c(1,2 ), sep = "")))
-df2 <- df[sample(1:length(df), size = 10)]
-width(df2) <- 1e6
-ggplot() + layout_karyogram(df, cytoband = FALSE) + layout_karyogram(df2, geom = "rect",
-                                  fill = "steelblue") +
-  theme_null() + opts(legend.position = "none")
-
+autoplot(grc, layout = "karyogram")
 dev.off()
-
 ## layout circle
 dev.fun("layout_circle", w, h)
 grc <- GRanges(c("chr1", "chr2", "chr3"),
                IRanges(start = 1,
                        width = 100))
 seqlengths(grc) <- c(100, 200, 300)
-
+grc
 autoplot(grc, layout = "circle", geom = "ideo")
 dev.off()
 ## facetting
@@ -178,3 +190,10 @@ dev.off()
 
 
 
+## gappedalignment
+gr <- GRanges("1", IRanges(c(1, 10), width = 5))
+gr2 <- GRanges("1", IRanges(1, width = 5))
+grl <- GRangesList(gr, gr2)
+dev.fun("autoplot_GappedAlignment", w, h)
+autoplot(grl, gap.geom = "segment") + theme_null()
+dev.off()

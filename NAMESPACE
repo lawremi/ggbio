@@ -111,6 +111,7 @@ export(tracks,
        plotSpliceSum,       
        plotStackedOverview,
        plotSingleChrom,
+       plotIdeogram,       
        plotGrandLinear,
        plotRangesLinkedToData)
 

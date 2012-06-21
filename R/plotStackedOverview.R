@@ -45,7 +45,6 @@ plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
   p
 }
 
-
 plotSingleChrom <- function(obj, subchr, zoom.region,
                             xlab, ylab, main, xlabel = FALSE){
   ## do we need subchr here
@@ -86,3 +85,4 @@ plotSingleChrom <- function(obj, subchr, zoom.region,
 }
 
 
+plotIdeogram <- plotSingleChrom

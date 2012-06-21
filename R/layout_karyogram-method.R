@@ -27,9 +27,29 @@ setMethod("layout_karyogram", "GRanges",
             }else{
               .ideo.range <- ylim
             }
+            ## getCytoColor <- function(cols){
+            ##   cols.df <- getOption("biovizBase")$cytobandColor
+            ##   idx <- cols %in% cols.df
+            ##   if(!all(idx)){
+            ##     cols.non <- cols[!idx]
+            ##     idx.gpos <- substr(cols.non, 1, 4) == "gpos"
+            ##     if(!all(idx.gpos))
+            ##       warning(cols.non[!idx.gpos], "not in default gieStain name and will be dropped")
+            ##     if(length(cols.non[idx.gpos])){
+            ##       cols.non.num <- gsub("gpos", "", cols.non[idx.gpos])
+            ##       cols.non.num <- as.numeric(cols.non.num)
+            ##       cols.new <- paste("grey", 120 - cols.non.num[!is.na(cols.non.num)], sep= "")
+            ##       names(cols.new) <- cols.non[idx.gpos]
+            ##       cols.df <- c(cols.df, cols.new)
+            ##     }
+            ##   }
+            ##   cols.df
+            ## }
+            
             ## check facets
             if(cytoband){
               cytobandColor <- getOption("biovizBase")$cytobandColor
+              ## cytobandColor <- getCytoColor(unique(values(data)$gieStain))
               ## TODO: change to
               if(!isIdeogram(data))
                 stop("Need cytoband information, please check the getIdeogram function")
@@ -48,45 +68,51 @@ setMethod("layout_karyogram", "GRanges",
                                                                     fill = as.name("gieStain")))),
                                                            list(color = "black"))))
 
-              p.ideo <- c(p.ideo,
-                          list(geom_polygon(data = df.tri.p,
-                                            do.call(aes,
-                                         list(x = substitute(c(start, start, end)),
-                                              y = substitute(c(rep(val[1], length(start)),
-                                                rep(val[2],length(start)),
-                                        rep(mean(val),length(start))), list(val = .ideo.range)),
-                                         fill = as.name("gieStain"))))))
+              ## if(nrow(df.tri.p))
+              ## p.ideo <- c(p.ideo,
+              ##             list(geom_polygon(data = df.tri.p,
+              ##                               do.call(aes,
+              ##                            list(x = substitute(c(start, start, end)),
+              ##                                 y = substitute(c(rep(val[1], length(start)),
+              ##                                   rep(val[2],length(start)),
+              ##                           rep(mean(val),length(start))), list(val = .ideo.range)),
+              ##                            fill = as.name("gieStain"))))))
+
+              ## if(nrow(df.tri.q))
+              ## p.ideo <- c(p.ideo,
+              ##             list(geom_polygon(data = df.tri.q,
+              ##                               do.call(aes,
+              ##                            list(x = substitute(c(start, end, end)),
+              ##                                 y = substitute(
+              ##                                   c(rep(mean(val),length(start)),
+              ##                                     rep(val[2], length(start)),
+              ##                                     rep(val[1],length(start))),
+              ##                                   list(val = .ideo.range)),
+              ##                            fill = as.name("gieStain"))))))
 
               p.ideo <- c(p.ideo,
-                          list(geom_polygon(data = df.tri.q,
-                                            do.call(aes,
-                                         list(x = substitute(c(start, end, end)),
-                                              y = substitute(
-                                                c(rep(mean(val),length(start)),
-                                                  rep(val[2], length(start)),
-                                                  rep(val[1],length(start))),
-                                                list(val = .ideo.range)),
-                                         fill = as.name("gieStain"))))))
-
-              p.ideo <- c(p.ideo,
-                          list(geom_polygon(data = df.tri.p,
-                                            do.call(aes,list(x = substitute(c(start, start, end)),
-                                                             y = c(.ideo.range[1], .ideo.range[2],
-                                                               mean(.ideo.range)),
-                                                             fill = as.name("gieStain")))),
+                          ifelse(nrow(df.tri.p),
+                                 list(geom_polygon(data = df.tri.p,
+                                      do.call(aes,list(x = substitute(c(start, start, end)),
+                                                       y = c(.ideo.range[1], .ideo.range[2],
+                                                            mean(.ideo.range)),
+                                                           fill = as.name("gieStain"))))),
+                                 list(NULL)),
+                          ifelse(nrow(df.tri.q),
                           list(geom_polygon(data = df.tri.q,
                                             do.call(aes,
                                                     list(x = substitute(c(start, end, end)),
                                                          y = c(mean(.ideo.range),
                                              .ideo.range[2], .ideo.range[1]),
                                                          fill = as.name("gieStain"))))),
+                                 list(NULL)),
                           list(opts(axis.text.y = theme_blank(),
                                     axis.title.y=theme_blank(),
                                     axis.ticks = theme_blank(),
                                     panel.grid.minor = theme_line(colour = NA),
                                     panel.grid.major = theme_line(colour = NA)),
                                scale_fill_manual(values = cytobandColor)),
-                          list(facet_grid(seqnames ~ .))))
+                          list(facet_grid(seqnames ~ .)))
               
             }else {
               ideo.gr <- getIdeoGR(data)

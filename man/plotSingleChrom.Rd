@@ -1,12 +1,17 @@
 \name{plotSingleChrom}
 \alias{plotSingleChrom}
+\alias{plotIdeogram}
 \title{Plot single chromosome with cytoband}
 \usage{
 plotSingleChrom(obj, subchr, zoom.region, xlab, ylab,
                  main, xlabel = FALSE)
+plotIdegoram(obj, subchr, zoom.region, xlab, ylab,
+                 main, xlabel = FALSE)
+
 }
 \description{
-  Plot single chromosome with cytoband
+  Plot single chromosome with cytoband. \code{plotIdeogram} is synonyms
+  to \code{plotSingleChrom}.
 }
 \details{
   User could provide the whole ideogram and use subchr to point to

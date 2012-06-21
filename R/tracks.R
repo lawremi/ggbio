@@ -26,16 +26,30 @@ tracks.gen <- setClass("Tracks",
                                       opts = "optionsORNULL",
                                       track.skip = "numeric",
                                       xlim.change = "logical",
-                                      track.plot.col = "character"))
-
+                                      named = "logical",
+                                      label.bg.color = "character",
+                                      label.bg.fill = "character",
+                                      label.text.color = "character",
+                                      label.text.cex = "numeric",
+                                      track.plot.color = "character",
+                                      label.width = "unit"))
 
 tracks <- function(..., heights, xlim, xlab = NULL,                
                    opts = NULL, track.skip = -1,
-                   xlim.change = rep(TRUE, length(list(...))),
-                   track.plot.col = rep("white", nrow)){
+                   xlim.change = NULL,
+                   track.plot.color = rep("white", nrow),
+                   label.bg.color =  "white",
+                   label.bg.fill = "gray80",
+                   label.text.color = "black",
+                   label.text.cex = 1.5,                   
+                   label.width = unit(4, "line")){
 
   dots <- list(...)
+  if(length(dots) == 1 & is.list(dots[[1]]))
+    dots <- dots[[1]]
   nrow <- length(dots)
+  if(is.null(xlim.change))
+    xlim.change <- rep(TRUE, nrow)
   if(missing(heights))
     heights <- unit(rep(1, nrow), "null")
   grobs <- dots
@@ -60,14 +74,27 @@ tracks <- function(..., heights, xlim, xlab = NULL,
     }
   }
   ylim <- lapply(grobs, function(grob) getLimits(grob)$ylim)
+  if(is.null(names(dots)))
+    named <- FALSE
+  else
+    named <- TRUE
+  
   backup <- list(grobs = ggplotGrobList(...), 
+                 heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab, opts = opts,
+                 track.skip = track.skip, xlim.change = xlim.change,
+                 named = named, label.bg.color = label.bg.color, label.bg.fill = label.bg.fill,
+                 label.text.color = label.text.color,
+                 track.plot.color = track.plot.color,
+                 label.text.cex = label.text.cex,
+                 label.width = label.width)
+  new("Tracks", grobs = ggplotGrobList(...), backup = backup, named = named, 
       heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab, opts = opts,
       track.skip = track.skip, xlim.change = xlim.change,
-      track.plot.col = track.plot.col)
-  new("Tracks", grobs = ggplotGrobList(...), backup = backup,
-      heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab, opts = opts,
-      track.skip = track.skip, xlim.change = xlim.change,
-      track.plot.col = track.plot.col)
+      label.bg.color = label.bg.color, label.bg.fill = label.bg.fill,
+      label.text.color = label.text.color,      
+      track.plot.color = track.plot.color,
+      label.text.cex = label.text.cex,
+      label.width = label.width)
 }
 
 
@@ -79,7 +106,7 @@ setMethod("summary", "Tracks", function(object){
   cat("heights", object@heights, "\n")
   cat("track.skip", object@track.skip, "\n")
   cat("xlim.chage", object@xlim.change, "\n")
-  cat("track.plot.col", object@track.plot.col, "\n")
+  cat("track.plot.color", object@track.plot.color, "\n")
   cat("-------------------------------------------\n")
 })
 
@@ -87,18 +114,21 @@ setMethod("summary", "Tracks", function(object){
 setMethod("print", "Tracks", function(x){
     grobs <- x@grobs
     N <- length(grobs)
+    if(x@named)
+      nms <- names(x@grobs)
     lst <- lapply(seq_len(N),
                   function(i) {
                     ylim <- x@ylim[[i]]
-                    s <- coord_cartesian(xlim = x@xlim, ylim = ylim, wise = TRUE)
-                    grobs[[i]] <- grobs[[i]] + opts(plot.background = theme_rect(colour = NA, fill = x@track.plot.col[i]))
+                    s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
+                    grobs[[i]] <- grobs[[i]] +
+                      opts(plot.background = theme_rect(colour = NA, fill = x@track.plot.color[i]))
                     if(i %in% which(x@xlim.change))
                       grobs[[i]] <- grobs[[i]] + s
                     if(!is.null(opts))
                       grobs[[i]] <- grobs[[i]] + x@opts
                     ## margin
                     if(!is.null(x@track.skip))
-                      if(i < N){  s <- coord_cartesian(xlim = x@xlim, wise = TRUE)
+                      if(i < N){  s <- coord_cartesian(xlim = x@xlim)
                         grobs[[i]] <- grobs[[i]] +
                           opts(plot.margin = unit(c(1, 1, x@track.skip, 0.5), "lines"))
                       }
@@ -112,10 +142,26 @@ setMethod("print", "Tracks", function(x){
                       grobs[[i]] <- grobs[[i]] +
                         opts(axis.title.x = theme_text(vjust = 0))
                     }
-                    grobs[[i]] 
+                    grobs[[i]]
                   })
-  res <- do.call(align.plots, c(lst, list(heights = x@heights)))
-  res
+    if(x@named)
+      res <- do.call(align.plots, c(lst, list(heights = x@heights,
+                                              label = TRUE,
+                                              label.width = x@label.width)))
+    else
+      res <- do.call(align.plots, c(lst, list(heights = x@heights)))
+    if(x@named){
+      for(i in seq_len(N)){
+        rect.grob <- rectGrob(gp = gpar(fill = x@label.bg.fill,
+                                col = x@label.bg.color))
+        label.grob <- textGrob(nms[i], rot = 90, 
+                               gp = gpar(col = x@label.text.color,
+                                 cex = x@label.text.cex))
+        left.grob <- gTree(children = gList(rect.grob, label.grob))
+        pushViewport(viewport(layout.pos.row = i, layout.pos.col = 1))
+        grid.draw(left.grob)
+        upViewport(1)                
+    }}
 })
 
 setMethod("show", "Tracks", function(object){
@@ -209,9 +255,10 @@ setMethod("backup", "Tracks", function(obj){
 ##
 ## TODO: adust due to left/right legend
 align.plots <- function (..., vertical = TRUE,
-                         heights = unit(rep(1, nrow), "null")) 
+                         heights = unit(rep(1, nrow), "null"),
+                         label = FALSE,
+                         label.width = unit(4, "line")) 
 {
-
   if (!vertical) stop("only vertical alignment implemented")
   dots0 <- list(...)
   dots0 <- lapply(dots0, function(.g){
@@ -267,7 +314,12 @@ align.plots <- function (..., vertical = TRUE,
       editGrob(vstrips[[1]],vp=NULL)
     else ggplot2:::zeroGrob()
   })
-  gl <- grid.layout(nrow = length(dots), heights=heights)
+  if(label)
+    gl <- grid.layout(nrow = length(dots), heights=heights, ncol = 2,
+                      width = unit.c(label.width, unit(1, "null")))
+  else
+    gl <- grid.layout(nrow = length(dots), heights=heights)
+  
   vp <- viewport(layout = gl)
   pushViewport(vp)
 
@@ -280,9 +332,11 @@ align.plots <- function (..., vertical = TRUE,
   
   widths.left.max <- max(do.call(unit.c, widths.left))
   widths.right.max <- max(do.call(unit.c, widths.right))
-
   for (ii in seq_along(dots)) {
-    pushViewport(viewport(layout.pos.row = ii))
+    if(label)
+      pushViewport(viewport(layout.pos.row = ii, layout.pos.col = 2))
+    else
+      pushViewport(viewport(layout.pos.row = ii))
     pushViewport(viewport(x = unit(0, "npc") + widths.left.max - 
                           widths.left[[ii]], width = unit(1, "npc") - widths.left.max + 
                           widths.left[[ii]] - widths.right.max + widths.right[[ii]], 

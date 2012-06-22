@@ -33,13 +33,15 @@ getLimits <- function(obj){
   ## if(length(obj$layer)>1){
 
   l.res <- getLimitsFromLayer(obj)
-  ## }else{
-  ##   l.res <- NULL
-  ## }
-  res <- list(xlim = c(min(c(l.res$xmin, x, xmin)),
+  
+  res <- suppressWarnings(list(xlim = c(min(c(l.res$xmin, x, xmin)),
                 max(c(l.res$xmax, x, xmax, xend))),
               ylim = c(min(c(l.res$ymin, y, ymin)),
-                max(c(l.res$ymax, y, ymax, yend))))
+                max(c(l.res$ymax, y, ymax, yend)))))
+  
+  if(any(unlist(res) %in% c(Inf, -Inf)))
+    res <- evalLan(obj)
+  
   if(length(obj$coordinates$limits$x) == 2)
     res$xlim <- obj$coordinates$limits$x
   
@@ -116,15 +118,17 @@ getLimitsFromLayer <- function(obj){
   res
 }
 
+evalLan <- function(obj){
+  x <- obj$mapping$x
+  y <- obj$mapping$y
+  if(is.language(x) & is.language(y)){
+    xlim <- range(eval(x))
+    ylim <- range(eval(y))
+  }
+  list(xlim = xlim, ylim = ylim)
+}
 
 
-## setMethod("disjointBins", "GRanges", function(x){
-##   res <- split(x, seqnames(x))
-##   res <- unlist(lapply(res, function(x){
-##     disjointBins(ranges(x))
-##   }))
-##   unname(res)
-## })
 
 
 getGeomFun <- function(geom){

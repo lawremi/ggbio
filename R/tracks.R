@@ -41,7 +41,7 @@ tracks <- function(..., heights, xlim, xlab = NULL,
                    label.bg.color =  "white",
                    label.bg.fill = "gray80",
                    label.text.color = "black",
-                   label.text.cex = 1.5,                   
+                   label.text.cex = 1,                   
                    label.width = unit(4, "line")){
 
   dots <- list(...)
@@ -118,8 +118,10 @@ setMethod("print", "Tracks", function(x){
       nms <- names(x@grobs)
     lst <- lapply(seq_len(N),
                   function(i) {
-                    ylim <- x@ylim[[i]]
-                    s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
+                    ## if(i == 2) browser()
+                    ## ylim <- x@ylim[[i]]
+                    ## s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
+                    s <- coord_cartesian(xlim = x@xlim)
                     grobs[[i]] <- grobs[[i]] +
                       opts(plot.background = theme_rect(colour = NA, fill = x@track.plot.color[i]))
                     if(i %in% which(x@xlim.change))
@@ -144,12 +146,14 @@ setMethod("print", "Tracks", function(x){
                     }
                     grobs[[i]]
                   })
+
     if(x@named)
       res <- do.call(align.plots, c(lst, list(heights = x@heights,
                                               label = TRUE,
                                               label.width = x@label.width)))
     else
       res <- do.call(align.plots, c(lst, list(heights = x@heights)))
+    
     if(x@named){
       for(i in seq_len(N)){
         rect.grob <- rectGrob(gp = gpar(fill = x@label.bg.fill,
@@ -169,7 +173,7 @@ setMethod("show", "Tracks", function(object){
 })
 
 
-setMethod("Arith", c("Tracks", "ANY"), function(e1, e2) {
+setMethod("Arith", signature = c("Tracks", "ANY"), function(e1, e2) {
      switch(.Generic,
             "+"= {
                 N <- length(e1@grobs)
@@ -181,6 +185,31 @@ setMethod("Arith", c("Tracks", "ANY"), function(e1, e2) {
      e1
 })
 
+
+setOldClass("positino_c")
+setMethod("Arith", signature = c("Tracks", "position_c"), function(e1, e2) {
+  e1@xlim <- e2$limits
+  N <- length(e1@grobs)  
+  for(i in 1:N){
+    e1@grobs[[i]] <- e1@grobs[[i]] + e2
+  }
+  e1
+})
+
+
+setOldClass("cartesian")
+setMethod("Arith", signature = c("Tracks", "cartesian"), function(e1, e2) {
+  e1@xlim <- e2$limits$x
+  for(i in seq_len(length(e1@ylim))){
+    e1@ylim[[i]] <- e2$limits$y    
+  }
+  N <- length(e1@grobs)  
+  for(i in 1:N){
+    e1@grobs[[i]] <- e1@grobs[[i]] + e2
+  }
+  e1
+})
+
 setGeneric("xlim",function(obj, ...) standardGeneric("xlim"))
 
 setMethod("xlim", "numeric", function(obj, ...){
@@ -189,14 +218,15 @@ setMethod("xlim", "numeric", function(obj, ...){
 setMethod("xlim", "Tracks", function(obj, ...){
   obj@xlim
 })
-setGeneric("xlim<-", function(x, value) standard("xlim<-"))
+
+setGeneric("xlim<-", function(x, value) standardGeneric("xlim<-"))
 
 setReplaceMethod("xlim", c("Tracks", "IRanges"), function(x, value){
     xlim <- c(start(value), end(value))
     x@xlim <- xlim
     lapply(1:length(x@grobs), function(i){
       ylim <- x@ylim[[i]]
-      s <- coord_cartesian(xlim = x@xlim, ylim = ylim, wise = TRUE)
+      s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
       if(i %in% which(x@xlim.change))
         x@grobs[[i]] <- x@grobs[[i]] + s
     })
@@ -209,7 +239,7 @@ setReplaceMethod("xlim", c("Tracks", "GRanges"), function(x, value){
   x@xlim <- xlim
   lapply(1:length(x@grobs), function(i){
     ylim <- x@ylim[[i]]
-    s <- coord_cartesian(xlim = x@xlim, ylim = ylim, wise = TRUE)
+    s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
     if(i %in% which(x@xlim.change))
       x@grobs[[i]] <- x@grobs[[i]] + s
   })
@@ -221,7 +251,7 @@ setReplaceMethod("xlim", c("Tracks", "numeric"), function(x, value){
   x@xlim <- xlim
   lapply(1:length(x@grobs), function(i){
     ylim <- x@ylim[[i]]
-    s <- coord_cartesian(xlim = x@xlim, ylim = ylim, wise = TRUE)
+    s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
     if(i %in% which(x@xlim.change))
       x@grobs[[i]] <- x@grobs[[i]] + s
   })
@@ -231,6 +261,7 @@ setReplaceMethod("xlim", c("Tracks", "numeric"), function(x, value){
 
 setMethod("update", "Tracks", function(object, xlim){
   xlim(object) <- xlim
+  object@xlim <- xlim
   print(object)
 })
 
@@ -240,6 +271,7 @@ setMethod("reset", "Tracks", function(obj){
   for(nm in nms){
     slot(obj, nm) <- obj@backup[[nm]]
   }
+  xlim(obj) <- obj@xlim
   obj
 })
 

@@ -25,9 +25,14 @@
 \title{Tracks for genomic graphics}
 \usage{
 tracks(..., heights, xlim, xlab = NULL,                
-           opts = NULL, track.skip = -1,
-           xlim.change = rep(TRUE, length(list(...))),
-           track.plot.col = rep("white", nrow))
+                   opts = NULL, track.skip = -1,
+                   xlim.change = NULL,
+                   track.plot.color = rep("white", nrow),
+                   label.bg.color =  "white",
+                   label.bg.fill = "gray80",
+                   label.text.color = "black",
+                   label.text.cex = 1,                   
+                   label.width = unit(4, "line"))
 
 \S4method{summary}{Tracks}(object)
 \S4method{print}{Tracks}(x)
@@ -56,6 +61,11 @@ xlim(x) <- value
     pass a single chromosome view on top of the tracks.}
   \item{track.plot.col}{plot background color for each track, default is
     white}
+  \item{label.bg.color}{track labeling background rectangle border color}
+  \item{label.bg.fill}{track labeling background fill color}
+  \item{label.text.color}{track labeling text color}
+  \item{label.text.cex}{track labeling text size}
+  \item{label.width}{track labeling size}  
   \item{obj}{
     \code{Tracks} object.
   }

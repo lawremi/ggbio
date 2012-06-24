@@ -36,8 +36,8 @@ Collate: utils.R
 	 stat_gene-method.R 	
 	 stat_table-method.R 	
 	 autoplot-method.R
+	 ideogram.R
 	 plotGrandLinear.R
-	 plotStackedOverview.R	
 	 plotRangesLinkedToData.R
 	 plotFragLength-method.R
 	 plotSpliceSum-method.R

@@ -3,6 +3,7 @@ library(ggbio)
 vcffile <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
 vcf <- readVcf(vcffile, "hg19")
 library(reshape)
+## fixme:
 p1 <- autoplot(vcf, type = "geno")
 p2 <- autoplot(vcf, type = "info")
 p2

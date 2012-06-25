@@ -228,3 +228,6 @@ pdf("~/Desktop/geoms.pdf")
 tracks(p1, p2, p3, p4, p5, p6, p7, p8) + scale_y_continuous(breaks = NULL)
 dev.off() 
 
+
+gr <- GRanges("chr1", IRanges(c(1, 5), width = 4))
+autoplot(gr, extend.size = 1)

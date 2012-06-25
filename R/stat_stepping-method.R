@@ -17,6 +17,7 @@ setMethod("stat_stepping", "GRanges", function(data, ...,
                 rect = do.call(geom_rect, args),
                 alignment = do.call(geom_alignment, args),
                 segment = do.call(geom_segment, args))
+
   }else{
     p <- NULL
   }

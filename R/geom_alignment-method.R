@@ -19,6 +19,12 @@ setMethod("geom_alignment", "GRanges", function(data,...,
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(data, args.facets)
 
+  if("extend.size" %in% names(args.non))
+    es <- args.non$extend.size
+  else
+    es <- 0
+  
+
   ## rect.height <- force(rect.height)
   if(is.null(rect.height))
     rect.height <- 0.4
@@ -55,9 +61,10 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                      function(dt){
                        if("group" %in% names(args.aes)){
                          dt <- addStepping(dt, group.name = as.character(args.aes$group),
-                                           group.selfish = group.selfish)
+                                           group.selfish = group.selfish,
+                                           extend.size = es)
                        }else{
-                         dt <- addStepping(dt)
+                         dt <- addStepping(dt,extend.size = es)
                        }
                      })
     

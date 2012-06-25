@@ -5,7 +5,8 @@ setMethod("layout_karyogram", "GRanges",
                    facets = seqnames ~ .,
                    cytoband = FALSE,
                    geom = NULL, stat = NULL, ylim = NULL,
-                   rect.height = 10
+                   rect.height = 10,
+                   stack.level = 0
                    ) {
               
             ## geom <- match.arg(geom)
@@ -27,24 +28,6 @@ setMethod("layout_karyogram", "GRanges",
             }else{
               .ideo.range <- ylim
             }
-            ## getCytoColor <- function(cols){
-            ##   cols.df <- getOption("biovizBase")$cytobandColor
-            ##   idx <- cols %in% cols.df
-            ##   if(!all(idx)){
-            ##     cols.non <- cols[!idx]
-            ##     idx.gpos <- substr(cols.non, 1, 4) == "gpos"
-            ##     if(!all(idx.gpos))
-            ##       warning(cols.non[!idx.gpos], "not in default gieStain name and will be dropped")
-            ##     if(length(cols.non[idx.gpos])){
-            ##       cols.non.num <- gsub("gpos", "", cols.non[idx.gpos])
-            ##       cols.non.num <- as.numeric(cols.non.num)
-            ##       cols.new <- paste("grey", 120 - cols.non.num[!is.na(cols.non.num)], sep= "")
-            ##       names(cols.new) <- cols.non[idx.gpos]
-            ##       cols.df <- c(cols.df, cols.new)
-            ##     }
-            ##   }
-            ##   cols.df
-            ## }
             
             ## check facets
             if(cytoband){
@@ -67,28 +50,6 @@ setMethod("layout_karyogram", "GRanges",
                                                                     ymax = .ideo.range[2],
                                                                     fill = as.name("gieStain")))),
                                                            list(color = "black"))))
-
-              ## if(nrow(df.tri.p))
-              ## p.ideo <- c(p.ideo,
-              ##             list(geom_polygon(data = df.tri.p,
-              ##                               do.call(aes,
-              ##                            list(x = substitute(c(start, start, end)),
-              ##                                 y = substitute(c(rep(val[1], length(start)),
-              ##                                   rep(val[2],length(start)),
-              ##                           rep(mean(val),length(start))), list(val = .ideo.range)),
-              ##                            fill = as.name("gieStain"))))))
-
-              ## if(nrow(df.tri.q))
-              ## p.ideo <- c(p.ideo,
-              ##             list(geom_polygon(data = df.tri.q,
-              ##                               do.call(aes,
-              ##                            list(x = substitute(c(start, end, end)),
-              ##                                 y = substitute(
-              ##                                   c(rep(mean(val),length(start)),
-              ##                                     rep(val[2], length(start)),
-              ##                                     rep(val[1],length(start))),
-              ##                                   list(val = .ideo.range)),
-              ##                            fill = as.name("gieStain"))))))
 
               p.ideo <- c(p.ideo,
                           ifelse(nrow(df.tri.p),
@@ -153,11 +114,11 @@ setMethod("layout_karyogram", "GRanges",
               p.addon <- c(list(p.addon), list(do.call(ggplot2::geom_rect,
                           c(list(data = df), list(do.call(aes, args.aes.rect)),args.non))))
             }else{
-            .drawFun <- getDrawFunFromGeomStat(geom, stat)
-            aes.res <- do.call(aes, args.aes)
-            args.res <- c(list(data = df), list(aes.res), args.non)
-            p.addon <- do.call(.drawFun, args.res)
-          }
+              .drawFun <- getDrawFunFromGeomStat(geom, stat)
+              aes.res <- do.call(aes, args.aes)
+              args.res <- c(list(data = df), list(aes.res), args.non)
+              p.addon <- do.call(.drawFun, args.res)
+            }
             p <- list(p.addon , facet_grid(facets))            
           }else{
             p <- list(p.ideo,  facet_grid(facets))

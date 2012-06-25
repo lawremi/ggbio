@@ -74,3 +74,19 @@ update(obj, xlim  = c(6130000, 6150000))
 ## and this will apply it to every plot in the track.
 obj + theme_bw() 
 
+## @knitr NULL
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(nrow = 1, nocl = 1)))
+library(ggbio)
+p1 <- qplot(data = mtcars, x = mpg, y = wt, ylab = "ylab", facets = gear ~ .)
+p2 <- qplot(data = mtcars, x = wt, y = mpg, geom = "line", ylab = "")
+tracks(list(a = p1, b = p2))
+tracks(list(a = p1, p2))
+tracks(p1, p2)
+tracks("DNA seq" = p1, "RNA-seq" = p2)
+png("~/Desktop/testTrack.png", height = 700, width = 700)
+tracks(list("Rna sesq" = p1, "DNA-seq" = p2), label.width = unit(3, "line"),
+       heights = c(1, 3), label.text.cex = 1.5, label.text.color = "white" )
+dev.off()
+list(list(a = 2, b = 2))[[1]][[1]]
+list(2, 2)[[1]]

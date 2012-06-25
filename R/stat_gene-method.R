@@ -48,7 +48,6 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     ## just cds, gaps and utrs
     df <- as.data.frame(gr)
     df.cds <- df[df$type == "cds",]
-    ## p <- ggplot(df.cds)
     ## add a segment for hacking at 1pix
     if(nrow(df.cds)){
     args.cds <- args.aes[names(args.aes) != "y"]
@@ -91,6 +90,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     args.utr.res <- c(list(data = df.utr),
                       list(aes.res),
                       args.non)
+    
     p <- c(p, list(do.call(ggplot2::geom_segment, args.utr.res)))
 
     args.utr <- args.aes[names(args.aes) != "y"]
@@ -110,11 +110,13 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     ## df.gaps <- gr[values(gr)$type == "gap"]
     df.gaps <- getGaps(c(gr[values(gr)$type %in% c("utr", "cds")]),
                        group.name = "tx_id")
+    
     args.aes.gaps <- args.aes[!(names(args.aes) %in% c("x", "y", "fill"))]
     aes.res <- do.call(aes, args.aes.gaps)
     args.gaps.res <- c(list(data = df.gaps),
                        list(aes.res),
                        args.non)
+    
      p <- c(p , list(do.call(geom_chevron, args.gaps.res)))
 
     .df.lvs <- unique(df$stepping)
@@ -144,7 +146,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
                                 labels = .labels)))
   }else{
-    p <- NULL
+    p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
+           list(ggplot2::xlim(c(0, 1))))
   }
   }
   if(geom == "reduced_gene"){
@@ -197,9 +200,11 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                   args.non)
     p <- c(p, list(do.call(geom_chevron, args.res)))
   }else{
-    p <- NULL
+    p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
+           list(ggplot2::xlim(c(0, 1))))
   }
-    p <- c(p, list(scale_y_continuous(breaks = NULL)), list(opts(axis.text.y = theme_blank())))
+    p <- c(p, list(scale_y_continuous(breaks = NULL)),
+           list(opts(axis.text.y = theme_blank())))
   }
   if(missing(xlab)){
     if(length(gr)){
@@ -216,6 +221,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
       xlab <- ""
     }
   }
+
   p <- c(p, list(xlab(xlab)))
   if(missing(ylab)){
     p <- c(p, list(ggplot2::ylab(getYLab(object))))
@@ -226,16 +232,19 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     p <- c(p, opts(title = main))
   
   if(!missing(xlim)){
-    ## xlim <- c(start(range(gr)),
-    ##           end(range(gr)))
-  p <- c(p, list(coord_cartesian(xlim = xlim, wise = TRUE)))
+    p <- c(p, list(coord_cartesian(xlim = xlim)))
+  }else{
+    if(!is.list(which))
+      xlim <- c(start(which), end(which))
+    p <- c(p, list(coord_cartesian(xlim = xlim)))
   }
+
   ## test scale
   if(is_coord_truncate_gaps(gr)){
     gr <- gr[values(gr)$type %in% c("utr", "cds")]
     ss <- getXScale(gr)
     p <- c(p, list(scale_x_continuous(breaks = ss$breaks,
-                                labels = ss$labels)))
+                                      labels = ss$labels)))
   }
   p  
 })

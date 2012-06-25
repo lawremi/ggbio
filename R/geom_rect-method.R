@@ -17,6 +17,10 @@ setMethod("geom_rect", "GRanges", function(data,...,
   args$facets <- facets
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
+  if("extend.size" %in% names(args.non))
+    es <- args.non$extend.size
+  else
+    es <- 0
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(data, args.facets)
   stat <- match.arg(stat)
@@ -29,9 +33,10 @@ setMethod("geom_rect", "GRanges", function(data,...,
                      function(dt){
                        if("group" %in% names(args.aes))
                          dt <- addStepping(dt, group.name = as.character(args.aes$group),
-                                            group.selfish = group.selfish)
+                                            group.selfish = group.selfish,
+                                           extend.size = es)
                        else
-                         dt <- addStepping(dt)
+                         dt <- addStepping(dt, extend.size = es)
                      })
     res <- unlist(res)
     df <- fortify(res)

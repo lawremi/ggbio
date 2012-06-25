@@ -83,6 +83,8 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
 }else{
   p <- NULL
 }
+
+  p <- .changeStrandColor(p, args.aes)
   p <- c(list(p) , list(facet))
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))

@@ -23,6 +23,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
                                           legend = TRUE,
                                           geom = NULL,
                                           stat = NULL,
+                                          parse.xlab = FALSE,
                                           coord = c("default", "genome", "truncate_gaps"),
                                           layout = c("linear", "karyogram", "circle")
                                           ){
@@ -110,8 +111,12 @@ setMethod("autoplot", "GRanges", function(object, ...,
       p <- c(p, list(opts(legend.position = "none")))
 
 
-    if(missing(xlab)) 
-      xlab <- getXLab(object)
+    if(missing(xlab)) {
+      if(parse.xlab)
+        xlab <- paste(getXLab(object), "Position")
+      else
+        xlab <- "Position"
+    }
     p <- c(p, list(xlab(xlab)))
     ## tweak with default y lab
     if(!missing(ylab))
@@ -148,7 +153,8 @@ setMethod("autoplot", "GRangesList", function(object, ...,
                                               coverage.col = "gray50",
                                               coverage.fill = coverage.col,
                                               group.selfish = FALSE,
-                                              arch.offset = 1.3){
+                                              arch.offset = 1.3,
+                                              parse.xlab = FALSE){
 
   type <- match.arg(type)
   args <- list(...)
@@ -188,8 +194,13 @@ setMethod("autoplot", "GRangesList", function(object, ...,
   }
   ## if(!missing(xlab))
   ##   p <- p + xlab(xlab)
-  if(missing(xlab)) 
-    xlab <- getXLab(object)
+  
+  if(missing(xlab)) {
+      if(parse.xlab)
+        xlab <- paste(getXLab(object), "Position")
+      else
+        xlab <- "Position"
+  }
   p <- p + ggplot2::xlab(xlab)
   if(!missing(ylab))
     p <- p + ylab(ylab)
@@ -229,7 +240,8 @@ setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
 setMethod("autoplot", "GappedAlignments", function(object, ...,
                                                    xlab, ylab, main,
                                                    which,
-                                                   geom = NULL, stat = NULL
+                                                   geom = NULL, stat = NULL,
+                                                   parse.xlab = FALSE
                                                    ){
 
   args <- list(...)
@@ -271,8 +283,12 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
     args.non$object <- gr
     p <- do.call(autoplot, c(list(aes.res), args.non))
   }
-  if(missing(xlab)) 
-    xlab <- getXLab(object)
+  if(missing(xlab)) {
+      if(parse.xlab)
+        xlab <- paste(getXLab(object), "Position")
+      else
+        xlab <- "Position"
+  }
   p <- p + ggplot2::xlab(xlab)
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
@@ -567,85 +583,47 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
 ## ======================================================================
 ## geom: ... color = I("red"), doesn't work
 ## FIXME: idenity
-setMethod("autoplot", "Rle", function(object, lower, ...,
-                                      xlab = "x", 
-                                      ylab = "y", main,
-                                      color, size, shape, alpha,
-                                      geom = c("point", "line", "segment"),
-                                      type = c("raw", "viewMaxs","viewMins",
-                                        "viewSums", "viewMeans")){
+setMethod("autoplot", "Rle", function(object, ...,
+                                      xlab, ylab, main,
+                                      binwidth, nbin = 30,
+                                      geom = NULL,
+                                      stat = c("bin", "identity", "slice"),
+                                      type = c("viewSums","viewMins",
+                                        "viewMaxs", "viewMeans")){
 
-
-  geom <- match.arg(geom)
+  stat <- match.arg(stat)
   type <- match.arg(type)
-  if(type %in% c("viewMaxs", "viewMeans", "viewMins", "viewSums") && missing(lower))
-    stop("please at least specify the value of lower, you could pass
-          extra parameters to slice too")
-  
-  ## args.dots <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
+
   args <- list(...)
-  args.slice <- args[names(args) %in%
-                          c("upper", "includeLower",
-                            "includeUpper", "rangesOnly")]
-  args <- args[!names(args) %in%
-                          c("upper", "includeLower",
-                            "includeUpper", "rangesOnly")]
 
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
+  args.non$data <- object
+  args.non$geom <- geom
+
+  if(stat == "identity"){
+    aes.res <- do.call(aes, args.aes)
+    args.res <- c(list(aes.res), args.non)
+    p <- ggplot() + do.call(stat_identity, args.res)
+  }
+  if(stat == "bin"){
+    args.non$nbin <- nbin
+    aes.res <- do.call(aes, args.aes)
+    if(!missing(binwidth))
+      args.non$binwidth <- binwidth
+    args.res <- c(list(aes.res), args.non)
+    p <- ggplot() + do.call(stat_bin, args.res)
+  }
+  if(stat == "slice"){
+    aes.res <- do.call(aes, args.aes)
+    args.res <- c(list(aes.res), args.non)
+    p <- ggplot() + do.call(stat_slice, args.res)
+  }
   
-  if(!"geom" %in% names(args))
-    args$geom <- geom  
-  if(!missing(lower))
-    args.slice <- c(list(x = object,
-                         lower = lower), args.slice)
-  df <- switch(type,
-               raw = {
-                 x <- 1:length(object)                
-                 y <- as.numeric(object)
-                 data.frame(x = x, y = y)
-               },
-               viewMaxs = {
-                 vs <- do.call(slice, args.slice)
-                 x <- viewWhichMaxs(vs)                
-                 y <- viewMaxs(vs)
-                 data.frame(x = x, y = y)
-               },
-               viewMins = {
-                 vs <- do.call(slice, args.slice)
-                 x <- viewWhichMins(vs)                
-                 y <- viewMins(vs)
-                 data.frame(x = x, y = y)
-               },
-               viewSums = {
-                 vs <- do.call(slice, args.slice)
-                 x <- start(vs) + width(vs)/2
-                 y <- viewSums(vs)
-                 data.frame(x = x, y = y)                
-               },
-               viewMeans = {
-                 vs <- do.call(slice, args.slice) 
-                 x <- start(vs) + width(vs)/2
-                 y <- viewMeans(vs)
-                 data.frame(x = x, y = y)                
-               })
-
-  if(args$geom == "segment")
-    args <- c(list(data = df,
-                   x = substitute(x),
-                   xend = substitute(x),
-                   y = 0,
-                   yend = substitute(y)),
-              args)
-
-  else
-    args <- c(list(data = df,
-                   x = substitute(x),
-                   y = substitute(y)),
-              args)
-  p <- do.call(qplot, args)
-  p <- p + xlab(xlab)
-  p <- p + ylab(ylab)
+  if(!missing(xlab))
+    p <- p + ggplot2::xlab(xlab)
+  if(!missing(ylab))
+    p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
     p <- p + opts(title = main)
   p
@@ -657,112 +635,58 @@ setMethod("autoplot", "Rle", function(object, lower, ...,
 ## ======================================================================
 ## 1. facet by list
 ## 2. support as what has been supported in Rle.
-setMethod("autoplot", "RleList", function(object, lower, ...,
-                                          xlab = "x", 
-                                          ylab = "y", main,
-                                          size, shape, color, alpha, 
+setMethod("autoplot", "RleList", function(object, ...,
+                                          xlab , ylab, main,
+                                          nbin = 30,
+                                          binwidth,
                                           facetByRow = TRUE,
-                                          geom = c("point", "line", "segment"),
-                                          type = c("raw", "viewMaxs","viewMins",
-                                            "viewSums", "viewMeans")){
-
-  geom <- match.arg(geom)
+                                          stat = c("bin", "identity", "slice"),
+                                          geom = NULL,
+                                          type = c("viewSums","viewMins",
+                                            "viewMaxs", "viewMeans")){
+  stat <- match.arg(stat)
+  
   type <- match.arg(type)
-  if(type %in% c("viewMaxs", "viewMeans", "viewMins", "viewSums") && missing(lower))
-    stop("please at least specify the value of lower, you could pass
-          extra parameters to slice too")
+  ## if(stat == "slice" &&
+  ##    type %in% c("viewMaxs", "viewMeans", "viewMins", "viewSums") && missing(lower))
+  ##   stop("please at least specify the value of lower, you could pass
+  ##         extra parameters to slice too")
 
   ## args <- as.list(match.call(call = sys.call(sys.parent(2)))[-1])
   args <- list(...)
-  args <- args[names(args) %in% c("size", "shape", "color", "alpha", "geom")]
-  if(!"geom" %in% names(args))
-    args$geom <- geom
-  
-  ## args <- c(geom = geom, args)
-
-  args.slice <- args[names(args) %in%
-                     c("upper", "includeLower",
-                       "includeUpper", "rangesOnly")]
-  if(!missing(lower))
-    args.slice <- c(list(x = object,
-                         lower = lower), args.slice)
-
-  df <- switch(type,
-               raw = {
-                 x <- do.call(c,lapply(elementLengths(object),function(n) 1:n))
-                 y <- as.numeric(unlist(object))
-                 if(is.null(names(object)))
-                   nms <- rep(1:length(object), times = elementLengths(object))
-                 else
-                   nms <- rep(names(object), times = elementLengths(object))
-                 data.frame(x = x, y = y, listName = nms)
-               },
-               viewMaxs = {
-                 vs <- do.call(slice, args.slice)
-                 x <- viewWhichMaxs(vs)
-                 y <- viewMaxs(vs)
-                 if(is.null(names(x)))
-                   nms <- rep(1:length(x), times = elementLengths(x))
-                 else
-                   nms <- rep(names(x), times = elementLengths(x))
-                 data.frame(x = unlist(x), y = unlist(y), listName = nms)
-               },
-               viewMins = {
-                 vs <- do.call(slice, args.slice)
-                 x <- viewWhichMins(vs)                
-                 y <- viewMins(vs)
-                 if(is.null(names(x)))
-                   nms <- rep(1:length(x), times = elementLengths(x))
-                 else
-                   nms <- rep(names(x), times = elementLengths(x))
-                 data.frame(x = unlist(x), y = unlist(y), listName = nms)                
-               },
-               viewSums = {
-                 vs <- do.call(slice, args.slice)
-                 x <- start(vs) + width(vs)/2
-                 if(is.null(names(x)))
-                   nms <- rep(1:length(x), times = elementLengths(x))
-                 else
-                   nms <- rep(names(x), times = elementLengths(x))
-                 y <- viewSums(vs)
-                 data.frame(x = unlist(x), y = unlist(y), listName = nms)                
-               },
-               viewMeans = {
-                 vs <- do.call(slice, args.slice) 
-                 x <- start(vs) + width(vs)/2
-                 if(is.null(names(x)))
-                   nms <- rep(1:length(x), times = elementLengths(x))
-                 else
-                   nms <- rep(names(x), times = elementLengths(x))
-                 y <- viewMeans(vs)
-                 data.frame(x = unlist(x), y = unlist(y), listName = nms)                
-               })
-
-  if(facetByRow)
-    facets <- listName ~ .
-  else
-    facets <- . ~ listName
-  rm("x", "y")
-  if(args$geom == "segment")
-    args <- c(list(data = df,
-                   facets = facets,
-                   x = substitute(x),
-                   xend = substitute(x),
-                   y = 0,
-                   yend = substitute(y)),
-              args)
-  else
-    args <- c(list(data = df,
-                   facets = facets,                   
-                   x = substitute(x),
-                   y = substitute(y)),
-              args)
-  p <- do.call(qplot, args)
-  p <- p + xlab(xlab)
-  p <- p + ylab(ylab)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  args.non$data <- object
+  args.non$geom <- geom
+  if(stat == "identity"){
+    aes.res <- do.call(aes, args.aes)
+    args.res <- c(list(aes.res), args.non)
+    p <- ggplot() + do.call(stat_identity, args.res)
+  }
+  if(stat == "bin"){
+    args.non$nbin <- nbin
+    aes.res <- do.call(aes, args.aes)
+    if(!missing(binwidth))
+      args.non$binwidth <- binwidth
+    args.res <- c(list(aes.res), args.non)
+    p <- ggplot() + do.call(stat_bin, args.res)
+  }
+  if(stat == "slice"){
+    aes.res <- do.call(aes, args.aes)
+    args.res <- c(list(aes.res), args.non)
+    p <- ggplot() + do.call(stat_slice, args.res)
+  }
+  if(!missing(xlab))
+    p <- p + ggplot2::xlab(xlab)
+  if(!missing(ylab))
+    p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
     p <- p + opts(title = main)
   p
+  ## if(facetByRow)
+  ##   facets <- listName ~ .
+  ## else
+  ##   facets <- . ~ listName
 })
 
 

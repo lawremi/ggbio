@@ -77,7 +77,10 @@ importMethodsFrom(rtracklayer, import)
 ## ============================================================
 ## Export
 ## ============================================================
-exportMethods(autoplot, rescale, fortify, xlim, "xlim<-", update, reset, backup)
+## utils
+exportMethods(autoplot, rescale, fortify,
+              xlim, "xlim<-", update, reset, backup,
+              highlight)
 
 
 ## geom
@@ -97,7 +100,10 @@ exportMethods(stat_aggregate,
               stat_mismatch, 	
               stat_stepping,
               stat_gene,
-              stat_table)
+              stat_table,
+              stat_slice,
+              stat_bin,
+              stat_reduce)
 
 ## layout
 exportMethods(layout_karyogram,

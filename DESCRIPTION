@@ -35,6 +35,9 @@ Collate: utils.R
 	 stat_stepping-method.R 	
 	 stat_gene-method.R 	
 	 stat_table-method.R 	
+	 stat_bin-method.R
+	 stat_slice-method.R
+	 stat_reduce-method.R
 	 autoplot-method.R
 	 ideogram.R
 	 plotGrandLinear.R

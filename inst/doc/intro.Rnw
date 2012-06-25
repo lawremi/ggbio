@@ -1,7 +1,7 @@
 %\VignetteIndexEntry{An Introduction to ggbio}
 %\VignetteDepends{}
 %\VignetteKeywords{visualization utilities}
-%\VignettePackage{biovizBase}
+%\VignettePackage{ggbio}
 \documentclass[10pt]{article}
 
 % \usepackage{times}
@@ -9,12 +9,13 @@
 \usepackage{verbatim}
 \usepackage{graphicx}
 
-% \SweaveOpts{width = 2.5, height = 2}
 
+\setkeys{Gin}{width=0.95\textwidth}
 
 \textwidth=6.5in
 \textheight=8.5in
-%\parskip=.3cm
+\parskip=.3cm
+\parindent = 0cm
 \oddsidemargin=-.1in
 \evensidemargin=-.1in
 \headheight=-.3in
@@ -87,5 +88,10 @@ examples R code are under /inst/example.
 
 On-line documentation is google search-able and multi-media friendly, more
 flexible for visualization package demonstration.
+\section{Autoplot}
+\subsection{\Robject{GRanges}}
+\subsection{\Robject{IRanges}}
+\subsection{\Robject{Rle/RleList}}
+\subsection{\Robject{TranscriptDb}}
 
 \end{document}

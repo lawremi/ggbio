@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{tracks}
+%\VignetteIndexEntry{Buidling tracks}
 %\VignetteDepends{}
 %\VignetteKeywords{visualization utilities}
 %\VignettePackage{ggbio}
@@ -14,10 +14,13 @@
 
 \textwidth=6.5in
 \textheight=8.5in
-%\parskip=.3cm
+\parskip=.3cm
+\parindent = 0cm
 \oddsidemargin=-.1in
 \evensidemargin=-.1in
 \headheight=-.3in
+
+\setkeys{Gin}{width=0.95\textwidth}
 
 \newcommand{\Rfunction}[1]{{\texttt{#1}}}
 \newcommand{\Robject}[1]{{\texttt{#1}}}

@@ -119,9 +119,9 @@ setMethod("print", "Tracks", function(x){
     lst <- lapply(seq_len(N),
                   function(i) {
                     ## if(i == 2) browser()
-                    ## ylim <- x@ylim[[i]]
-                    ## s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
-                    s <- coord_cartesian(xlim = x@xlim)
+                    ylim <- x@ylim[[i]]
+                    s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
+                    ## s <- coord_cartesian(xlim = x@xlim)
                     grobs[[i]] <- grobs[[i]] +
                       opts(plot.background = theme_rect(colour = NA, fill = x@track.plot.color[i]))
                     if(i %in% which(x@xlim.change))
@@ -188,7 +188,8 @@ setMethod("Arith", signature = c("Tracks", "ANY"), function(e1, e2) {
 
 setOldClass("positino_c")
 setMethod("Arith", signature = c("Tracks", "position_c"), function(e1, e2) {
-  e1@xlim <- e2$limits
+  if("x" %in% e2$aesthetics)
+    e1@xlim <- e2$limits
   N <- length(e1@grobs)  
   for(i in 1:N){
     e1@grobs[[i]] <- e1@grobs[[i]] + e2
@@ -199,11 +200,14 @@ setMethod("Arith", signature = c("Tracks", "position_c"), function(e1, e2) {
 
 setOldClass("cartesian")
 setMethod("Arith", signature = c("Tracks", "cartesian"), function(e1, e2) {
-  e1@xlim <- e2$limits$x
-  for(i in seq_len(length(e1@ylim))){
-    e1@ylim[[i]] <- e2$limits$y    
+  if(!is.null(e2$limits$x))
+    e1@xlim <- e2$limits$x
+  if(!is.null(e2$limits$y)){  
+    for(i in seq_len(length(e1@ylim))){
+      e1@ylim[[i]] <- e2$limits$y    
+    }
   }
-  N <- length(e1@grobs)  
+  N <- length(e1@grobs)
   for(i in 1:N){
     e1@grobs[[i]] <- e1@grobs[[i]] + e2
   }

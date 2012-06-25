@@ -17,6 +17,12 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
   
   stat <- match.arg(stat)
 
+  if("extend.size" %in% names(args.non))
+    es <- args.non$extend.size
+  else
+    es <- 0
+  
+
   if(length(data)){
   if(stat == "stepping"){
     grl <- splitByFacets(data, facets)
@@ -24,9 +30,10 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
                      function(dt){
                        if("group" %in% names(args.aes))
                          dt <- addStepping(dt, group.name = as.character(args.aes$group),
-                                            group.selfish = group.selfish)
+                                            group.selfish = group.selfish,
+                                           extend.size = es)
                        else
-                         dt <- addStepping(dt)
+                         dt <- addStepping(dt, extend.size = es)
                      })
     res <- unlist(res)
     df <- fortify(res)

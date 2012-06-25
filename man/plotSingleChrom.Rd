@@ -4,9 +4,9 @@
 \title{Plot single chromosome with cytoband}
 \usage{
 plotSingleChrom(obj, subchr, zoom.region, xlab, ylab,
-                 main, xlabel = FALSE)
+                 main, xlabel = FALSE, cytoband = TRUE)
 plotIdegoram(obj, subchr, zoom.region, xlab, ylab,
-                 main, xlabel = FALSE)
+                 main, xlabel = FALSE, cytoband = TRUE)
 
 }
 \description{
@@ -44,16 +44,19 @@ plotIdegoram(obj, subchr, zoom.region, xlab, ylab,
   \item{xlabel}{
     A logical value. Show the x label or not.
   }
+  \item{cytoband}{
+    If FALSE, plot just blank chromosome without cytoband. default is TRUE.
+  }  
 }
 \examples{
 \dontrun{
 library(biovizBase)
 data(hg19IdeogramCyto, package = "biovizBase")
 biovizBase::isIdeogram(hg19IdeogramCyto) ## return TRUE
-plotSingleChrom(hg19IdeogramCyto, subchr = "chr1")
-plotSingleChrom(hg19IdeogramCyto, subchr = "chr1", xlabel = TRUE)
+plotIdeogram(hg19IdeogramCyto, "chr1")
+plotIdeogram(hg19IdeogramCyto, "chr1", xlabel = TRUE)
 ## zoom
-plotSingleChrom(hg19IdeogramCyto, subchr = "chr1",  zoom.region = c(1e8, 1.5e8))
+plotIdeogram(hg19IdeogramCyto, "chr1",  zoom.region = c(1e8, 1.5e8))
 }
 }
 

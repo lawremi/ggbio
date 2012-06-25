@@ -230,3 +230,33 @@ getDrawFunFromGeomStat <- function(geom, stat){
     }
   facet
 }
+
+setGeneric("highlight", function(obj, ...) standardGeneric("highlight"))
+
+setMethod("highlight", "numeric", function(obj, col = "red", fill = "red", alpha = 1){
+  xmin <- range(obj)[1]
+  xmax <- range(obj)[2]
+  annotation_custom(grob = rectGrob(gp = gpar(fill = fill, col = col, alpha = alpha)),
+                    xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf)
+})
+
+setMethod("highlight", "data.frame", function(obj, col = "red", fill = "red", alpha = 1){
+  if(ncol(obj) != 2)
+    stop("obj(data.frame) passed to hightlight must be of column number 2, the
+          first column is xmin, and second column is xmax")
+  xmin <- obj[,1]
+  xmax <- obj[,2]
+  lapply(seq_len(nrow(obj)), function(i){
+    annotation_custom(grob = rectGrob(gp = gpar(fill = fill,
+                                        col = col, alpha = alpha)),
+                      xmin = xmin[i], xmax = xmax[i], ymin = -Inf, ymax = Inf)
+  })
+})
+
+setMethod("highlight", "GRanges", function(obj, col = "red", fill = "red", alpha = 1){
+  if(length(unique(as.character(seqnames(obj))))>1)
+    stop("GRanges contains more than one chromosomes.")
+  ir <- ranges(obj)
+  df <- data.frame(start(ir), end(ir))
+  highlight(df, col = col, fill = fill, alpha = alpha)
+})

@@ -18,3 +18,5 @@ autoplot(txdb, which = genesymbol["RBM17"],
 ## @knitr NULLL
 p1 <- ggplot() + stat_gene(txdb, which = GRanges("chr1", IRanges(1, 100)), fill = "gray40", stat = "reduce")
 p2 <- ggplot() + stat_gene(txdb, which = GRanges("chr1", IRanges(1, 100)), fill = "gray40")
+p1
+p1 <- ggplot() + stat_reduce(txdb, which = GRanges("chr1", IRanges(1, 100)))

@@ -66,3 +66,8 @@ grl
 genome(grl) <- "gen"
 getXLab(grl)
 getXLab(ga)
+
+
+reads <- GappedAlignments(names="read", seqnames = Rle("chr1"), pos = as.integer(25),cigar = "100M", strand = strand("*"))
+reads
+autoplot(reads)

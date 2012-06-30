@@ -1,0 +1,59 @@
+* Ideogram 
+** TODO Arch in the end instead of just rectangle to make more pretty.
+
+* plot_margin
+** TODO add plot_margin or layout_margin to insert a plot as row of a track.
+** TODO or stat_view idea.
+
+* autoplot
+** autoplot,Matrix
+*** TODO label by row names and align by column names of matrix
+** autoplot,GRanges, GRangesList,TranscriptDb
+*** consider row names and label them automatically
+** [#A] autoplot,TranscriptDb
+*** TODO gap.geom need to be supported and use direction(arrow).
+*** TODO x lab should be a right default
+*** TODO smart parsing for names. eg. gene_id(tx_id)
+** autoplot,ExpressionSet
+*** TODO think about heatmap with phenotpe plot as margin?
+** autoplot,SummerizedExperiments
+*** potentially useful for splicing and copy number variants..
+** autoplot,VCF
+*** just to make it to work again.
+
+
+
+* facet
+** TODO support facet = gr ~ . where gr is just GRanges
+
+* coord
+** TODO new coordinate system origin: to map interval to certain origin and need a transformatin method for GRanges in biovizBase.
+
+* theme
+** TODO theme_pack_facet  to pack facetted plots and make it more compact.
+
+* Protein space
+** TODO map() idea, data granges and exon granges, map protein space back to genomic coordiantes.
+** TODO Can parse data from uniprot autopmatically and it's easy actually.
+
+
+* arrange plots
+** TODO plot arrange function, to do something like arrange all plots and parse the legend.
+
+* MISC
+** TODO global way to make sure color is not NA when plot rectangles? 
+** TODO resolution to figure out the stepping "buffer"
+** TODO switch label to right
+** TODO scale_bio_heat, blue to white to red
+** TODO remove stepping label
+** TODO put data in ggplot() first to make sure the add-on features are mostly available
+** TODO multiple geoms should be supported.
+** TODO You need to work on the X tick marks, too. It needs to be more like Gviz. If the tick labels are over 1mb, use mb as the unit, else, use kb, unless less than 1kb, then use bp. Those long numbers are tough to read.
+
+* TODO vignettes
+* TODO update and check manual to make sure it's the latest.
+
+
+
+
+

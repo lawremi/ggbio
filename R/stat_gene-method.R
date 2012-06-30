@@ -233,12 +233,11 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   
   if(!missing(xlim)){
     p <- c(p, list(coord_cartesian(xlim = xlim)))
-  }else{
-    if(!is.list(which))
-      xlim <- c(start(which), end(which))
+  } else if (!is.list(which)) {
+    xlim <- c(start(which), end(which))
     p <- c(p, list(coord_cartesian(xlim = xlim)))
   }
-
+  
   ## test scale
   if(is_coord_truncate_gaps(gr)){
     gr <- gr[values(gr)$type %in% c("utr", "cds")]

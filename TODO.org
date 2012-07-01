@@ -1,58 +1,161 @@
-* Ideogram 
-** TODO Arch in the end instead of just rectangle to make more pretty.
-
-* plot_margin
-** TODO add plot_margin or layout_margin to insert a plot as row of a track.
-** TODO or stat_view idea.
-
-* autoplot
+#+DRAWERS: MICHAEL TENGFEI
+* Geoms
+** TODO geom_ideogram
+*** TODO Make this an actual geom
+    DEADLINE: <2012-09-01 Sat>
+*** TODO Make scale_fill_giemsa for coloring by cytoband
+    DEADLINE: <2012-09-01 Sat>
+*** TODO Arch in the end instead of just rectangle to make more pretty.
+** TODO multiple geoms should be supported.
+   DEADLINE: <2012-09-01 Sat>
+* Layout
+** TODO layout_margin
+*** TODO add layout_margin to insert a plot as row of a track.
+    DEADLINE: <2012-10-01 Mon>
+** TODO arrange all plots with a single legend.
+   :MICHAEL:
+   Crazy idea: what about putting the plots into a single column of a
+   DataFrame, with extra factors for grouping them? I think we talked
+   about a similar (but different) idea with the plot templates in
+   visnab. Then, have a geom_plot that will draw plots (with the
+   center X/Y coming from those grouping factors) so that they do not
+   overlap. Faceting would need to be supported, but the faceting
+   modes currently in ggplot might not work so well, because every
+   plot needs to be the same size. This would end up wasting
+   space. Might want a special class for this, like PlotFrame. Then
+   have an autoplot method for it. I am not sure if it would always be
+   possible/desirable to unify the legends.
+   :END:
+* Statistics
+** TODO stat_views
+*** TODO generate grouping variable by view intersection
+    DEADLINE: <2012-10-01 Mon>
+*** TODO shift to coordinates relative to some origin (default: start)
+    DEADLINE: <2012-10-01 Mon>
+** TODO stat_relative_position
+   DEADLINE: <2012-09-01 Sat>
+    :MICHAEL: 
+    Question: is this really a coordinate system or a stat? My
+    understanding is that a coordinate system changes the data->pixel
+    mapping but it does not change the data itself. So coord_truncate
+    does not change the coordinates (as labeled in the axis), it just
+    squishes stuff together in the plot. In this case though, we need
+    the X axis to be the same across many different origins/tracks, so
+    the coordinates need to be transformed through a 'stat'. Right?
+    :END:
+*** TODO need a transformation method for GRanges in biovizBase.
+    DEADLINE: <2012-09-01 Sat>
+* Faceting
+** TODO support facet = gr ~ . where gr is just GRanges
+   DEADLINE: <2012-09-01 Sat>
+* Theme
+** TODO theme_pack_panels to pack facetted plots and make it more compact.
+   DEADLINE: <2012-09-01 Sat>
+* Scales
+** TODO scale_fill_fold_change, blue to white to red
+   DEADLINE: <2012-07-08 Sun>
+** TODO global way to make sure color is not NA when plot rectangles? 
+** TODO switch label to right
+   DEADLINE: <2012-10-01 Mon>
+** TODO X tick labels
+   DEADLINE: <2012-07-20 Fri>
+   It needs to be more like Gviz. If the tick labels are over 1mb, use
+   mb as the unit, else, use kb, unless less than 1kb, then use
+   bp. Those long numbers are tough to read.
+** TODO remove stepping label
+   DEADLINE: <2012-07-08 Sun>
+** TODO resolution to figure out the stepping "buffer"
+* Autoplotting
 ** autoplot,Matrix
 *** TODO label by row names and align by column names of matrix
-** autoplot,GRanges, GRangesList,TranscriptDb
-*** consider row names and label them automatically
-** [#A] autoplot,TranscriptDb
+    DEADLINE: <2012-10-01 Mon>
+** TODO consider row names and label them automatically
+   DEADLINE: <2012-09-01 Sat>
+** autoplot,TranscriptDb
 *** TODO gap.geom need to be supported and use direction(arrow).
+    DEADLINE: <2012-07-08 Sun>
 *** TODO x lab should be a right default
+    DEADLINE: <2012-07-08 Sun>
 *** TODO smart parsing for names. eg. gene_id(tx_id)
 ** autoplot,ExpressionSet
 *** TODO think about heatmap with phenotpe plot as margin?
-** autoplot,SummerizedExperiments
-*** potentially useful for splicing and copy number variants..
+    DEADLINE: <2012-10-01 Mon>
+** TODO autoplot,SummarizedExperiment
+   Focus should be on multivariate (multiple sample) plots, like
+   ExpressionSet. This would include parallel coordinate plots and
+   scatterplot matrices. If those plots are by-row, i.e., the
+   variables correspond to ranges, then the data-linked-to-ranges
+   plots would work. If the variables are the samples, the pcp/splom
+   could be a margin plot, where each track shows something for each
+   sample in genomic context. Or in the case of the splom, we could
+   use one triangle for the traditional scatterplot and the other
+   triangle would be something else incorporating range information.
+
+   As a first step, we could just make this method behave just like
+   autoplot,ExpressionSet. Then come up with clever ways of
+   incorporating the range information.
+
+*** TODO Make equivalent to autoplot,ExpressionSet
+    DEADLINE: <2012-07-08 Sun>
+*** TODO Support data-linked-to-range plots
+    DEADLINE: <2012-07-20 Fri>
+*** TODO Facet by sample in linked plots and incorporate splom/pcp in margin?
+    DEADLINE: <2012-10-01 Mon>
 ** autoplot,VCF
-*** just to make it to work again.
-
-
-
-* facet
-** TODO support facet = gr ~ . where gr is just GRanges
-
-* coord
-** TODO new coordinate system origin: to map interval to certain origin and need a transformatin method for GRanges in biovizBase.
-
-* theme
-** TODO theme_pack_facet  to pack facetted plots and make it more compact.
-
+*** TODO just to make it to work again.
+   DEADLINE: <2012-07-20 Fri>
+** TODO autoplot,Seqinfo
+   DEADLINE: <2012-07-20 Fri>
+   Grabs cytoband information automatically
+** TODO put data in ggplot() first
+   DEADLINE: <2012-07-15 Sun>
 * Protein space
-** TODO map() idea, data granges and exon granges, map protein space back to genomic coordiantes.
-** TODO Can parse data from uniprot autopmatically and it's easy actually.
+** TODO map() idea, data granges and exon granges, linked plot
+   DEADLINE: <2012-10-01 Mon>
+   :MICHAEL:
+   There is a similarity, I think, between the ideogram and this
+   idea. The ideogram is drawn over the entire chromosome but then
+   somehow it knows to draw a red rectangle around the region being
+   plotted below. That currently works for only a single range, but it
+   could be extended for multiple ranges. Those ranges would be
+   assumed to be directly adjacent in the bottom track, and lines
+   would be drawn from the rectangle sides down to the breakpoints. I
+   think visnab did this line drawing for the ideogram (single range
+   only). 
 
+   We might need a new geom, maybe called geom_splice, that
+   delegates to another geom (geom_ideogram, geom_alignment, etc) and
+   then draws lines from sub-regions of the global space down to
+   adjacent, spliced regions. The bottom end points of those lines would
+   somehow depend on the coordinate system, while the top end points
+   somehow use the global coordinates. For the linear coordinate
+   system, the lines simply go to the X axis limits. We would then
+   have a coord_splice that does the necessary removal of gaps, with
+   the structure stored in a GRanges. coord_truncate_gaps is really
+   just a special case of coord_splice, where the exons have been
+   (invisibly) extended a little. So maybe we could replace that with
+   coord_splice and add a parameter for the buffer width. 
 
-* arrange plots
-** TODO plot arrange function, to do something like arrange all plots and parse the legend.
+   For protein space though, it sort of no longer makes sense to speak
+   in genomic coordinates. Instead, we have protein coordinates that
+   start at 1, so that requires a 'stat' transformation similar to
+   that in stat_views. So sometimes we want a coord_splice, other
+   times a stat_splice, depending on whether we still want global,
+   genomic coordinates on the X axis. They should share a lot of code.
 
-* MISC
-** TODO global way to make sure color is not NA when plot rectangles? 
-** TODO resolution to figure out the stepping "buffer"
-** TODO switch label to right
-** TODO scale_bio_heat, blue to white to red
-** TODO remove stepping label
-** TODO put data in ggplot() first to make sure the add-on features are mostly available
-** TODO multiple geoms should be supported.
-** TODO You need to work on the X tick marks, too. It needs to be more like Gviz. If the tick labels are over 1mb, use mb as the unit, else, use kb, unless less than 1kb, then use bp. Those long numbers are tough to read.
-
-* TODO vignettes
-* TODO update and check manual to make sure it's the latest.
-
+   This sounds a bit involved, but I think it's really important for
+   biological plotting.
+   :END:
+** TODO Can parse data from uniprot automatically and it's easy actually.
+   :MICHAEL:
+   What sort of data would we parse? This is probably the domain of
+   some other package.
+   :END:
+* Documentation
+** TODO vignettes
+   DEADLINE: <2012-07-20 Fri>
+** TODO update and check manual to make sure it's the latest.
+   DEADLINE: <2012-07-08 Sun>
 
 
 

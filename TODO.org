@@ -1,4 +1,5 @@
 #+DRAWERS: MICHAEL TENGFEI
+#+STARTUP lognoteredeadline
 * Geoms
 ** TODO geom_ideogram
 *** TODO Make this an actual geom

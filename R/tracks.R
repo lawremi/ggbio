@@ -73,7 +73,9 @@ tracks <- function(..., heights, xlim, xlab = NULL,
       xlim <- range(xlim)
     }
   }
-  ylim <- lapply(grobs, function(grob) getLimits(grob)$ylim)
+
+  ylim <- lapply(grobs, function(grob) scales::expand_range(getLimits(grob)$ylim, mul = 0.05))
+
   if(is.null(names(dots)))
     named <- FALSE
   else
@@ -119,9 +121,9 @@ setMethod("print", "Tracks", function(x){
     lst <- lapply(seq_len(N),
                   function(i) {
                     ## if(i == 2) browser()
-                    ylim <- x@ylim[[i]]
-                    s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
-                    ## s <- coord_cartesian(xlim = x@xlim)
+                    ## ylim <- x@ylim[[i]]
+                    ## s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
+                    s <- coord_cartesian(xlim = x@xlim)
                     grobs[[i]] <- grobs[[i]] +
                       opts(plot.background = theme_rect(colour = NA, fill = x@track.plot.color[i]))
                     if(i %in% which(x@xlim.change))

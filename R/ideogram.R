@@ -23,7 +23,7 @@ plotSingleChrom <- function(obj, subchr, zoom.region,
   if(!xlabel)
     p <- p + opts(axis.text.x = theme_blank())
   
-  p <- p + theme_alignment(grid = FALSE, label = TRUE, border = FALSE) +
+  p <- p + theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
     scale_y_continuous(breaks = 5, label = subchr) +
       opts(strip.background = theme_rect(colour = 'NA', fill = 'NA'))+ 
         opts(strip.text.y = theme_text(colour = 'white'))   + opts(legend.position = "none")+

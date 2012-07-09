@@ -336,8 +336,32 @@ p3 <- plotIdeogram(mm9, "chr1") + scale_fill_manual(values = cyto.new)
 tracks(p1, p2, p3)
 @ %def 
 
+\subsection{Plot ideogram directly from Seqinfo}
+More information could be found in autoplot tutorial.
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<seqinfo, fig = TRUE, height = 2.4>>=
+data(hg19Ideogram)
+seqs <- seqinfo(hg19Ideogram)
+class(seqs)
+p1 <- autoplot(seqs["chr1"])
+p2 <- autoplot(seqs["chr1"], FALSE)
+tracks(type1 = p1, type2 = p2)
+@ %def 
+  \caption{Plot Seqinfo object.}
+\end{figure}
+
+
 \section{Recommended reading}
 Other vignettes associated with this package, such as chip-seq data analysis
 shows a fairly high level construction of tracks which embed ideogram. 
+
+\section{sessionInfo}
+@ 
+<<session-info>>=
+sessionInfo()
+@ %def 
+
 
 \end{document}

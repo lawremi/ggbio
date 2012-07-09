@@ -82,6 +82,8 @@ exportMethods(autoplot, rescale, fortify,
               xlim, "xlim<-", update, reset, backup,
               highlight)
 
+## scale
+export(scale_x_sequnit)
 
 ## geom
 exportMethods(geom_chevron,

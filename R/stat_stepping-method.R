@@ -29,7 +29,7 @@ setMethod("stat_stepping", "GRanges", function(data, ...,
   if(!missing(ylab))
     p <- c(p, list(ggplot2::ylab(ylab)))
   else
-    p <- c(p, list(ggplot2::ylab("Stepping")))
+    p <- c(p, list(ggplot2::ylab("")))
   
   if(!missing(main))
     p <- c(p, list(opts(title = main)))

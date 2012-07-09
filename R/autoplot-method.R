@@ -409,8 +409,7 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                ratio = 0.0025, 
                                                geom = c("gene"),
                                                stat = c("identity", "reduce"),
-                                               names.expr = expression(paste(tx_name,
-                                                   "(", gene_id,")", sep = ""))){
+                                               names.expr = "tx_name(gene_id)"){
 
   stat <- match.arg(stat)
   args <- list(...)
@@ -422,6 +421,7 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
   args.non$ratio <- ratio
   args.non$geom <- geom
   args.non$stat <- stat
+  args.non$names.expr <- names.expr
   if(!missing(which))
     args.non$which <- which
   aes.res <- do.call(aes, args.aes)
@@ -997,4 +997,52 @@ setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
     p <- p + opts(title = main)
   p
 })
+
+
+setMethod("autoplot", "matrix", function(object, label = TRUE, evenlegend = TRUE,
+                                         scale = scale_fill_fold_change()){
+  x <- seq_len(ncol(object))
+  
+  if(!is.null(colnames(object))){
+    cnms <- as.numeric(colnames(object))
+    if(all(!is.na(cnms))){
+      x <- cnms[x]
+    }
+  }
+  
+  y <- seq_len(nrow(object))
+  df <- expand.grid(x = x, y = y)
+  df$z <- as.numeric(t(object))
+  if(label)
+  p <- qplot(data = df, x = x, y = y , fill = z, geom = "raster") + scale
+  if(label & !is.null(rownames(object))){
+    y.lab <- rownames(object)
+    p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+  }
+  p
+})
+
+.transformSeqinfo <- function(obj){
+  ss <- seqlengths(obj)
+  res <- GRanges(seqnames(obj), IRanges(start = 1, end = ss))
+  res <- keepSeqlevels(res, names(ss))
+  seqlengths(res) <- ss
+  res
+}
+
+setMethod("autoplot", "Seqinfo", function(object, single.ideo = TRUE, ... ){
+  obj <- .transformSeqinfo(object)
+  if(length(obj) > 1)
+    p <- ggplot() + layout_karyogram(obj)
+  if(length(obj) == 1){
+    if(single.ideo)
+      p <- plotSingleChrom(obj, as.character(seqnames(obj)))
+    else
+      p <- ggplot() + layout_karyogram(obj)
+  }
+  p
+})
+
+
+
 

@@ -51,6 +51,7 @@
 \begin{document}
 \setkeys{Gin}{width=0.6\textwidth}
 \maketitle
+\tableofcontents
 
 \section{Motivation}
 Track-based view are widely used in almost all genome viewers, it usually stacks
@@ -401,5 +402,10 @@ Another useful source is \ggplot{}'s on-line documentation and examples, because
 most post-plot modification is compatible with \ggbio{} object or
 \Robject{Tracks} object.
 
+\section{sessionInfo}
+@ 
+<<session-info>>=
+sessionInfo()
+@ %def 
 
 \end{document}

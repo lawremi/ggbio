@@ -24,7 +24,7 @@ gr <- GRanges(seqnames =
 grl <- split(gr, values(gr)$pair)
 
 ## @knitr exp
-autoplot(grl)
+
 autoplot(grl, group.selfish = TRUE)
 autoplot(grl, group.selfish = TRUE, main.geom = "arrowrect", gap.geom = "segment")
 
@@ -32,3 +32,8 @@ autoplot(grl, group.selfish = TRUE, main.geom = "arrowrect", gap.geom = "segment
 autoplot(grl, aes(fill = ..grl_name..))
 ## equal to 
 ## autoplot(grl, aes(fill = grl_name))
+
+## @knitr NULL
+genome(grl) <- "hg19"
+biovizBase:::getXLab(grl)
+autoplot(grl, aes(group = ..grl_name..))

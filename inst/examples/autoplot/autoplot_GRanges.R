@@ -8,6 +8,7 @@ library(ggbio)
 set.seed(1)
 N <- 1000
 library(GenomicRanges)
+
 gr <- GRanges(seqnames = 
               sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),
@@ -35,6 +36,7 @@ gr.b <- GRanges(seqnames = "chr1", IRanges(start = seq(1, 100, by = 10),
 gr.b2 <- GRanges(seqnames = "chr2", IRanges(start = seq(1, 100, by = 10),
                   width = sample(4:9, size = 10, replace = TRUE)),
                 score = rnorm(10, 10, 3), value = runif(10, 1, 100))
+head(gr)
 gr.b <- c(gr.b, gr.b2)
 ## default use score as y
 autoplot(gr.b, geom = "bar", aes(fill = value))
@@ -42,7 +44,12 @@ autoplot(gr.b, geom = "bar", aes(y = value))
 
 
 ## @knitr geom/aes/facet
-autoplot(gr, geom = "point", aes(y = score))
+p <- autoplot(gr, geom = "point", aes(y = score))
+p + geom_smooth()
+
+## autoplot(gr, geom = "smooth", aes(y = score))
+p + geom_smooth(data = as.data.frame(gr), aes(x = start, y = score))
+p + geom_smooth()
 autoplot(gr, fill = "red")
 autoplot(gr, aes(fill = value))
 autoplot(gr, facets = sample ~ seqnames)

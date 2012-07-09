@@ -6,6 +6,8 @@ txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 
 ## @knitr tracks
 p1 <- autoplot(txdb, which = genesymbol["ALDOA"])
+p1 <- autoplot(txdb, which = genesymbol["ALDOA"], names.expr = "tx_name:::gene_id")
+p1
 p2 <- autoplot(txdb, which = genesymbol["ALDOA"], stat = "reduce")
 library(biovizBase)
 tracks(p1, p2, heights = c(5, 1)) + ylab("")

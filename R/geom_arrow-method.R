@@ -7,7 +7,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
                                             length = unit(0.15, "cm"),
                                             type = "open", 
                                             stat = c("stepping", "identity"),
-                                            facets = NULL, arrow.rate = 0.05,
+                                            facets = NULL, arrow.rate = 0.03,
                                             group.selfish = TRUE){
 
 
@@ -31,17 +31,19 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
   if(length(data)){
     ## small arrow
     if(stat == "stepping"){
-      grl <- splitByFacets(data, facets)
-      res <- endoapply(grl,
-                       function(dt){
-                         if("group" %in% names(args.aes))
-                           dt <- addStepping(dt, group.name = as.character(args.aes$group),
-                                              group.selfish = group.selfish)
-                         else
-                           dt <- addStepping(dt)
-                       })
-      res <- unlist(res)
-      data <- res
+      if(!"stepping" %in% colnames(values(data))){
+        grl <- splitByFacets(data, facets)
+        res <- endoapply(grl,
+                         function(dt){
+                           if("group" %in% names(args.aes))
+                             dt <- addStepping(dt, group.name = as.character(args.aes$group),
+                                               group.selfish = group.selfish)
+                           else
+                             dt <- addStepping(dt)
+                         })
+        res <- unlist(res)
+        data <- res
+      }
       df <- as.data.frame(data)
       lst <- apply(df, 1, function(x){
         x <- as.data.frame(t(x))
@@ -64,6 +66,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
       args.aes$x <- as.name("temp.x")
       args.aes$xend <- as.name("temp.x2")
       args.aes$y <- args.aes$yend <- as.name("stepping")
+
       ## need to split to two direction/maybe three?
       p <- by(res, res$strand, function(x){
         s <- unique(as.character(x$strand))
@@ -82,7 +85,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
                       do.call(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
                     },
                     "*" = {
-                      aes.temp <- do.call(aes, args.aes)                    
+                      aes.temp <- do.call(aes, args.aes)
                       do.call(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
                     })
         p

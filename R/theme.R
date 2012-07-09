@@ -32,15 +32,15 @@ theme_null<- function()
 
 
 ## TODO: with axis?
-theme_alignment <-   function (label = FALSE, base_size = 12,
-                               base_family = "",
+theme_alignment <-   function (ylabel = FALSE, base_size = 12,
+                               base_family = "", 
                                axis = TRUE, border = TRUE, grid = TRUE) 
 {
-  structure(
+  res <- structure(
             list(
                  axis.line = theme_blank(),
                  ## axis.text.x = theme_blank(),
-                 axis.text.y = {if(label)
+                 axis.text.y = {if(ylabel)
                  theme_text(family = base_family, size = base_size * 0.8,
                             lineheight = 0.9, hjust = 1)
                                 else
@@ -53,9 +53,6 @@ theme_alignment <-   function (label = FALSE, base_size = 12,
                  axis.ticks.margin = unit(0.5, "lines"),
 
                  panel.background = theme_blank(),
-                 ## panel.background = theme_rect(fill = "white", 
-                 ##   colour = "grey"),
-                 ## panel.border = theme_blank(),
                  panel.border = {if(border)
                                    theme_rect(fill = NA, colour = "grey50")
                                  else
@@ -76,6 +73,10 @@ theme_alignment <-   function (label = FALSE, base_size = 12,
                    1.2),
                  plot.margin = unit(c(1, 1, 0.5, 0.5), "lines")), 
             class = "options")
+  if(!ylabel){
+    res <- list(res, list(scale_y_continuous(breaks = NULL)))
+  }
+  res
 }
 
 ## need a theme_bw2()

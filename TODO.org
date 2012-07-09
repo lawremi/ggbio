@@ -7,6 +7,7 @@
 *** TODO Make scale_fill_giemsa for coloring by cytoband
     DEADLINE: <2012-09-01 Sat>
 *** TODO Arch in the end instead of just rectangle to make more pretty.
+*** TODO Highlight function.
 ** TODO multiple geoms should be supported.
    DEADLINE: <2012-09-01 Sat>
 * Layout
@@ -35,15 +36,15 @@
     DEADLINE: <2012-10-01 Mon>
 ** TODO stat_relative_position
    DEADLINE: <2012-09-01 Sat>
-    :MICHAEL: 
-    Question: is this really a coordinate system or a stat? My
-    understanding is that a coordinate system changes the data->pixel
-    mapping but it does not change the data itself. So coord_truncate
-    does not change the coordinates (as labeled in the axis), it just
-    squishes stuff together in the plot. In this case though, we need
-    the X axis to be the same across many different origins/tracks, so
-    the coordinates need to be transformed through a 'stat'. Right?
-    :END:
+   :MICHAEL: 
+   Question: is this really a coordinate system or a stat? My
+   understanding is that a coordinate system changes the data->pixel
+   mapping but it does not change the data itself. So coord_truncate
+   does not change the coordinates (as labeled in the axis), it just
+   squishes stuff together in the plot. In this case though, we need
+   the X axis to be the same across many different origins/tracks, so
+   the coordinates need to be transformed through a 'stat'. Right?
+   :END:
 *** TODO need a transformation method for GRanges in biovizBase.
     DEADLINE: <2012-09-01 Sat>
 * Faceting
@@ -53,17 +54,17 @@
 ** TODO theme_pack_panels to pack facetted plots and make it more compact.
    DEADLINE: <2012-09-01 Sat>
 * Scales
-** TODO scale_fill_fold_change, blue to white to red
+** DONE scale_fill_fold_change, blue to white to red
    DEADLINE: <2012-07-08 Sun>
 ** TODO global way to make sure color is not NA when plot rectangles? 
 ** TODO switch label to right
    DEADLINE: <2012-10-01 Mon>
-** TODO X tick labels
+** DONE X tick labels
    DEADLINE: <2012-07-20 Fri>
    It needs to be more like Gviz. If the tick labels are over 1mb, use
    mb as the unit, else, use kb, unless less than 1kb, then use
    bp. Those long numbers are tough to read.
-** TODO remove stepping label
+** DONE remove stepping label
    DEADLINE: <2012-07-08 Sun>
 ** TODO resolution to figure out the stepping "buffer"
 * Autoplotting
@@ -73,11 +74,11 @@
 ** TODO consider row names and label them automatically
    DEADLINE: <2012-09-01 Sat>
 ** autoplot,TranscriptDb
-*** TODO gap.geom need to be supported and use direction(arrow).
+*** DONE gap.geom need to be supported and use direction(arrow).
     DEADLINE: <2012-07-08 Sun>
 *** TODO x lab should be a right default
     DEADLINE: <2012-07-08 Sun>
-*** TODO smart parsing for names. eg. gene_id(tx_id)
+*** DONE smart parsing for names. eg. gene_id(tx_id)
 ** autoplot,ExpressionSet
 *** TODO think about heatmap with phenotpe plot as margin?
     DEADLINE: <2012-10-01 Mon>
@@ -104,7 +105,7 @@
     DEADLINE: <2012-10-01 Mon>
 ** autoplot,VCF
 *** TODO just to make it to work again.
-   DEADLINE: <2012-07-20 Fri>
+    DEADLINE: <2012-07-20 Fri>
 ** TODO autoplot,Seqinfo
    DEADLINE: <2012-07-20 Fri>
    Grabs cytoband information automatically

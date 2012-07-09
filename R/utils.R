@@ -260,3 +260,130 @@ setMethod("highlight", "GRanges", function(obj, col = "red", fill = "red", alpha
   df <- data.frame(start(ir), end(ir))
   highlight(df, col = col, fill = fill, alpha = alpha)
 })
+
+## matrix
+scale_fill_fold_change<- function(){
+  s <- scale_fill_gradient2(low = "blue", mid = "white", high = "red")
+  res <- c(list(s), list(guides(fill = guide_colorbar())),
+                       list(scale_x_continuous(expand = c(0, 0))),
+                       list(scale_y_continuous(expand = c(0, 0))))
+}
+
+need_color <- function(args){
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  if("color" %in% c(names(args.non),names(args.aes))){
+    return(FALSE)
+  }else{
+    return(TRUE)
+  }
+}
+
+
+
+
+trans_seq <- function(unit = c("mb", "kb", "bp")){
+  unit <- match.arg(unit)
+  function(x){
+    res <- switch(unit,
+                  mb = {
+                    x/1e6
+                  },
+                  kb = {
+                    x/1000
+                  },
+                  bp = {
+                    x
+                  })
+    res
+  }
+}
+
+trans_seq_format<- function(unit = c("mb", "kb", "bp")){
+  unit <- match.arg(unit)
+  function(x){
+    res <- switch(unit,
+                  mb = {
+                    x/1e6
+                  },
+                  kb = {
+                    x/1000
+                  },
+                  bp = {
+                    x
+                  })
+    paste(res, unit)
+  }
+}
+
+trans_seq_rev<- function(unit = c("mb", "kb", "bp")){
+  unit <- match.arg(unit)
+  function(x){
+    res <- switch(unit,
+                  mb = {
+                    x*1e6
+                  },
+                  kb = {
+                    x*1000
+                  },
+                  bp = {
+                    x
+                  })
+    res
+  }
+}
+
+scale_x_sequnit <- function(unit = c("mb", "kb", "bp")){
+  unit <- match.arg(unit)
+  scale_x_continuous(breaks = trans_breaks(trans_seq(unit),
+                                           trans_seq_rev(unit)),
+                     labels = trans_format(trans_seq_format(unit), math_format(.x)))
+}
+
+get_digits <- function(x){
+  floor(log10(x))
+}
+
+
+scale_by_xlim <- function(xlim, by.unit = TRUE){
+    if(by.unit)
+      .d <- max(xlim)
+    else
+      .d <- diff(xlim)
+    if(.d > 1e6){
+      res <- scale_x_sequnit("mb")
+    }else if(.d <= 1e6 & .d > 1e3){
+      res <- scale_x_sequnit("kb")
+    }else{
+      res <- scale_x_sequnit("bp")
+    }
+  res
+}
+
+
+sub_names <- function(data, name.expr){
+  ## name.expr <- deparse(substitute(name.expr))
+  .res <- c()  
+  for(i in seq_len(nrow(data))){
+    res <- data[i,]
+    res <- as.list(res)
+    res <- lapply(res, function(x) {
+      if(is.numeric(x))
+        return(as.character(as.name(x)))
+      else
+        return(as.character(x))
+    })
+    subfun <- function(res, name.expr){
+      nm <- names(res[1])
+      val <- res[[1]]
+      name.expr <- gsub(nm, val, name.expr)
+      if(!length(res) == 1)
+        subfun(res[-1], name.expr)
+      else
+        return(name.expr)
+    }
+    .res <- c(subfun(res, name.expr), .res)
+  }
+  .res
+}
+

@@ -1,0 +1,357 @@
+%\VignetteIndexEntry{Manhattan plot}
+%\VignetteDepends{}
+%\VignetteKeywords{visualization utilities}
+%\VignettePackage{ggbio}
+\documentclass[10pt]{article}
+
+% \usepackage{times}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage{graphicx}
+
+% \SweaveOpts{width = 2.5, height = 2}
+
+
+\textwidth=6.5in
+\textheight=8.5in
+\parskip=.3cm
+\parindent = 0cm
+\oddsidemargin=-.1in
+\evensidemargin=-.1in
+\headheight=-.3in
+
+
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rcode}[1]{{\texttt{#1}}}
+
+\newcommand{\software}[1]{\textsf{#1}}
+\newcommand{\R}{\software{R}}
+\newcommand{\Bioc}{\software{Bioconductor}}
+\newcommand{\IRanges}{\Rpackage{IRanges}}
+\newcommand{\biovizBase}{\Rpackage{biovizBase}}
+\newcommand{\ggbio}{\Rpackage{ggbio}}
+\newcommand{\visnab}{\Rpackage{visnab}}
+\newcommand{\ggplot}{\Rpackage{ggplot2}}
+\newcommand{\grid}{\Rpackage{grid}}
+\newcommand{\gridExtra}{\Rpackage{gridExtra}}
+\newcommand{\qplot}{\Rfunction{qplot}}
+\newcommand{\autoplot}{\Rfunction{autoplot}}
+
+\title{How to make Manhattan plot with \ggbio{}}
+\author{Tengfei Yin}
+\date{\today}
+
+\setkeys{Gin}{width=0.95\textwidth}
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+In this tutorial, we introduce a new coordinate system called "genome" for
+genomic data. This transformation is to put all chromosomes on the same genome
+coordinates following specified orders and adding buffers in between.  One may
+think about facet ability based on \textit{seqnames}, it can produce something
+similar to \textit{Manhattan
+  plot}\footnote{http://en.wikipedia.org/wiki/Manhattan}, but the view will not
+be compact. What's more, genome transformation is previous step to form a
+circular view. In this tutorial, we will simulate some SNP data and use this
+special coordinate and a specialized function \Rfunction{plotGrandLinear} to
+make a Manhattan plot.
+
+\textit{Manhattan plot} is just a special use design with this coordinate system.
+
+\section{Understand the new coordinate}
+Let's load some packages and data first
+@ 
+<<load>>=
+library(ggbio)
+data(hg19IdeogramCyto, package = "biovizBase")
+data(hg19Ideogram, package = "biovizBase")
+library(GenomicRanges)
+@ %def 
+
+
+Make a minimal example `GRanges`, and see what the default coordiante looks
+like, pay attention that, by default, the graphics are faceted by `seqnames` as
+shown in Figure \ref{fig:simul_gr}
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<simul_gr, fig = TRUE>>=
+library(biovizBase)
+gr <- GRanges(rep(c("chr1", "chr2"), each = 5),
+              IRanges(start = rep(seq(1, 100, length = 5), times = 2),
+                      width = 50))
+autoplot(gr, aes(fill = seqnames))
+@ %def 
+  \caption{Default grahpics is faceted by seqnames}
+  \label{fig:simul_gr}
+\end{figure}
+
+What if we specify the coordinate system to be "genome" in \autoplot{} function,
+there is no faceting anymore, the two plots are merged into one single genome
+space, and properly labeled as shown in Figure \ref{fig:coord-genome}
+% There is a limitation on integer in \R{}, so the
+% genome space cannot be too long, to overcome this limitation, a default argument
+% called `maxSize` is defined with this function, if the genome space is over
+% limits, it will rescale everything automatically, function `tranformToGenome`
+% with return a transformed `GRanges` object, with only one single `seqnames`
+% called "genome" and the `seqlengths` of it, is just genome space(with buffering
+% region). arguments called `space.ratio` control the skipped region between
+% chromosomes.
+
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<coord-genome, fig = TRUE>>=
+autoplot(gr, coord = "genome", aes(fill = seqnames))
+@ %def   
+  \caption{Coordinate genome}
+  \label{fig:coord-genome}
+\end{figure}
+
+
+The internal transformation are implemented into the function
+\Rfunction{transformToGenome}. And there is some simple way to test if a
+\Robject{GRanges} object is transformed to coordinate "genome" or not
+
+@ 
+<<is>>=
+gr.t <- transformToGenome(gr)
+head(gr.t)
+is_coord_genome(gr.t)
+metadata(gr.t)$coord
+@ %def 
+
+
+\section{Step 2: Simulate a SNP data set}
+Let's use the real human genome space to simulate a SNP data set.
+@ 
+<<simul_snp>>=
+chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
+seqlths <- seqlengths(hg19Ideogram)[chrs]
+set.seed(1)
+nchr <- length(chrs)
+nsnps <- 100
+gr.snp <- GRanges(rep(chrs,each=nsnps),
+                  IRanges(start =
+                          do.call(c, lapply(chrs, function(chr){
+                            N <- seqlths[chr]
+                            runif(nsnps,1,N)
+                          })), width = 1),
+                  SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
+                  pvalue =  -log10(runif(nchr*nsnps)),
+                  group = sample(c("Normal", "Tumor"), size = nchr*nsnps,
+                    replace = TRUE)
+                  )
+@ %def 
+
+
+We use the some trick to make a shorter names.
+@ 
+<<shorter>>=
+seqlengths(gr.snp)
+nms <- seqnames(seqinfo(gr.snp))
+nms.new <- gsub("chr", "", nms)
+names(nms.new) <- nms
+gr.snp <- renameSeqlevels(gr.snp, nms.new)
+seqlengths(gr.snp)
+@ %def 
+
+
+\section{Step 3: Start to make Manhattan plot by using \autoplot{}}
+wrapped basic functions into \autoplot{}, you can specify the coordinate. Figure
+\ref{fig:unorder} shows what the unordered object looks like.
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<unorder, fig = TRUE>>=
+autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
+@ %def   
+  \caption{Unordred Manhattan plot}
+  \label{fig:unorder}
+\end{figure}
+
+
+That's probably not what you want, if you want to change to specific order, just
+sort them by hand and use `keepSeqlevels`. Figure \ref{fig:sort} shows a sorted
+plot.
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<sort, fig = TRUE>>=
+gr.snp <- keepSeqlevels(gr.snp, c(1:22, "X", "Y"))
+autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
+@ %def 
+  \caption{Sorted data for Manhattan plot}
+  \label{fig:sort}
+\end{figure}
+
+
+\textbf{NOTICE}: the data now doesn't have information about lengths of each
+chromosomes, this is allowed to be plotted, but it's misleading sometimes,
+without chromosomes lengths information, \ggbio{} use data space to make
+estimated lengths for you, this is not accurate! So let's just assign
+\Rfunction{seqlengths} to the object. Then you will find the data space now is
+distributed proportional to real space as shown in Figure \ref{fig:with-seql}.
+
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<with_seql, fig = TRUE>>=
+names(seqlths) <- gsub("chr", "", names(seqlths))
+seqlengths(gr.snp) <- seqlths[names(seqlengths(gr.snp))]
+autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
+@ %def 
+  \caption{Manhattan plot after setting seqlengths to the data, the data space now is
+    distributed proportional to real chromosome space.}
+\label{fig:with-seql}
+\end{figure}
+
+In \autoplot{}, argument \Rfunarg{coord} is just used to transform the data,
+after that, you can use it as common \Robject{GRanges}, all other geom/stat
+works for it. Here just show a simple example for another geom "line" as shown
+in Figure \ref{fig:line}
+
+\begin{figure}[!htpb]
+  \centering
+<<line, fig = TRUE>>=
+autoplot(gr.snp, coord = "genome", geom = "line", aes(y = pvalue, group = seqnames,
+                                     color = seqnames))
+@ %def   
+  \caption{Use line to represent the data in typical Manhattan plot.}
+  \label{fig:line}
+\end{figure}
+@ 
+
+
+
+\section{Convenient \Rfunction{plotGrandLinear} function}
+In \ggbio{}, sometimes we develop specialized function for certain types of
+plots, it's basically a wrapper over lower level API and \autoplot{}, but more
+convenient to use. Here for \textit{Manhattan plot}, we have a function called
+\Rfunction{plotGrandLinear} used for it. aes(y = ) is required to indicate the y
+value, e.g.  p-value. Figure \ref{fig:plotGl} shows a defalut graphic.
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<plotGrandLinear, fig = TRUE>>=
+plotGrandLinear(gr.snp, aes(y = pvalue))
+@ %def   
+  \caption{Default Manhattan plot by calling plotGrandLinear function}
+  \label{fig:plotGl}
+\end{figure}
+
+
+Color mapping is automatically figured out by *ggbio* following the rules
+\begin{itemize}
+\item if \Rfunarg{color} present in \Rcode{aes()}, like \Rcode{aes(color =
+    seqnames)}, it will assume it's mapping to data column called 'seqnames'.
+\item if \Rfunarg{color} is not wrapped in \Rcode{aes()}, then this function
+  will \textbf{recylcle} them to all chromosomes.
+\item if \Rfunarg{color} is single character representing color, then just use
+  one arbitrary color.
+\end{itemize}
+ 
+Let's test some examples for controling colors.
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<morecolor1, fig = TRUE>>=
+plotGrandLinear(gr.snp, aes(y = pvalue, color = seqnames))
+@ %def   
+  \caption{Color mapped to chromosome names.}
+  \label{fig:more1}
+\end{figure}
+
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<morecolor2, fig = TRUE>>=
+plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue"))
+@ %def   
+  \caption{Color follow 'green' and 'deepskyblue' order for all chromosome space.}
+  \label{fig:more2}
+\end{figure}
+
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<morecolor3, fig = TRUE>>=
+plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue", "red"))
+@ %def   
+\caption{Color follow three colors pattern: 'green','deepskyblue', 'red'}
+  \label{fig:more3}
+\end{figure}
+
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<morecolor4, fig = TRUE>>=
+plotGrandLinear(gr.snp, aes(y = pvalue), color = "red")
+@ %def   
+  \caption{Unique color for all.}
+  \label{fig:more4}
+\end{figure}
+
+
+You can also add cutoff line as shown in Figure \ref{fig:cutoff}.
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<cutoff, fig = TRUE>>=
+plotGrandLinear(gr.snp, aes(y = pvalue), cutoff = 3, cutoff.color = "blue", cutoff.size = 4)
+@ %def   
+  \caption{Set cutoff on the Manhattan plot. The 'blue' line shows cutoff at value 3.}
+  \label{fig:cutoff}
+\end{figure}
+
+
+This is equivalent to \ggplot{} 's API.
+@ 
+<<cutoff-low, eval = FALSE>>=
+plotGrandLinear(gr.snp, aes(y = pvalue)) + geom_hline(yintercept = 3, color = "blue", size = 4)
+@ %def 
+
+Sometimes the names of chromosomes maybe very long, you may want to rotate them, 
+let's make a longer name first
+@ 
+<<longer>>=
+## let's make a long name
+nms <- seqnames(seqinfo(gr.snp))
+nms.new <- paste("chr00000", nms, sep = "")
+names(nms.new) <- nms
+gr.snp <- renameSeqlevels(gr.snp, nms.new)
+seqlengths(gr.snp)
+@ %def 
+
+Then rotate it!
+\begin{figure}[rotate]
+  \centering
+@ 
+<<rotate, fig = TRUE>>=
+plotGrandLinear(gr.snp, aes(y = pvalue)) + opts(axis.text.x=theme_text(angle=-90, hjust=0))
+@ %def   
+  \caption{Rotate the x lable to save space.}
+  \label{fig:rotate}
+\end{figure}
+
+\clearpage
+As you can tell from above examples, all utilities works for \ggplot{} will work
+for \ggbio{} too.
+
+\section{sessionInfo}
+@ 
+<<session-info>>=
+sessionInfo()
+@ %def 
+
+
+\end{document}

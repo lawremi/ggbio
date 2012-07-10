@@ -1,0 +1,405 @@
+%\VignetteIndexEntry{Circular view}
+%\VignetteDepends{}
+%\VignetteKeywords{visualization utilities}
+%\VignettePackage{ggbio}
+\documentclass[10pt]{article}
+
+% \usepackage{times}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage{graphicx}
+
+% \SweaveOpts{width = 2.5, height = 2}
+
+
+\textwidth=6.5in
+\textheight=8.5in
+\parskip=.3cm
+\parindent = 0cm
+\oddsidemargin=-.1in
+\evensidemargin=-.1in
+\headheight=-.3in
+
+
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rcode}[1]{{\texttt{#1}}}
+
+\newcommand{\software}[1]{\textsf{#1}}
+\newcommand{\R}{\software{R}}
+\newcommand{\Bioc}{\software{Bioconductor}}
+\newcommand{\IRanges}{\Rpackage{IRanges}}
+\newcommand{\biovizBase}{\Rpackage{biovizBase}}
+\newcommand{\ggbio}{\Rpackage{ggbio}}
+\newcommand{\visnab}{\Rpackage{visnab}}
+\newcommand{\ggplot}{\Rpackage{ggplot2}}
+\newcommand{\grid}{\Rpackage{grid}}
+\newcommand{\gridExtra}{\Rpackage{gridExtra}}
+\newcommand{\qplot}{\Rfunction{qplot}}
+\newcommand{\autoplot}{\Rfunction{autoplot}}
+
+\title{How to make circular view with \ggbio{}}
+\author{Tengfei Yin}
+\date{\today}
+
+\setkeys{Gin}{width=0.95\textwidth}
+\begin{document}
+\maketitle
+\tableofcontents
+\section{Introduction}
+Layout "circle" is inspired by \textit{Circos
+  project}\footnote{http://circos.ca/}. We extended it into the grammar of
+graphics and make it a general layout. Layout is generally more complex than a
+coordinate transformation, it's a combination of different components like
+coordinate transformation(genome and polar), and tracks-based layout,
+etc. Especially, circular view is very useful to show links between different
+locations. Since we are following the grammar of graphics, aesthetics mapping
+are fairly easy in \ggbio{}.
+
+In this tutorial, we will start from the raw data, if you are already familiar
+with how to process your data into the right format, which here I mean
+\Robject{GRanges},you can jump to \ref{sec:step3} directly.
+
+\section{Step 1: understand the layout circle}
+We have discussed about the new coordinate "genome" in vignette about Manhattan
+plot before, now this time, it's one step further compared to genome coordinate
+transformation. We specify ring radius \Rfunarg{radius} and track width
+\Rfunarg{trackWidth} to help transform a linear genome coordinate system to a
+circular coordinate system. By using \Rfunction{layout\_circle} function which we
+will introduce later.
+
+Before we visualize our data, we need to have something in mind
+\begin{itemize}
+\item How many tracks we want?
+\item Can they be combined into the same data?
+\item Do I have chromosomes lengths information?
+\item Do I have interesting variables attached as one column?
+\end{itemize}
+
+
+\section{Step 2: get your data ready to plot}
+Ok, let's start to process some raw data to the format we want. The data used in
+this study is from this a
+paper\footnote{http://www.nature.com/ng/journal/v43/n10/full/ng.936.html}. In
+this example, We are going to
+\begin{enumerate}
+\item Visualize somatic mutation as segment.
+\item Visualize inter,intro-chromosome rearrangement as links.
+\item Visualize mutation score as point tracks with grid-background.
+\item Add scale and ticks and labels.  
+\item To arrange multiple plots and legend. create multiple sample comparison.
+\end{enumerate}
+
+Notes: don't put too much tracks on it.  
+
+
+I simply put script here to get mutation data as `GRanges` object.
+
+@ 
+<<processing>>=
+crc1 <- system.file("extdata", "crc1-missense.csv", package = "biovizBase")
+crc1 <- read.csv(crc1)
+library(GenomicRanges)
+mut.gr <- with(crc1,GRanges(Chromosome, IRanges(Start_position, End_position),
+                            strand = Strand))
+values(mut.gr) <- subset(crc1, select = -c(Start_position, End_position, Chromosome))
+data("hg19Ideogram", package = "biovizBase")
+seqs <- seqlengths(hg19Ideogram)
+## subset_chr
+chr.sub <- paste("chr", 1:22, sep = "")
+## levels tweak
+seqlevels(mut.gr) <- c(chr.sub, "chrX")
+mut.gr <- keepSeqlevels(mut.gr, chr.sub)
+seqs.sub <- seqs[chr.sub]
+## remove wrong position
+bidx <- end(mut.gr) <= seqs.sub[match(as.character(seqnames(mut.gr)),
+              names(seqs.sub))]
+mut.gr <- mut.gr[which(bidx)]
+## assign_seqlengths
+seqlengths(mut.gr) <- seqs.sub
+## reanme to shorter names
+new.names <- as.character(1:22)
+names(new.names) <- paste("chr", new.names, sep = "")
+new.names
+mut.gr.new <- renameSeqlevels(mut.gr, new.names)
+head(mut.gr.new)
+@ %def 
+
+To get ideogram track, we need to load human hg19 ideogram data, for details
+please check another vignette about getting ideogram.
+
+@ 
+<<ideo>>=
+hg19Ideo <- hg19Ideogram
+hg19Ideo <- keepSeqlevels(hg19Ideogram, chr.sub)
+hg19Ideo <- renameSeqlevels(hg19Ideo, new.names)
+head(hg19Ideo)
+@ %def 
+
+\section{Step 3: low level API: `layout\_circle`}\label{sec:step3}
+\Rfunction{layout\_circle} is a lower level API for creating circular plot, it
+accepts \Robject{Granges} object, and users need to specify radius, track width,
+and other aesthetics, it's very flexible. But keep in mind, you \textbf{have to}
+pay attention rules when you make circular plots.
+
+\begin{itemize}
+\item For now, \Rfunction{seqlengths}, \Rfunction{seqlevels} and chromosomes
+  names should be exactly the same, so you have to make sure data on all tracks
+  have this uniform information to make a comparison.
+\item Set arguments \Rfunarg{space.skip} to the same value for all tracks, that
+  matters for transformation, default is the same, so you don't have to change
+  it, unless you want to add/remove space in between.
+\item \Rfunarg{direction} argument should be exactly the same, either
+  "clockwise" or "counterclockwise".
+\item Tweak with your radius and tracks width to get best results.
+\end{itemize}
+
+
+Since low level API leave you as much flexibility as possible, this may looks
+hard to adjust, but it can produce various types of graphics which higher levels
+API like \autoplot{} hardly can, for instance, if you want to overlap multiple
+tracks or fine-tune your layout.
+
+Ok, let's start to add tracks one by one.
+
+First to add a "ideo" track
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<lower-ideo-track, fig = TRUE>>=
+library(ggbio)
+p <- ggplot() + layout_circle(hg19Ideo, geom = "ideo", fill = "gray70",
+                              radius = 30, trackWidth = 4)
+p
+@ %def   
+  \caption{Adding 'ideogram' track.}
+  \label{fig:ideo}
+\end{figure}
+\clearpage
+
+Then a "scale" track with ticks
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<lower-scale-track, fig = TRUE>>=
+p <- p + layout_circle(hg19Ideo, geom = "scale", size = 2, radius = 35, trackWidth = 2)
+p
+@ %def   
+  \caption{Adding a 'scale' track.}
+  \label{fig:scale}
+\end{figure}
+
+\clearpage
+
+Then a "text" track to label chromosomes. *NOTICE*, after genome coordinate
+transformation, original data will be stored in column ".ori", and for mapping,
+just use ".ori" prefix to it. Here we use `.ori.seqnames`, if you use
+`seqnames`, that is going to be just "genome" character.
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<lower-text-track, fig = TRUE>>=
+p <- p + layout_circle(hg19Ideo, geom = "text", aes(label = seqnames), vjust = 0,
+                       radius = 38, trackWidth = 7)
+p
+@ %def 
+  \caption{Adding a 'text' track.}
+  \label{fig:text}
+\end{figure}
+\clearpage
+
+Then a "rectangle" track to show somatic mutation, this will looks like vertical
+segments. 
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<lower-mut-track, fig = TRUE>>=
+p <- p + layout_circle(mut.gr, geom = "rect", color = "steelblue",
+                       radius = 23 ,trackWidth = 6)
+p
+@ %def   
+  \caption{Adding a segment track to show mutation.}
+  \label{fig:mut}
+\end{figure}
+
+\clearpage
+Next, we need to add some "links" to show the rearrangement, of course, links
+can be used to map any kind of association between two or more different
+locations to indicate relationships like copies or fusions.
+
+@ 
+<<links>>=
+rearr  <- read.csv(system.file("extdata", "crc-rearrangment.csv", package = "biovizBase"))
+## start position
+gr1 <- with(rearr, GRanges(chr1, IRanges(pos1, width = 1)))
+## end position
+gr2 <- with(rearr, GRanges(chr2, IRanges(pos2, width = 1)))
+## add extra column
+nms <- colnames(rearr)
+.extra.nms <- setdiff(nms, c("chr1", "chr2", "pos1", "pos2"))
+values(gr1) <- rearr[,.extra.nms]
+## remove out-of-limits data
+seqs <- as.character(seqnames(gr1))
+.mx <- seqlengths(hg19Ideo)[seqs]
+idx1 <- start(gr1) > .mx
+seqs <- as.character(seqnames(gr2))
+.mx <- seqlengths(hg19Ideo)[seqs]
+idx2 <- start(gr2) > .mx
+idx <- !idx1 & !idx2
+gr1 <- gr1[idx]
+seqlengths(gr1) <- seqlengths(hg19Ideo)
+gr2 <- gr2[idx]
+seqlengths(gr2) <- seqlengths(hg19Ideo)
+@ %def 
+
+To create a suitable structure to plot, please use another `GRanges` to
+represent the end of the links, and stored as elementMetadata for the "start
+point" `GRanges`. Here we named it as "to.gr" and will be used later.
+@ 
+<<link-data>>=
+values(gr1)$to.gr <- gr2
+## rename to gr
+gr <- gr1
+@ %def 
+
+Here we show the flexibility of *ggbio*, for example, if you want to use color
+to indicate your links, make sure you add extra information in the data, used
+for mapping later. Here in this example, we use "intrachromosomal" to label
+rearrangement within the same chromosomes and use "interchromosomal" to label
+rearrangement in different chromosomes.
+@ 
+<<rearr>>=
+values(gr)$rearrangements <- ifelse(as.character(seqnames(gr))
+                                    == as.character(seqnames((values(gr)$to.gr))),
+                                    "intrachromosomal", "interchromosomal")
+@ %def 
+
+Get subset of links data for only one sample "CRC1"
+@ 
+<<subset-crc-1>>=
+gr.crc1 <- gr[values(gr)$individual == "CRC-1"]
+@ %def 
+
+Ok, add a "point" track with grid background for rearrangement data and map `y`
+to variable "score", map `size` to variable "tumreads", rescale the size to a
+proper size range.
+@ 
+<<lower-point-track>>=
+p <- p + layout_circle(gr.crc1, geom = "point", aes(y = score, size = tumreads), color = "red",
+                       radius = 12 ,trackWidth = 10, grid = TRUE) +
+  scale_size(range = c(1, 2.5))
+p
+@ %def 
+
+\clearpage
+Finally, let's add links and map color to rearrangement types. Remember you need
+to specify `linked.to` to the column that contain end point of the data.
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<lower-link-track, fig = TRUE>>=
+p <- p + layout_circle(gr.crc1, geom = "link", linked.to = "to.gr", aes(color = rearrangements),
+                       radius = 10 ,trackWidth = 1)
+p
+@ %def   
+  \caption{A link track is added to the circular plot.}
+  \label{fig:links}
+\end{figure}
+
+\section{Step 5: Complex arragnment of plots}
+In this step, we are going to make multiple sample comparison, this may require some
+knowledge about package *grid* and *gridExtra*.
+
+We just want 9 single circular plots put together in one page, since we cannot
+keep too many tracks, we only keep ideogram and links. Here is one sample.
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<single-arr, fig = TRUE>>=
+cols <- RColorBrewer::brewer.pal(3, "Set2")[2:1]
+names(cols) <- c("interchromosomal", "intrachromosomal")
+
+p0 <- ggplot() + layout_circle(gr.crc1, geom = "link", linked.to = "to.gr",
+                              aes(color = rearrangements), radius = 7.1) +
+  layout_circle(hg19Ideo, geom = "ideo", trackWidth = 1.5,
+                color = "gray70", fill = "gray70") +
+  scale_color_manual(values = cols)  
+p0
+@ %def   
+  \caption{Just to show single individuals crc1.}
+  \label{fig:single-arr}
+\end{figure}
+
+
+We need to get one legend for all of them, and put it on the right, ok, that's a
+little tricky, we can first store the legend from the plot we just created.
+
+
+@ 
+<<legend>>=
+library(gridExtra)
+g = ggplotGrob(p0)
+gg = editGrob(getGrob(g, gPath("guide-box"), 
+  grep=TRUE), vp=viewport())
+@ %def 
+Start to creating plots for each sample.
+
+@ 
+<<arrangement>>=
+grl <- split(gr, values(gr)$individual)
+## need "unit", load grid
+library(grid)
+lst <- lapply(grl, function(gr.cur){
+  print(unique(as.character(values(gr.cur)$individual)))
+  cols <- RColorBrewer::brewer.pal(3, "Set2")[2:1]
+  names(cols) <- c("interchromosomal", "intrachromosomal")
+  p <- ggplot() + layout_circle(gr.cur, geom = "link", linked.to = "to.gr",
+                         aes(color = rearrangements), radius = 7.1) +
+                           layout_circle(hg19Ideo, geom = "ideo", trackWidth = 1.5,
+                         color = "gray70", fill = "gray70") +
+                           scale_color_manual(values = cols)  + 
+     opts(title = (unique(values(gr.cur)$individual)), legend.position = "none") +
+    opts(plot.margin = unit(rep(0, 4), "lines"))
+})
+l.g <- lapply(lst, ggplotGrob)
+square <- do.call(arrangeGrob, l.g)
+@ %def 
+nn\clearpage
+Use package *gridExtra* to arrange them and add legend to the right.
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<9-circle, fig = TRUE>>=
+grid.arrange(square, gg, ncol = 2, widths = c(4/5, 1/5))
+@ %def   
+  \caption{Arrange 9 circles together.}
+  \label{fig:9circle}
+\end{figure}
+
+
+
+\section{sessionInfo}
+@ 
+<<sesseionInfo>>=
+sessionInfo()
+@ %def 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

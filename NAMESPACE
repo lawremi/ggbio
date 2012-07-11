@@ -81,6 +81,7 @@ importMethodsFrom(rtracklayer, import)
 exportMethods(autoplot, rescale, fortify,
               xlim, "xlim<-", update, reset, backup,
               highlight)
+export(arrangeGrobByParsingLegend)
 
 ## scale
 export(scale_x_sequnit)

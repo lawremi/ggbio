@@ -387,3 +387,26 @@ sub_names <- function(data, name.expr){
   .res
 }
 
+
+getLegendGrob <- function(p){
+  g = ggplotGrob(p)
+  gg = grid::editGrob(getGrob(g, gPath("guide-box"), 
+    grep=TRUE), vp=viewport())
+}
+
+arrangeGrobByParsingLegend <- function(..., nrow = NULL, ncol = NULL,
+                                       widths = c(4, 1), legend.idx = NULL){
+  lst <- list(...)
+  if(length(lst) == 1 && is.list(lst[[1]]))
+    lst <- lst[[1]]
+  gg <- lapply(lst, getLegendGrob)  
+  l.g <- lapply(lst, function(x){
+    ggplotGrob(x + opts(legend.position = "none"))
+  })
+  
+  if(!is.null(legend.idx))
+    gg <- gg[legend.idx]
+  gg2 <- do.call(arrangeGrob, c(gg, list(ncol = 1)))
+  print(grid.arrange(do.call(arrangeGrob, c(l.g, list(nrow = nrow, ncol = ncol))),
+                     gg2, ncol = 2, widths = widths))
+}

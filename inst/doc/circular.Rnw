@@ -64,8 +64,8 @@ are fairly easy in \ggbio{}.
 In this tutorial, we will start from the raw data, if you are already familiar
 with how to process your data into the right format, which here I mean
 \Robject{GRanges},you can jump to \ref{sec:step3} directly.
-
-\section{Step 1: understand the layout circle}
+\section{Tutorial}
+\subsection{Step 1: understand the layout circle}
 We have discussed about the new coordinate "genome" in vignette about Manhattan
 plot before, now this time, it's one step further compared to genome coordinate
 transformation. We specify ring radius \Rfunarg{radius} and track width
@@ -82,7 +82,7 @@ Before we visualize our data, we need to have something in mind
 \end{itemize}
 
 
-\section{Step 2: get your data ready to plot}
+\subsection{Step 2: get your data ready to plot}
 Ok, let's start to process some raw data to the format we want. The data used in
 this study is from this a
 paper\footnote{http://www.nature.com/ng/journal/v43/n10/full/ng.936.html}. In
@@ -141,7 +141,7 @@ hg19Ideo <- renameSeqlevels(hg19Ideo, new.names)
 head(hg19Ideo)
 @ %def 
 
-\section{Step 3: low level API: `layout\_circle`}\label{sec:step3}
+\subsection{Step 3: low level API: \Rfunction{layout\_circle}}\label{sec:step3}
 \Rfunction{layout\_circle} is a lower level API for creating circular plot, it
 accepts \Robject{Granges} object, and users need to specify radius, track width,
 and other aesthetics, it's very flexible. But keep in mind, you \textbf{have to}
@@ -289,7 +289,7 @@ Ok, add a "point" track with grid background for rearrangement data and map `y`
 to variable "score", map `size` to variable "tumreads", rescale the size to a
 proper size range.
 @ 
-<<lower-point-track>>=
+<<lower-point-track, fig = TRUE>>=
 p <- p + layout_circle(gr.crc1, geom = "point", aes(y = score, size = tumreads), color = "red",
                        radius = 12 ,trackWidth = 10, grid = TRUE) +
   scale_size(range = c(1, 2.5))
@@ -311,9 +311,10 @@ p
   \label{fig:links}
 \end{figure}
 
-\section{Step 5: Complex arragnment of plots}
-In this step, we are going to make multiple sample comparison, this may require some
-knowledge about package *grid* and *gridExtra*.
+\subsection{Step 4: Complex arragnment of plots}
+In this step, we are going to make multiple sample comparison, this may require
+some knowledge about package \Rpackage{grid} and \Rpackage{gridExtra}. We will
+introduce a more easy way to combine your graphics later after this.
 
 We just want 9 single circular plots put together in one page, since we cannot
 keep too many tracks, we only keep ideogram and links. Here is one sample.
@@ -363,43 +364,44 @@ lst <- lapply(grl, function(gr.cur){
                            layout_circle(hg19Ideo, geom = "ideo", trackWidth = 1.5,
                          color = "gray70", fill = "gray70") +
                            scale_color_manual(values = cols)  + 
-     opts(title = (unique(values(gr.cur)$individual)), legend.position = "none") +
+     opts(title = (unique(values(gr.cur)$individual))) +
     opts(plot.margin = unit(rep(0, 4), "lines"))
 })
-l.g <- lapply(lst, ggplotGrob)
-square <- do.call(arrangeGrob, l.g)
-@ %def 
-nn\clearpage
-Use package *gridExtra* to arrange them and add legend to the right.
+lst.nolegend <- lapply(lst, function(p) p + opts(legend.position = "none"))
+l.g <- lapply(lst.nolegend, ggplotGrob)
+@ %def
+\clearpage 
+
+Use package \Rpackage{gridExtra} to arrange them and add legend to the right.
 \begin{figure}[!htpb]
   \centering
 @ 
 <<9-circle, fig = TRUE>>=
-grid.arrange(square, gg, ncol = 2, widths = c(4/5, 1/5))
+grid.arrange(do.call(arrangeGrob, l.g), gg, ncol = 2, widths = c(4/5, 1/5))
 @ %def   
   \caption{Arrange 9 circles together.}
   \label{fig:9circle}
 \end{figure}
 
+\clearpage
+We wrap the function in grid level to a more user-friendly high level function,
+called \Rfunction{arrangeGrobByParsingLegend}. You can pass your ggplot2
+graphics to this function , specify the legend you want to keep on the right,
+you can also specify the column/row numbers. Here we assume all plots we have
+passed follows the same color scale and have the same legend, so we only have to
+keep one legend on the right.
 
 
+@ 
+<<simple-wrapper, eval = FALSE>>=
+## noitce this code doesn't have opts(legend.position = "none"), which means
+## we keep the legend for each plot.
+arrangeGrobByParsingLegend(lst, widths = c(4, 1), legend.idx = 1, ncol = 2)
+@ %def   
+\newpage
 \section{sessionInfo}
 @ 
 <<sesseionInfo>>=
 sessionInfo()
 @ %def 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 \end{document}

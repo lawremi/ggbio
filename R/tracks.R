@@ -188,7 +188,7 @@ setMethod("Arith", signature = c("Tracks", "ANY"), function(e1, e2) {
 })
 
 
-setOldClass("positino_c")
+setOldClass("position_c")
 setMethod("Arith", signature = c("Tracks", "position_c"), function(e1, e2) {
   if("x" %in% e2$aesthetics)
     e1@xlim <- e2$limits

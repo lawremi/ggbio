@@ -84,7 +84,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
       p <- c(p, list(scale_y_continuous(breaks = NULL)))
     }
     if(missing(ylab))
-      p <- c(p, list(ggplot2::ylab("Stepping")))
+      p <- c(p, list(ggplot2::ylab("")))
     else
       p <- c(p, list(ggplot2::ylab(ylab)))
   }

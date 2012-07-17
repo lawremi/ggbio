@@ -6,7 +6,7 @@ setMethod("layout_karyogram", "GRanges",
                    cytoband = FALSE,
                    geom = NULL, stat = NULL, ylim = NULL,
                    rect.height = 10,
-                   stack.level = 0
+                   offset = 0
                    ) {
               
             ## geom <- match.arg(geom)
@@ -23,10 +23,17 @@ setMethod("layout_karyogram", "GRanges",
                 .ideo.range <- expand_range(.y.r, mul = 0.05)
               }else{
                   .ideo.range <- c(0, rect.height)
-
               }
             }else{
+              if("y" %in% names(args.aes)){
+                .y <- values(data)[, as.character(args.aes$y)]
+                .y <- scales::rescale(.y, to = ylim)
+                .y.r <- range(.y)
+                .ideo.range <- expand_range(.y.r, mul = 0.05)
+                values(data)[, as.character(args.aes$y)] <- .y
+              }else{
               .ideo.range <- ylim
+            }
             }
             
             ## check facets
@@ -42,7 +49,6 @@ setMethod("layout_karyogram", "GRanges",
               df.tri.p <- df.tri[substr(df.tri$name, 1, 1) == "p",]
               df.tri.q <- df.tri[substr(df.tri$name, 1, 1) == "q",]
               ## p.ideo <- ggplot(df.rect)
-
               p.ideo <- list(do.call(ggplot2::geom_rect, c(list(data = df.rect),
                                               list(do.call(aes,list(xmin = as.name("start"),
                                                                     ymin =.ideo.range[1],
@@ -51,22 +57,46 @@ setMethod("layout_karyogram", "GRanges",
                                                                     fill = as.name("gieStain")))),
                                                            list(color = "black"))))
 
+
+              lst <- lapply(seq_len(nrow(df.tri.p)), function(i){
+                with(df.tri.p[i,],
+                     data.frame(x = c(start, start, end),
+                                y = c(.ideo.range[1], .ideo.range[2], mean(.ideo.range)),
+                                seqnames = seqnames, strand = strand, name = name,
+                                gieStain = gieStain)
+                     )
+              })
+              df.tri.p2 <- do.call(rbind, lst)
+
+              lst <- lapply(seq_len(nrow(df.tri.q)), function(i){
+                with(df.tri.q[i,],
+                     data.frame(x = c(start, end, end),
+                                y = c(mean(.ideo.range), .ideo.range[2], .ideo.range[1]),
+                                seqnames = seqnames, strand = strand, name = name,
+                                gieStain = gieStain)
+                     )
+              })
+              df.tri.q2 <- do.call(rbind, lst)
+              
               p.ideo <- c(p.ideo,
-                          ifelse(nrow(df.tri.p),
-                                 list(geom_polygon(data = df.tri.p,
-                                      do.call(aes,list(x = substitute(c(start, start, end)),
-                                                       y = c(.ideo.range[1], .ideo.range[2],
-                                                            mean(.ideo.range)),
-                                                           fill = as.name("gieStain"))))),
-                                 list(NULL)),
-                          ifelse(nrow(df.tri.q),
-                          list(geom_polygon(data = df.tri.q,
+                          ifelse(nrow(df.tri.p2),
+                          list(geom_polygon(data = df.tri.p2,
                                             do.call(aes,
-                                                    list(x = substitute(c(start, end, end)),
-                                                         y = c(mean(.ideo.range),
-                                             .ideo.range[2], .ideo.range[1]),
-                                                         fill = as.name("gieStain"))))),
-                                 list(NULL)),
+                                         list(x = substitute(x),
+                                              y = substitute(y),
+                                         fill = as.name("gieStain"))))),
+                                 list(NULL)))
+
+              p.ideo <- c(p.ideo,
+                          ifelse(nrow(df.tri.q2),list(geom_polygon(data = df.tri.q2,
+                                            do.call(aes,
+                                         list(x = substitute(x),
+                                              y = substitute(y),
+                                         fill = as.name("gieStain"))))),
+                                 list(NULL)))
+              
+
+              p.ideo <- c(p.ideo,
                           list(opts(axis.text.y = theme_blank(),
                                     axis.title.y=theme_blank(),
                                     axis.ticks = theme_blank(),
@@ -127,7 +157,8 @@ setMethod("layout_karyogram", "GRanges",
                       axis.title.y=theme_blank(),
                       axis.ticks = theme_blank(),
                       panel.grid.minor = theme_line(colour = NA),
-                      panel.grid.major = theme_line(colour = NA))
-            p <- list(p, list(o))
+                      panel.grid.major = theme_line(colour = NA),
+                      strip.text.y=theme_text(angle=0))
+            p <- list(p, list(o), list(scale_x_sequnit()))
           })
 

@@ -410,3 +410,9 @@ arrangeGrobByParsingLegend <- function(..., nrow = NULL, ncol = NULL,
   print(grid.arrange(do.call(arrangeGrob, c(l.g, list(nrow = nrow, ncol = ncol))),
                      gg2, ncol = 2, widths = widths))
 }
+
+
+scale_fill_giemsa <- function(name = "gieStain",
+                              fill = getOption("biovizBase")$cytobandColor){
+  list(scale_fill_manual(values = fill))
+}

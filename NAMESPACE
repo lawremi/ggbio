@@ -17,7 +17,7 @@ importFrom(Hmisc, bezier)
 importFrom(IRanges, IRanges,  disjointBins,
            matchMatrix, findOverlaps, subsetByOverlaps,
            "elementMetadata", "elementMetadata<-",
-           start, width, end,  resize, 
+           start, width, end,  resize, metadata, "metadata<-",
            "values", "values<-",
            ranges, "ranges<-", 
            isTRUEorFALSE, coverage, slice,
@@ -84,7 +84,7 @@ exportMethods(autoplot, rescale, fortify,
 export(arrangeGrobByParsingLegend)
 
 ## scale
-export(scale_x_sequnit)
+export(scale_x_sequnit, scale_fill_giemsa)
 
 ## geom
 exportMethods(geom_chevron,
@@ -119,6 +119,7 @@ export(tracks,
        plotFragLength,        
        plotSpliceSum,       
        plotStackedOverview,
+       plotKaryogram,       
        plotSingleChrom,
        plotIdeogram,       
        plotGrandLinear,

@@ -48,7 +48,6 @@ plotIdeogram <- plotSingleChrom
 ## ## ======================================================================
 plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
                          cytoband = FALSE, rescale = TRUE, rescale.range = c(0, 10)){
-  .Deprecated("autoplot with layout = 'karyogram'")
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
@@ -89,4 +88,6 @@ plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
   
   p
 }
+
+plotKaryogram <- plotStackedOverview
 

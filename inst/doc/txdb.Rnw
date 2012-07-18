@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Buidling genomic features}
+%\VignetteIndexEntry{How to visualize genomic features from TranscriptDb object.}
 %\VignetteDepends{}
 %\VignetteKeywords{visualization utilities}
 %\VignettePackage{ggbio}

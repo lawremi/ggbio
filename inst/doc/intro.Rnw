@@ -57,26 +57,91 @@
 <<options,echo=FALSE>>=
 options(width=72)
 @
-\section{Introdunction}
-\ggbio{} is a package for visualizing genomic data, the imporant concept
-underlying this package is the extension of Leland Wilkinson's grammar of
-graphics, this separate components into differnt part including statistical
-tranformatoin, geometric object, coordinate system, layout, scale and data.
+\section{Introduction}
+A mature graphic eco-system always has a well-developed data model, a grammar
+and a powerful computing platform. Grammar of graphics\footnote{``The grammar of
+  graphics'' by Leland Wilkinson} is the essential part to help people
+understand the underlying data by using a general visualization
+framework. What's more, object-oriented graphics is especially useful for a
+well-developed infrastructure system that have carefully defined data model to
+store specific data sets for special purpose. Let's say, given a
+\Robject{GRanges} we know it represents annotated genetic intervals, given
+\Robject{TranscriptDb} we know it represents transcripts-centric annotation
+data, given \Robject{matrix}, in biology, we probably expect a heatmap.
 
-\R{} is a perfect platform for prototyping a object oriented graphic design,
-because \Bioc{} really have nice designed data structure and powerful analytical
-tools. \ggbio{} is built on \ggplot{} package, so almost all utils which works
-for \ggplot{} could directly works for \ggbio{} object. 
+Let's scrutinize what we have in R:
+\begin{itemize}
+\item \textbf{data model}: \Bioc{} tries hard to define and generalize
+  infrastructure for storing particular biological data. For example, we have
+  \Rclass{ExpressionSet} to store microarray data, we have
+  \Rclass{GappedAlignments} to store NGS alignments, and \Rclass{IRanges} to
+  represent numeric intervals. This is especially useful, which make
+  object-oriented programming for specific biological questions much easier, and
+  make object-oriented visualization possible in \Bioc{} too. 
+\item \textbf{Powerful computing platform}: \R{} is a modern statistical
+  computing environment, provides plenty of models and computing method for
+  multivariate data analysis, at the same time, \Bioc{} has numerous data mining
+  tools in genetic analysis and other fields. These well-developed and tested
+  tool kits make processing and analysis easier than before. And we have to pay
+  attention to that many useful graphics are just statistical summary of raw
+  data, so statistical transformation exists could be implemented as part of the
+  visualization procedure.
+\item \textbf{The grammar of graphics}: This conceptual framework is proposed by
+  Leland Wilkinson\footnote{Please check Wilkinson's book ``The grammar of
+    graphics'' for more detail.}. Hadley Wickham extended the grammar and also
+  first implemented it in \R{} in his package \Rpackage{ggplot2} with great
+  success. \ggbio{} is built on \ggplot2{} and extends the grammar to genomic
+  data with new features and extended components.
+\end{itemize}
 
-We extending the grammar, and have more interesting experimental graphics, like
-circular view, kayrogram view, and some specialized graphics like splicing
-summary and mismatch summary. We always keep fexibility to lower level API such
-as stat\_*, geom\_*, layout\_* functions, and always provide a generic function
-\Rfunction{autoplot} for all-in-one usage.
+\section{Grammar of graphics(gog)}
+To introduce the usage of \Rfunction{autoplot} function, we need to get an idea
+about grammar of graphics(GoG), it's basically composed of following components:
+\begin{itemize}
+\item \textit{Data}: Data you are going to visualize with a set of
+  variables, it's usually the first argument passed in function \autoplot{}.
+\item \textit{Statistical transformation}: Statistical methods performed on the
+  variables of raw data and generate more informative summary. It's usually
+  controlled by the parameters \textbf{stat}.
+\item \textit{Geometric object}: e.g arrow, rectangle. It's usually controlled
+  by the parameters \textbf{geom}.
+\item \textit{Coordinate system}: eg Cartesian. It's usually controlled by the
+  parameters \textbf{coord}.
+\item \textit{Scales}:Transformation of scales, such as logarithm. It's usually
+  controlled by the parameters \textbf{scale}.
+\item \textit{Facetting}:Subset the data by factors and create small panels for
+  each subset of data with same representation of graphics. It's usually
+  controlled by the parameters \textbf{facets}.
+\end{itemize}  
 
+\section{Overview of \ggbio{}}
+What \ggbio{} can do depends on how you are going to utilize those components to
+construct your graphics. We tend to keep flexibility as well as convenience of
+usage. 
+
+Here is just a quick overview for \ggbio{}'s usage, but not limited to them. You
+can find every topic with a tutorial vignette(pdf) distributed with package.
+
+\begin{itemize}
+\item \autoplot{} function for object-oriented visualization, which support
+  various \Bioc{} core data object, such as \Robject{GRanges, IRanges,
+    TranscriptDb, BamFile, GappedAlignment, Seqinfo} etc. Trying to use simplest way to
+  bring you highly customized graphics. Please check another vignette
+  available with this package. 
+\item Visualize genomic features easily from \Robject{TranscriptDb} object.
+\item Visualize mismatch summary from bam file.
+\item Make ranges linked to data view.
+\item Build ideogram(single chromosomes).  
+\item Create circular view by using a new layout 'circle'.
+\item Create karyogram view by using a new layout 'karyogram'.
+\item Create Manhattan plot by using 'genome' coordinate.  
+\item How to build tracks easily for existing plots. 
+\end{itemize}
+
+\clearpage
 \section{On-line documentation}
-From this version of \ggbio{}, I am going to move documentation and demofrom pdf to
-on-line version, new website is here
+From this version of \ggbio{}, I am going to move part of documentation and demo
+to on-line version, new website is here
 
 http://tengfei.github.com/ggbio
 
@@ -88,10 +153,9 @@ examples R code are under /inst/example.
 
 On-line documentation is google search-able and multi-media friendly, more
 flexible for visualization package demonstration.
-\section{Autoplot}
-\subsection{\Robject{GRanges}}
-\subsection{\Robject{IRanges}}
-\subsection{\Robject{Rle/RleList}}
-\subsection{\Robject{TranscriptDb}}
+
+In the future, since most tutorial has been distributed together with package
+itself. We might put only examples for each function to make 'complete' graphics
+manual on-line.
 
 \end{document}

@@ -333,7 +333,11 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
       else
         p <- ggplot() + stat_coverage(bf, ..., method = method, geom  =  geom)
     }else if(stat == "mismatch"){
-      p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which)
+      if(geom %in% c("bar", "segment")){
+        p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which, geom = "bar")
+      }else{
+        p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which)
+      }
     }else{
       ga <- readBamGappedAlignments(bf,
                                     param = ScanBamParam(which = which),

@@ -398,7 +398,6 @@ keep one legend on the right.
 ## we keep the legend for each plot.
 arrangeGrobByParsingLegend(lst, widths = c(4, 1), legend.idx = 1, ncol = 2)
 @ %def   
-\newpage
 \section{sessionInfo}
 @ 
 <<sesseionInfo>>=

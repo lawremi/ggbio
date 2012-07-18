@@ -89,6 +89,7 @@ library(biovizBase)
 gr <- GRanges(rep(c("chr1", "chr2"), each = 5),
               IRanges(start = rep(seq(1, 100, length = 5), times = 2),
                       width = 50))
+
 autoplot(gr, aes(fill = seqnames))
 @ %def 
   \caption{Default grahpics is faceted by seqnames}
@@ -151,6 +152,8 @@ gr.snp <- GRanges(rep(chrs,each=nsnps),
                   group = sample(c("Normal", "Tumor"), size = nchr*nsnps,
                     replace = TRUE)
                   )
+genome(gr.snp) <- "hg19"
+gr.snp
 @ %def 
 
 

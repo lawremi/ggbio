@@ -1,6 +1,6 @@
 setGeneric("stat_mismatch", function(data, ...) standardGeneric("stat_mismatch"))
 ## this require a special GenomicRanges
-setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome, which,
+setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome,
                                                      xlab, ylab, main,
                                                      geom = c("segment", "bar"),
                                                      show.coverage = TRUE){
@@ -123,7 +123,7 @@ setMethod("stat_mismatch", "BamFile", function(data, ...,  bsgenome, which,
                                                xlab, ylab, main,
                                                geom = c("segment", "bar"),  
                                                show.coverage = TRUE){
-
+  geom <- match.arg(geom)
     if(missing(bsgenome)){
       stop("For geom mismatch.summary, please provide bsgenome(A BSgenome object)")
     }else
@@ -131,13 +131,10 @@ setMethod("stat_mismatch", "BamFile", function(data, ...,  bsgenome, which,
       stop("bsgenome must be A BSgenome object")
     }
     data <- data$path
-    args <- list(...)
     pgr <- pileupAsGRanges(data, region = which)
     if(length(pgr)){    
     pgr.match <- pileupGRangesAsVariantTable(pgr, bsgenome)
-    args$show.coverage <- show.coverage
-    args$data <- pgr.match
-    p <- do.call(stat_mismatch, args)
+    p <- stat_mismatch(pgr.match, ..., show.coverage = show.coverage, geom = geom)
   }else{
     p <- NULL
   }

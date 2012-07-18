@@ -11,6 +11,7 @@ setMethod("fortify", c("eSet", "missing"), function(model, data){
 
 setMethod("fortify", c("GRanges", "missing"), function(model, data){
   vals <- values(model)
+  names(model) <- NULL
   if(length(vals)){
     idx <- !unlist(lapply(vals@listData, function(x) is(x, "List") & !is(x, "DNAStringSet")))
     if(sum(!idx))

@@ -20,10 +20,10 @@ setMethod("stat_reduce", "GRanges", function(data, ...,xlim,
   args.res <- c(list(aes.res), args.non)
   p <- list(do.call(stat_stepping, args.res))
 
-  if(!missing(xlab))
-    p <- c(p, list(ggplot2::xlab(xlab)))
-  else
-    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+  if(missing(xlab)) 
+    xlab <- getXLab(data)
+  p <- c(p, list(ggplot2::xlab(xlab)))
+
 
   if(!missing(ylab))
     p <- c(p, list(ggplot2::ylab(ylab)))

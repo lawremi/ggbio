@@ -23,7 +23,6 @@ setMethod("autoplot", "GRanges", function(object, ...,
                                           legend = TRUE,
                                           geom = NULL,
                                           stat = NULL,
-                                          parse.xlab = FALSE,
                                           coord = c("default", "genome", "truncate_gaps"),
                                           layout = c("linear", "karyogram", "circle")
                                           ){
@@ -111,11 +110,8 @@ setMethod("autoplot", "GRanges", function(object, ...,
       p <- c(p, list(opts(legend.position = "none")))
 
 
-    if(missing(xlab)) {
-      if(parse.xlab)
-        xlab <- paste(getXLab(object), "Position")
-      else
-        xlab <- "Position"
+    if(missing(xlab)){
+        xlab <- getXLab(object)
     }
     p <- c(p, list(xlab(xlab)))
     ## tweak with default y lab
@@ -153,8 +149,7 @@ setMethod("autoplot", "GRangesList", function(object, ...,
                                               coverage.col = "gray50",
                                               coverage.fill = coverage.col,
                                               group.selfish = FALSE,
-                                              arch.offset = 1.3,
-                                              parse.xlab = FALSE){
+                                              arch.offset = 1.3){
 
   type <- match.arg(type)
   args <- list(...)
@@ -196,10 +191,7 @@ setMethod("autoplot", "GRangesList", function(object, ...,
   ##   p <- p + xlab(xlab)
   
   if(missing(xlab)) {
-      if(parse.xlab)
-        xlab <- paste(getXLab(object), "Position")
-      else
-        xlab <- "Position"
+        xlab <- getXLab(object)
   }
   p <- p + ggplot2::xlab(xlab)
   if(!missing(ylab))
@@ -240,9 +232,7 @@ setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
 setMethod("autoplot", "GappedAlignments", function(object, ...,
                                                    xlab, ylab, main,
                                                    which,
-                                                   geom = NULL, stat = NULL,
-                                                   parse.xlab = FALSE
-                                                   ){
+                                                   geom = NULL, stat = NULL){
 
   args <- list(...)
   args.aes <- parseArgsForAes(args)
@@ -284,10 +274,7 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
     p <- do.call(autoplot, c(list(aes.res), args.non))
   }
   if(missing(xlab)) {
-      if(parse.xlab)
-        xlab <- paste(getXLab(object), "Position")
-      else
-        xlab <- "Position"
+        xlab <- getXLab(object)
   }
   p <- p + ggplot2::xlab(xlab)
   if(!missing(ylab))

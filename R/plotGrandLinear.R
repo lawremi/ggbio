@@ -1,7 +1,7 @@
 plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
                             cutoff = NULL, cutoff.color = "red",
                             cutoff.size = 1, legend = FALSE, xlim, ylim, 
-                            xlab = "Genomic Coordinates",
+                            xlab,
                             ylab = substitute(y), main, theme){
 
   if(is.null(geom))
@@ -75,6 +75,9 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
     p <- p + xlim(xlim)
   if(!missing(ylim))
     p <- p + ylim(ylim)
+  if(missing(xlab))
+    xlab <- getXLab(obj)
+  p <- p + ggplot2::xlab(xlab)
   p
 }
 

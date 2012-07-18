@@ -91,10 +91,11 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
     p <- NULL
   }
   p <- c(list(p) , list(facet))
-  if(!missing(xlab))
-    p <- c(p, list(ggplot2::xlab(xlab)))
-  else
-    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
+
+  if(missing(xlab)) 
+    xlab <- getXLab(data)
+  p <- c(p, list(ggplot2::xlab(xlab)))
+  
   if(!missing(ylab))
     p <- c(p, list(ggplot2::ylab(ylab)))
   if(!missing(main))

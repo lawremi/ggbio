@@ -31,13 +31,12 @@ getLimits <- function(obj){
     yend <- NULL
 
   ## if(length(obj$layer)>1){
-
   l.res <- getLimitsFromLayer(obj)
   
   res <- suppressWarnings(list(xlim = c(min(c(l.res$xmin, x, xmin)),
-                max(c(l.res$xmax, x, xmax, xend))),
-              ylim = c(min(c(l.res$ymin, y, ymin)),
-                max(c(l.res$ymax, y, ymax, yend)))))
+                                 max(c(l.res$xmax,x, xmax, xend))),
+                               ylim = c(min(c(l.res$ymin, y, ymin)),
+                                 max(c(l.res$ymax, y, ymax, yend)))))
   
   if(any(unlist(res) %in% c(Inf, -Inf)))
     res <- evalLan(obj)
@@ -47,9 +46,57 @@ getLimits <- function(obj){
   
   if(length(obj$coordinates$limits$y) == 2)
     res$ylim <- obj$coordinates$limits$y
+  ## scales
+  l.res.s <- suppressWarnings(getLimitsFromScales(obj))
+  l.res.s <- as.list(l.res.s)
+  l.res.s <- lapply(l.res.s, function(x){
+    if(x %in% c(-Inf, Inf)){
+      NULL
+    }else{
+      x
+    }
+  })
+
+  if(!is.null(l.res.s$xmin) & !is.null(l.res.s$xmax))
+    res$xlim <- c(l.res.s$xmin, l.res.s$xmax)
+  if(!is.null(l.res.s$ymin) & !is.null(l.res.s$ymax))
+    res$ylim <- c(l.res.s$ymin, l.res.s$ymax)
 
   res
 
+}
+
+getLimitsFromScales <- function(obj){
+  scal <- obj$scales$scales
+  lst <- lapply(scal, function(x){
+    if(!is.null(x$limits)){
+      limits <- x$limits
+    if(any(x$aesthetics %in% c("x", "xmin", "xmax", "xend", "xintercept",
+                               "xmin_final", "xmax_final"))){
+      res <- data.frame(xmin = limits[1],
+                        xmax = limits[2],
+                        ymin = NA,
+                        ymax = NA)
+    }
+      if(any(x$aesthetics %in% c("y", "ymin", "ymax", "yend",
+                                 "yintercept", "ymin_final", "ymax_final"))){
+      res <- data.frame(ymin = limits[1],
+                        ymax = limits[2],
+                        xmin = NA,
+                        xmax = NA)
+      }
+  }else{
+    res <- NULL
+  }
+    res
+  })
+  lst <- lst[!is.null(lst)]
+  res <- do.call("rbind", lst)
+  res <- data.frame(xmin = min(res$xmin[!is.na(res$xmin)]),
+                    xmax = max(res$xmax[!is.na(res$xmax)]),
+                    ymin = min(res$ymin[!is.na(res$ymin)]),
+                    ymax = max(res$ymax[!is.na(res$ymax)]))
+  res
 }
 
 getLimitsFromLayer <- function(obj){
@@ -117,6 +164,9 @@ getLimitsFromLayer <- function(obj){
   res <- do.call("rbind", lst)
   res
 }
+
+
+
 
 evalLan <- function(obj){
   x <- obj$mapping$x

@@ -114,6 +114,7 @@ setMethod("summary", "Tracks", function(object){
 
 
 setMethod("print", "Tracks", function(x){
+  grid.newpage()
     grobs <- x@grobs
     N <- length(grobs)
     if(x@named)
@@ -190,8 +191,10 @@ setMethod("Arith", signature = c("Tracks", "ANY"), function(e1, e2) {
 
 setOldClass("position_c")
 setMethod("Arith", signature = c("Tracks", "position_c"), function(e1, e2) {
-  if("x" %in% e2$aesthetics)
-    e1@xlim <- e2$limits
+  if("x" %in% e2$aesthetics){
+    if(!is.null(e2$limits))
+      e1@xlim <- e2$limits
+  }
   N <- length(e1@grobs)  
   for(i in 1:N){
     e1@grobs[[i]] <- e1@grobs[[i]] + e2
@@ -221,6 +224,7 @@ setGeneric("xlim",function(obj, ...) standardGeneric("xlim"))
 setMethod("xlim", "numeric", function(obj, ...){
   ggplot2::xlim(obj, ...)
 })
+
 setMethod("xlim", "Tracks", function(obj, ...){
   obj@xlim
 })

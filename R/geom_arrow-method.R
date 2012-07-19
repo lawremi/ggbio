@@ -44,7 +44,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
         res <- unlist(res)
         data <- res
       }
-      df <- as.data.frame(data)
+      df <- fortify(data)
       lst <- apply(df, 1, function(x){
         x <- as.data.frame(t(x))
         x.s <- as.numeric(as.character(x$start))
@@ -104,7 +104,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
       args.aes$y <-  args.aes$yend <- .y
     }
       
-      df <- as.data.frame(data)
+      df <- fortify(data)
 
       lst <- apply(df, 1, function(x){
 

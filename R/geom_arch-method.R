@@ -87,7 +87,7 @@ setMethod("geom_arch", "GRanges", function(data, ...,
 
   ## note rect.height = 0.4 is default cross ggbio
   ## need to make sure they are connected by two nearest point of rectangle
-  df <- as.data.frame(data)
+  df <- fortify(data)
   if("height" %in% names(args.aes))
     signs <- sign(eval(args.aes$height, df))
   else

@@ -73,7 +73,7 @@ p
 
 breakGrTo5polyDf <- function(object, arrow.head = 0.02, rect.height = 0.4, y){
   ah <- width(range(ranges(object))) * arrow.head
-  df <- as.data.frame(object)
+  df <- fortify(object)
   df$.id <- seq_len(nrow(df))
   res <- do.call(rbind,lapply(1:5, function(i) df))
   res <- res[order(res$.id), ]

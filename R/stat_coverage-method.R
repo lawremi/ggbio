@@ -139,7 +139,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                                                facets = NULL, 
                                                geom = NULL,
                                                method = c("estimate", "raw")){
-  ## which could be a granges or seqnames 
+  ## which could be a granges or seqnames
   if(missing(which)){
     seq.nm <- names(scanBamHeader(data)[[1]])[1]
   }else{
@@ -185,6 +185,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                   res <- biovizBase:::fetch(data, which = which)
                 })
 
+  
   if(method == "estimate"){
   message("Constructing graphics...")
   res <- res[seqnames(res) %in% seq.nm]
@@ -209,7 +210,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                 list(aes.res),
                 args.non)
 
-  p <- do.call(stat_identity, args.res)
+  p <- c(list(do.call(stat_identity, args.res)), list(facet))
 }
   if(method == "raw"){
     p <- stat_coverage(res, ..., geom = geom, facets = facets)

@@ -599,6 +599,7 @@ setMethod("autoplot", "Rle", function(object, ...,
   }
   if(stat == "bin"){
     args.non$nbin <- nbin
+    args.non$type <- type
     aes.res <- do.call(aes, args.aes)
     if(!missing(binwidth))
       args.non$binwidth <- binwidth
@@ -699,7 +700,8 @@ setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("heatmap",
     p <- plotmatrix(df, ...)
   }
   if(type == "heatmap"){
-    p <- autoplot(df.exp) + scale_fill_fold_change()
+    colnames(df.exp) <- rownames(pData(object))
+    p <- autoplot(df.exp) + ylab("Features") + xlab("Samples")
   }
   if(type == "pcp"){
     p <- ggpcp(df) + geom_line() + xlab("Sample Name")
@@ -1047,7 +1049,6 @@ setMethod("autoplot", "matrix", function(object, label = TRUE,
       message("No column names found, use default")
     }
   }
-  
   y <- seq_len(nrow(object))
   df <- expand.grid(x = x, y = y)
   if(mode(object) == "numeric"){
@@ -1061,6 +1062,10 @@ setMethod("autoplot", "matrix", function(object, label = TRUE,
   if(label & !is.null(rownames(object))){
     y.lab <- rownames(object)
     p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+  }
+  if(label & !is.null(colnames(object)) & !genomic.pos){
+    x.lab <- colnames(object)
+    p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
   }
   p
 })
@@ -1094,9 +1099,9 @@ setMethod("autoplot", "SummarizedExperiment", function(object, ...,
                                                          "scatterplot.matrix")){
   type <- match.arg(type)
   if(type == "heatmap"){
-    res <- t(assay(object))
-    rownames(res) <- colnames(object)
-    p <- autoplot(res) + ylab("Sample")
+    res <- assay(object)
+    colnames(res) <- colnames(object)
+    p <- autoplot(res) + ylab("Features") + xlab("Samples")
   }
   if(type == "link"){
     ## res <- rowData(object)

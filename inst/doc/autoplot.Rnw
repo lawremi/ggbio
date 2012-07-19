@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{autoplot}
+%\VignetteIndexEntry{Autoplot: A high level function for 'smart' object-oriented visualization.}
 %\VignetteDepends{}
 %\VignetteKeywords{visualization utilities}
 %\VignettePackage{ggbio}
@@ -103,7 +103,8 @@ Load packages
 library(ggbio)
 @ %def 
 
-Let's generate some simulated interval data and store it as *GRanges* object.
+Let's generate some simulated interval data and store it as \Robject{GRanges} object.
+
 @ 
 <<simul>>=
 set.seed(1)
@@ -125,6 +126,64 @@ gr <- GRanges(seqnames =
 
 idx <- sample(1:length(gr), size = 50)
 @ %def 
+\clearpage
+
+Let's first take a look at a general table about stat/geom/layout/coord/scale,
+\autoplot{} for \Robject{GRanges} supported, this table is just a subset and
+will keep completing with more.
+
+\begin{table}[h!t!b!p]
+\begin{center}
+\small{
+\begin{tabular}{|p{1.4cm}|p{3cm}|p{8cm}|p{0.6cm}|}
+\hline
+Comp & name  & usage & icon\\\hline
+\textbf{geom} &geom\_rect & rectangle& \includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_rect.pdf}\\
+              &geom\_segment & segment& \includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_segment.pdf}\\
+              &geom\_chevron & chevron&\includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_chevron.pdf}\\
+              &geom\_arrow & arrow&\includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_arrow.pdf}\\
+              &geom\_arch & arches &\includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_arch.pdf}\\
+              &geom\_bar & bar &\includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_bar.pdf}\\
+              &geom\_alignment & alignment (gene) & 
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_alignment.pdf}\\\hline
+\textbf{stat} 
+              &stat\_coverage & coverage (of reads) &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/stat_coverage_icon.pdf}\\
+              &stat\_mismatch & mismatch pileup for alignments &
+              \includegraphics[height = 0.25cm,width = 0.6cm]{figures/stat_mismatch.pdf}\\
+              &stat\_aggregate & aggregate in sliding window &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/stat_aggregate.pdf}\\
+              &stat\_stepping & avoid overplotting &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/stat_stepping.pdf}\\
+              &stat\_gene & consider gene structure &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/stat_gene.pdf}\\
+              &stat\_table & tabulate ranges &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/stat_table.pdf}\\
+              &stat\_identity & no change &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/stat_identity.pdf}\\\hline
+\textbf{coord} &linear& ggplot2 linear but facet by chromosome &
+               \includegraphics[height = 0.25cm, width = 0.6cm]{figures/coord_linear.pdf}\\
+               &genome& put everything on genomic coordinates&
+               \includegraphics[height = 0.25cm, width = 0.6cm]{figures/coord_genome.pdf}\\
+               &truncate gaps & compact view by shrinking gaps&
+               \includegraphics[height = 0.25cm, width = 0.6cm]{figures/coord_truncate_gaps.pdf}\\\hline
+\textbf{layout}& track & stacked tracks &\includegraphics[height = 0.25cm, width = 0.6cm]{figures/coord_linear.pdf}\\
+              &karyogram & karyogram display &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/layout_karyogram.pdf}\\
+              &circle & circular &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/layout_circle.pdf}\\\hline
+\textbf{faceting}&formula & facet by formula &
+               \includegraphics[height = 0.25cm, width = 0.6cm]{figures/facet.pdf}\\
+                 &ranges & facet by ranges &
+                 \includegraphics[height = 0.25cm, width = 0.6cm]{figures/facet_gr.pdf}\\\hline
+\textbf{scale} &not extended  & \ggplot{}default& \\\hline
+\end{tabular}
+}
+\end{center}
+\caption{Components of the basic grammar of graphics, with the extensions available in 
+\ggbio{}.}
+\label{tab:components}
+\end{table}
 
 \clearpage
 Default is to use geom "rect" to represent those 'short reads', show overlaped
@@ -265,20 +324,24 @@ lengths, we have a way to quickly give a karyogram overview for adding data on
 later. Please read another vignette about karyogram overview. 
 
 You can easily subset/re-order the visualized the chromosomes by using '[' method.
+@ 
+<<seqinfo-src>>=
+data(hg19Ideogram, package = "biovizBase")
+sq <- seqinfo(hg19Ideogram)
+sq
+@ %def 
+\clearpage
 \begin{figure}[!htpb]
   \centering
 @ 
 <<seqinfo, fig = TRUE>>=
-data(hg19Ideogram, package = "biovizBase")
-sq <- seqinfo(hg19Ideogram)
-sq
 autoplot(sq[paste0("chr", c(1:22, "X"))])
 @ %def   
   \caption{Seqinfo visualization for chromosomes 1 to 22 and X.}
   \label{fig:seqinfo}
 \end{figure}
 
-
+\clearpage
 
 \subsection{autoplot,IRanges}
 \Rfunction{autoplot} for \Robject{IRanges} is used to visualize simple interval
@@ -328,6 +391,8 @@ ir
 \clearpage
 \autoplot{} will coerce \Robject{IRanges} together with its element meta data, so
 aesthetics mapping works for those extra information too.
+\begin{figure}[!htbp]
+  \centering
 @ 
 <<ir-exp, fig = TRUE>>=
 p1 <- autoplot(ir)
@@ -335,7 +400,11 @@ p2 <- autoplot(ir, aes(fill = pair)) + opts(legend.position = "none")
 p3 <- autoplot(ir, stat = "coverage", geom = "line", facets = sample ~. )
 p4 <- autoplot(ir, stat = "reduce")
 tracks(p1, p2, p3, p4)
-@ %def 
+@ %def   
+  \caption{IRanges visualization.}
+  \label{fig:ir-v}
+\end{figure}
+\clearpage
 
 \subsection{autoplot,GRangesList}
 \Robject{GRangesList} is most suitable data structure for storing a set of genomic
@@ -510,6 +579,7 @@ Let's simulate some data first.
 @ 
 <<rlel-simul>>=
 xRleList <- RleList(xRle, 2L * xRle)
+xRleList
 @ %def 
 \clearpage
 
@@ -616,29 +686,34 @@ tracks(default = p1, rect = p2, coverage = p3)
 \end{figure}
 
 \subsection{autoplot,BamFile}\label{sec:bamfile}
+For \Robject{BamFile}, we bring a fast estimated method(implemented by Michael
+Lawrence), which is suitable for overview for particular chromosome and a much
+slower raw data view which could be used in visualizing a small region.
 
+Load some raw data first, we didn't provide an attached data here, you can try
+to download a whole genome NGS seq file fro ENCODE or somewhere else.
 @ 
-<<bf-load>>=
+<<bf-load, eval = FALSE>>=
 library(Rsamtools)
-bamfile <- "~/Datas/seqs/ENCODE/caltech/single/wgEncodeCaltechRnaSeqK562R1x75dAlignsRep1V2.bam"
+bamfile <- "./wgEncodeCaltechRnaSeqK562R1x75dAlignsRep1V2.bam"
 bf <- BamFile(bamfile)
 @ %def 
 
-@ 
-<<bf-est-cov, fig = TRUE>>=
-p1 <- autoplot(bamfile, geom = "line", method = "estimate")
-p1
-@ %def 
+A very efficient method called 'estimate', \Rfunarg{which} argument accepted a
+chromsome names, will give you an overview about coverage. If multiple
+chromosome names are provided, it will be faceted by seqnames. If which is
+missing, it's going to use the first chromosomes appeared in the header.
 
 @ 
-<<bf-est-raw, fig = TRUE>>=
+<<bf-est-cov, eval = FALSE>>=
+autoplot(bamfile)
+autoplot(bamfile, which = c("chr1", "chr2"))
+autoplot(bf)
+autoplot(bf, which = c("chr1", "chr2"))
+
 data(genesymbol, package = "biovizBase")
-p2 <- autoplot(bamfile,  method = "raw", which = genesymbol["ALDOA"])
-p2
-@ %def 
+autoplot(bamfile,  method = "raw", which = genesymbol["ALDOA"])
 
-@ 
-<<bf-mismatch>>=
 library(BSgenome.Hsapiens.UCSC.hg19)
 autoplot(bf, stat = "mismatch", which = genesymbol["ALDOA"], bsgenome = Hsapiens)
 @ %def 
@@ -651,6 +726,28 @@ any other extension names package \Rpackage{rtracklayer} supported, such as
 it will be turned into a \Robject{GRanges} object, and 'score' column will be
 potentially used.  So please read Section \ref{sec:gr} Section
 \ref{sec:gapped} Section \ref{sec:bamfile} for related topics. 
+
+For example, if you have a bam file
+@ 
+<<char-bam, eval = FALSE>>=
+bamfile <- "./wgEncodeCaltechRnaSeqK562R1x75dAlignsRep1V2.bam"
+autoplot(bamfile)
+@ %def 
+
+Or for an example bed file, remember you can pass an argument \Rfunarg{which} to
+subset the data.
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<char-gr, fig = TRUE>>=
+library(rtracklayer)
+test_path <- system.file("tests", package = "rtracklayer")
+test_bed <- file.path(test_path, "test.bed")
+autoplot(test_bed, aes(fill = name))
+@ %def   
+  \caption{autoplot for bed files}
+  \label{fig:char-bed}
+\end{figure}
 
 \subsection{autoplot,matrix}
 For object \Robject{matrix}, the default graphic would be heatmap, here we bring
@@ -996,6 +1093,24 @@ p3
   \label{fig:va-rs}
 \end{figure}
 \clearpage
+\subsection{autoplot,BSgenome}
+The \Robject{BSgenome} class is a container for the complete genome sequence of
+a given organism, it's defined in package \Rpackage{BSgenome}. We use it to plot
+reference genome, along with other tracks.
+\begin{figure}[!htpb]
+  \centering
+@ 
+<<bs-v, fig = TRUE>>=
+library(BSgenome.Hsapiens.UCSC.hg19)
+data(genesymbol, package = "biovizBase")
+p1 <- autoplot(Hsapiens, which = resize(genesymbol["ALDOA"], width = 50))
+p2 <- autoplot(Hsapiens, which = resize(genesymbol["ALDOA"], width = 50), geom = "rect")
+tracks(text = p1, rect = p2)
+@ %def   
+  \caption{plot BSgenome}
+  \label{fig:bs-v}
+\end{figure}
+
 
 \section{sessionInfo}
 @ 

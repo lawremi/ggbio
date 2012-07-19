@@ -202,6 +202,7 @@ autoplot(txdb, which = aldoa.gr, gap.geom = "chevron")
   \centering
 @ 
 <<change-intron-geom-arrow, fig = TRUE, height = 4.5>>=
+library(grid)
 autoplot(txdb, which = aldoa.gr, arrow.rate = 0.001, length = unit(0.35, "cm"))
 @ %def   
   \label{fig:gap.geom-up}

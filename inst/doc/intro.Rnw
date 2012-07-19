@@ -138,6 +138,55 @@ can find every topic with a tutorial vignette(pdf) distributed with package.
 \item How to build tracks easily for existing plots. 
 \end{itemize}
 
+Let's give some example graphics here, you can find most graphics' tutorial in
+ditributed vignettes.
+\begin{figure}[H]
+ \centering
+\includegraphics[width = 0.8\textwidth]{figures/cir-single.pdf}
+\caption{Single circular view.}
+\end{figure}
+\clearpage
+\begin{figure}[H]
+ \centering
+\includegraphics[width = 0.8\textwidth]{figures/circular-9-circle.pdf}
+\caption{9 circles layout}
+\end{figure}
+\clearpage
+\begin{figure}[H]
+ \centering
+\includegraphics[width = 0.8\textwidth]{figures/rangeslinkedtodata-link4.pdf}
+\caption{Ranges Linked To Data View.}
+\end{figure}
+\clearpage
+\begin{figure}[H]
+ \centering
+\includegraphics[width = 0.8\textwidth]{figures/splice.pdf}
+\caption{Splicing}
+\end{figure}
+\clearpage
+\begin{figure}[H]
+ \centering
+\includegraphics[width = 0.8\textwidth]{figures/track_layout.pdf}\\ 
+\caption{Genome coordiante layout.}
+\end{figure}
+\clearpage
+
+\begin{figure}[H]
+ \centering
+\includegraphics[width = 0.8\textwidth]{figures/karyogram.pdf}\\ 
+\caption{Kayogram layout.}
+\end{figure}
+\clearpage
+
+\begin{figure}[H]
+ \centering
+\includegraphics[width = 0.8\textwidth]{figures/Manhattan-plotGrandLinear.pdf}\\ 
+\caption{Manhattan plot.}
+\end{figure}
+\clearpage
+
+
+
 \clearpage
 \section{On-line documentation}
 From this version of \ggbio{}, I am going to move part of documentation and demo

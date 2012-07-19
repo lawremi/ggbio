@@ -8,10 +8,9 @@
   then view summary for all those viewed region.
 }
 \usage{
-\S4method{stat_slice}{Rle}(data, ...,xlim,
+\S4method{stat_slice}{Rle}(data, ...,
           xlab, ylab, main,
           na.rm = FALSE,
-          facets = NULL, 
           geom = NULL,
           lower=-Inf, upper=Inf,
           includeLower=TRUE, includeUpper=TRUE,
@@ -19,11 +18,10 @@
           type = c("viewSums","viewMins",
           "viewMaxs", "viewMeans"))
 
-\S4method{stat_slice}{RleList}(data, ...,xlim,
+\S4method{stat_slice}{RleList}(data, ...,
           xlab, ylab, main,
           indName = "sample",
           na.rm = FALSE,
-          facets = NULL, 
           geom = NULL,
           lower=-Inf, upper=Inf,
           includeLower=TRUE, includeUpper=TRUE,
@@ -37,12 +35,6 @@
 }
 \item{...}{
     arguments passed to aesthetics mapping.
-}
-\item{binwidth}{
-    width of the bins.
-}
-\item{nbin}{
-    number of bins.
 }
 \item{xlab}{
 x label.

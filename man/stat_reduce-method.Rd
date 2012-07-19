@@ -1,5 +1,8 @@
 \name{stat_reduce}
 \alias{stat_reduce}
+\alias{stat_reduce,GRanges}
+\alias{stat_reduce,IRanges}
+\alias{stat_reduce,TranscriptDb}
 \title{Reduce an object.}
 \description{
   Reduce \code{GRanges}, \code{IRanges} or \code{TranscriptDb} object.

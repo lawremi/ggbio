@@ -99,34 +99,9 @@
   \item{object}{
     object to be plot.
   }
-  \item{x}{
-    x value, start/end/midpoint without quotes. e.g \code{x = start},
-    default use the \code{midpoint}.
-  }
-  \item{y}{
-    y value, only be used in geom: point/line. Should be a single name
-    of the column names in the elementMetatata without quotes.
-    e.g \code{y = score}
-  }
   \item{geom}{
     Geom to use (Single character for now). Please see section Geometry
     for details.
-  }
-  \item{size}{
-    Size for point or lines. Could equal a column name or a fixed
-    number. When it's fixed, please use \code{I()} to wrap the value.
-  }
-  \item{shape}{
-    Shape for point or lines. Could equal a column name or a fixed
-    number. When it's fixed, please use \code{I()} to wrap the value.
-  }
-  \item{color}{
-    Color for point for lines. Could equal a column name or a fixed
-    character. When it's fixed, please use \code{I()} to wrap the value.
-  }
-  \item{alpha}{
-    Alpha blending. Could equal a column name or a fixed
-    number. When it's fixed, please use \code{I()} to wrap the value.
   }
   \item{truncate.gaps}{
     logical value indicate to truncate gaps or not.
@@ -143,11 +118,6 @@
   \item{coord}{
     Coodinate system.
   }
-  \item{lower}{
-    When object is Rle/RleList, and use other types of methods which is
-  not "raw", at least a lower parameters which passed to \code{slice}
-  function is required.
-    }
   \item{legend}{
     A logical value indicates whether to show legend or not. Default is
     \code{TRUE}
@@ -271,8 +241,18 @@ indicate whether you want to adding grid background or not.
   \item{full.string}{
     logical value. If TRUE, show full string of indels in plot for VCF.
   }
-  \item{ref.show expand}{
+  \item{ref.show}{
     logical value. If TRUE, show REF in VCF at bottom track.
+  }
+  \item{expand}{
+    expand passed to scale_y_continuous().
+  }
+  \item{single.ideo}{
+    for object 'Seqinfo', if length of object is 1, then this control
+    whether to use \code{plotSingleChrom} or \code{layout_karyogram}.
+  }
+  \item{label}{
+    For matrix, you want to label by column names/rownames or not.
   }
 }
 \value{

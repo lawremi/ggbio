@@ -190,7 +190,6 @@ setMethod("stat_bin", "RleList", function(data, ..., binwidth, nbin = 30,
                      nms <- rep(1:length(x), times = elementLengths(x))
                    else
                      nms <- rep(names(x), times = elementLengths(x))
-                   y <- viewMeans(vs)
                    data.frame(x = unlist(x), y = unlist(y), listName = nms)                
                  })
   colnames(df) <- c("x", "y", indName)

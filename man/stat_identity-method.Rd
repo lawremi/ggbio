@@ -30,6 +30,18 @@
   \item{geom}{
     The geometric object to use display the data. 
   }
+  \item{xlab}{
+    x label.
+  }
+  \item{ylab}{
+    y label.
+  }
+  \item{main}{
+    title of graphic..
+  }
+  \item{indName}{
+    sample name.
+    }
 }
 \value{
   A 'Layer'.

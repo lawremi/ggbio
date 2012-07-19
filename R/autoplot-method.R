@@ -685,29 +685,30 @@ setMethod("autoplot", "RleList", function(object, ...,
 ##======================================================================
 ##  For ExpressionSet/eSet??
 ##======================================================================
-setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("none", "heatmap",
-                                    "matrix", "parallel", "MA",
+setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("heatmap","none",
+                                    "scatterplot.matrix", "pcp", "MA", "boxplot",
                                     "mean-sd", "volcano",
                                     "NUSE", "RLE"),
                      test.method = "t"){
 
-  args <- as.list(match.call()[-1])
+  args <- list(...)
   type <- match.arg(type)
   df.exp <- exprs(object)
   df <- as.data.frame(df.exp)
-  if(type == "matrix"){
+  if(type == "scatterplot.matrix"){
     p <- plotmatrix(df, ...)
   }
   if(type == "heatmap"){
-    df.m <- melt(df.exp)
-    colnames(df.m) <- c("probe", "sampleNames", "value")
-    head(df.m)
-    res <- ddply(df.m, .(sampleNames), transform, rescale = rescale(value))
-
-    p <- ggpcp(df) + geom_line()
+    p <- autoplot(df.exp) + scale_fill_fold_change()
+  }
+  if(type == "pcp"){
+    p <- ggpcp(df) + geom_line() + xlab("Sample Name")
   }
   if(type == "boxplot"){
-    p <- ggpcp(res) + geom_boxplot(aes(group=variable))    
+    p <- ggpcp(df) + geom_boxplot(aes(group=variable))+ xlab("Sample Name")
+  }
+  if(type == "MA"){
+    stop("not impleenmted yet")
   }
   if(type == "NUSE"){
     require(affyPLM)
@@ -737,7 +738,6 @@ setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("none", "h
     if("ranks" %in% names(args))
       rk <- args$ranks
     res <- vsn::meanSdPlot(object, ranks = rk, plot = FALSE)
-    print(rk)
     if(rk)
       xlabs <- "rank(mean)"
     else
@@ -745,12 +745,14 @@ setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("none", "h
     p <- qplot(x = res$px, y = res$py, geom = "point") +
       geom_point(aes(x = res[[1]], y = res$sd), color = "red") +
         xlab(xlabs) + ylab("sd")
+    p
   }
   if(type == "volcano"){
     require(genefilter)
     if(!"fac" %in% names(args))
       stop("argument fac must be provided to make t-test,
             check genefilter::rowttests for details")
+
     message("genefilter::rowttests used")
     tt <- rowttests(object, args$fac)
     p <- qplot(tt$dm, -log10(tt$p.value), geom = "point") +
@@ -759,7 +761,7 @@ setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("none", "h
 
   }
   if(type == "none"){
-    df.l <- transform(objct)    
+    df.l <- fortify(object)
     p <- qplot(data = df.l, ...)
   }
   p
@@ -886,8 +888,12 @@ setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
 ##======================================================================
 ##  For VCF
 ##======================================================================
-setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
+setMethod("autoplot", "VCF", function(object, ..., genomic.pos = FALSE,
+                                      xlab, ylab, main,
                                       type = c("geno", "info", "fixed"),
+                                      full.string = FALSE,
+                                      ref.show = TRUE,
+                                      expand = c(1, 1),
                                       ylabel = TRUE){
   args <- list(...)
   args.aes <- parseArgsForAes(args)
@@ -909,14 +915,9 @@ setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
     if(sum(!idx))
       warning("remove ", sum(!idx), " snp with duplicated position, only keep first one")
     gt <- gt[idx,]
-    df <- melt(gt)
-    df$start <- start(rowData(object)[idx])
-    df$y <- as.integer(df$Var2)
-    .y <- unique(df$y)
-    .label <- df$Var2[match(.y, df$y)]
-    p <- qplot(data = df, ..., x = start, y = y,  fill = value, geom = "raster") +
-      scale_y_continuous(breaks = .y, label = .label)
-    
+    rownames(gt) <- start(rowData(object)[idx])
+    gt.t <- t(gt)
+    p <- autoplot(gt.t, genomic.pos = genomic.pos)
   }
   if(type == "info"){
     df <- fortify(info(object))
@@ -948,12 +949,14 @@ setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
     fix <- fixed(object)
     fix <- fix[, !colnames(values(fix)) %in% c("ALT", "REF")]
     values(fix)$ALT <- unlist(values(alt(object))[, "ALT"])
-    idx <- width(values(fix)$ALT) > 1
-    type <- vector("character", length  = length(fix))
-    type[idx] <- "I"
-    type[!idx] <- as.character(values(fix[!idx])$ALT)
-    values(fix)$type <- type
-    id <- start(fix) < 25238400 & start(fix) > 25238100
+    values(fix)$REF <- values(ref(object))[, "REF"]
+    fix2 <- fix        
+    type2 <- vector("character", length  = length(fix))      
+    idx <- width(values(fix)$ALT) > 1    
+    type2[idx] <- "I"
+    type2[!idx] <- as.character(values(fix[!idx])$ALT)
+    values(fix)$type <- type2
+    ## id <- start(fix) < 25238400 & start(fix) > 25238100
     if(!"color" %in% names(args.non))
       isDNABaseColor <- TRUE
     else
@@ -962,24 +965,61 @@ setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
     .i <- "black"
     names(.i) <- "I"
     baseColor <- c(baseColor, .i)
-    fix <- addStepping(fix)
-    id <- start(fix) < 25238400 & start(fix) > 25238100
-    ## only show SNP
-    df <- fortify(fix)
-    df$type <- factor(df$type, levels = c(names(baseColor)))
-    ylim <- range(df$stepping)
-    ylim <- scales::expand_range(ylim, mul = 0.5)
-    p <- ggplot() + geom_text(data = df,
-                         aes(x = start, label = type, color = type,  y = stepping)) +
-                          scale_color_manual(values = baseColor) +  
-                            scale_y_continuous(breaks = unique(sort(values(fix)$stepping)),
-                                               labels = unique(sort(values(fix)$stepping)),
-                                               limits = ylim)
+    ir <- IRanges(start = start(fix), width = width(values(fix)$ALT))
+    if(!full.string)
+      width(ir[idx,]) <- 1
+    steps <- disjointBins(ir)      
+    values(fix)$stepping <- steps      
+    values(fix)$value <- values(fix)$ALT
+    values(fix)$group <- "ALT"    
+    fix2 <- addStepping(fix2)
+    idx <- width(values(fix2)$REF) > 1        
+    ir <- IRanges(start = start(fix), width = width(values(fix2)$REF))
+    if(!full.string)
+      width(ir[idx,]) <- 1
+    steps <- disjointBins(ir)      
+    values(fix2)$stepping <- steps      
+    type2 <- vector("character", length  = length(fix2))      
+    type2[idx] <- "I"
+    type2[!idx] <- as.character(values(fix[!idx])$REF)
+    values(fix2)$type <- type2
+    values(fix2)$value <- values(fix2)$REF
+    values(fix2)$group <- "REF"
+    .nms <- colnames(values(fix))
+    fix <- c(fix, fix2[, .nms])
+    if(ref.show){
+      facet <- facet_grid(group ~ ., scales = "free_y")
+      }else{
+        fix <- fix[values(fix)$group == "ALT"]
+        facet <- NULL
+      }
+    if(!full.string){
+      ## only show SNP
+      df <- fortify(fix)
+      p <- ggplot() + geom_text(data = df, ..., 
+                                aes(x = start, label = type, color = type,  y = stepping)) +
+                                  scale_color_manual(values = baseColor) +  facet
+                              
+    }else{
+      df <- fortify(fix)
+      df$type <- factor(df$type, levels = c(names(baseColor)))
+      p <- ggplot() + geom_text(data = df, ..., 
+                                aes(x = start, label = value, color = type, y = stepping)) +
+                                scale_color_manual(values = baseColor) + facet
+
+    }
   }
-  if(!ylabel)
+  p <- p + scale_y_continuous(expand = expand)
+  if(!ylabel){
+    if(type == "fixed"){
+    p <- p + scale_y_continuous(breaks = NULL, expand = expand)
+  }else{
     p <- p + scale_y_continuous(breaks = NULL)
+  }
+  }
+  
   if(missing(xlab))
-    xlab <- "Genomic Coordinates"
+    xlab <- "Position"
   p <- p + ggplot2::xlab(xlab)
   if(missing(ylab))
     ylab <- ""
@@ -990,22 +1030,34 @@ setMethod("autoplot", "VCF", function(object, ..., xlab, ylab, main,
 })
 
 
-setMethod("autoplot", "matrix", function(object, label = TRUE, evenlegend = TRUE,
-                                         scale = scale_fill_fold_change()){
+setMethod("autoplot", "matrix", function(object, label = TRUE,
+                                         genomic.pos = FALSE){
+
   x <- seq_len(ncol(object))
-  
-  if(!is.null(colnames(object))){
-    cnms <- as.numeric(colnames(object))
-    if(all(!is.na(cnms))){
-      x <- cnms[x]
+  if(genomic.pos){
+    if(!is.null(colnames(object))){
+      message("using genomic position, parsing column names as position")      
+      cnms <- as.numeric(colnames(object))
+      if(all(!is.na(cnms))){
+        x <- cnms[x]
+      }else{
+        message("NA found in column names, use default")
+      }
+    }else{
+      message("No column names found, use default")
     }
   }
   
   y <- seq_len(nrow(object))
   df <- expand.grid(x = x, y = y)
-  df$z <- as.numeric(t(object))
+  if(mode(object) == "numeric"){
+    df$value <- as.numeric(t(object))
+  }else{
+    df$value <- as.character(t(object))
+  }
   if(label)
-  p <- qplot(data = df, x = x, y = y , fill = z, geom = "raster") + scale
+  p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
+    geom_raster()
   if(label & !is.null(rownames(object))){
     y.lab <- rownames(object)
     p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
@@ -1035,5 +1087,34 @@ setMethod("autoplot", "Seqinfo", function(object, single.ideo = TRUE, ... ){
 })
 
 
-
-
+## SummarizedExperiment
+setMethod("autoplot", "SummarizedExperiment", function(object, ...,
+                                                       type = c("heatmap", "link",
+                                                         "pcp", "boxplot",
+                                                         "scatterplot.matrix")){
+  type <- match.arg(type)
+  if(type == "heatmap"){
+    res <- t(assay(object))
+    rownames(res) <- colnames(object)
+    p <- autoplot(res) + ylab("Sample")
+  }
+  if(type == "link"){
+    ## res <- rowData(object)
+    ## values(res) <- assay(object)
+    ## plotRangesLinkedToData(res[seqnames(res) == "chr1"], stat.col = seq_len(length(values(res))))
+    stop("not implemented yet")
+  }
+  if(type == "pcp"){
+    df <- as.data.frame(assay(object))
+    p <- ggpcp(df) + geom_line(...) + xlab("Sample Name")
+  }
+  if(type == "boxplot"){
+    df <- as.data.frame(assay(object))
+    p <- ggpcp(df, ...) + geom_boxplot(aes(group=variable))+ xlab("Sample Name")
+  }
+  if(type == "scatterplot.matrix"){
+    df <- as.data.frame(assay(object))
+    p <- plotmatrix(df, ...)    
+  }
+  p
+})

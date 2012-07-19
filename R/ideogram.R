@@ -40,7 +40,6 @@ plotSingleChrom <- function(obj, subchr, zoom.region,
   p
 }
 
-
 plotIdeogram <- plotSingleChrom
 
 ## ## ======================================================================

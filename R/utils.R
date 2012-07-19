@@ -460,8 +460,7 @@ arrangeGrobByParsingLegend <- function(..., nrow = NULL, ncol = NULL,
 }
 
 
-scale_fill_giemsa <- function(name = "gieStain",
-                              fill = getOption("biovizBase")$cytobandColor){
+scale_fill_giemsa <- function(fill = getOption("biovizBase")$cytobandColor){
   list(scale_fill_manual(values = fill))
 }
 

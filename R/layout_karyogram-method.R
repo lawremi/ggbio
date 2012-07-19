@@ -5,8 +5,7 @@ setMethod("layout_karyogram", "GRanges",
                    facets = seqnames ~ .,
                    cytoband = FALSE,
                    geom = NULL, stat = NULL, ylim = NULL,
-                   rect.height = 10,
-                   offset = 0
+                   rect.height = 10
                    ) {
               
             ## geom <- match.arg(geom)

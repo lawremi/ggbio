@@ -56,7 +56,6 @@ getLimits <- function(obj){
       x
     }
   })
-
   if(!is.null(l.res.s$xmin) & !is.null(l.res.s$xmax))
     res$xlim <- c(l.res.s$xmin, l.res.s$xmax)
   if(!is.null(l.res.s$ymin) & !is.null(l.res.s$ymax))
@@ -314,9 +313,9 @@ setMethod("highlight", "GRanges", function(obj, col = "red", fill = "red", alpha
 ## matrix
 scale_fill_fold_change<- function(){
   s <- scale_fill_gradient2(low = "blue", mid = "white", high = "red")
-  res <- c(list(s), list(guides(fill = guide_colorbar())),
-                       list(scale_x_continuous(expand = c(0, 0))),
-                       list(scale_y_continuous(expand = c(0, 0))))
+  res <- c(list(s), list(guides(fill = guide_colorbar())))
+                       ## list(scale_x_continuous(expand = c(0, 0))),
+                       ## list(scale_y_continuous(expand = c(0, 0))))
 }
 
 need_color <- function(args){
@@ -410,7 +409,6 @@ scale_by_xlim <- function(xlim, by.unit = TRUE){
   res
 }
 
-
 sub_names <- function(data, name.expr){
   ## name.expr <- deparse(substitute(name.expr))
   .res <- c()  
@@ -466,3 +464,4 @@ scale_fill_giemsa <- function(name = "gieStain",
                               fill = getOption("biovizBase")$cytobandColor){
   list(scale_fill_manual(values = fill))
 }
+

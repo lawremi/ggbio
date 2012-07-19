@@ -1,6 +1,6 @@
 setGeneric("stat_reduce", function(data, ...) standardGeneric("stat_reduce"))
 
-setMethod("stat_reduce", "GRanges", function(data, ...,xlim,
+setMethod("stat_reduce", "GRanges", function(data, ...,
                                                xlab, ylab, main,
                                                drop.empty.ranges = FALSE,
                                                min.gapwidth = 1L,
@@ -35,7 +35,7 @@ setMethod("stat_reduce", "GRanges", function(data, ...,xlim,
 p
 })
 
-setMethod("stat_reduce", "IRanges", function(data, ...,xlim,
+setMethod("stat_reduce", "IRanges", function(data, ...,
                                                xlab, ylab, main,
                                                drop.empty.ranges = FALSE,
                                                min.gapwidth = 1L,

@@ -79,4 +79,12 @@ theme_alignment <-   function (ylabel = FALSE, base_size = 12,
   res
 }
 
-## need a theme_bw2()
+theme_pack_panels <- opts(
+                       panel.background = theme_blank(),
+                       panel.grid.major = theme_blank(),
+                       panel.grid.minor = theme_blank(),
+                       axis.text.y = theme_blank(),
+                       strip.background = theme_blank(),
+                       strip.text.y = theme_text(angle = 0),
+                       panel.margin = grid::unit(0, "lines")
+                       )

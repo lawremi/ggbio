@@ -25,8 +25,10 @@ gr <- GRanges(seqnames =
 
 idx <- sample(1:length(gr), size = 50)
 
+
 ## @knitr default
 autoplot(gr[idx])
+
 
 ## @knitr bar
 set.seed(123)
@@ -238,3 +240,26 @@ dev.off()
 
 gr <- GRanges("chr1", IRanges(c(1, 5), width = 4))
 autoplot(gr, extend.size = 1)
+
+p1 <- qplot(data = mtcars, x = mpg, y = wt, geom = "line")
+p2 <- qplot(data = mtcars, x = mpg, y = wt, geom = "point")
+p2
+p2
+library(grid)
+grid.newpage()
+tracks(p1, p2)
+library(GenomicRanges)
+source("http://bioconductor.org/biocLite.R")
+biocLite("ggbio")
+library(ggbio)
+library(GenomicRanges)
+gr <- GRanges("chr1", IRanges(start = c(1,2), end = c(2,4)))
+ir <- IRanges(start = c(1,3), end = c(2,4))
+autoplot(ir, color = "red", fill = "blue")
+disjointBins(gr)
+
+autoplot(gr, extend.size = 1)
+library(ggplot2)
+p = qplot(data = mtcars, x = mpg, y = wt)
+tracks(p,p, p, heights = c(3, 3, 1))
+

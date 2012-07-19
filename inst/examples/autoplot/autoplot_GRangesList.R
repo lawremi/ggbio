@@ -21,8 +21,9 @@ gr <- GRanges(seqnames =
                 size = N, replace = TRUE),
               pair = sample(letters, size = N, 
                 replace = TRUE))
-grl <- split(gr, values(gr)$pair)
 
+
+grl <- split(gr, values(gr)$pair)
 ## @knitr exp
 
 autoplot(grl, group.selfish = TRUE)

@@ -25,7 +25,9 @@ gr <- GRanges(seqnames =
 
 library(biovizBase)
 data(hg19IdeogramCyto, package = "biovizBase")
-library(GenomicRanges)
+hg19IdeogramCyto[seqnames(hg19IdeogramCyto) == "chr12"]
+data(hg19Ideogram, package = "biovizBase")
+hg19Ideogram[seqnames(hg19Ideogram) == "chr12"]
 ## make shorter and clean labels
 old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
 new.chrs <- gsub("chr", "", old.chrs)
@@ -33,24 +35,39 @@ names(new.chrs) <- old.chrs
 new.ideo <- renameSeqlevels(hg19IdeogramCyto, new.chrs)
 new.ideo <- keepSeqlevels(new.ideo, c(as.character(1:22) , "X", "Y"))
 new.ideo
+
+## make new data
+library(ggplot2)
 ggplot() + layout_karyogram(new.ideo, cytoband = TRUE)
 ggplot() + layout_karyogram(new.ideo, cytoband = FALSE)
 
 data(darned_hg19_subset500, package = "biovizBase")
+dn <- darned_hg19_subset500
+max(end(dn[seqnames(dn) == "chr12"]))
 idx <- is.na(values(darned_hg19_subset500)$exReg)
+
 values(darned_hg19_subset500)$exReg[idx] <- "unknown"
-ggplot() + layout_karyogram(new.ideo, cytoband = FALSE)
-ggplot() + layout_karyogram(darned_hg19_subset500, geom = "rect",
+
+ggplot() +  layout_karyogram(darned_hg19_subset500, geom = "rect",
                             aes(color = exReg, fill = exReg))
+
+
+ggplot() + layout_karyogram(new.ideo, cytoband = FALSE) +
+  layout_karyogram(darned_hg19_subset500, geom = "rect",
+                            aes(color = exReg, fill = exReg))
+
 
 ## need to be consistency!
 old.chrs <- seqnames(seqinfo(darned_hg19_subset500))
-new.chrs <- gsub("chr", "", old.chrs)
+new.chrs <- sub("chr", "", old.chrs)
 ## lst <- as.list(new.chrs)
 names(new.chrs) <- old.chrs
 new.chrs <- new.chrs[order(as.numeric(new.chrs))]
-darned_hg19_subset500 <- renameSeqlevels(darned_hg19_subset500, new.chrs)
+new.chrs
+
+data(darned_hg19_subset500, package = "biovizBase")
 dn <- darned_hg19_subset500
+
 ggplot() + layout_karyogram(new.ideo, cytoband = FALSE) +
   layout_karyogram(dn, geom = "rect",
                    aes(color = exReg, fill = exReg))
@@ -67,11 +84,10 @@ ggplot() + layout_karyogram(new.ideo, cytoband = FALSE) +
                    aes(x = midpoint, y = score2), fill = "steelblue")
 
 
-## make a different layout for karyogram? instead of stacked one?
-
-
 ## plotStackedOverview is a simple wrapper around this functions to create a stacked layout
 plotStackedOverview(new.ideo, cytoband = TRUE)
+plotKaryogram(new.ideo, cytoband = TRUE)
+plotKaryogram(new.ideo)
 plotStackedOverview(dn)
 plotStackedOverview(dn, aes(color = exReg, fill = exReg))
 ## this will did the trick for you to rescale the space

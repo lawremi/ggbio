@@ -10,7 +10,7 @@ import(ggplot2)
 import(reshape2)
 import(scales)
 import(plyr)
-importFrom(gridExtra, grid.arrange)
+importFrom(gridExtra, grid.arrange, arrangeGrob)
 importFrom(Hmisc, bezier)
 ## GenomicRanges
 ## IRanges
@@ -79,12 +79,11 @@ importMethodsFrom(rtracklayer, import)
 ## ============================================================
 ## utils
 exportMethods(autoplot, rescale, fortify,
-              xlim, "xlim<-", update, reset, backup,
-              highlight)
+              xlim, "xlim<-", update, reset, backup)
 export(arrangeGrobByParsingLegend)
 
 ## scale
-export(scale_x_sequnit, scale_fill_giemsa)
+export(scale_x_sequnit, scale_fill_giemsa, scale_fill_fold_change)
 
 ## geom
 exportMethods(geom_chevron,

@@ -6,7 +6,7 @@ Author: Tengfei Yin, Dianne Cook, Michael Lawrence
 Maintainer: Tengfei Yin <yintengfei@gmail.com>
 Depends: methods, ggplot2 (>= 0.9)
 Imports: methods, biovizBase(>= 1.5.6), reshape2, ggplot2(>= 0.9), BiocGenerics, Biobase, IRanges, GenomicRanges, GenomicFeatures, Rsamtools, BSgenome, gridExtra, scales, plyr, VariantAnnotation, Hmisc, rtracklayer
-Suggests: BSgenome.Hsapiens.UCSC.hg19, TxDb.Hsapiens.UCSC.hg19.knownGene, affyPLM
+Suggests: BSgenome.Hsapiens.UCSC.hg19, TxDb.Hsapiens.UCSC.hg19.knownGene, affyPLM, chipseq, TxDb.Mmusculus.UCSC.mm9.knownGene
 biocViews: Infrastructure, Visualization, Bioinformatics
 URL: http://tengfei.github.com/ggbio/
 BugReports: https://github.com/tengfei/ggbio/issues

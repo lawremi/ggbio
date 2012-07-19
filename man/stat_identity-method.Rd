@@ -2,15 +2,22 @@
 \alias{stat_identity}
 \alias{stat_identity,data.frame-method}
 \alias{stat_identity,GRanges-method}
-\title{Calculate coverage}
+\alias{stat_identity,Rle-method}
+\alias{stat_identity,RleList-method}
+\title{Transform the data to a data.frame and for multiple geoms.}
 \description{
-  Calculate coverage.
+  Transform the data to a suitable data.frame and then one could use
+  multiple geom or even stat to re-plot the data.
 }
 \usage{
-% data.frame
 \S4method{stat_identity}{data.frame}(data, ...)
-% GRanges
+
 \S4method{stat_identity}{GRanges}(data, ..., geom = NULL)
+
+\S4method{stat_identity}{Rle}(data, ..., xlab, ylab, main, geom = NULL)
+
+\S4method{stat_identity}{RleList}(data, ..., xlab, ylab, main,
+          geom = NULL, indName = "sample")
 }
 \arguments{
   \item{data}{
@@ -28,12 +35,12 @@
   A 'Layer'.
 }
 \examples{
-## @knitr load
+##  load
 set.seed(1)
 N <- 50
 require(ggbio)
 require(GenomicRanges)
-## @knitr simul
+##  simul
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -51,25 +58,36 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
-## @knitr geom_point_start
+##  geom_point_start
 ggplot() + stat_identity(gr, aes(x = start, y = value), geom = "point")
 
-## @knitr geom_point_midpoint
+##  geom_point_midpoint
 ggplot() + stat_identity(gr, aes(x = midpoint, y = value), geom = "point")
 
-## @knitr geom_rect_all
+##  geom_rect_all
 ggplot() + stat_identity(gr, aes(xmin = start, xmax = end,
                                  ymin = value - 0.5, ymax = value + 0.5),
                            geom = "rect")
 
-## @knitr geom_rect_y
+##  geom_rect_y
 ggplot() + stat_identity(gr, aes(y = value), geom = "rect")
 
-## @knitr geom_line
+##  geom_line
 ggplot() + stat_identity(gr, aes(x = start, y = value),  geom = "line")
 
-## @knitr geom_segment
+##  geom_segment
 ggplot() + stat_identity(gr, aes(y = value), geom = "segment")
+
+## Rle/RleList
+library(IRanges)
+lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
+            seq(10, 0.001, length = 500))
+xVector <- rpois(1e4, lambda)
+xRle <- Rle(xVector)
+xRleList <- RleList(xRle, 2L * xRle)
+
+ggplot() + stat_identity(xRle, geom = "point")
+ggplot() + stat_identity(xRleList, geom = "point")
 }
 \author{Tengfei Yin}
 

@@ -6,10 +6,10 @@
   Create a karyogram layout.
 }
 \usage{
-\S4method{layout_karyogram}{GRanges}(data,..., xlab, ylab, main,
-                 facets = seqnames ~ ., cytoband = FALSE,
-                 geom = NULL, stat = NULL, ylim = NULL,
-                 rect.height = 10)
+\S4method{layout_karyogram}{GRanges}(data, ..., xlab, ylab, main,
+          facets = seqnames ~ ., cytoband = FALSE, geom = NULL,
+          stat = NULL, ylim = NULL, rect.height = 10)
+
 }
 \arguments{
   \item{data}{
@@ -44,7 +44,9 @@
     character vector specifying statistics to use.
   }
   \item{ylim}{
-    limits for y axis.
+    limits for y axis, usually the chromosome spaces y limits are from 0
+    to rect.height, which 10, so if you wan to stack some data on top of
+    it, you can set limits to like c(10, 20).
   }
   \item{rect.height}{
     numreic value indicate half of the rectangle ploting region, used
@@ -54,101 +56,131 @@
   A 'Layer'.
 }
 \examples{
-## @knitr load
+### R code from vignette source 'karyogram.Rnw'
+
+###################################################
+### code chunk number 1: loading
+###################################################
 library(ggbio)
 data(hg19IdeogramCyto, package = "biovizBase")
-data(hg19Ideogram, package = "biovizBase")
+head(hg19IdeogramCyto)
+## default pre-set color stored in 
+getOption("biovizBase")$cytobandColor
+
+
+###################################################
+### code chunk number 2: default
+###################################################
+autoplot(hg19IdeogramCyto, layout = "karyogram", cytoband = TRUE) 
+
+
+###################################################
+### code chunk number 3: change-order
+###################################################
 library(GenomicRanges)
-
-## @knitr simul_gr
-library(biovizBase)
-gr <- GRanges(rep(c("chr1", "chr2"), each = 5),
-              IRanges(start = rep(seq(1, 100, length = 5), times = 2),
-                      width = 50))
-autoplot(gr)
-
-## @knitr coord:genome
-autoplot(gr, coord = "genome")
-autoplot(gr, coord = "genome", aes(fill = seqnames))
-gr.t <- transformToGenome(gr)
-head(gr.t)
-
-## @knitr is
-is_coord_genome(gr.t)
-metadata(gr.t)$coord
+hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X", "Y")))
+head(hg19)
+autoplot(hg19, layout = "karyogram", cytoband = TRUE)
 
 
-## @knitr simul_snp
-chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
-seqlths <- seqlengths(hg19Ideogram)[chrs]
-set.seed(1)
-nchr <- length(chrs)
-nsnps <- 100
-gr.snp <- GRanges(rep(chrs,each=nsnps),
-                  IRanges(start =
-                          do.call(c, lapply(chrs, function(chr){
-                            N <- seqlths[chr]
-                            runif(nsnps,1,N)
-                          })), width = 1),
-                  SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
-                  pvalue =  -log10(runif(nchr*nsnps)),
-                  group = sample(c("Normal", "Tumor"), size = nchr*nsnps,
-                    replace = TRUE)
-                  )
-
-## @knitr shorter
-seqlengths(gr.snp)
-nms <- seqnames(seqinfo(gr.snp))
-nms.new <- gsub("chr", "", nms)
-names(nms.new) <- nms
-gr.snp <- renameSeqlevels(gr.snp, nms.new)
-seqlengths(gr.snp)
+###################################################
+### code chunk number 4: cyto-normal
+###################################################
+library(GenomicRanges)
+## it's a 'ideogram'
+biovizBase::isIdeogram(hg19)
+## set to FALSE
+autoplot(hg19, layout = "karyogram", cytoband = FALSE, aes(fill = gieStain)) +
+  scale_fill_giemsa()
 
 
+###################################################
+### code chunk number 5: load-RNAediting
+###################################################
+data(darned_hg19_subset500, package = "biovizBase")
+dn <- darned_hg19_subset500
+head(dn)
+## add seqlengths
+## we have seqlegnths information in another data set
+data(hg19Ideogram, package = "biovizBase")
+seqlengths(dn) <- seqlengths(hg19Ideogram)[names(seqlengths(dn))]
+## now we have seqlengths
+head(dn)
+## then we change order
+dn <- keepSeqlevels(dn, paste0("chr", c(1:22, "X")))
+autoplot(dn, layout = "karyogram")
+## this equivalent to 
+## autoplot(seqinfo(dn))
 
-## @knitr unorder
-autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
 
-## @knitr sort
-gr.snp <- keepSeqlevels(gr.snp, c(1:22, "X", "Y"))
-autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
-
-## @knitr with_seql
-names(seqlths) <- gsub("chr", "", names(seqlths))
-seqlengths(gr.snp) <- seqlths[names(seqlengths(gr.snp))]
-autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
-
-## @knitr line
-autoplot(gr.snp, coord = "genome", geom = "line", aes(y = pvalue, group = seqnames,
-                                     color = seqnames))
+###################################################
+### code chunk number 6: load-RNAediting-color
+###################################################
+## since default is geom rectangle, even though it's looks like segment
+## we still use both fill/color to map colors
+autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg))
 
 
+###################################################
+### code chunk number 7: load-RNAediting-color-NA
+###################################################
+## since default is geom rectangle, even though it's looks like segment
+## we still use both fill/color to map colors
+autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg)) +
+  scale_color_discrete(na.value = "brown")
 
-## @knitr plotGrandLinear
-plotGrandLinear(gr.snp, aes(y = pvalue))
 
-## @knitr morecolor
-plotGrandLinear(gr.snp, aes(y = pvalue, color = seqnames))
-plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue"))
-plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue", "red"))
-plotGrandLinear(gr.snp, aes(y = pvalue), color = "red")
+###################################################
+### code chunk number 8: load-RNAediting-color-fake
+###################################################
+dn2 <- dn
+seqlengths(dn2) <- rep(max(seqlengths(dn2)), length(seqlengths(dn2)) )
+autoplot(dn2, layout = "karyogram", aes(color = exReg, fill = exReg)) 
 
-## @knitr cutoff
-plotGrandLinear(gr.snp, aes(y = pvalue), cutoff = 3, cutoff.color = "blue", cutoff.size = 4)
 
-## @knitr cutoff-low
-plotGrandLinear(gr.snp, aes(y = pvalue)) + geom_hline(yintercept = 3, color = "blue", size = 4)
+###################################################
+### code chunk number 9: plotKaryogram (eval = FALSE)
+###################################################
+## plotKaryogram(dn)
+## plotKaryogram(dn, aes(color = exReg, fill = exReg))
 
-## @knitr longer
-## let's make a long name
-nms <- seqnames(seqinfo(gr.snp))
-nms.new <- paste("chr00000", nms, sep = "")
-names(nms.new) <- nms
-gr.snp <- renameSeqlevels(gr.snp, nms.new)
-seqlengths(gr.snp)
 
-## @knitr rotate
-plotGrandLinear(gr.snp, aes(y = pvalue)) + opts(axis.text.x=theme_text(angle=-90, hjust=0))
+###################################################
+### code chunk number 10: low-default
+###################################################
+## plot ideogram
+p <- ggplot() + layout_karyogram(hg19, cytoband = TRUE)
+p
+## eqevelant autoplot(hg19, layout = "karyogram", cytoband = TRUE)
+
+
+###################################################
+### code chunk number 11: low-default-addon
+###################################################
+p <- p + layout_karyogram(dn, geom = "rect", ylim = c(11, 21), color = "red")
+## commented line below won't work
+## the cytoband fill color has been used already.
+## p <- p + layout_karyogram(dn, aes(fill = exReg, color = exReg), geom = "rect")
+p
+
+
+###################################################
+### code chunk number 12: edit-space
+###################################################
+## plot chromosome space
+p <- autoplot(seqinfo(dn))
+## make sure you pass rect as geom
+## otherwise you just get background
+p <- p + layout_karyogram(dn, aes(fill = exReg, color = exReg), geom = "rect")
+values(dn)$pvalue <- rnorm(length(dn))
+p + layout_karyogram(dn, aes(x = start, y = pvalue), ylim = c(10, 30), geom = "line", color = "red")
+p
+
+
+###################################################
+### code chunk number 13: sessionInfo
+###################################################
+sessionInfo()
 }
 \author{Tengfei Yin}
 

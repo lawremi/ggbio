@@ -5,19 +5,18 @@
   Theme for alignment
 }
 \usage{
-theme_alignment(label = FALSE, base_size = 12,
-                base_family = "", axis = TRUE,
-                border = TRUE, grid = TRUE)
+theme_alignment(ylabel = FALSE, base_size = 12, base_family = "",
+                axis = TRUE, border = TRUE, grid = TRUE)
 }
 \arguments{
-  \item{label}{
+  \item{ylabel}{
     logical value. Show labels or not.
   }
   \item{base_size}{
-    size for font
+    size for font.
   }
   \item{base_family}{
-    family for font
+    family for font.
   }
   \item{axis}{
     logical value, show axis or not.
@@ -33,18 +32,18 @@ theme_alignment(label = FALSE, base_size = 12,
   Return a options list.
 }
 \examples{
-## @knitr load
+##  load
 library(ggbio)
 data(genesymbol, package = "biovizBase")
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 
-## @knitr theme:default
+##  theme:default
 p <- autoplot(txdb, which = genesymbol["RBM17"])
 p
 
-## @knitr theme:tweak
-p + theme_alignment(border = TRUE, grid = FALSE, label = TRUE)
+##  theme:tweak
+p + theme_alignment(border = TRUE, grid = FALSE, ylabel = TRUE)
 }
 \author{Tengfei Yin}
 

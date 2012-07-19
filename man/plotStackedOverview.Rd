@@ -1,8 +1,12 @@
 \name{plotStackedOverview}
 \alias{plotStackedOverview}
+\alias{plotKaryogram}
 \title{Plot stacked overview}
 \usage{
 plotStackedOverview(obj, ..., xlab, ylab, main, geom = "rect",
+                         cytoband = FALSE, rescale = TRUE,
+                         rescale.range = c(0, 10))
+plotKaryogram(obj, ..., xlab, ylab, main, geom = "rect",
                          cytoband = FALSE, rescale = TRUE,
                          rescale.range = c(0, 10))
 }

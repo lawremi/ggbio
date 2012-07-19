@@ -5,7 +5,7 @@
 \usage{
 plotSingleChrom(obj, subchr, zoom.region, xlab, ylab,
                  main, xlabel = FALSE, cytoband = TRUE)
-plotIdegoram(obj, subchr, zoom.region, xlab, ylab,
+plotIdeogram(obj, subchr, zoom.region, xlab, ylab,
                  main, xlabel = FALSE, cytoband = TRUE)
 
 }

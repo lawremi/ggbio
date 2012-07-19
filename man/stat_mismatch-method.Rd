@@ -8,7 +8,7 @@
 }
 \usage{
 ## for GRanges
-\S4method{stat_mismatch}{GRanges}(data, ..., bsgenome, which,
+\S4method{stat_mismatch}{GRanges}(data, ..., bsgenome, 
               xlab, ylab, main,
               geom = c("segment", "bar"),
               show.coverage = TRUE)

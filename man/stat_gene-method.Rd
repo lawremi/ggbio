@@ -7,10 +7,10 @@
 }
 \usage{
 \S4method{stat_gene}{TranscriptDb}(data, ..., which, xlim, truncate.gaps = FALSE,
-                 truncate.fun = NULL, ratio = 0.0025, xlab, ylab, main,
-                 facets = NULL, geom = "gene", stat = c("identity",
-                 "reduce"), names.expr = expression(paste(tx_name, "(",
-                 gene_id, ")", sep = "")))
+           truncate.fun = NULL, ratio = 0.0025, xlab, ylab, main,
+           facets = NULL, geom = "gene", stat = c("identity", "reduce"),
+           gap.geom = c("arrow", "chevron", "segment"),
+           names.expr = "tx_name(gene_id)")
 }
 \arguments{
   \item{data}{
@@ -53,6 +53,9 @@
   \item{stat}{
     defualt "identity" give full gene model and "reduce" for reduced model.
   }
+  \item{gap.geom}{
+    geom to show as introns. default is arrow.
+  }
   \item{names.expr}{
     Expression for showing y label.
   }
@@ -61,15 +64,18 @@
   A 'Layer'.
 }
 \examples{
-## @knitr load
+## loading package
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 data(genesymbol, package = "biovizBase")
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 
-## @knitr tracks
+## made a track comparing full/reduce stat.
 p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"])
 p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], stat = "reduce")
-tracks(p1, p2, heights = c(3, 1))
+tracks(full = p1, reduce = p2, heights = c(3, 1))
+
+## change y labels
+ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], names.expr = "tx_id:::gene_id")
 }
 \author{Tengfei Yin}
 

@@ -6,12 +6,11 @@
   Show interval data as arrows.
 }
 \usage{
-\S4method{geom_arrow}{GRanges}(data, ...,
-              xlab, ylab, main,
-              angle = 30, length = unit(0.15, "cm"),
-              type = "open", stat = c("stepping", "identity"),
-              facets = NULL, arrow.rate = 0.05,
-              group.selfish = TRUE)
+\S4method{geom_arrow}{GRanges}(data, ..., xlab, ylab, main,
+          angle = 30, length = unit(0.15, "cm"), type = "open",
+          stat = c("stepping", "identity"), facets = NULL,
+          arrow.rate = 0.03, group.selfish = TRUE)
+
 }
 \arguments{
   \item{data}{

@@ -25,14 +25,14 @@
 \title{Tracks for genomic graphics}
 \usage{
 tracks(..., heights, xlim, xlab = NULL,                
-                   opts = NULL, track.skip = -1,
-                   xlim.change = NULL,
-                   track.plot.color = rep("white", nrow),
-                   label.bg.color =  "white",
-                   label.bg.fill = "gray80",
-                   label.text.color = "black",
-                   label.text.cex = 1,                   
-                   label.width = unit(4, "line"))
+       opts = NULL, track.skip = -1,
+       xlim.change = NULL,
+       track.plot.color = rep("white", nrow),
+       label.bg.color =  "white",
+       label.bg.fill = "gray80",
+       label.text.color = "black",
+       label.text.cex = 1,                   
+       label.width = unit(4, "line"))
 
 \S4method{summary}{Tracks}(object)
 \S4method{print}{Tracks}(x)
@@ -59,7 +59,7 @@ xlim(x) <- value
     passed graphic objects, to control whether we adjust that track with
     each other or just leave it as it is. This could be useful when you
     pass a single chromosome view on top of the tracks.}
-  \item{track.plot.col}{plot background color for each track, default is
+  \item{track.plot.color}{plot background color for each track, default is
     white}
   \item{label.bg.color}{track labeling background rectangle border color}
   \item{label.bg.fill}{track labeling background fill color}
@@ -103,6 +103,12 @@ xlim(x) <- value
 
   ggbio provide a set of utilities to reset, backup, and apply options to
   tracks, please see examples below.
+
+  If you pass named graphics into \code{tracks}, it will create the
+  labels on the left for you. Several ways supported to name it. You can
+  pass a list of graphics with names. Or you can use
+  \code{tracks('fun part1' = p1, 'fun part2' = p2, ...)} or
+  \code{tracks(part1 = p1, part = p2, ...)}. Please see examples below.
 }
 \details{\code{tracks} function has some extra special features.
   \itemize{
@@ -144,7 +150,8 @@ xlim(x) <- value
  A \code{Tracks} object.
 }
 \examples{
-## @knitr load
+## please check out the vignette about creating tracks.
+##  load
 ## ==========================================================
 ## Load packages
 ## ==========================================================
@@ -153,28 +160,21 @@ library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 data(genesymbol, package = "biovizBase")
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 
-## @knitr tracks
+##  tracks
 ## ==========================================================
 ## Create tracks
 ## ==========================================================
 ## create two tracks
 ## full gene model
-p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "gene")
+p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"])
 ## reduced gene model
-p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "reduced_gene")
+p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], stat = "reduce")
 ## building tracks
-obj <- tracks(p1, p2, heights = c(3, 1))
+obj <- tracks(full = p1, reduce = p2, heights = c(3, 1))
 ## showing 
 obj
 
-
-## @knitr align.plots
-## ==========================================================
-## align.plots
-## ==========================================================
-align.plots(p1, p2)
-
-## @knitr reset
+##  reset
 ## ==========================================================
 ## test reset/backup
 ## ==========================================================
@@ -201,7 +201,7 @@ obj
 obj <- reset(obj)
 obj
 
-## @knitr utils
+##  utils
 ## ==========================================================
 ## utils
 ## ==========================================================
@@ -211,7 +211,7 @@ summary(obj)
 ## keep the view open and tweak with limits on the fly.
 update(obj, xlim  = c(6130000, 6150000))
 
-## @knitr opts
+## opts
 ## ==========================================================
 ## options
 ## ==========================================================

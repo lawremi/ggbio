@@ -5,8 +5,9 @@
   align plots on x axis
 }
 \usage{
-align.plots(..., vertical = TRUE,
-            heights = unit(rep(1, nrow), "null"))
+align.plots(..., vertical = TRUE, heights = unit(rep(1, nrow),
+                 "null"), label = FALSE, label.width = unit(4, "line"))
+
 }
 \arguments{
   \item{...}{
@@ -18,6 +19,13 @@ align.plots(..., vertical = TRUE,
   }
   \item{heights}{
     numeric values or units, indicate the heights of each track.
+  }
+  \item{label}{
+    logical value, indicate whether there is a fixed label on the left
+    or not.
+  }
+  \item{label.width}{
+    label width.
   }
 }
 \value{

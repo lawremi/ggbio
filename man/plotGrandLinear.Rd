@@ -13,9 +13,9 @@ association they are.
 \usage{
 plotGrandLinear(obj, ..., facets, space.skip = 0.01, geom = NULL,
                  cutoff = NULL, cutoff.color = "red", cutoff.size = 1,
-                 legend = FALSE, xlim, ylim,
-                 xlab = "Genomic Coordinates",
-                 ylab = substitute(y), main, theme)
+                 legend = FALSE, xlim, ylim, xlab, ylab =
+                 substitute(y), main, theme)
+
 }
 \arguments{
   \item{obj}{
@@ -82,30 +82,30 @@ plotGrandLinear(obj, ..., facets, space.skip = 0.01, geom = NULL,
   
 }
 \examples{
-## @knitr load
+##  load
 library(ggbio)
 data(hg19IdeogramCyto, package = "biovizBase")
 data(hg19Ideogram, package = "biovizBase")
 library(GenomicRanges)
 
-## @knitr simul_gr
+##  simul_gr
 library(biovizBase)
 gr <- GRanges(rep(c("chr1", "chr2"), each = 5),
               IRanges(start = rep(seq(1, 100, length = 5), times = 2),
                       width = 50))
 autoplot(gr)
 
-## @knitr coord:genome
+##  coord:genome
 autoplot(gr, coord = "genome")
 gr.t <- transformToGenome(gr)
 head(gr.t)
 
-## @knitr is
+##  is
 is_coord_genome(gr.t)
 metadata(gr.t)$coord
 
 
-## @knitr simul_snp
+##  simul_snp
 chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
 seqlths <- seqlengths(hg19Ideogram)[chrs]
 set.seed(1)
@@ -123,7 +123,7 @@ gr.snp <- GRanges(rep(chrs,each=nsnps),
                     replace = TRUE)
                   )
 
-## @knitr shorter
+##  shorter
 seqlengths(gr.snp)
 nms <- seqnames(seqinfo(gr.snp))
 nms.new <- gsub("chr", "", nms)
@@ -133,40 +133,40 @@ seqlengths(gr.snp)
 
 
 
-## @knitr unorder
+##  unorder
 autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
 
-## @knitr sort
+##  sort
 gr.snp <- keepSeqlevels(gr.snp, c(1:22, "X", "Y"))
 autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
 
-## @knitr with_seql
+##  with_seql
 names(seqlths) <- gsub("chr", "", names(seqlths))
 seqlengths(gr.snp) <- seqlths[names(seqlengths(gr.snp))]
 autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
 
-## @knitr line
+##  line
 autoplot(gr.snp, coord = "genome", geom = "line", aes(y = pvalue, group = seqnames,
                                      color = seqnames))
 
 
 
-## @knitr plotGrandLinear
+##  plotGrandLinear
 plotGrandLinear(gr.snp, aes(y = pvalue))
 
-## @knitr morecolor
+##  morecolor
 plotGrandLinear(gr.snp, aes(y = pvalue, color = seqnames))
 plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue"))
 plotGrandLinear(gr.snp, aes(y = pvalue), color = c("green", "deepskyblue", "red"))
 plotGrandLinear(gr.snp, aes(y = pvalue), color = "red")
 
-## @knitr cutoff
+##  cutoff
 plotGrandLinear(gr.snp, aes(y = pvalue), cutoff = 3, cutoff.color = "blue", cutoff.size = 4)
 
-## @knitr cutoff-low
+##  cutoff-low
 plotGrandLinear(gr.snp, aes(y = pvalue)) + geom_hline(yintercept = 3, color = "blue", size = 4)
 
-## @knitr longer
+##  longer
 ## let's make a long name
 nms <- seqnames(seqinfo(gr.snp))
 nms.new <- paste("chr00000", nms, sep = "")
@@ -174,10 +174,10 @@ names(nms.new) <- nms
 gr.snp <- renameSeqlevels(gr.snp, nms.new)
 seqlengths(gr.snp)
 
-## @knitr rotate
+##  rotate
 plotGrandLinear(gr.snp, aes(y = pvalue)) + opts(axis.text.x=theme_text(angle=-90, hjust=0))
 
-## @knitr sessionInfo
+##  sessionInfo
 sessionInfo()
 }
 \author{Tengfei Yin}

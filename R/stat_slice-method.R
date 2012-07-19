@@ -1,10 +1,9 @@
 ## FIXME: add ..coverage.., and a new way
 setGeneric("stat_slice", function(data, ...) standardGeneric("stat_slice"))
 
-setMethod("stat_slice", "Rle", function(data, ...,xlim,
+setMethod("stat_slice", "Rle", function(data, ...,
                                         xlab, ylab, main,
                                         na.rm = FALSE,
-                                        facets = NULL, 
                                         geom = NULL,
                                         lower=-Inf, upper=Inf,
                                         includeLower=TRUE, includeUpper=TRUE,
@@ -127,11 +126,10 @@ setMethod("stat_slice", "Rle", function(data, ...,xlim,
 })
 
 
-setMethod("stat_slice", "RleList", function(data, ...,xlim,
+setMethod("stat_slice", "RleList", function(data, ...,
                                         xlab, ylab, main,
                                             indName = "sample",
                                         na.rm = FALSE,
-                                        facets = NULL, 
                                         geom = NULL,
                                         lower=-Inf, upper=Inf,
                                         includeLower=TRUE, includeUpper=TRUE,

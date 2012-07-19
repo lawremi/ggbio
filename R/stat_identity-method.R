@@ -38,13 +38,9 @@ setMethod("stat_identity", "Rle", function(data, ...,
   df <- data.frame(x = x, y = y)
   args.non$geom <- geom
   args.non$data <- df
-  if(!length(args)){
-    args.aes <- list(x = substitute(x),
-                     y = substitute(y))
+  args.aes <- list(x = substitute(x),
+                   y = substitute(y))
   p <- do.call(ggplot2::stat_identity, c(args.non, list(do.call(aes, args.aes))))
-  }else{
-  p <- do.call(ggplot2::stat_identity, args.non)
-  }
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))
   else
@@ -85,13 +81,10 @@ setMethod("stat_identity", "RleList", function(data, ...,
   args.non$geom <- geom
   args.non$data <- df
   
-  if(!length(args)){
     args.aes <- list(x = substitute(x),
                      y = substitute(y))
     p <- do.call(ggplot2::stat_identity, c(args.non, list(do.call(aes, args.aes))))
-  }else{
-    p <- do.call(ggplot2::stat_identity, args.non)
-  }
+
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))
   else

@@ -301,6 +301,8 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
                                           resize.extra = 10,
                                           show.coverage = TRUE){
 
+  if(missing(xlab))
+    xlab <- NULL
   args <- list(...)
   method <- match.arg(method)
   bf <- open(object)
@@ -315,6 +317,21 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
     p <- do.call(autoplot, args)
   }else{
     if(stat == "coverage"){
+      if(method == "estimate"){
+      if(missing(which)){
+        seq.nm <- names(scanBamHeader(object)[[1]])[1]
+      }else{
+        if(is(which, "GRanges")){
+          seq.nm <- unique(as.character(seqnames(which)))
+        } else if(is(which, "character")){
+          seq.nm <- which
+        }else{
+          stop("which must be missing, GRanges or character(for seqnames)")
+        }
+      }
+      xlab <- paste("Position on", seq.nm)
+    }
+      
       if(!missing(which))
         p <- ggplot() + stat_coverage(bf, ..., method = method, geom  =  geom, which = which)
       else
@@ -333,15 +350,15 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
       p <- autoplot(gr, ..., geom = geom, stat = stat)
     }
   }
-  if(!missing(xlab))
+  if(length(xlab) >=1){
     p <- p + ggplot2::xlab(xlab)
-  else
-    p <- p + ggplot2::xlab("Genomic Coordinate")
+  }else{
+    p <- p + ggplot2::xlab("Genomic Position")
+  }
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
     p <- p + opts(title = main) 
-
   p
 })
 
@@ -354,6 +371,8 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
+  if(!missing(which))
+    args.non$which <- which
 
   .ext <- tools::file_ext(object)
   if(.ext == "bam"){
@@ -375,13 +394,12 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
       args.non$geom <- "rect"
     }}
   }else{
-    if(missing(xlab))
-      xlab <- "Genomic Coordinate"
-  }
+    if(!missing(xlab)){
+      p <- p + ggplot2::xlab(xlab)
+    }}
   args.non$object <- obj
   aes.res <- do.call(aes, args.aes)
   p <- do.call(autoplot, c(list(aes.res), args.non))
-  p <- p + ggplot2::xlab(xlab)
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))

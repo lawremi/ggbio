@@ -36,7 +36,7 @@ importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL)
 
 ## ## GenomicRanges
 importFrom(GenomicRanges, "seqnames<-",
-           seqlevels, "seqlevels<-",
+           seqlevels, "seqlevels<-", genome, "genome<-",
            GRanges, GRangesList, Seqinfo, seqlengths, "seqlengths<-")
 importMethodsFrom(GenomicRanges, ranges, "ranges<-",
                   start, end, width, "start<-", "end<-", "width<-",
@@ -63,7 +63,7 @@ importClassesFrom(BSgenome, BSgenome)
 importClassesFrom(GenomicFeatures,TranscriptDb)
 importFrom(GenomicFeatures,
            transcriptsByOverlaps,
-           exonsBy,
+           exonsBy, 
            cdsBy)
 
 ## VariantAnnotation

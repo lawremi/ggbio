@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{How to make a mismatch summary plot}
+%\VignetteIndexEntry{How to make a ranges-linked-to-data plot}
 %\VignetteDepends{}
 %\VignetteKeywords{visualization utilities}
 %\VignettePackage{ggbio}

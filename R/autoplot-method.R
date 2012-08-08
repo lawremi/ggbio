@@ -5,8 +5,8 @@ formals.facet_grid <- getFormalNames(facet_grid)
 formals.facet_wrap <- getFormalNames(facet_wrap)
 formals.facets <- union(formals.facet_grid, formals.facet_wrap)
 
-.ggbio.geom <- c("rect", "chevron", "alignment", "arrowrect", "arrow", "segment", "arch",
-                 "bar")
+.ggbio.geom <- c("rect", "chevron", "alignment", "arrowrect", "arrow",
+                 "segment", "arch", "bar")
 .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate", "table",
                  "gene", "mismatch", "reduce")
 
@@ -105,10 +105,13 @@ setMethod("autoplot", "GRanges", function(object, ...,
     aes.res <- do.call(aes, args.aes)
     args.res <- c(list(aes.res), args.non)
     .fun <- getDrawFunFromGeomStat(geom, stat)
+    .xlim <- c(start(range(object, ignore.strand = TRUE)),
+               end(range(object, ignore.strand = TRUE)))
+    
     p <- list(do.call(.fun, args.res))
+    p <- c(p, list(scale_by_xlim(.xlim)))
     if(!legend)
       p <- c(p, list(opts(legend.position = "none")))
-
 
     if(missing(xlab)){
         xlab <- getXLab(object)
@@ -123,6 +126,10 @@ setMethod("autoplot", "GRanges", function(object, ...,
   }  
   if(layout == "karyogram"){
     p <- plotStackedOverview(object, ...,  geom = geom)
+    if(missing(xlab)){
+        xlab <- "Position"
+    }
+    p <- c(p, list(xlab(xlab)))
     ## FIXME: xlab/ylab/main
   }
   if(layout == "circle"){
@@ -1050,11 +1057,18 @@ setMethod("autoplot", "VCF", function(object, ..., genomic.pos = FALSE,
 })
 
 
-setMethod("autoplot", "matrix", function(object, label = TRUE,
-                                         genomic.pos = FALSE){
+setMethod("autoplot", "matrix", function(object, ...,
+                                         xlab, ylab, main,
+                                         label = TRUE,
+                                         genomic.pos = FALSE,
+                                         geom = c("tile", "line"),
+                                         facet = FALSE,
+                                         compact = TRUE,
+                                         strip.bg = FALSE, strip.text.y = TRUE){
 
+  geom <- match.arg(geom)
   x <- seq_len(ncol(object))
-  if(genomic.pos){
+  if(genomic.pos | !is.null(colnames(object))){
     if(!is.null(colnames(object))){
       message("using genomic position, parsing column names as position")      
       cnms <- as.numeric(colnames(object))
@@ -1074,17 +1088,37 @@ setMethod("autoplot", "matrix", function(object, label = TRUE,
   }else{
     df$value <- as.character(t(object))
   }
-  if(label)
-  p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
-    geom_raster()
-  if(label & !is.null(rownames(object))){
-    y.lab <- rownames(object)
-    p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+  if(geom == "tile"){
+    if(label)
+      p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
+        geom_raster()
+    if(label & !is.null(rownames(object))){
+      y.lab <- rownames(object)
+      p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+    }
+    if(label & !is.null(colnames(object)) & !genomic.pos){
+      x.lab <- colnames(object)
+      p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
+    }
   }
-  if(label & !is.null(colnames(object)) & !genomic.pos){
-    x.lab <- colnames(object)
-    p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
+  if(geom == "line"){
+    p <- ggplot(data = df, aes(x = x, group = y ,y = value)) + geom_line(...)
+    if(facet){
+      p <- p + facet_grid(y ~ .)
+      if(compact)
+        p <- p + facet_grid(y ~ .) + theme_pack_panels(strip.bg = strip.bg,
+                                                       strip.text.y = strip.text.y)
+    }
   }
+  if(missing(xlab))
+    xlab <- "Position"
+  p <- p + ggplot2::xlab(xlab)
+  if(missing(ylab))
+    ylab <- ""
+  p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + opts(title = main)
+  
   p
 })
 

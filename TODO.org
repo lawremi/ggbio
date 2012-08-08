@@ -158,7 +158,16 @@
    DEADLINE: <2012-07-20 Fri>
 ** TODO update and check manual to make sure it's the latest.
    DEADLINE: <2012-07-08 Sun>
-
-
-
-
+** TODO bioc2012 
+*** a geom/stat method for associate stat with geom automatically, vice versha.
+**** for example, boxplot geom with stat aggregate automatically
+*** a factorized general theme for every object
+**** so fix the autoplot,GRanges use scale_x_sequnit.
+*** IRanges 0 width and 1 width
+*** xlim problem, override this problem
+*** getIdeogram should be built in with autoplot, for example, 
+    when use autoplot,seqinfo, and with cytoband = TRUE, and provide
+    genome names, need to download that automatically.
+    
+*** global setting
+*** arches link region to region.

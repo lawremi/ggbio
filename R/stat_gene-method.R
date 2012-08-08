@@ -207,21 +207,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
            list(opts(axis.text.y = theme_blank())))
   }
   if(missing(xlab)){
-    if(length(gr)){
-      chrs <- unique(seqnames(gr))
-      gms <- genome(object)
-      gm <- unique(gms[chrs])
-      chrs.tx <- paste(chrs, sep = ",")
-      if(is.na(gm)){
-        xlab <- chrs.tx
-      }else{
-        gm.tx <- paste(gm)
-        xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
-      }}else{
-        xlab <- ""
+        xlab <- getXLab(gr)
       }
-  }
-
   p <- c(p, list(xlab(xlab)))
   if(missing(ylab)){
     p <- c(p, list(ggplot2::ylab(getYLab(object))))

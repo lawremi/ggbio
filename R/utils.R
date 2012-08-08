@@ -313,9 +313,10 @@ setMethod("highlight", "GRanges", function(obj, col = "red", fill = "red", alpha
 ## matrix
 scale_fill_fold_change<- function(){
   s <- scale_fill_gradient2(low = "blue", mid = "white", high = "red")
-  res <- c(list(s), list(guides(fill = guide_colorbar())))
-                       ## list(scale_x_continuous(expand = c(0, 0))),
-                       ## list(scale_y_continuous(expand = c(0, 0))))
+  res <- c(list(s), list(guides(fill = guide_colorbar())),
+                       list(scale_x_continuous(expand = c(0, 0))),
+                       list(scale_y_continuous(expand = c(0, 0))),
+           list(opts(panel.border=theme_rect(colour="black",size=0.2))))
 }
 
 need_color <- function(args){

@@ -79,12 +79,18 @@ theme_alignment <-   function (ylabel = FALSE, base_size = 12,
   res
 }
 
-theme_pack_panels <- opts(
-                       panel.background = theme_blank(),
-                       panel.grid.major = theme_blank(),
-                       panel.grid.minor = theme_blank(),
-                       axis.text.y = theme_blank(),
-                       strip.background = theme_blank(),
-                       strip.text.y = theme_text(angle = 0),
-                       panel.margin = grid::unit(0, "lines")
-                       )
+theme_pack_panels <- function(strip.bg = FALSE, strip.text.y = TRUE){
+  res <- opts(panel.background = theme_blank(),
+              panel.grid.major = theme_blank(),
+              panel.grid.minor = theme_blank(),
+              axis.text.y = theme_blank(),
+              strip.background = if(strip.bg){
+                theme_rect(fill = "grey80", colour = NA)
+              }else{
+                theme_blank()
+              },
+              strip.text.y = if(strip.text.y){theme_text(angle = 0)}else{theme_blank()},
+              panel.margin = grid::unit(0, "lines"))
+  res <- c(list(res),
+           list(scale_y_continuous(breaks = NULL)))
+                       }

@@ -332,11 +332,11 @@ need_color <- function(args){
 
 
 
-trans_seq <- function(unit = c("mb", "kb", "bp")){
+trans_seq <- function(unit = c("Mb", "kb", "bp")){
   unit <- match.arg(unit)
   function(x){
     res <- switch(unit,
-                  mb = {
+                  Mb = {
                     x/1e6
                   },
                   kb = {
@@ -349,11 +349,11 @@ trans_seq <- function(unit = c("mb", "kb", "bp")){
   }
 }
 
-trans_seq_format<- function(unit = c("mb", "kb", "bp")){
+trans_seq_format<- function(unit = c("Mb", "kb", "bp")){
   unit <- match.arg(unit)
   function(x){
     res <- switch(unit,
-                  mb = {
+                  Mb = {
                     x/1e6
                   },
                   kb = {
@@ -366,11 +366,11 @@ trans_seq_format<- function(unit = c("mb", "kb", "bp")){
   }
 }
 
-trans_seq_rev<- function(unit = c("mb", "kb", "bp")){
+trans_seq_rev<- function(unit = c("Mb", "kb", "bp")){
   unit <- match.arg(unit)
   function(x){
     res <- switch(unit,
-                  mb = {
+                  Mb = {
                     x*1e6
                   },
                   kb = {
@@ -383,7 +383,7 @@ trans_seq_rev<- function(unit = c("mb", "kb", "bp")){
   }
 }
 
-scale_x_sequnit <- function(unit = c("mb", "kb", "bp")){
+scale_x_sequnit <- function(unit = c("Mb", "kb", "bp")){
   unit <- match.arg(unit)
   scale_x_continuous(breaks = trans_breaks(trans_seq(unit),
                                            trans_seq_rev(unit)),
@@ -401,7 +401,7 @@ scale_by_xlim <- function(xlim, by.unit = TRUE){
     else
       .d <- diff(xlim)
     if(.d > 1e6){
-      res <- scale_x_sequnit("mb")
+      res <- scale_x_sequnit("Mb")
     }else if(.d <= 1e6 & .d > 1e3){
       res <- scale_x_sequnit("kb")
     }else{

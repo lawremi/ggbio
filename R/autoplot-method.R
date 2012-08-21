@@ -1061,7 +1061,7 @@ setMethod("autoplot", "matrix", function(object, ...,
                                          xlab, ylab, main,
                                          label = TRUE,
                                          genomic.pos = FALSE,
-                                         geom = c("tile", "line"),
+                                         geom = c("raster","tile", "line"),
                                          facet = FALSE,
                                          compact = TRUE,
                                          strip.bg = FALSE, strip.text.y = TRUE){
@@ -1088,10 +1088,25 @@ setMethod("autoplot", "matrix", function(object, ...,
   }else{
     df$value <- as.character(t(object))
   }
+  if(geom == "raster"){
+    if(label)
+      p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
+        geom_raster(...)
+    p <- p + theme_noexpand()
+    if(label & !is.null(rownames(object))){
+      y.lab <- rownames(object)
+      p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+    }
+    if(label & !is.null(colnames(object)) & !genomic.pos){
+      x.lab <- colnames(object)
+      p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
+    }
+  }
   if(geom == "tile"){
     if(label)
       p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
-        geom_raster()
+        geom_tile(...)
+    p <- p + theme_noexpand()
     if(label & !is.null(rownames(object))){
       y.lab <- rownames(object)
       p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))

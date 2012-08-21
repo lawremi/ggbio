@@ -94,3 +94,11 @@ theme_pack_panels <- function(strip.bg = FALSE, strip.text.y = TRUE){
   res <- c(list(res),
            list(scale_y_continuous(breaks = NULL)))
                        }
+
+theme_noexpand <- function(){
+  c(list(scale_x_continuous(expand = c(0, 0))),
+  list(scale_y_continuous(expand = c(0, 0))))
+}
+
+
+

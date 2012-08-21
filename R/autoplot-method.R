@@ -1126,7 +1126,7 @@ setMethod("autoplot", "matrix", function(object, ...,
     }
   }
   if(missing(xlab))
-    xlab <- "Position"
+    xlab <- ""
   p <- p + ggplot2::xlab(xlab)
   if(missing(ylab))
     ylab <- ""
@@ -1168,7 +1168,7 @@ setMethod("autoplot", "SummarizedExperiment", function(object, ...,
   if(type == "heatmap"){
     res <- assay(object)
     colnames(res) <- colnames(object)
-    p <- autoplot(res) + ylab("Features") + xlab("Samples")
+    p <- autoplot(res, ...) + ylab("Features") + xlab("Samples")
   }
   if(type == "link"){
     ## res <- rowData(object)

@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+  <head>
+    <link type="text/css" rel="stylesheet" href="css/mystyles.css"> </script>
+<!-- <link href="syntaxhighlighter_3.0.83/styles/shThemeDefault.css" rel="stylesheet" -->
+<!--       type="text/css" /> -->
+<!-- <script type="text/javascript" -->
+<!-- 	src="syntaxhighlighter_3.0.83/scripts/shCore.js"></script> -->
+<!-- <script type="text/javascript" src="syntaxhighlighter_3.0.83/scripts/shAutoloader.js"></script> -->
+<!-- <script src="syntaxhighlighter_3.0.83/scripts/shBrushPython.js" type="text/javascript"></script> -->
+</head>
+<body>
+<div class = "container">
+<div id = "header">
+<div id = "icon">
+<h1 class = "icon">GGBIO</h1>
+</div>
+<div id = "div-nav">
+<nav>
+  <a class = "nav" style = "border-left-style:dotted; border-left-width:1px"
+  href="http://tengfei.github.com/ggbio"> Home </a>
+  <a class = "nav" href="docs/"> DOCUMENTATION </a>
+  <a class = "nav" style = "background-color:#EAEAEA" href="download.html"> DOWNLOAD </a>
+  <a class = "nav" href="support.html"> SUPPORT </a>
+  <a class = "nav" href="about.html"> ABOUT </a>
+</nav>
+</div>
+</div>
+<div id = "shadow">
+</div>
+<div class = "content">
+<h2>Installation <a id = "install"></a></h2>
+
+<p>After <b>R</b> 2.15, <b>R</b> release cycle falls into annual release instead of
+semi-annual release cycle, at the same time, <b>Bioconductor</b> project still
+follows semi-annual release cycle. So now you can install both released and
+developmental version for the same version of R.</p>
+
+<p>In your <b>R</b> session, please run following code to install released version
+of <b>ggbio</b>, but if you are using developmental version of <b>R</b>, you
+will get developmental version of <b>ggbio</b> automatically. Because what you
+get depends on the bioconductor installer, which is implemented in
+package <b>BiocInstaller</b> and its version decides which version
+of <b>Bioconductor</b> you got.</p>
+
+<pre>
+<code>
+source("http://bioconductor.org/biocLite.R")
+biocLite("ggbio")
+</code>
+</pre>
+
+
+<p>After you run the code above, next time if you wish to install something new
+from <b>Bioconductor</b>, you can simply run</p>
+
+<pre>
+<code>
+library("BiocInstaller")
+biocLite("ggbio")
+</code>
+</pre>
+
+<p>Or you can check all released bioc packages <a href =
+					       http://www.bioconductor.org/packages/release/BiocViews.html#___Software>here</a>.</p>
+
+<p>To install developmental version, run</p>
+<pre>
+<code>
+library("BiocInstaller")
+useDevel(TRUE)
+biocLite("ggbio")
+</code>
+</pre>
+
+<p>For developers, please you can find latest source code in
+  bioc <a href="https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/">svn</a>,
+  username and password are all "readonly"(without quotes).</p>
+
+<div id = "footer">
+<footer>
+&copy; 2011-2012 <a href="http://tengfei.name">Tengfei Yin</a>
+</footer>
+</div>
+</div>
+<script type="text/javascript">
+     SyntaxHighlighter.all()
+</script>
+</body>
+</html>

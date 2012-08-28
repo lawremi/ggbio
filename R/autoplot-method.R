@@ -400,13 +400,12 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
     }else{
       args.non$geom <- "rect"
     }}
-  }else{
-    if(!missing(xlab)){
-      p <- p + ggplot2::xlab(xlab)
-    }}
+  }
   args.non$object <- obj
   aes.res <- do.call(aes, args.aes)
   p <- do.call(autoplot, c(list(aes.res), args.non))
+  if(!missing(xlab))
+    p <- p + ggplot2::xlab(xlab)
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))

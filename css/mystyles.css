@@ -1,0 +1,132 @@
+a:link {color:#71BEE0;}      /* unvisited link */
+a.nav:visited {color:#000000;}  /\* visited link *\/ */
+a:hover {color:gray;}  /* mouse over link */
+/* a:active {color:#0000FF;}  */
+a.nav:link {text-decoration:none;}
+a.nav:visited {text-decoration:none;}
+a.nav{
+    padding:0 10px;
+    border-right-style:dotted; 
+    border-right-width:1px
+}
+/* a:hover {text-decoration:underline;} */
+/* a:active {text-decoration:underline;} */
+
+
+body{
+    color:#343432;
+    background-color:#FAFAFA;
+}
+p{
+    font-family:"Times New Roman";
+    font-size:1em;   
+}
+
+/* div{ */
+/* } */
+gallery{
+    border-top-style:solid;
+    border-top-width:10px;
+    border-top-color:gray;
+}
+.container{
+    width:800px;
+    height:100%;
+    margin:0px auto;
+    /* border-radius:25px; */
+    /* background-color:#000; */
+    /* box-shadow: 10px 10px 5px #888888; */
+}
+
+#header{
+    width: 800px;
+    border-top-style:solid;
+    border-top-width:5px;
+    border-bottom-style:solid;
+    border-bottom-width:2px;
+    height:100px;
+    float:left;
+    margin: 10px 0px;
+}
+.content{
+    margin-top:20px;
+    border-top-style:dotted;
+    border-top-width:1px;
+}
+
+h1.icon{
+    font-size:3.5em;
+    margin-bottom:5px;
+    /* text-align:center; */
+    /* margin-top:8; */
+}
+#icon{
+    /* transform: scale(1,2); */
+    /* -ms-transform: scale(1,2); /\* IE 9 *\/ */
+    /* -webkit-transform: scale(1,2); /\* Safari and Chrome *\/ */
+    /* -o-transform: scale(1,2); /\* Opera *\/ */
+    /* -moz-transform: scale(1,2); /\* Firefox *\/ */
+    /* /\* background-color:green; *\/ */
+    color: #333333;
+    font-family: Impact, Charcoal, sans-serif;
+    width:150px;
+    height:100%;
+    float:left;
+}
+
+#div-nav{
+    postition:relative;
+    width:650px;
+    height:100%;
+    float:left;
+    text-align:right;
+}
+nav{
+    font-size:18px;   
+    color: #000000;
+    font-family: Century Gothic, sans-serif;
+    position: relative; 
+    bottom: -70%;
+}
+
+hr.style-five {
+    border: 0;
+    height: 0; /* Firefox... */
+    box-shadow: 0 0 10px 1px black;
+}
+hr.style-five:after {  /* Not really supposed to work, but does */
+    content: "\00a0";  /* Prevent margin collapse */
+}
+		
+hr.style-eight {
+    padding: 0;
+    border: none;
+    border-top: medium double #333;
+    color: #333;
+    text-align: center;
+}
+hr.style-eight:after {
+    content: "§";
+    display: inline-block;
+    position: relative; 
+    top: -0.7em;  
+    font-size: 1.5em;
+    padding: 0 0.25em;
+    background: white;
+}
+
+footer{
+    width:800px;
+    border-top-style:dotted;
+    border-top-width:1px;
+    float:left;
+    text-align:right;
+}
+/* #main-nav{ */
+/*     position:relative; */
+/*     top:-3; */
+/*     left:0; */
+/* } */
+
+/* #header { position: relative; } */
+/* #header-content { position: absolute; bottom: 0; left: 0; } */

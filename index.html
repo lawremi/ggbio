@@ -1,40 +1,71 @@
----
-layout: base
-title: Home
----
+<!doctype html>
+<html>
+  <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+    <link type="text/css" rel="stylesheet"
+	  href="galleria/themes/classic/galleria.classic.css"> </script>
+    <link type="text/css" rel="stylesheet" href="css/mystyles.css"> </script>
+    <script type="text/javascript" src="galleria/galleria-1.2.8.js"> </script>
+      <script type="text/javascript" src="galleria/themes/classic/galleria.classic.js"> </script>
+    <style>
+      #galleria{ width: 800px; height: 400px; background: #000}
+    </style>
+<script>
+  root_url = "https://raw.github.com/tengfei/ggbio/gh-pages/";
+</script>
+</head>
+<body>
+<div class = "container">
+<div id = "header">
+<div id = "icon">
+<h1 class = "icon">GGBIO</h1>
+</div>
+<div id = "div-nav">
+<nav>
+  <a class = "nav" style = "border-left-style:dotted; border-left-width:1px"
+  href=""> Home </a>
+  <a class = "nav" href="docs/"> DOCUMENTATION </a>
+  <a class = "nav" href="download.html"> DOWNLOAD </a>
+  <a class = "nav" href="support.html"> SUPPORT </a>
+  <a class = "nav" href="about.html"> ABOUT </a>
+</nav>
+</div>
+</div>
 <div id="gallery">
-  <img src="{{ site.url }}/images/cir.png">
-  <img src="{{ site.url }}/images/overview.png">
-  <img src="{{ site.url }}/images/stacked-darn.png">
-  <img src="{{ site.url }}/images/interval.png">
-  <img src="{{ site.url }}/images/tracks.png">
+  <img src="https://raw.github.com/tengfei/ggbio/gh-pages/images/cir.png">
+  <img src="https://raw.github.com/tengfei/ggbio/gh-pages/images/overview.png">
+  <img src="https://raw.github.com/tengfei/ggbio/gh-pages/images/stacked-darn.png">
+  <img src="https://raw.github.com/tengfei/ggbio/gh-pages/images/interval.png">
+  <img src="https://raw.github.com/tengfei/ggbio/gh-pages/images/tracks.png">
 </div>
 <script>
-  Galleria.loadTheme('{{ site.url }}/galleria/themes/classic/galleria.classic.min.js');
-  $("#gallery").galleria({
-  autoplay: 3000, 
-  width: 800,
-  height: 500
-  });
+  $("#gallery").galleria({ 
+   <!-- autoplay: 0, -->
+   width: 800, 
+   height: 500
+   }); 
 </script>
-<div class="row">
-	<div class="column grid_9">
-		<p id="frontbio"> ggbio: An R implementation for extending the
-		Grammar of Graphics for Genomic Data </p>
+ <div class = "content"> 
+ 	<header> 
+ 		<h2> ggbio: An R implementation for extending the 
+ 		Grammar of Graphics for Genomic Data </h2> 
 		
-		<p>The ggbio package extends and specializes the grammar of
-		graphics for biological data. The graphics are designed to
-		answer common scientific questions, in particular those often
-		asked of high throughput genomics data. All core Bioconductor
-		data structures are supported, where appropriate. The package
-		supports detailed views of particular genomic regions, as well
-		as genome-wide overviews. Supported overviews include ideograms
-		and grand linear views. High-level plots include sequence
-		fragment length, edge-linked interval to data view, mismatch
-		pileup, and several splicing summaries.</p>
-	</div>
+ 		<p>The ggbio package extends and specializes the grammar of 
+ 		graphics for biological data. The graphics are designed to 
+ 		answer common scientific questions, in particular those often 
+ 		asked of high throughput genomics data. All core Bioconductor 
+ 		data structures are supported, where appropriate. The package 
+ 		supports detailed views of particular genomic regions, as well 
+ 		as genome-wide overviews. Supported overviews include ideograms 
+ 		and grand linear views. High-level plots include sequence 
+ 		fragment length, edge-linked interval to data view, mismatch 
+ 		pileup, and several splicing summaries.</p> 
+ 	</header> 
+ </div> 
+<div id = "footer"></div>
+<footer>
+&copy; 2011-2012 <a href="http://tengfei.name">Tengfei Yin</a>
+</footer>
 </div>
-<div class="row">
-
-
-</div>
+</body>
+</html>

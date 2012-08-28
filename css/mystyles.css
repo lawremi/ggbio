@@ -5,7 +5,8 @@ a:hover {color:gray;}  /* mouse over link */
 a.nav:link {text-decoration:none;}
 a.nav:visited {text-decoration:none;}
 a.nav{
-    padding:0 10px;
+    /* margin:0 10px 0 10px; */
+    padding:10px 10px 8px 10px;
     border-right-style:dotted; 
     border-right-width:1px
 }
@@ -24,10 +25,16 @@ p{
 
 /* div{ */
 /* } */
-gallery{
+#shadow{
+    width:800px;
+    height:0px;
+    float:left;
+    margin:0 0 5px 0;
+    padding:0;
+    /* padding:10px 0 0 0;; */
     border-top-style:solid;
-    border-top-width:10px;
-    border-top-color:gray;
+    border-top-width:20px;
+    border-top-color:#EAEAEA;
 }
 .container{
     width:800px;
@@ -46,7 +53,7 @@ gallery{
     border-bottom-width:2px;
     height:100px;
     float:left;
-    margin: 10px 0px;
+    margin: 10px 0px 0px 0px;
 }
 .content{
     margin-top:20px;

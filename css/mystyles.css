@@ -58,8 +58,8 @@ p{
 .content{
     float:left;
     margin-top:2px;
-    border-top-style:dotted;
-    border-top-width:1px;
+    /* border-top-style:dotted; */
+    /* border-top-width:1px; */
 }
 
 h1.icon{

@@ -51,9 +51,15 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                end(range(gr, ignore.strand = TRUE)))    
     if(length(gr)){
       message("Constructing graphics...")
+      
       values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
       df <- as.data.frame(gr)      
       gr.cds <- gr[values(gr)$type == "cds"]
+      args.cds.non <- args.non
+      if(!"rect.height" %in% names(args.cds.non)){
+        args.cds.non$rect.height <- 0.4
+      }
+      
       ## df.cds <- df[df$type == "cds",]
       if(length(gr.cds)){
         args.cds <- args.aes[names(args.aes) != "y"]
@@ -61,7 +67,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
         aes.res <- do.call(aes, args.cds)
         args.cds.res <- c(list(data = gr.cds),
                           list(aes.res),
-                          args.non,
+                          args.cds.non,
                           list(stat = "identity"))
         p <- do.call(range.fun, args.cds.res)
       }else{

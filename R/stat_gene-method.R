@@ -240,7 +240,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     p <- c(p, list(ylab(ylab)))
   }
   if(!missing(main))
-    p <- c(p, theme(title = main))
+    p <- c(p, opts(title = main))
   
   ## test scale
   if(is_coord_truncate_gaps(gr)){

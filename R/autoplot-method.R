@@ -111,23 +111,23 @@ setMethod("autoplot", "GRanges", function(object, ...,
     p <- list(do.call(.fun, args.res))
     p <- c(p, list(scale_by_xlim(.xlim)))
     if(!legend)
-      p <- c(p, list(opts(legend.position = "none")))
+      p <- c(p, list(theme(legend.position = "none")))
 
     if(missing(xlab)){
-        xlab <- getXLab(object)
+        xlab <- ""
     }
     p <- c(p, list(xlab(xlab)))
     ## tweak with default y lab
     if(!missing(ylab))
       p <- c(p,list(ylab(ylab)))
     if(!missing(main))
-      p <- c(p, list(opts(title = main)))
+      p <- c(p, list(theme(title = main)))
      p <- ggplot() + p
   }  
   if(layout == "karyogram"){
     p <- plotStackedOverview(object, ...,  geom = geom)
     if(missing(xlab)){
-        xlab <- "Position"
+        xlab <- ""
     }
     p <- c(p, list(xlab(xlab)))
     ## FIXME: xlab/ylab/main
@@ -198,13 +198,13 @@ setMethod("autoplot", "GRangesList", function(object, ...,
   ##   p <- p + xlab(xlab)
   
   if(missing(xlab)) {
-        xlab <- getXLab(object)
+        xlab <- ""
   }
   p <- p + ggplot2::xlab(xlab)
   if(!missing(ylab))
     p <- p + ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p
 })          
 
@@ -226,9 +226,9 @@ setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main) +
-      opts(strip.background = theme_rect(colour = 'NA', fill = 'NA'))+ 
-        opts(strip.text.y = theme_text(colour = 'white')) 
+    p <- p + theme(title = main) +
+      theme(strip.background = theme_rect(colour = 'NA', fill = 'NA'))+ 
+        theme(strip.text.y = theme_text(colour = 'white')) 
   p
 })
 
@@ -281,13 +281,13 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
     p <- do.call(autoplot, c(list(aes.res), args.non))
   }
   if(missing(xlab)) {
-        xlab <- getXLab(object)
+        xlab <- ""
   }
   p <- p + ggplot2::xlab(xlab)
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p <- p + facet
   p
 })
@@ -336,7 +336,7 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
           stop("which must be missing, GRanges or character(for seqnames)")
         }
       }
-      xlab <- paste("Position on", seq.nm)
+      xlab <- ""
     }
       
       if(!missing(which))
@@ -360,12 +360,12 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
   if(length(xlab) >=1){
     p <- p + ggplot2::xlab(xlab)
   }else{
-    p <- p + ggplot2::xlab("Genomic Position")
+    p <- p + ggplot2::xlab("")
   }
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main) 
+    p <- p + theme(title = main) 
   p
 })
 
@@ -393,7 +393,7 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
   }
   if(is(obj, "GRanges")){
     if(missing(xlab))
-      xlab <- getXLab(obj)
+      xlab <- ""
     if(!"geom" %in% names(args.non)){
     if("y" %in% names(args.aes) | "score" %in% colnames(values(obj))){
       args.non$geom <- "bar"
@@ -409,7 +409,7 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main) 
+    p <- p + theme(title = main) 
   p  
 })
 
@@ -422,7 +422,7 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                truncate.gaps = FALSE,
                                                truncate.fun = NULL,
                                                ratio = 0.0025, 
-                                               geom = c("gene"),
+                                               geom = c("alignment"),
                                                stat = c("identity", "reduce"),
                                                names.expr = "tx_name(gene_id)"){
 
@@ -444,10 +444,14 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
   p <- ggplot() + do.call(stat_gene, args.res)
   if(!missing(xlab))
     p <- p + xlab(xlab)
+  else
+    p <- p + ggplot2::xlab("")
   if(!missing(ylab))
     p <- p + ylab(ylab)
+  else
+    p <- p + ggplot2::ylab("")
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p
 })
 
@@ -568,16 +572,17 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
 
               })
   if(missing(xlab)){
-    chrs <- unique(seqnames(which))
-    gms <- genome(object)
-    gm <- unique(gms[chrs])
-    chrs.tx <- paste(chrs, sep = ",")    
-    if(is.na(gm)){
-      xlab <- chrs.tx
-    }else{
-      gm.tx <- paste(gm)
-      xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
-    }
+    ## chrs <- unique(seqnames(which))
+    ## gms <- genome(object)
+    ## gm <- unique(gms[chrs])
+    ## chrs.tx <- paste(chrs, sep = ",")    
+    ## if(is.na(gm)){
+    ##   xlab <- chrs.tx
+    ## }else{
+    ##   gm.tx <- paste(gm)
+    ##   xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
+    ## }
+    xlab <- ""
   }
   p <- p + xlab(xlab)
   ## tweak with default y lab
@@ -588,7 +593,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
   ## if(stat == "stepping" | geom == "alignment")
   p <- p + scale_y_continuous(breaks = NULL)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p
 })
 
@@ -638,10 +643,12 @@ setMethod("autoplot", "Rle", function(object, ...,
   
   if(!missing(xlab))
     p <- p + ggplot2::xlab(xlab)
+  else
+    p <- p + ggplot2::xlab("")    
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p
 })
 
@@ -694,10 +701,12 @@ setMethod("autoplot", "RleList", function(object, ...,
   }
   if(!missing(xlab))
     p <- p + ggplot2::xlab(xlab)
+  else
+    p <- p + ggplot2::xlab("")
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p
   ## if(facetByRow)
   ##   facets <- listName ~ .
@@ -1045,13 +1054,13 @@ setMethod("autoplot", "VCF", function(object, ..., genomic.pos = FALSE,
   }
   
   if(missing(xlab))
-    xlab <- "Position"
+    xlab <- ""
   p <- p + ggplot2::xlab(xlab)
   if(missing(ylab))
     ylab <- ""
   p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p
 })
 
@@ -1088,10 +1097,9 @@ setMethod("autoplot", "matrix", function(object, ...,
     df$value <- as.character(t(object))
   }
   if(geom == "raster"){
-    if(label)
-      p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
+    p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
         geom_raster(...)
-    p <- p + theme_noexpand()
+    p <- p + theme_noexpand() + scale_x_continuous(breaks = NULL, expand = c(0, 0))
     if(label & !is.null(rownames(object))){
       y.lab <- rownames(object)
       p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
@@ -1102,10 +1110,9 @@ setMethod("autoplot", "matrix", function(object, ...,
     }
   }
   if(geom == "tile"){
-    if(label)
-      p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
-        geom_tile(...)
-    p <- p + theme_noexpand()
+    p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
+      geom_tile(...)
+    p <- p + theme_noexpand() + scale_x_continuous(breaks = NULL, expand = c(0, 0))
     if(label & !is.null(rownames(object))){
       y.lab <- rownames(object)
       p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
@@ -1131,7 +1138,7 @@ setMethod("autoplot", "matrix", function(object, ...,
     ylab <- ""
   p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   
   p
 })

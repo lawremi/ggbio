@@ -7,7 +7,6 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
                                                geom = NULL){
 
 
-
   
   if(is.null(geom))
     geom <- "line"
@@ -97,6 +96,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
     p <- c(p, list(ggplot2::ylab("Coverage")))
   if(!missing(main))
     p <- c(p, list(theme(title = main)))
+
   
   p
 })
@@ -138,7 +138,11 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                                                xlab, ylab, main,
                                                facets = NULL, 
                                                geom = NULL,
-                                               method = c("estimate", "raw")){
+                                               method = c("estimate", "raw"),
+                                               space.skip = 0.1,
+                                               coord = c("linear", "genome")){
+
+  coord <- match.arg(coord)  
   ## which could be a granges or seqnames
   if(missing(which)){
     seq.nm <- names(scanBamHeader(data)[[1]])[1]
@@ -191,9 +195,17 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
   if(method == "estimate"){
   message("Constructing graphics...")
   res <- res[seqnames(res) %in% seq.nm]
+
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(res, args.facets)
   res <- keepSeqlevels(res, unique(as.character(seqnames(res))))
+
+
+  if(coord == "genome"){
+    res <- transformToGenome(res, space.skip = space.skip)
+    res.ori <- res <- biovizBase:::rescaleGr(res)
+  }
+  
   if(geom == "area"){
     grl <- splitByFacets(res, facets)
     res <- endoapply(grl, function(gr){
@@ -228,7 +240,17 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
   else
     p <- c(p, list(ggplot2::ylab("Coverage")))
   if(!missing(main))
-    p <- c(p, list(theme(title = main)))
+    p <- c(p, list(opts(title = main)))
+
+  if(is_coord_genome(res.ori)){
+    ss <- getXScale(res.ori)
+    p <- c(p, list(scale_x_continuous(breaks = ss$breaks,
+                                labels = ss$labels)))
+  }
+  if(coord == "genome"){
+    facet <- facet_null()
+    p <- c(p, list(facet))
+  }
   
   p
   

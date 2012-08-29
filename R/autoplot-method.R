@@ -305,9 +305,12 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
                                           geom = "line",
                                           stat = "coverage",
                                           method = c("estimate", "raw"),
+                                          coord = c("linear", "genome"),
                                           resize.extra = 10,
+                                          space.skip = 0.1,
                                           show.coverage = TRUE){
 
+  coord <- match.arg(coord)
   if(missing(xlab))
     xlab <- NULL
   args <- list(...)
@@ -340,9 +343,13 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
     }
       
       if(!missing(which))
-        p <- ggplot() + stat_coverage(bf, ..., method = method, geom  =  geom, which = which)
+        p <- ggplot() + stat_coverage(bf, ..., method = method, coord = coord,
+                                      space.skip = space.skip,
+                                      geom  =  geom, which = which)
       else
-        p <- ggplot() + stat_coverage(bf, ..., method = method, geom  =  geom)
+        p <- ggplot() + stat_coverage(bf, ..., method = method, coord = coord,
+                                      space.skip = space.skip,
+                                      geom  =  geom)
     }else if(stat == "mismatch"){
       if(geom %in% c("bar", "segment")){
         p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which, geom = "bar")
@@ -365,7 +372,7 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + theme(title = main) 
+    p <- p + opts(title = main) 
   p
 })
 
@@ -409,7 +416,7 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + theme(title = main) 
+    p <- p + opts(title = main) 
   p  
 })
 

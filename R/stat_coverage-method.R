@@ -96,7 +96,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   else
     p <- c(p, list(ggplot2::ylab("Coverage")))
   if(!missing(main))
-    p <- c(p, list(opts(title = main)))
+    p <- c(p, list(theme(title = main)))
   
   p
 })
@@ -128,7 +128,7 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
   else
     p <- c(p, list(ggplot2::ylab("Coverage")))
   if(!missing(main))
-    p <- c(p, list(opts(title = main)))
+    p <- c(p, list(theme(title = main)))
   p
 })
 
@@ -176,6 +176,8 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                 estimate = {
                   message("Estimating coverage...")
                   res <- estimateCoverage(data, maxBinSize = maxBinSize)
+                  if(!missing(which) && is(which, "GRanges"))
+                    res <- subsetByOverlaps(res, which)
                   res
                 },
                 raw = {
@@ -226,7 +228,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
   else
     p <- c(p, list(ggplot2::ylab("Coverage")))
   if(!missing(main))
-    p <- c(p, list(opts(title = main)))
+    p <- c(p, list(theme(title = main)))
   
   p
   

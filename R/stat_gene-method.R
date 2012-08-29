@@ -6,25 +6,19 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                                                 ratio = 0.0025, 
                                                 xlab, ylab, main,
                                                 facets = NULL,
-                                                geom = "gene",
+                                                geom = "alignment",
                                                 stat = c("identity", "reduce"),
-                                                gap.geom = c("arrow", "chevron",  "segment"),
+                                                range.geom = "rect",
+                                                gap.geom = "arrow",
                                                 names.expr = "tx_name(gene_id)"){
 
-
-
-  stat <- match.arg(stat)
-  gap.geom <- match.arg(gap.geom)
-  gap.fun <- switch(gap.geom,
-                    chevron = {
-                      geom_chevron
-                    },
-                    arrow = {
-                      geom_arrow
-                    },
-                    segment = {
-                      geom_segment
-                    })
+  
+  
+  ## stat <- match.arg(stat)
+  ## geom <- match.arg(geom)
+  ## gap.geom <- match.arg(gap.geom)
+  gap.fun <- getGeomFun(gap.geom)
+  range.fun <- getGeomFun(range.geom)  
   
   if(stat == "reduce")
     geom <- "reduced_gene"
@@ -43,9 +37,10 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   
   if(need_color(args))
     args.non$color <- "grey20"
+  
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
 
-  if(geom == "gene"){
+  if(geom == "alignment"){
     message("Aggregating TranscriptDb...")
     gr <- biovizBase:::fetch(object, which, truncate.gaps = truncate.gaps,
                              truncate.fun = truncate.fun, ratio = ratio)
@@ -54,24 +49,23 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     if(length(gr)){
       message("Constructing graphics...")
       values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
-      ## drawing,  hard coded width of rect
-      ## just cds, gaps and utrs
-      df <- as.data.frame(gr)
-      df.cds <- df[df$type == "cds",]
-      ## add a segment for hacking at 1pix
-      ## rect
-      if(nrow(df.cds)){
+      df <- as.data.frame(gr)      
+      gr.cds <- gr[values(gr)$type == "cds"]
+      ## df.cds <- df[df$type == "cds",]
+      if(length(gr.cds)){
         args.cds <- args.aes[names(args.aes) != "y"]
-        args.cds <- c(args.cds, list(xmin = substitute(start),
-                                     xmax = substitute(end),
-                                     ymin = substitute(stepping - 0.4),
-                                     ymax = substitute(stepping + 0.4)))
+        ## values(gr.cds)$stepping <- 1
+        args.cds$y <- as.name("stepping")
+        ## args.cds <- c(args.cds, list(xmin = substitute(start),
+        ##                              xmax = substitute(end),
+        ##                              ymin = substitute(stepping - 0.4),
+        ##                              ymax = substitute(stepping + 0.4)))
         aes.res <- do.call(aes, args.cds)
-
-        args.cds.res <- c(list(data = df.cds),
+        args.cds.res <- c(list(data = gr.cds),
                           list(aes.res),
-                          args.non)
-        p <- do.call(ggplot2::geom_rect, args.cds.res)
+                          args.non,
+                          list(stat = "identity"))
+        p <- do.call(range.fun, args.cds.res)
       }else{
         p <- NULL
       }
@@ -86,9 +80,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
       args.utr.res <- c(list(data = df.utr),
                         list(aes.res),
                         args.non)
-      
       p <- c(p, list(do.call(ggplot2::geom_rect, args.utr.res)))
-      
+
       df.gaps <- getGaps(c(gr[values(gr)$type %in% c("utr", "cds")]),
                          group.name = "tx_id")
 
@@ -102,10 +95,11 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
           args.non$arrow.rate <- arrow.rate
         }
       }
-      
+      aes.res$y <- as.name("stepping")
       args.gaps.res <- c(list(data = df.gaps),
                          list(aes.res),
-                         args.non)
+                         args.non,
+                         list(stat = "identity"))
       p <- c(p , list(do.call(gap.fun, args.gaps.res)))
 
       .df.lvs <- unique(df$stepping)
@@ -178,7 +172,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
 
       chrs <- unique(as.character(seqnames(gr)))
       df.gaps <- GRanges(chrs, df.gaps)
-      values(df.gaps)$stepping <- 1
+      ## values(df.gaps)$stepping <- 1
 
       if(!"arrow.rate" %in%  names(args.non)){
         if(!is.list(which)){
@@ -204,7 +198,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
              list(ggplot2::xlim(c(0, 1))))
     }
     p <- c(p, list(scale_y_continuous(breaks = NULL)),
-           list(opts(axis.text.y = theme_blank())))
+           list(theme(axis.text.y = theme_blank())))
   }
   if(missing(xlab)){
         xlab <- getXLab(gr)
@@ -216,7 +210,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     p <- c(p, list(ylab(ylab)))
   }
   if(!missing(main))
-    p <- c(p, opts(title = main))
+    p <- c(p, theme(title = main))
   
   ## test scale
   if(is_coord_truncate_gaps(gr)){

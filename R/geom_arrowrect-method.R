@@ -5,6 +5,8 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
                                                   stat = c("stepping", "identity"),
                                                   rect.height = NULL,
                                                   arrow.head = 0.06,
+                                                  arrow.head.rate = arrow.head,                                                
+                                                 arrow.head.fix = NULL,                                                
                                                   group.selfish = TRUE){
 
   stat <- match.arg(stat)
@@ -33,7 +35,7 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
                        })
       res <- unlist(res)
       df <- breakGrTo5polyDf(res, y = "stepping", rect.height = rect.height,
-                             arrow.head = arrow.head)
+                             arrow.head = arrow.head, arrow.head.rate = arrow.head.rate, arrow.head.fix = arrow.head.fix)
       args.aes$x <- as.name(".temp.x")
       args.aes$y <- as.name(".temp.y")
       args.aes$group <- as.name(".id")
@@ -47,7 +49,7 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
          rect.height <- diff(range(values(data)[,as.character(args.aes$y)]))/20
       }
       df <- breakGrTo5polyDf(data, y = as.character(args.aes$y), rect.height = rect.height,
-                             arrow.head = arrow.head)
+                             arrow.head = arrow.head, arrow.head.rate = arrow.head.rate, arrow.head.fix = arrow.head.fix)
       args.aes$x <- as.name(".temp.x")
       args.aes$y <- as.name(".temp.y")
       args.aes$group <- as.name(".id")      
@@ -66,13 +68,24 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
   if(!missing(ylab))
     p <- c(p, list(ggplot2::ylab(ylab)))
   if(!missing(main))
-    p <- c(p, list(opts(title = main)))
+    p <- c(p, list(theme(title = main)))
 p  
 })
 
 
-breakGrTo5polyDf <- function(object, arrow.head = 0.02, rect.height = 0.4, y){
-  ah <- width(range(ranges(object))) * arrow.head
+getArrowLen <- function(object, arrow.head.rate = 0.4){
+  width(range(ranges(object))) * arrow.head.rate
+}
+
+breakGrTo5polyDf <- function(object, arrow.head = 0.02,
+                             arrow.head.rate = arrow.head,
+                             arrow.head.fix = NULL,
+                             rect.height = 0.4, y){
+  if(!length(arrow.head.fix)){
+    ah <- getArrowLen(object, arrow.head.rate)
+  }else{
+    ah <- arrow.head.fix
+  }
   df <- fortify(object)
   df$.id <- seq_len(nrow(df))
   res <- do.call(rbind,lapply(1:5, function(i) df))

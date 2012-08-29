@@ -10,6 +10,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                                                 stat = c("identity", "reduce"),
                                                 range.geom = "rect",
                                                 gap.geom = "arrow",
+                                                utr.geom = "rect",
                                                 names.expr = "tx_name(gene_id)"){
 
   
@@ -18,7 +19,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
   ## geom <- match.arg(geom)
   ## gap.geom <- match.arg(gap.geom)
   gap.fun <- getGeomFun(gap.geom)
-  range.fun <- getGeomFun(range.geom)  
+  range.fun <- getGeomFun(range.geom)
+  utr.fun <- getGeomFun(utr.geom)    
   
   if(stat == "reduce")
     geom <- "reduced_gene"
@@ -34,7 +36,8 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
 
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  
+  args.utr.non <- args.non
+  args.gap.non <- args.non    
   if(need_color(args))
     args.non$color <- "grey20"
   
@@ -54,12 +57,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
       ## df.cds <- df[df$type == "cds",]
       if(length(gr.cds)){
         args.cds <- args.aes[names(args.aes) != "y"]
-        ## values(gr.cds)$stepping <- 1
         args.cds$y <- as.name("stepping")
-        ## args.cds <- c(args.cds, list(xmin = substitute(start),
-        ##                              xmax = substitute(end),
-        ##                              ymin = substitute(stepping - 0.4),
-        ##                              ymax = substitute(stepping + 0.4)))
         aes.res <- do.call(aes, args.cds)
         args.cds.res <- c(list(data = gr.cds),
                           list(aes.res),
@@ -70,18 +68,30 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
         p <- NULL
       }
       ## utrs
-      df.utr <- df[df$type == "utr",]
+      gr.utr <- gr[values(gr)$type == "utr"]
       args.utr <- args.aes[names(args.aes) != "y"]
-      args.utr <- c(args.utr, list(xmin = substitute(start),
-                                   xmax = substitute(end),
-                                   ymin = substitute(stepping - 0.2),
-                                   ymax = substitute(stepping + 0.2)))
+      args.utr$y <- as.name("stepping")      
       aes.res <- do.call(aes, args.utr)
-      args.utr.res <- c(list(data = df.utr),
-                        list(aes.res),
-                        args.non)
-      p <- c(p, list(do.call(ggplot2::geom_rect, args.utr.res)))
 
+      if(!"rect.height" %in% names(args.non)){
+        args.utr.non$rect.height <- 0.15
+      }else{
+        args.utr.non$rect.height <- args.non$rect.height/3
+      }
+      if(range.geom == "arrowrect" && utr.geom == range.geom){
+        if(!"arrow.head" %in% names(args.utr.non)){
+          args.utr.non$arrow.head <- 0.06
+        }
+        arrow.head.fix <- getArrowLen(gr.cds, arrow.head.rate = args.non$arrow.head)
+        args.utr.non <- args.non[names(args.non) != "arrow.rate"]
+        args.utr.non$arrow.head.fix <- arrow.head.fix
+      }
+      args.utr.res <- c(list(data = gr.utr),
+                        list(aes.res),
+                        args.utr.non,
+                        list(stat = "identity"))
+      p <- c(p, list(do.call(utr.fun, args.utr.res)))
+      
       df.gaps <- getGaps(c(gr[values(gr)$type %in% c("utr", "cds")]),
                          group.name = "tx_id")
 
@@ -95,11 +105,13 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
           args.non$arrow.rate <- arrow.rate
         }
       }
+      
       aes.res$y <- as.name("stepping")
       args.gaps.res <- c(list(data = df.gaps),
                          list(aes.res),
                          args.non,
                          list(stat = "identity"))
+      
       p <- c(p , list(do.call(gap.fun, args.gaps.res)))
 
       .df.lvs <- unique(df$stepping)
@@ -141,31 +153,49 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
       ## drawing
       ## just cds, gaps and utrs
       df <- as.data.frame(gr)
-      df.cds <- df[df$type == "cds",]
-      ## p <- ggplot(df.cds)
+      gr.cds <- gr[values(gr)$type == "cds"]      
       args.aes <- args.aes[names(args.aes) != "y"]
-      args.aes.cds <- c(args.aes, list(xmin = substitute(start),
-                                       xmax = substitute(end),
-                                       ymin = substitute(stepping - 0.4),
-                                       ymax = substitute(stepping + 0.4)))
-      ## only for rect
-      aes.res.cds <- do.call(aes, args.aes.cds)
-      args.res <- c(list(data = df.cds),
-                    list(aes.res.cds),
-                    args.non)
-      p <- list(do.call(ggplot2::geom_rect,args.res))
+      args.utr.non <- args.non            
+      if(!"rect.height" %in% names(args.non)){
+        args.non$rect.height <- 0.4
+      }
+      if(length(gr.cds)){
+        args.cds <- args.aes[names(args.aes) != "y"]
+        args.cds$y <- as.name("stepping")
+        aes.res <- do.call(aes, args.cds)
+        args.cds.res <- c(list(data = gr.cds),
+                          list(aes.res),
+                          args.non,
+                          list(stat = "identity"))
+        p <- do.call(range.fun, args.cds.res)
+      }else{
+        p <- NULL
+      }
+      
       ## utrs
-      df.utr <- df[df$type == "utr",]
+      gr.utr <- gr[values(gr)$type == "utr"]
       args.utr <- args.aes[names(args.aes) != "y"]
-      args.utr <- c(args.utr, list(xmin = substitute(start),
-                                   xmax = substitute(end),
-                                   ymin = substitute(stepping - 0.2),
-                                   ymax = substitute(stepping + 0.2)))
+      args.utr$y <- as.name("stepping")            
       aes.res <- do.call(aes, args.utr)
-      args.utr.res <- c(list(data = df.utr),
+      if(!"rect.height" %in% names(args.utr.non)){
+        args.utr.non$rect.height <- 0.15
+      }else{
+        args.utr.non$rect.height <- args.non$rect.height/3
+      }
+      if(range.geom == "arrowrect" && utr.geom == range.geom){
+        if(!"arrow.head" %in% names(args.non)){
+          args.utr.non$arrow.head <- 0.06
+        }
+        arrow.head.fix <- getArrowLen(gr.cds, arrow.head.rate = args.non$arrow.head)
+        args.utr.non <- args.non[names(args.non) != "arrow.rate"]
+        args.utr.non$arrow.head.fix <- arrow.head.fix
+      }
+      args.utr.res <- c(list(data = gr.utr),
                         list(aes.res),
-                        args.non)
-      p <- c(p, list(do.call(ggplot2::geom_rect, args.utr.res)))
+                        args.utr.non,
+                        list(stat = "identity"))
+      p <- c(p, list(do.call(utr.fun, args.utr.res)))
+      
       ## gaps
       gr.rr <- reduce(ranges(gr[(values(gr)$type %in%  c("utr", "cds"))]))
       df.gaps <- gaps(gr.rr, start = min(start(gr.rr)), end = max(end(gr.rr)))
@@ -198,7 +228,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
              list(ggplot2::xlim(c(0, 1))))
     }
     p <- c(p, list(scale_y_continuous(breaks = NULL)),
-           list(theme(axis.text.y = theme_blank())))
+           list(opts(axis.text.y = theme_blank())))
   }
   if(missing(xlab)){
         xlab <- getXLab(gr)

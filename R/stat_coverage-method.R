@@ -190,7 +190,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                   message("Parsing raw coverage...")
                   res <- biovizBase:::fetch(data, which = which)
                 })
-
+  res.ori <- res
   
   if(method == "estimate"){
   message("Constructing graphics...")

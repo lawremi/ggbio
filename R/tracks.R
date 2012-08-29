@@ -8,7 +8,7 @@ setClass("ggplotGrobList", prototype = prototype(elementType = "ggplot"),
 
 ggplotGrobList <- function(...){
   items <- list(...)
-  if (length(items) == 1 && is.list(items[[1L]]))
+  if (length(items) == 1 && is.list(items[[1L]]) && !is(items[[1L]], "ggplot"))
     items <- items[[1L]]
   if (!all(sapply(items, is, "ggplot")))
     stop("all elements in '...' must be Item objects")
@@ -45,7 +45,7 @@ tracks <- function(..., heights, xlim, xlab = NULL,
                    label.width = unit(4, "line")){
 
   dots <- list(...)
-  if(length(dots) == 1 & is.list(dots[[1]]))
+  if(length(dots) == 1 && is.list(dots[[1]]) && !is(dots[[1]], "ggplot"))
     dots <- dots[[1]]
   nrow <- length(dots)
   if(is.null(xlim.change))

@@ -82,6 +82,7 @@ setMethod("geom_arch", "GRanges", function(data, ...,
   args$facets <- facets
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
+  args.non$max.height <- max.height
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- .buildFacetsFromArgs(data, args.facets)
 
@@ -116,7 +117,7 @@ setMethod("geom_arch", "GRanges", function(data, ...,
   if(!missing(ylab))
     p <- c(p, list(ggplot2::ylab(ylab)))
   if(!missing(main))
-    p <- c(p, list(opts(title = main)))
+    p <- c(p, list(theme(title = main)))
   p
 })
 
@@ -163,7 +164,7 @@ setMethod("geom_arch", "GRanges", function(data, ...,
 ##   if(!missing(ylab))
 ##     p <- c(p, list(ggplot2::ylab(ylab)))
 ##   if(!missing(main))
-##     p <- c(p, list(opts(title = main)))
+##     p <- c(p, list(theme(title = main)))
 ##   if(is_coord_truncate_gaps(data.new) | is_coord_genome(data.new)){
 ##     ss <- getXScale(data.new)
 ##     p <- c(p, list(scale_x_continuous(breaks = ss$breaks,

@@ -178,8 +178,6 @@ evalLan <- function(obj){
 }
 
 
-
-
 getGeomFun <- function(geom){
   match.fun(paste("geom_", geom, sep = ""))
 }
@@ -316,7 +314,7 @@ scale_fill_fold_change<- function(){
   res <- c(list(s), list(guides(fill = guide_colorbar())),
                        list(scale_x_continuous(expand = c(0, 0))),
                        list(scale_y_continuous(expand = c(0, 0))),
-           list(opts(panel.border=theme_rect(colour="black",size=0.2))))
+           list(theme(panel.border=theme_rect(colour="black",size=0.2))))
 }
 
 need_color <- function(args){
@@ -438,9 +436,8 @@ sub_names <- function(data, name.expr){
 
 
 getLegendGrob <- function(p){
-  g = ggplotGrob(p)
-  gg = grid::editGrob(getGrob(g, gPath("guide-box"), 
-    grep=TRUE), vp=viewport())
+  g = ggplotGrob(p2)
+  gg = gtable_filter(g, "guide-box")
 }
 
 arrangeGrobByParsingLegend <- function(..., nrow = NULL, ncol = NULL,
@@ -450,7 +447,7 @@ arrangeGrobByParsingLegend <- function(..., nrow = NULL, ncol = NULL,
     lst <- lst[[1]]
   gg <- lapply(lst, getLegendGrob)  
   l.g <- lapply(lst, function(x){
-    ggplotGrob(x + opts(legend.position = "none"))
+    ggplotGrob(x + theme(legend.position = "none"))
   })
   
   if(!is.null(legend.idx))
@@ -465,3 +462,9 @@ scale_fill_giemsa <- function(fill = getOption("biovizBase")$cytobandColor){
   list(scale_fill_manual(values = fill))
 }
 
+## simply wrapper
+coord_genome <- function(){
+  list(facet_grid(.~seqnames),
+       theme_pack_panels(),
+       scale_x_continuous(breaks = NULL))       
+}

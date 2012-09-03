@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <link type="text/css" rel="stylesheet" href="../css/mystyles.css"> </script>
+<!-- <link href="syntaxhighlighter_3.0.83/styles/shThemeDefault.css" rel="stylesheet" -->
+<!--       type="text/css" /> -->
+<!-- <script type="text/javascript" -->
+<!-- 	src="syntaxhighlighter_3.0.83/scripts/shCore.js"></script> -->
+<!-- <script type="text/javascript" src="syntaxhighlighter_3.0.83/scripts/shAutoloader.js"></script> -->
+<!-- <script src="syntaxhighlighter_3.0.83/scripts/shBrushPython.js" type="text/javascript"></script> -->
+</head>
+<body>
+<div class = "container">
+<div id = "header">
+<div id = "icon">
+<h1 class = "icon">GGBIO</h1>
+</div>
+<div id = "div-nav">
+<nav>
+  <a class = "nav" style = "border-left-style:dotted; border-left-width:1px"
+  href="http://tengfei.github.com/ggbio"> Home </a>
+  <a class = "nav" style = "background-color:#EAEAEA"  href="docs/"> DOCUMENTATION </a>
+  <a class = "nav" href="download.html"> DOWNLOAD </a>
+  <a class = "nav" href="support.html"> SUPPORT </a>
+  <a class = "nav" href="about.html"> ABOUT </a>
+</nav>
+</div>
+</div>
+<div id = "shadow">
+</div>
+<div class = "content">
+<p>Thanks for your patience, you may notice that I have removed old
+documentations, I have to make it clear about documentation in next release(Oct 3rd). </p>
+
+<p><ul>
+  <li>I appologize you may end up with *endless loop* to find documentation,
+  which bioconductor pdf vignette point to this website and this website point
+  to bioconductor and so on. That's because in released version of ggbio(Bioc
+  2.10), we put every documentation in this website, which is hybrid of
+  knitr+jekyll+github page. We are going to drop this style, because we document
+  everything now in sweave or knitr, and would be part of bioconductor website
+  for this package, it's more formal, so basically documentation of bioconductor
+  packages will be better hosted on bioc website. Our principle would be keep
+  one copy for those things(either source code or documentation) in one place. 
+<li> ggplot2 0.9.2 is released on Sep.3rd, this will breaks tracks API in ggbio,
+  I am working on solving this issue.
+<li> bioconductor 2.11 is going to be released on <b>Oct
+  3rd</b>(<a href="http://www.bioconductor.org/developers/release-schedule/">schedule</a>),
+  and I will put together all documentation and fixes and updates by then. By
+  the time bioconductor is released, all vignettes with codes will be visible
+  from bioconductor website. Before that time, I really appreciate your patience
+  and attention for this package!
+</ul></p>
+
+</div>
+<div id = "footer">
+<footer>
+&copy; 2011-2012 <a href="http://tengfei.name">Tengfei Yin</a>
+</footer>
+</div>
+</body>
+</html>

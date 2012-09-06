@@ -2,9 +2,12 @@ setOldClass("ggplot")
 setOldClass("options")
 setOldClass("unit")
 setClassUnion("optionsORNULL", c("options", "NULL"))
+setClassUnion("characterORNULL", c("character", "NULL"))
 setClassUnion("numericORunit", c("numeric", "unit"))
+## suppose to store original graphics
 setClass("ggplotGrobList", prototype = prototype(elementType = "ggplot"),
          contains = "list")
+
 
 ggplotGrobList <- function(...){
   items <- list(...)
@@ -15,7 +18,6 @@ ggplotGrobList <- function(...){
   new("ggplotGrobList", items)
 }
 
-
 tracks.gen <- setClass("Tracks",
                        representation(grobs = "ggplotGrobList",
                                       backup = "list",
@@ -23,7 +25,7 @@ tracks.gen <- setClass("Tracks",
                                       xlim = "numeric",
                                       ylim = "list",
                                       xlab = "characterORNULL",
-                                      opts = "optionsORNULL",
+                                      theme = "optionsORNULL",
                                       track.skip = "numeric",
                                       xlim.change = "logical",
                                       named = "logical",
@@ -35,7 +37,7 @@ tracks.gen <- setClass("Tracks",
                                       label.width = "unit"))
 
 tracks <- function(..., heights, xlim, xlab = NULL,                
-                   opts = NULL, track.skip = -1,
+                   theme = NULL, track.skip = -1,
                    xlim.change = NULL,
                    track.plot.color = rep("white", nrow),
                    label.bg.color =  "white",
@@ -82,7 +84,7 @@ tracks <- function(..., heights, xlim, xlab = NULL,
     named <- TRUE
   
   backup <- list(grobs = ggplotGrobList(...), 
-                 heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab, opts = opts,
+                 heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab, theme = theme,
                  track.skip = track.skip, xlim.change = xlim.change,
                  named = named, label.bg.color = label.bg.color, label.bg.fill = label.bg.fill,
                  label.text.color = label.text.color,
@@ -90,7 +92,7 @@ tracks <- function(..., heights, xlim, xlab = NULL,
                  label.text.cex = label.text.cex,
                  label.width = label.width)
   new("Tracks", grobs = ggplotGrobList(...), backup = backup, named = named, 
-      heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab, opts = opts,
+      heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab, theme = theme,
       track.skip = track.skip, xlim.change = xlim.change,
       label.bg.color = label.bg.color, label.bg.fill = label.bg.fill,
       label.text.color = label.text.color,      
@@ -126,49 +128,37 @@ setMethod("print", "Tracks", function(x){
                     ## s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
                     s <- coord_cartesian(xlim = x@xlim)
                     grobs[[i]] <- grobs[[i]] +
-                      opts(plot.background = theme_rect(colour = NA, fill = x@track.plot.color[i]))
+                      theme(plot.background = theme_rect(colour = NA, fill = x@track.plot.color[i]))
                     if(i %in% which(x@xlim.change))
                       grobs[[i]] <- grobs[[i]] + s
-                    if(!is.null(opts))
-                      grobs[[i]] <- grobs[[i]] + x@opts
+                    if(!is.null(theme))
+                      grobs[[i]] <- grobs[[i]] + x@theme
                     ## margin
                     if(!is.null(x@track.skip))
                       if(i < N){  s <- coord_cartesian(xlim = x@xlim)
                         grobs[[i]] <- grobs[[i]] +
-                          opts(plot.margin = unit(c(1, 1, x@track.skip, 0.5), "lines"))
+                          theme(plot.margin = unit(c(1, 1, x@track.skip, 0.5), "lines"))
                       }
                     ## xlab
                     if(i %in% 1:(N-1)){
                       grobs[[i]] <- grobs[[i]] + 
-                          opts(axis.text.x = theme_blank()) + xlab("") 
+                          theme(axis.text.x = theme_blank()) + xlab("") 
                     }else{
                       if(!is.null(xlab))
                         grobs[[i]] <- grobs[[i]] + xlab(x@xlab)
                       grobs[[i]] <- grobs[[i]] +
-                        opts(axis.title.x = theme_text(vjust = 0))
+                        theme(axis.title.x = theme_text(vjust = 0))
                     }
                     grobs[[i]]
                   })
 
+  names(lst) <- nms
     if(x@named)
-      res <- do.call(align.plots, c(lst, list(heights = x@heights,
-                                              label = TRUE,
-                                              label.width = x@label.width)))
+      res <- do.call(alignPlots, c(lst, list(heights = x@heights,
+                                             label.width = x@label.width)))
     else
-      res <- do.call(align.plots, c(lst, list(heights = x@heights)))
+      res <- do.call(alignPlots, c(lst, list(heights = x@heights)))
     
-    if(x@named){
-      for(i in seq_len(N)){
-        rect.grob <- rectGrob(gp = gpar(fill = x@label.bg.fill,
-                                col = x@label.bg.color))
-        label.grob <- textGrob(nms[i], rot = 90, 
-                               gp = gpar(col = x@label.text.color,
-                                 cex = x@label.text.cex))
-        left.grob <- gTree(children = gList(rect.grob, label.grob))
-        pushViewport(viewport(layout.pos.row = i, layout.pos.col = 1))
-        grid.draw(left.grob)
-        upViewport(1)                
-    }}
 })
 
 setMethod("show", "Tracks", function(object){
@@ -294,9 +284,217 @@ setMethod("backup", "Tracks", function(obj){
   obj
 })
 
-##
+
 ## TODO: adust due to left/right legend
-align.plots <- function (..., vertical = TRUE,
+alignPlots <- function(..., vertical = TRUE, widths = NULL,
+                       heights = NULL, z = NULL, plot = TRUE,
+                       padding = NULL,
+                       track.plot.color = rep("white", nrow),
+                       label.bg.color =  "white",
+                       label.bg.fill = "gray80",
+                       label.text.color = "black",
+                       label.text.cex = 1,                   
+                       label.width = unit(4, "line")){
+                         
+  ggl <- list(...)
+  if(length(ggl)){
+    if(length(ggl) == 1 && is.list(ggl[[1]])){
+      ggl <- ggl[[1]]
+    }}else{
+      return(gtable())
+    }
+
+  N <- length(ggl)
+  
+  ## ggl <- lapply(1:N, function(i){
+  ##   ggl[[i]] + theme(plot.background = element_rect(colour = NA, fill = track.plot.color[i]))
+  ## })
+
+  
+  grobs <- lapply(ggl, function(x){
+    gg <- ggplotGrob(x)
+    if(length(padding))
+      gg <- gtable_add_padding(gg, padding)
+    gg
+  })
+
+  nms <- names(ggl)
+  addLabel <- function(grobs, nms,
+                       label.bg.color =  "white",
+                       label.bg.fill = "gray80",
+                       label.text.color = "black",
+                       label.text.cex = 1,                   
+                       label.width = unit(4, "line")                       
+                       ){
+    lapply(1:length(grobs), function(i){
+      grob <- grobs[[i]]
+      rect <- rectGrob(gp = gpar(fill = label.bg.fill,
+                         col = label.bg.color))
+      label <- textGrob(nms[i], rot = 90, 
+                        gp = gpar(col = label.text.color,
+                          alpha = 1,
+                          cex = label.text.cex))
+      left.grob <- grobTree(gTree(children = gList(rect, label)))
+      gt <- gtable(width = unit.c(label.width,unit(1, "null")), height = unit(1, "null"))
+      gt <- gtable_add_grob(gt, left.grob,l = 1, t = 1)      
+      gt <- gtable_add_grob(gt, grob, l = 2, t =1 )
+    })
+    }
+    
+  grobs <- do.call(uniformAroundPanel, grobs)
+
+  if(any(!is.null(nms)))
+    grobs <- addLabel(grobs, nms)
+  
+  
+  if(vertical){
+    if(!length(widths)){
+      widths <- unit(1, "null")
+    }else if(is.numeric(widths)){
+      widths <- unit(widths, "null")
+    }else if(!is.unit(widths)){
+      stop("widths must be unit or numeric value")
+    }
+    
+    if(!length(heights)){
+      heights <- unit(rep(1, N), "null")
+    }else if(is.numeric(heights)){
+      heights <- unit(heights, "null")
+    }else if(!is.unit(heights)){
+      stop("heights must be unit or numeric value")
+    }
+    
+    tab <- gtable(widths, heights)
+    
+    for(i in 1:N){
+      tab <- gtable_add_grob(tab, grobs[[i]], t = i, r = 1, l  = 1)
+    }
+  }else{
+
+    if(!length(widths)){
+      widths <- unit(rep(1, N), "null")
+    }else if(is.numeric(widths)){
+      widths <- unit(widths, "null")
+    }else if(!is.unit(widths)){
+      stop("widths must be unit or numeric value")
+    }
+    
+    if(!length(heights)){
+      heigths <- unit(1, "null")      
+    }else if(is.numeric(heights)){
+      heights <- unit(heights, "null")
+    }else if(!is.unit(heights)){
+      stop("heights must be unit or numeric value")
+    }
+    
+    tab <- gtable(widths, heights)
+    
+    for(i in 1:N){
+      tab <- gtable_add_grob(tab, grobs[[i]], l = i, t = 1, b = 1)
+    }
+  }
+  if(plot){
+    grid.newpage()
+    grid.draw(tab)
+  }else{
+    tab
+  }
+}
+
+
+getPanelIndex <- function(g){
+  if(inherits(g, "ggplot"))
+    g <- ggplotGrob(g)
+  idx <- which("panel" == g$layout$name)
+  idx
+}
+
+spaceAroundPanel <- function(g, type = c("t", "l", "b", "r")){
+  if(inherits(g, "ggplot"))
+    g <- ggplotGrob(g)
+  idx <- getPanelIndex(g)
+  rsl <- list()
+  for(tp in type){
+    rsl[[tp]] <- switch(tp,
+                t = {
+                  id <- which(g$layout$t < g$layout[idx, ]$t)
+                  id <- id[!duplicated(g$layout$name[id])]                  
+                  if(length(id))
+                    res <- sum(g$height[g$layout$t[id]])  
+                  else
+                    res <- unit(0, "inches")
+                  res
+                },
+                l = {
+                  id <- which(g$layout$l < min(g$layout[idx, ]$l))
+                  id <- id[!duplicated(g$layout$name[id])]
+                  if(length(id))
+                    res <- sum(g$width[unique(g$layout$l[id])])  
+                  else
+                    res <- unit(0, "inches")
+                  res
+                },
+                b = {
+                  id <- which(g$layout$b > g$layout[idx, ]$b)
+                  id <- id[!duplicated(g$layout$name[id])]                  
+                  if(length(id))
+                    res <- sum(g$height[g$layout$b[id]])  
+                  else
+                    res <- unit(0, "inches")
+                  res
+
+                },
+                r = {
+                  id <- which(g$layout$r > max(g$layout[idx, ]$r))
+                  id <- id[!duplicated(g$layout$name[id])]                  
+                  if(length(id))
+                    res <- sum(g$width[unique(g$layout$r[id])])
+                  else
+                    res <- unit(0, "inches")
+                  res
+                })
+    
+  }
+  rsl
+}
+
+
+## return uniformed grobs
+uniformAroundPanel <- function(..., direction = c("row", "col")){
+  dir <- match.arg(direction)
+  lst <- list(...)
+  grobs <- lapply(lst, function(p){
+    if(inherits(p, "ggplot"))
+      g <- ggplotGrob(p)
+    else
+      g <- p
+    g
+  })
+  if(dir == "row"){
+    slst <- lapply(grobs, spaceAroundPanel, c("l", "r"))
+    lmx <- do.call(max, lapply(slst, function(lst) lst$l))
+    rmx <- do.call(max, lapply(slst, function(lst) lst$r))
+    for(i in 1:length(grobs)){
+      grobs[[i]] <- gtable_add_cols(grobs[[i]], lmx - slst[[i]]$l ,
+                                    pos = 0)
+      grobs[[i]] <- gtable_add_cols(grobs[[i]], rmx - slst[[i]]$r, pos = -1)      
+    }
+  }
+  if(dir == "col"){
+    slst <- lapply(grobs, spaceAroundPanel, c("t", "b"))    
+    tmx <- do.call(max, lapply(slst, function(lst) lst$t))
+    bmx <- do.call(max, lapply(slst, function(lst) lst$b))    
+    for(i in 1:length(grobs)){
+      grobs[[i]] <- gtable_add_rows(grobs[[i]], tmx - slst[[i]]$t, pos = 0)
+      grobs[[i]] <- gtable_add_rows(grobs[[i]], bmx - slst[[i]]$b, pos = -1)      
+    }
+  }
+  grobs
+}
+
+
+align.plots <- alignPlots
+align.plots.old <- function (..., vertical = TRUE,
                          heights = unit(rep(1, nrow), "null"),
                          label = FALSE,
                          label.width = unit(4, "line")) 

@@ -234,7 +234,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
              list(ggplot2::xlim(c(0, 1))))
     }
     p <- c(p, list(scale_y_continuous(breaks = NULL)),
-           list(opts(axis.text.y = theme_blank())))
+           list(theme(axis.text.y = theme_blank())))
   }
   if(missing(xlab)){
         xlab <- getXLab(gr)
@@ -246,7 +246,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     p <- c(p, list(ylab(ylab)))
   }
   if(!missing(main))
-    p <- c(p, opts(title = main))
+    p <- c(p, theme(title = main))
   
   ## test scale
   if(is_coord_truncate_gaps(gr)){

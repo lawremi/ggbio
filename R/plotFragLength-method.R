@@ -37,11 +37,11 @@ setMethod("plotFragLength", c("character", "GRanges"),
     if(is(model, "GRanges"))
       model <- GRangesList(model)
     names(model) <- "1"
-    p.exon <- qutoplot(model) + ylab(" ") + theme_bw() +opts(panel.grid.minor=theme_blank(),
+    p.exon <- qutoplot(model) + ylab(" ") + theme_bw() +theme(panel.grid.minor=theme_blank(),
                                              panel.grid.major=theme_blank())
                                                ## scale_y_continuous(breaks = c(0),
                                                ##                   labels = " x")
-                                               ## opts(axis.text.y = theme_blank())
+                                               ## theme(axis.text.y = theme_blank())
 
     df <- as.data.frame(gr.fraglength)
     p <- ggplot(df)
@@ -52,19 +52,19 @@ setMethod("plotFragLength", c("character", "GRanges"),
                                 yend = .fragLength), color = "gray")
 
     if(annotation)
-      p <- p + opts(panel.grid.minor=theme_blank()) +  theme_bw()
+      p <- p + theme(panel.grid.minor=theme_blank()) +  theme_bw()
     }
     if("point" %in% geom){
       p <- p + geom_point(aes(x = (start + end)/2, y = .fragLength), size = 1.2,
                           color = "gray30") +  theme_bw()
     if(annotation)      
-     p <- p + opts(panel.grid.minor=theme_blank())
+     p <- p + theme(panel.grid.minor=theme_blank())
     }
     if("line" %in% geom){
       p <- p + geom_line(aes(x = (start + end)/2, y = .fragLength), size = 1.2,
                           color = "gray30")  +  theme_bw()
     if(annotation)      
-     p <- p + opts(panel.grid.minor=theme_blank())
+     p <- p + theme(panel.grid.minor=theme_blank())
     }
     p <- p + ylab("Estimated Fragmeng Length") 
     if(annotation)

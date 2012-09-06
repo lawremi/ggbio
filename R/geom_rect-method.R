@@ -90,7 +90,6 @@ setMethod("geom_rect", "GRanges", function(data,...,
   }
   
   if(stat == "identity"){
-    
     if(!"y" %in% names(args.aes)){
       if(!all(c("ymin","ymax", "xmin", "xmax") %in% names(args.aes))){
         stop("aes(xmin =, xmax= , ymin =, ymax= ) is required for stat 'identity',
@@ -128,7 +127,6 @@ setMethod("geom_rect", "GRanges", function(data,...,
     args.res.seg <- c(list(data = df), list(aes.res.seg),
                   args.non)
     p <- list(do.call(ggplot2::geom_segment,args.res.seg))
-    
     args.aes <- args.aes[names(args.aes) != "group"]
     args.aes <- args.aes[names(args.aes) != "size"]
     
@@ -148,10 +146,8 @@ setMethod("geom_rect", "GRanges", function(data,...,
     xlab <- getXLab(data)
   p <- c(p, list(ggplot2::xlab(xlab)))
   
-
-  
   if(!missing(main))
-    p <- c(p, list(opts(title = main)))
+    p <- c(p, list(theme(title = main)))
   
   p
 })

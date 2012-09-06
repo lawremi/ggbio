@@ -5,7 +5,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                                                 xlab, ylab, main,
                                                 facets = NULL,
                                                    stat = c("stepping", "identity"),
-                                                   main.geom = c("rect", "arrowrect"),
+                                                   range.geom = c("rect", "arrowrect"),
                                                    gap.geom = c("chevron", "arrow", "segment"),
                                                    rect.height = NULL,
                                                 group.selfish = TRUE){
@@ -29,10 +29,10 @@ setMethod("geom_alignment", "GRanges", function(data,...,
   if(is.null(rect.height))
     rect.height <- 0.4
   args.non$rect.height <- rect.height
-  main.geom <- match.arg(main.geom)
+  range.geom <- match.arg(range.geom)
   gap.geom <- match.arg(gap.geom)
   
-  main.fun <- switch(main.geom,
+  main.fun <- switch(range.geom,
                      rect = {
                        geom_rect
                      },
@@ -134,9 +134,22 @@ setMethod("geom_alignment", "GRanges", function(data,...,
   if(!missing(ylab))
     p <- c(p, list(ggplot2::ylab(ylab)))
   if(!missing(main))
-    p <- c(p, list(opts(title = main)))
+    p <- c(p, list(theme(title = main)))
   
   p
 })
 
 
+
+
+## setMethod("geom_alignment", "TranscriptDb", function(data,...,
+##                                                      xlab, ylab, main,
+##                                                      facets = NULL,
+##                                                      stat = c("stepping", "identity"),
+##                                                      range.geom = c("rect", "arrowrect"),
+##                                                      gap.geom = c("chevron", "arrow", "segment"),
+##                                                      rect.height = NULL){
+  
+  
+  
+## })

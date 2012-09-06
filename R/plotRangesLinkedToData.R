@@ -82,7 +82,7 @@ plotRangesLinkedToData <- function(data, ..., stat.col, stat.label,
                                                  c(list(do.call(aes, args.dash)),
                                                    linetype = linetype)))
 
-  p.stat <- p.stat  +  theme.stat + opts(panel.grid.minor=theme_blank()) +
+  p.stat <- p.stat  +  theme.stat + theme(panel.grid.minor=theme_blank()) +
     labs(colour = "group")
   p.stat <- p.stat + stat.coord.trans
   if(!missing(stat.ylab))
@@ -106,7 +106,7 @@ plotRangesLinkedToData <- function(data, ..., stat.col, stat.label,
     p.link <- p.link + scale_color_manual(values = c("FALSE" = sig.col[1],
                                             "TRUE" = sig.col[2])) 
   }
-  p.link <- p.link + opts(legend.position = "none")
+  p.link <- p.link + theme(legend.position = "none")
 
   ## grl <- GRangesList(data)
   if(missing(sig)){
@@ -120,7 +120,7 @@ plotRangesLinkedToData <- function(data, ..., stat.col, stat.label,
    p.single <- p.single +
      scale_color_manual(values = c("FALSE" = sig.col[1], "TRUE" = sig.col[2])) +
        scale_fill_manual(values = c("FALSE" = sig.col[1], "TRUE" = sig.col[2])) +
-         opts(legend.position = "none")
+         theme(legend.position = "none")
 }
   if(length(annotation)){
     ## annotation <- lapply(annotation, function(p) p + theme_bw())

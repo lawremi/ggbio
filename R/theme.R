@@ -28,7 +28,7 @@ theme_null<- function()
       colour="grey50"), 
     strip.text.x=theme_text(size=size*0.8), 
     strip.text.y=theme_text(size=size*0.8, angle=-90)) 
-  return(structure(o, class="options"))}   
+  return(structure(o, class="theme"))}   
 
 
 ## TODO: with axis?
@@ -72,7 +72,7 @@ theme_alignment <-   function (ylabel = FALSE, base_size = 12,
                  plot.title = theme_text(family = base_family, size = base_size * 
                    1.2),
                  plot.margin = unit(c(1, 1, 0.5, 0.5), "lines")), 
-            class = "options")
+            class = "theme")
   if(!ylabel){
     res <- list(res, list(scale_y_continuous(breaks = NULL)))
   }
@@ -80,7 +80,7 @@ theme_alignment <-   function (ylabel = FALSE, base_size = 12,
 }
 
 theme_pack_panels <- function(strip.bg = FALSE, strip.text.y = TRUE){
-  res <- opts(panel.background = theme_blank(),
+  res <- theme(panel.background = theme_blank(),
               panel.grid.major = theme_blank(),
               panel.grid.minor = theme_blank(),
               axis.text.y = theme_blank(),

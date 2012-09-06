@@ -47,7 +47,7 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
   if(!missing(theme))
     p <- p + theme
   if(!legend)
-    p <- p + opts(legend.position = "none")
+    p <- p + theme(legend.position = "none")
 
   p <- p + ylab(ylab) 
   if(!is.null(cutoff))
@@ -68,9 +68,9 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
   facet <- .buildFacetsFromArgs(obj, args.facets)
   p <- p + facet
   }
-  p <- p +  opts(panel.grid.minor=theme_blank())
+  p <- p +  theme(panel.grid.minor=theme_blank())
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   if(!missing(xlim))
     p <- p + xlim(xlim)
   if(!missing(ylim))

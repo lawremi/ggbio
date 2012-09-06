@@ -95,7 +95,7 @@ setMethod("stat_bin", "Rle", function(data, ..., binwidth, nbin = 30,
   else
     p <- c(p, list(ggplot2::ylab("y")))
   if(!missing(main))
-    p <- c(p, list(opts(title = main)))
+    p <- c(p, list(theme(title = main)))
   p
 })
 
@@ -235,6 +235,6 @@ setMethod("stat_bin", "RleList", function(data, ..., binwidth, nbin = 30,
   else
     p <- c(p, list(ggplot2::ylab("y")))
   if(!missing(main))
-    p <- c(p, list(opts(title = main)))
+    p <- c(p, list(theme(title = main)))
   c(list(p), list(facet))
 })

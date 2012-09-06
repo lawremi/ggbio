@@ -111,7 +111,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
     p <- list(do.call(.fun, args.res))
     p <- c(p, list(scale_by_xlim(.xlim)))
     if(!legend)
-      p <- c(p, list(opts(legend.position = "none")))
+      p <- c(p, list(theme(legend.position = "none")))
 
     if(missing(xlab)){
         xlab <- ""
@@ -121,7 +121,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
     if(!missing(ylab))
       p <- c(p,list(ylab(ylab)))
     if(!missing(main))
-      p <- c(p, list(opts(title = main)))
+      p <- c(p, list(theme(title = main)))
      p <- ggplot() + p
   }  
   if(layout == "karyogram"){
@@ -204,7 +204,7 @@ setMethod("autoplot", "GRangesList", function(object, ...,
   if(!missing(ylab))
     p <- p + ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p
 })          
 
@@ -226,9 +226,9 @@ setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main) +
-      opts(strip.background = theme_rect(colour = 'NA', fill = 'NA'))+ 
-        opts(strip.text.y = theme_text(colour = 'white')) 
+    p <- p + theme(title = main) +
+      theme(strip.background = theme_rect(colour = 'NA', fill = 'NA'))+ 
+        theme(strip.text.y = theme_text(colour = 'white')) 
   p
 })
 
@@ -287,7 +287,7 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p <- p + facet
   p
 })
@@ -372,7 +372,7 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main) 
+    p <- p + theme(title = main) 
   p
 })
 
@@ -416,7 +416,7 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main) 
+    p <- p + theme(title = main) 
   p  
 })
 
@@ -458,7 +458,7 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
   else
     p <- p + ggplot2::ylab("")
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p
 })
 
@@ -600,7 +600,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
   ## if(stat == "stepping" | geom == "alignment")
   p <- p + scale_y_continuous(breaks = NULL)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p
 })
 
@@ -655,7 +655,7 @@ setMethod("autoplot", "Rle", function(object, ...,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p
 })
 
@@ -713,7 +713,7 @@ setMethod("autoplot", "RleList", function(object, ...,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p
   ## if(facetByRow)
   ##   facets <- listName ~ .
@@ -1067,7 +1067,7 @@ setMethod("autoplot", "VCF", function(object, ..., genomic.pos = FALSE,
     ylab <- ""
   p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   p
 })
 
@@ -1145,7 +1145,7 @@ setMethod("autoplot", "matrix", function(object, ...,
     ylab <- ""
   p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + opts(title = main)
+    p <- p + theme(title = main)
   
   p
 })

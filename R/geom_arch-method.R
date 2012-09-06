@@ -117,7 +117,7 @@ setMethod("geom_arch", "GRanges", function(data, ...,
   if(!missing(ylab))
     p <- c(p, list(ggplot2::ylab(ylab)))
   if(!missing(main))
-    p <- c(p, list(opts(title = main)))
+    p <- c(p, list(theme(title = main)))
   p
 })
 
@@ -164,7 +164,7 @@ setMethod("geom_arch", "GRanges", function(data, ...,
 ##   if(!missing(ylab))
 ##     p <- c(p, list(ggplot2::ylab(ylab)))
 ##   if(!missing(main))
-##     p <- c(p, list(opts(title = main)))
+##     p <- c(p, list(theme(title = main)))
 ##   if(is_coord_truncate_gaps(data.new) | is_coord_genome(data.new)){
 ##     ss <- getXScale(data.new)
 ##     p <- c(p, list(scale_x_continuous(breaks = ss$breaks,

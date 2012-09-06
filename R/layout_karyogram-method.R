@@ -96,7 +96,7 @@ setMethod("layout_karyogram", "GRanges",
               
 
               p.ideo <- c(p.ideo,
-                          list(opts(axis.text.y = theme_blank(),
+                          list(theme(axis.text.y = theme_blank(),
                                     axis.title.y=theme_blank(),
                                     axis.ticks = theme_blank(),
                                     panel.grid.minor = theme_line(colour = NA),
@@ -152,7 +152,7 @@ setMethod("layout_karyogram", "GRanges",
           }else{
             p <- list(p.ideo,  facet_grid(facets))
           }
-            o <- opts(axis.text.y = theme_blank(),
+            o <- theme(axis.text.y = theme_blank(),
                       axis.title.y=theme_blank(),
                       axis.ticks = theme_blank(),
                       panel.grid.minor = theme_line(colour = NA),

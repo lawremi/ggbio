@@ -26,6 +26,7 @@ setMethod("layout_circle",  "GRanges",
     res <- transformToRectInCircle(data, y = character(),
                      space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                      direction = direction, n = rect.inter.n, mul = 0)
+    names(res) <- NULL
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
     df <- df[idx, ]
@@ -43,6 +44,7 @@ setMethod("layout_circle",  "GRanges",
                     space.skip = space.skip, trackWidth = trackWidth,
                                   n = rect.inter.n,
                     radius = radius, direction = direction)
+    names(res) <- NULL    
     df <- as.data.frame(res)
     args.aes <-   args.non <- list()    
     args.aes$y <- as.name(".circle.y")
@@ -62,6 +64,7 @@ setMethod("layout_circle",  "GRanges",
     res <- transformToRectInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                     direction = direction, n = rect.inter.n)
+    names(res) <- NULL
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
     df <- df[idx, ]
@@ -115,7 +118,7 @@ setMethod("layout_circle",  "GRanges",
       values(obj)$.processed.angle <- ags
       args.aes$angle <- as.name(".processed.angle")      
     }
-
+    names(res) <- NULL
     df <- as.data.frame(obj)
     args.aes$y <- as.name(".circle.y")
     args.aes$x <- as.name(".circle.x")
@@ -136,6 +139,7 @@ setMethod("layout_circle",  "GRanges",
     }
     obj <- transformToCircle(obj, y = .y, radius= radius, trackWidth = trackWidth,
                      direction = direction)
+    names(obj) <- NULL
     df <- as.data.frame(obj)
     args.aes$y <- as.name(".circle.y")
     args.aes$x <- as.name(".circle.x")
@@ -152,6 +156,7 @@ setMethod("layout_circle",  "GRanges",
     obj <- transformToCircle(obj, y = as.character(args.aes$y),
                              radius= radius, trackWidth = trackWidth,
                      direction = direction)
+    names(obj) <- NULL
     df <- as.data.frame(obj)
     args.aes$y <- as.name(".circle.y")
     args.aes$x <- as.name(".circle.x")
@@ -166,6 +171,7 @@ setMethod("layout_circle",  "GRanges",
     res <- transformToSegInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth,
                     radius = radius, direction = direction)
+    names(res) <- NULL    
     df <- as.data.frame(res)
     args.aes$y <- as.name(".circle.y")
     args.aes$x <- as.name(".circle.x")
@@ -230,6 +236,7 @@ setMethod("layout_circle",  "GRanges",
     res <- transformToRectInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                     direction = direction, n = rect.inter.n)
+    names(res) <- NULL
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
     df <- df[idx, ]
@@ -253,6 +260,7 @@ setMethod("layout_circle",  "GRanges",
     res <- transformToBarInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                     direction = direction, n = rect.inter.n)
+    names(res) <- NULL    
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
     df <- df[idx, ]
@@ -293,7 +301,7 @@ setMethod("layout_circle",  "GRanges",
   }
   if(grid)
     p <- c(p.grid, p)
-  p <- c(p, list(opts(aspect.ratio = 1), theme_null()))
+  p <- c(p, list(theme(aspect.ratio = 1), theme_null()))
   p 
 })
 

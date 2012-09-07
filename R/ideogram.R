@@ -25,8 +25,8 @@ plotSingleChrom <- function(obj, subchr, zoom.region,
   
   p <- p + theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
     scale_y_continuous(breaks = 5, label = subchr) +
-      theme(strip.background = theme_rect(colour = 'NA', fill = 'NA'))+ 
-        theme(strip.text.y = theme_text(colour = 'white'))   + theme(legend.position = "none")+
+      theme(strip.background = element_rect(colour = 'NA', fill = 'NA'))+ 
+        theme(strip.text.y = element_text(colour = 'white'))   + theme(legend.position = "none")+
           ggplot2::xlab("")
 
   if(!missing(xlab))

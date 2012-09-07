@@ -6,7 +6,10 @@ bamfile <- "~/Datas/seqs/ENCODE/caltech/single/wgEncodeCaltechRnaSeqK562R1x75dAl
 bf <- BamFile(bamfile)
 
 ## @knitr coverage_est
-p1 <- autoplot(bamfile, geom = "line", method = "estimate")
+p1 <- autoplot(bamfile, geom = "line", method = "estimate", which = c("chr1", "chr2", "chr3"))
+p1  + coord_genome()
+p2 <- autoplot(bamfile, geom = "line", method = "estimate", which = GRanges("chr1",IRanges(1, 1e6)))
+p2
 
 ## @knitr coverage_raw
 data(genesymbol, package = "biovizBase")
@@ -23,3 +26,11 @@ autoplot(bf, geom = "gapped.pair", which = genesymbol["ALDOA"])
 library(biovizBase)
 autoplot(bf, geom = "segment", stat = "stepping", which = genesymbol["ALDOA"])
 
+
+p1 <- autoplot(bamfile, geom = "line", method = "estimate", which = c("chr1", "chr2", "chr3"),
+               coord = "genome")
+
+p1 <- autoplot(bf, geom = "line", method = "estimate", which = c("chr1", "chr2", "chr3"),
+               coord = "genome")
+
+p1

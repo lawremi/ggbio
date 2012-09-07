@@ -7,6 +7,8 @@ import(BiocGenerics)
 import(biovizBase)
 import(grid)
 import(ggplot2)
+importFrom(gtable, gtable_add_padding, gtable_add_grob, gtable_add_cols,
+           gtable_add_rows)
 import(reshape2)
 import(scales)
 import(plyr)
@@ -35,6 +37,7 @@ importMethodsFrom(IRanges,  split,
 importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL)
 
 ## ## GenomicRanges
+
 importFrom(GenomicRanges, "seqnames<-",
            seqlevels, "seqlevels<-", genome, "genome<-",
            GRanges, GRangesList, Seqinfo, seqlengths, "seqlengths<-")
@@ -49,6 +52,7 @@ importMethodsFrom(GenomicRanges, ranges, "ranges<-",
 importClassesFrom(GenomicRanges, GRanges, GRangesList, GenomicRangesList)
 
 ## ## ## Rsamtools
+
 importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,
            scanBamFlag,BamFile,
            PileupFiles, PileupParam ,
@@ -67,9 +71,10 @@ importFrom(GenomicFeatures,
            cdsBy)
 
 ## VariantAnnotation
-importClassesFrom(VariantAnnotation, VCF)
-importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref, "ref<-",
-                  alt, "alt<-", info, "info<-", geno, "geno<-",  readVcf) 
+
+## importClassesFrom(VariantAnnotation, VCF)
+## importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref, "ref<-",
+##                   alt, "alt<-", info, "info<-", geno, "geno<-",  readVcf) 
 
 ## rtracklayer
 importMethodsFrom(rtracklayer, import)
@@ -112,9 +117,11 @@ exportMethods(layout_karyogram,
               layout_circle)
 
 
-
+## coord
+export(coord_genome)
 export(tracks,
        align.plots,
+       alignPlots,
        plotFragLength,        
        plotSpliceSum,       
        plotStackedOverview,

@@ -98,16 +98,16 @@
    incorporating the range information.
 
 *** TODO Make equivalent to autoplot,ExpressionSet
-    DEADLINE: <2012-07-08 Sun>
+    DEADLINE: <2012-09-15 Sun>
 *** TODO Support data-linked-to-range plots
-    DEADLINE: <2012-07-20 Fri>
+    DEADLINE: <2012-09-15 Fri>
 *** TODO Facet by sample in linked plots and incorporate splom/pcp in margin?
     DEADLINE: <2012-10-01 Mon>
 ** autoplot,VCF
-*** TODO just to make it to work again.
+*** DONE just to make it to work again.
     DEADLINE: <2012-07-20 Fri>
 ** TODO autoplot,Seqinfo
-   DEADLINE: <2012-07-20 Fri>
+   DEADLINE: <2012-09-20 Fri>
    Grabs cytoband information automatically
 ** TODO put data in ggplot() first
    DEADLINE: <2012-07-15 Sun>
@@ -156,7 +156,7 @@
 * Documentation
 ** TODO vignettes
    DEADLINE: <2012-07-20 Fri>
-** TODO update and check manual to make sure it's the latest.
+** DONE update and check manual to make sure it's the latest.
    DEADLINE: <2012-07-08 Sun>
 ** TODO bioc2012 
 *** a geom/stat method for associate stat with geom automatically, vice versha.
@@ -168,6 +168,25 @@
 *** getIdeogram should be built in with autoplot, for example, 
     when use autoplot,seqinfo, and with cytoband = TRUE, and provide
     genome names, need to download that automatically.
-    
 *** global setting
 *** arches link region to region.
+* TODO Todo from Michael's email
+** TODO When I pass "which = list(tx_id = ...)" 
+   to autoplot,TranscriptDb, it shows me the region containing that tx_id,
+instead of just showing that exact transcript. I think that's a little
+surprising. Any reason why you do this?
+** TODO autoplot,BamFile 
+  ignores the 'which' argument when method = "estimate". Btw, I fixed a bug in
+  the coverage estimation when there were no reads on a chromosome. It is also
+  debatable as to whether we want to use method = "estimate" by default. People
+  do not know that it is an estimate.
+** TODO autoplot,BamFile 
+   does not use the kb/Mb/etc labels. The X axis label is just "Genomic
+Position" when method = "raw".
+** TODO The kb/Mb/etc labels
+   need to use special formatting, otherwise the trailing zeros are dropped off,
+  like 120.768, 120.77 [missing zero], 120.772.
+** TODO Same thing goes for autoplot,BSgenome: 
+it is using old scales and labels. And it would be nice to get rid of the "seqs"
+label over the legend. And I'm not sure if we even need the legend when using
+the text geom. It's kind of weird looking.

@@ -6,8 +6,6 @@ setMethod("rescale", signature(x = "numeric"), function(x, to = c(0, 1),
   scales::rescale(x, to = to , from = from)
 })
 
-setOldClass("ggplot")
-
 setMethod("rescale", "ggplot", function(x, xlim, ylim, sx = 1, sy = 1){
   if(!missing(xlim) & sx != 1)
     stop("You can only rescale by one of xlim or sx")

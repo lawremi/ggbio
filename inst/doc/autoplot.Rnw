@@ -1037,7 +1037,21 @@ hdr <- exptData(vcf)[["header"]]
   \centering
 @ 
 <<va-default, fig = TRUE>>=
-autoplot(vcf)
+library(VariantAnnotation)
+vcffile <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
+vcf <- readVcf(vcffile, "hg19")
+gt <- geno(vcf)[['GT']]
+sts <- start(rowData(vcf))
+idx <- !duplicated(sts)
+gt <- gt[idx,]
+rownames(gt) <- start(rowData(vcf)[idx])
+gt.t <- t(gt)
+autoplot(gt.t)+ scale_x_continuous()
+
+
+autoplot(gt.t, genomic.pos = TRUE) 
+
+
 @ %def 
   \caption{default heatmap to show GT for type 'geno'.}
   \label{fig:va-default}
@@ -1070,7 +1084,7 @@ autoplot(vcf, type = "fixed")
   \centering
 @ 
 <<va-fs, fig = TRUE>>=
-np1 <- autoplot(vcf, type = "fixed") + xlim(50310860, 50310890) 
+p1 <- autoplot(vcf, type = "fixed") + xlim(50310860, 50310890) 
 p2 <- autoplot(vcf, type = "fixed", full.string = TRUE) + xlim(50310860, 50310890)
 tracks("full.string = FALSE" = p1, "full.string = TRUE" = p2)+
   scale_y_continuous(breaks = NULL, limits = c(0, 3))

@@ -2,7 +2,7 @@ setOldClass("ggplot")
 setOldClass("options")
 setOldClass("unit")
 setClassUnion("optionsORNULL", c("options", "NULL"))
-setClassUnion("characterORNULL", c("character", "NULL"))
+## setClassUnion("characterORNULL", c("character", "NULL"))
 setClassUnion("numericORunit", c("numeric", "unit"))
 ## suppose to store original graphics
 setClass("ggplotGrobList", prototype = prototype(elementType = "ggplot"),
@@ -289,7 +289,7 @@ setMethod("backup", "Tracks", function(obj){
 alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        heights = NULL, z = NULL, plot = TRUE,
                        padding = NULL,
-                       track.plot.color = rep("white", nrow),
+                       track.plot.color = "white",
                        label.bg.color =  "white",
                        label.bg.fill = "gray80",
                        label.text.color = "black",
@@ -297,6 +297,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        label.width = unit(4, "line")){
                          
   ggl <- list(...)
+
   if(length(ggl)){
     if(length(ggl) == 1 && is.list(ggl[[1]])){
       ggl <- ggl[[1]]
@@ -306,11 +307,15 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
 
   N <- length(ggl)
   
-  ## ggl <- lapply(1:N, function(i){
-  ##   ggl[[i]] + theme(plot.background = element_rect(colour = NA, fill = track.plot.color[i]))
-  ## })
+  stopifnot(length(track.plot.color) != N || length(track.plot.color) != 1)
+  if(length(track.plot.color) == 1){
+      track.plot.color <- rep(track.plot.color, N)
+  }
 
-  
+  ggl <- lapply(1:N, function(i){
+    ggl[[i]] + theme(plot.background = element_rect(colour = NA, fill = track.plot.color[i]))
+  })
+
   grobs <- lapply(ggl, function(x){
     gg <- ggplotGrob(x)
     if(length(padding))
@@ -319,6 +324,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   })
 
   nms <- names(ggl)
+  
   addLabel <- function(grobs, nms,
                        label.bg.color =  "white",
                        label.bg.fill = "gray80",
@@ -491,7 +497,6 @@ uniformAroundPanel <- function(..., direction = c("row", "col")){
   }
   grobs
 }
-
 
 align.plots <- alignPlots
 align.plots.old <- function (..., vertical = TRUE,

@@ -90,3 +90,34 @@ tracks(list("Rna sesq" = p1, "DNA-seq" = p2), label.width = unit(3, "line"),
 dev.off()
 list(list(a = 2, b = 2))[[1]][[1]]
 list(2, 2)[[1]]
+
+## todo axis/
+library(ggbio)
+p1 <- qplot(data = mtcars, x = mpg, y = cyl) + ylab("") +  scale_y_continuous(breaks = NULL)
+p2 <- qplot(data = mtcars, x = cyl, y = mpg, color = mpg)
+p3 <- qplot(data = mtcars, x = mpg, y = cyl, facets = cyl ~ .)
+p3
+library(ggplot2)
+
+library(ggplot2)
+traceback()
+
+alignPlots(p1, p2, p3)
+alignPlots(a = p1, c = p2, d = p3)
+tracks(a = p1, b = p2, c = p3)
+alignPlots(p2, p3)
+alignPlots(p1, p2)
+grid.draw(g1)
+print(g1)
+grid.layout(g1)
+
+a <- gtable(unit(1:3, c("cm")), unit(5, "cm"))
+a
+gtable_show_layout(a)
+
+                                        # Add a grob:
+rect <- rectGrob(gp = gpar(fill = "black"))
+a <- gtable_add_grob(a, rect, 1, 1)
+a
+plot(a)
+

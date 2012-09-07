@@ -27,6 +27,8 @@ gr <- GRanges(seqnames =
 ##  default
 ## =======================================
 ggplot() + geom_arch(gr)
+trace("geom_arch", sig = "data.frame", at = "browser")
+args(trace)
 
 ## @knitr facet_aes
 ## =======================================

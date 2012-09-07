@@ -227,8 +227,8 @@ setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
     p <- p + theme(title = main) +
-      theme(strip.background = theme_rect(colour = 'NA', fill = 'NA'))+ 
-        theme(strip.text.y = theme_text(colour = 'white')) 
+      theme(strip.background = element_rect(colour = 'NA', fill = 'NA'))+ 
+        theme(strip.text.y = element_text(colour = 'white')) 
   p
 })
 

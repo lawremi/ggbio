@@ -32,7 +32,6 @@ ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE) +
 
 ## ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE) +
 ##   coord_cartesian(xlim = c(6134000, 6135000),wise = TRUE) + theme_bw()
-library(ggbio)
 library(Rsamtools)
 bamfile <- "~/Datas/1000genome/HG00096.chrom20.ILLUMINA.bwa.GBR.low_coverage.20101123.bam"
 bf <- BamFile(bamfile)
@@ -40,47 +39,53 @@ data(genesymbol, package = "biovizBase")
 
 rng.ori <- genesymbol["PYGB"]
 rng <- GRanges("20", ranges(rng.ori))
+rng <- GRanges("20", IRanges(25235720, 25235755))
 rng
 ## red vcf
 library(VariantAnnotation)
 svp_all <- ScanVcfParam(which=rng)
 vcf <- readVcf("~/Datas/1000genome/ALL.chr20.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz", genome = "hg19", svp_all)
-p.v <- autoplot(vcf, type = "fixed") + coord_cartesian(ylim = c(0.6, 1.4), wise = TRUE) +
+
+p.v <- autoplot(vcf, type = "fixed", ref.show = FALSE) +
+  coord_cartesian(ylim = c(0, 2)) +
   scale_y_continuous(breaks = NULL)+
   opts(legend.position = "none")
 
+
 ggplot() + stat_mismatch(bf, which = rng,
                          bsgenome = Hsapiens,show.coverage = TRUE) 
-coord_cartesian(xlim = c(6134000, 6135000), wise = TRUE) + theme_bw()
+coord_cartesian(xlim = c(6134000, 6135000)) + theme_bw()
 
 
 ##
-gr.t <- GRanges("chr16", IRanges(30080000, 30080000 + 2000))
-p0 <- ggplot() + stat_mismatch(bf, which = gr.t,
-                         bsgenome = Hsapiens,show.coverage = TRUE,
-                               geom = "bar") + ylab("Coverage") +
-   ## coord_cartesian(ylim = c(0, 200), wise = TRUE) +
-  theme_bw()
-library(biovizBase)
+## gr.t <- GRanges("chr16", IRanges(30080000, 30080000 + 2000))
+## p0 <- ggplot() + stat_mismatch(bf, which = gr.t,
+##                          bsgenome = Hsapiens,show.coverage = TRUE,
+##                                geom = "bar") + ylab("Coverage") +
+##    ## coord_cartesian(ylim = c(0, 200), wise = TRUE) +
+##   theme_bw()
 
+library(biovizBase)
 pgr <- pileupAsGRanges(bamfile, region = rng)
 nms <- "chr20"
 names(nms) <- "20"
 pgr <- renameSeqlevels(pgr, nms)
 pgr.match <- pileupGRangesAsVariantTable(pgr, genome = Hsapiens)
-pgr.match
-p.v
-p1 <- ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE)  +
-  coord_cartesian(ylim = c(0, 10), wise = TRUE)
-p.v
-p3 <- autoplot(Hsapiens, which = rng.ori) + opts(legend.position = "none")
-p3
-obj <- tracks(p1, p.v, p3, heights = c(4, 0.9, 1), xlim = c(25235400, 25236100))
+## pgr.match
+## p.v
+p1 <- ggplot() + stat_mismatch(pgr.match, show.coverage = TRUE, geom = "bar")  +
+  coord_cartesian(ylim = c(0, 10))
 
-obj <- tracks(p1, p.v, p3, heights = c(4, 0.9, 1),
-              xlim = c(25235720, 25235850))
+p3 <- autoplot(Hsapiens, which = rng.ori) + opts(legend.position = "none")
+
+## obj <- tracks(p1, p.v, p3, heights = c(4, 0.9, 1), xlim = c(25235400, 25236100))
+obj <- tracks('mismatch' = p1 + coord_cartesian(ylim = c(0, 10)), 'snp' = p.v,
+              'reference' = p3, heights = c(4, 0.9, 1),
+              xlim = c(25235720, 25235755))
+
 obj
-pdf("~/Desktop/mismatch.pdf", 18.3, 5.98)
+
+pdf("~/Desktop/mismatch.pdf", 12.3, 8)
 obj
 dev.off()
 

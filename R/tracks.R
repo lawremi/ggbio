@@ -1,4 +1,3 @@
-setOldClass("ggplot")
 setOldClass("options")
 setOldClass("unit")
 setClassUnion("optionsORNULL", c("options", "NULL"))
@@ -590,5 +589,6 @@ align.plots.old <- function (..., vertical = TRUE,
     upViewport(2)
   }
 }
+
 
 

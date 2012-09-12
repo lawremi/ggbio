@@ -1,5 +1,10 @@
 setGeneric("geom_alignment", function(data, ...) standardGeneric("geom_alignment"))
 
+setMethod("geom_alignment", "missing", function(data, ...){
+  return(match.call())
+})
+
+
 ## alignment should be convenient toggle with chevron...
 setMethod("geom_alignment", "GRanges", function(data,...,
                                                 xlab, ylab, main,

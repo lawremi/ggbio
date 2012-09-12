@@ -1,13 +1,25 @@
 ## FIXME: add ..coverage.., and a new way
 setGeneric("stat_coverage", function(data, ...) standardGeneric("stat_coverage"))
 
+setMethod("stat_coverage", "missing", function(data, ...){
+  return(match.call())
+})
+
+setMethod("stat_coverage", "uneval", function(data, ...){
+  return(match.call())
+})
+
+setMethod("stat_coverage", "IRanges", function(data, ...){
+  fake_gr <- GRanges("null", data)
+  stat_coverage(fake_gr, ...)
+})
+
 setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
                                                xlab, ylab, main,
                                                facets = NULL, 
                                                geom = NULL){
 
 
-  
   if(is.null(geom))
     geom <- "line"
   data <- keepSeqlevels(data, unique(as.character(seqnames(data))))

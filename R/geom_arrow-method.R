@@ -1,6 +1,11 @@
 ## FIXME: the group.selfish doesn't work
 setGeneric("geom_arrow", function(data, ...) standardGeneric("geom_arrow"))
 
+setMethod("geom_arrow", "missing", function(data, ...){
+  return(match.call())
+})
+
+
 setMethod("geom_arrow", "GRanges", function(data, ...,
                                             xlab, ylab, main, 
                                             angle = 30,

@@ -1,5 +1,9 @@
 setGeneric("geom_arch", function(data, ...) standardGeneric("geom_arch"))
 
+setMethod("geom_arch", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("geom_arch", "data.frame", function(data, ..., 
                                               n = 25, max.height = 10){
 

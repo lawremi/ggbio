@@ -1499,32 +1499,12 @@ window = 4
 
 
 ## broken code
-varsToEval <- c("main", "xlim", "ylim")
+p <- ggplot(gr) + stat_coverage(geom = "")
+p
+p + geom_line()
+p + geom_point()
+p + geom_area()
 
-fun <- function(x, ...) {  
-  mc <- as.list(match.call()[-1])
-  missingSym <- alist(foo=)
-  catcherArgNames <- c(setdiff(names(mc), varsToEval), "...")
-  catcherArgs <- structure(rep(missingSym, length(catcherArgNames)),
-                           names = catcherArgNames)
-  catcher <- as.function(c(catcherArgs, quote(list(...))))
-  catcher(...)
-}
 
-fun_broken <- function(x, ...) {
-  list(...)[varsToEval]
-}
 
-fun_broken2 <- function(x, ...) {
-  mc <- as.list(match.call()[-1])
-  lapply(mc[varsToEval], eval)
-}
 
-call_fun <- function(f = fun) {
-  main <- "plot title"
-  f(x, color = score, linetype = strand, main = main)
-}
-
-call_fun() # works
-call_fun(fun_broken) # cannot find the quoted arguments
-call_fun(fun_broken2) # cannot find the other arguments, like 'main'

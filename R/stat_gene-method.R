@@ -1,5 +1,10 @@
 ## FIXME: more flexible name.expr arguments
 setGeneric("stat_gene", function(data, ...) standardGeneric("stat_gene"))
+
+setMethod("stat_gene", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                                                 truncate.gaps = FALSE,
                                                 truncate.fun = NULL,
@@ -14,10 +19,7 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
                                                 names.expr = "tx_name(gene_id)"){
 
   
-  
-  ## stat <- match.arg(stat)
-  ## geom <- match.arg(geom)
-  ## gap.geom <- match.arg(gap.geom)
+  stat <- match.arg(stat)
   gap.fun <- getGeomFun(gap.geom)
   range.fun <- getGeomFun(range.geom)
   utr.fun <- getGeomFun(utr.geom)    
@@ -236,9 +238,13 @@ setMethod("stat_gene", "TranscriptDb", function(data, ..., which,xlim,
     p <- c(p, list(scale_y_continuous(breaks = NULL)),
            list(theme(axis.text.y = theme_blank())))
   }
+  
   if(missing(xlab)){
-        xlab <- getXLab(gr)
-      }
+    xlab <- ""
+  }else{
+    xlab <- ggplot2::xlab(xlab)
+  }
+  
   p <- c(p, list(xlab(xlab)))
   if(missing(ylab)){
     p <- c(p, list(ggplot2::ylab(getYLab(object))))

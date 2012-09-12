@@ -1,5 +1,9 @@
 setGeneric("stat_mismatch", function(data, ...) standardGeneric("stat_mismatch"))
 ## this require a special GenomicRanges
+setMethod("stat_mismatch", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome,
                                                      xlab, ylab, main,
                                                      geom = c("segment", "bar"),

@@ -1,4 +1,8 @@
 setGeneric("geom_arrowrect", function(data, ...) standardGeneric("geom_arrowrect"))
+setMethod("geom_arrowrect", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("geom_arrowrect", "GRanges", function(data, ...,
                                                   xlab, ylab, main,
                                                 facets = NULL,

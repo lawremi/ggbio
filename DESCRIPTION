@@ -14,6 +14,8 @@ License: Artistic-2.0
 LazyLoad: Yes
 Collate: utils.R
 	 AllGenerics.R
+	 ggbio-class.R
+	 ggplot-method.R
 	 theme.R	
 	 tracks.R
 	 fortify-method.R

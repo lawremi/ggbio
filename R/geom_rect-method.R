@@ -1,4 +1,8 @@
 setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
+setMethod("geom_rect", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("geom_rect", "data.frame", function(data, ...){
   ggplot2::geom_rect(data = data, ...)
 })

@@ -1,4 +1,8 @@
 setGeneric("geom_bar", function(data, ...) standardGeneric("geom_bar"))
+setMethod("geom_bar", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("geom_bar", "data.frame", function(data, ...){
   ggplot2::geom_bar(data  = data, ...)
 })

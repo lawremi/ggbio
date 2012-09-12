@@ -1,4 +1,8 @@
 setGeneric("stat_identity", function(data, ...) standardGeneric("stat_identity"))
+setMethod("stat_identity", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("stat_identity", "data.frame", function(data, ...){
   ggplot2::stat_identity(data = data, ...)
 })

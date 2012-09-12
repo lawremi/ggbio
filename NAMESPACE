@@ -7,8 +7,9 @@ import(BiocGenerics)
 import(biovizBase)
 import(grid)
 import(ggplot2)
-importFrom(gtable, gtable_add_padding, gtable_add_grob, gtable_add_cols,
-           gtable_add_rows)
+## importFrom(gtable, gtable_add_padding, gtable_add_grob, gtable_add_cols,
+##            gtable_add_rows, cbind)
+import(gtable)
 import(reshape2)
 import(scales)
 import(plyr)

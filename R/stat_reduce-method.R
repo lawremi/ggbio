@@ -1,5 +1,9 @@
 setGeneric("stat_reduce", function(data, ...) standardGeneric("stat_reduce"))
 
+setMethod("stat_reduce", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("stat_reduce", "GRanges", function(data, ...,
                                                xlab, ylab, main,
                                                drop.empty.ranges = FALSE,

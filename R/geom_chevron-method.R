@@ -1,4 +1,8 @@
 setGeneric("geom_chevron", function(data, ...) standardGeneric("geom_chevron"))
+setMethod("geom_chevron", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("geom_chevron", "GRanges", 
           function(data, ...,
                    xlab, ylab, main,

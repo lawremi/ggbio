@@ -43,3 +43,7 @@ ggplot() + stat_stepping(gr, aes(group = pair),geom = "alignment")
 ## @knitr NULLL
 ggplot() + stat_stepping(gr) + stat_stepping(GRanges(), xlab = "xlab", ylab = "ylab",
                                              main = "main")
+
+ggplot() + stat_stepping(gr)
+ggplot(gr) + stat_stepping()
+ggplot(gr) + stat_coverage() + geom_area()

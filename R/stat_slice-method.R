@@ -1,6 +1,10 @@
 ## FIXME: add ..coverage.., and a new way
 setGeneric("stat_slice", function(data, ...) standardGeneric("stat_slice"))
 
+setMethod("stat_slice", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("stat_slice", "Rle", function(data, ...,
                                         xlab, ylab, main,
                                         na.rm = FALSE,

@@ -1,4 +1,8 @@
 setGeneric("geom_segment", function(data, ...) standardGeneric("geom_segment"))
+setMethod("geom_segment", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("geom_segment", "data.frame", function(data, ...){
   ggplot2::geom_segment(data  = data, ...)
 })

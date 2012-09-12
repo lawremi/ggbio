@@ -1,4 +1,9 @@
 setGeneric("stat_bin", function(data, ...) standardGeneric("stat_bin"))
+
+setMethod("stat_bin", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("stat_bin", "data.frame", function(data, ...){
   ggplot2::stat_bin(data = data, ...)
 })

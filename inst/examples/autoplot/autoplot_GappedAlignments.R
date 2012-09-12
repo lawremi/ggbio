@@ -10,6 +10,7 @@ ga <- readBamGappedAlignments(bamfile,
                               param = ScanBamParam(which = genesymbol["RBM17"]),
                               use.names = TRUE)
 
+ggplot(ga) + stat_coverage()
 ## @knitr exp
 p1 <- autoplot(ga)
 p2 <- autoplot(ga, geom = "rect")

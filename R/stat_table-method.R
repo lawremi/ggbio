@@ -3,6 +3,11 @@
 ## ..score..
 setGeneric("stat_table", function(data, ...) standardGeneric("stat_table"))
 
+setMethod("stat_table", "missing", function(data, ...){
+  return(match.call())
+})
+
+
 setMethod("stat_table", "GRanges", function(data, ..., xlab, ylab, main,
                                             geom = NULL, stat = NULL){
 

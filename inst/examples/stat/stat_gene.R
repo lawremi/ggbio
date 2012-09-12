@@ -32,6 +32,6 @@ p1
 p1 <- ggplot() + stat_reduce(txdb, which = GRanges("chr1", IRanges(1, 100)))
 library(grid)
 p1
-convertX(unit(1, "strwidth", "Hello"), "npc")
-convertX(strwidth))
 
+ggplot(txdb) + stat_gene(which = genesymbol["RBM17"])
+ + geom_alignment(gap.geom = "arrow", range.geom = "arrowrect")

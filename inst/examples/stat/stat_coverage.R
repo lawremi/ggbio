@@ -71,3 +71,26 @@ ggplot() + stat_coverage(bf, geom = "line", which = gr.wh, method = "raw")
 
 ## @knitr NULLL
 ggplot() + stat_coverage(gr) + stat_coverage(GRanges())
+
+p <- ggplot(gr) + stat_coverage() + geom_point(aes(color = ..coverage..))
+p <- ggplot(gr) + stat_coverage()
+## doesn't work
+p
+p + geom_point(aes(color = coverage))
+p + geom_point(color = "red")
+p + geom_line()
+p + geom_point() + stat_smooth()
+p + geom_area()
+
+
+ggplot(data.frame(x = 1:10, y = 1:10), aes(x = x, y = y)) +
+  geom_line() +
+  geom_point(aes(color = x))
+
+
+
+
+
+
+
+

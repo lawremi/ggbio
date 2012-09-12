@@ -1,5 +1,9 @@
 setGeneric("stat_stepping", function(data, ...) standardGeneric("stat_stepping"))
 
+setMethod("stat_stepping", "missing", function(data, ...){
+  return(match.call())
+})
+
 setMethod("stat_stepping", "GRanges", function(data, ...,
                                                xlab, ylab, main,
                                                facets = NULL,

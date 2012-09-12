@@ -46,3 +46,5 @@ ggplot() + stat_aggregate(gr, window = 100, aes(y = value),
 
 ggplot() + stat_aggregate(gr, window = 100, aes(y = value), geom = "boxplot")
 
+ggplot(gr) + stat_aggregate(window = 100, aes(y = value), geom = "boxplot")
+

@@ -16,3 +16,17 @@ setMethod("fortify", c("GRanges", "missing"), function(model, data){
   df
 })
 
+setMethod("fortify", c("GRangesList", "missing"), function(model, data){
+  df <- as.data.frame(model)
+  df$midpoint <- (df$start+df$end)/2
+  df
+})
+
+setMethod("fortify", c("IRanges", "missing"), function(model, data){
+  df <- as.data.frame(model)
+  df$midpoint <- (df$start+df$end)/2
+  df
+})
+
+
+

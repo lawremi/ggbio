@@ -517,7 +517,7 @@ ir
 ### code chunk number 14: ir-exp
 ###################################################
 p1 <- autoplot(ir)
-p2 <- autoplot(ir, aes(fill = pair)) + opts(legend.position = "none")
+p2 <- autoplot(ir, aes(fill = pair)) + theme(legend.position = "none")
 p3 <- autoplot(ir, stat = "coverage", geom = "line", facets = sample ~. )
 p4 <- autoplot(ir, stat = "reduce")
 tracks(p1, p2, p3, p4)
@@ -834,51 +834,51 @@ autoplot(sset, type = "scatterplot.matrix")
 ###################################################
 ### code chunk number 50: vcf
 ###################################################
-library(VariantAnnotation)
-vcffile <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
-vcf <- readVcf(vcffile, "hg19")
-hdr <- exptData(vcf)[["header"]]
+% library(VariantAnnotation)
+% vcffile <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
+% vcf <- readVcf(vcffile, "hg19")
+% hdr <- exptData(vcf)[["header"]]
 
 
 
-## autoplot(vcf, type = "fixed") + coord_cartesian(xlim = c(50310860, 50310890))
+% ## autoplot(vcf, type = "fixed") + coord_cartesian(xlim = c(50310860, 50310890))
 
 
 
 
-###################################################
-### code chunk number 51: va-default
-###################################################
-autoplot(vcf)
+% ###################################################
+% ### code chunk number 51: va-default
+% ###################################################
+% autoplot(vcf)
 
 
-###################################################
-### code chunk number 52: va-info
-###################################################
-autoplot(vcf, type = "info", aes(y  = THETA))
+% ###################################################
+% ### code chunk number 52: va-info
+% ###################################################
+% autoplot(vcf, type = "info", aes(y  = THETA))
 
 
-###################################################
-### code chunk number 53: va-fixed
-###################################################
-autoplot(vcf, type = "fixed")
+% ###################################################
+% ### code chunk number 53: va-fixed
+% ###################################################
+% autoplot(vcf, type = "fixed")
 
 
-###################################################
-### code chunk number 54: va-fs
-###################################################
-np1 <- autoplot(vcf, type = "fixed") + xlim(50310860, 50310890) 
-p2 <- autoplot(vcf, type = "fixed", full.string = TRUE) + xlim(50310860, 50310890)
-tracks("full.string = FALSE" = p1, "full.string = TRUE" = p2)+
-  scale_y_continuous(breaks = NULL, limits = c(0, 3))
+% ###################################################
+% ### code chunk number 54: va-fs
+% ###################################################
+% np1 <- autoplot(vcf, type = "fixed") + xlim(50310860, 50310890) 
+% p2 <- autoplot(vcf, type = "fixed", full.string = TRUE) + xlim(50310860, 50310890)
+% tracks("full.string = FALSE" = p1, "full.string = TRUE" = p2)+
+%   scale_y_continuous(breaks = NULL, limits = c(0, 3))
 
 
-###################################################
-### code chunk number 55: va-rsw
-###################################################
-p3 <- autoplot(vcf, type = "fixed", ref.show = FALSE) + xlim(50310860, 50310890) +
-    scale_y_continuous(breaks = NULL, limits = c(0, 2))
-p3
+% ###################################################
+% ### code chunk number 55: va-rsw
+% ###################################################
+% p3 <- autoplot(vcf, type = "fixed", ref.show = FALSE) + xlim(50310860, 50310890) +
+%     scale_y_continuous(breaks = NULL, limits = c(0, 2))
+% p3
 
 
 ###################################################

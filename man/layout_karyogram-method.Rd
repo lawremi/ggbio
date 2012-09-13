@@ -71,7 +71,8 @@ getOption("biovizBase")$cytobandColor
 ###################################################
 ### code chunk number 2: default
 ###################################################
-autoplot(hg19IdeogramCyto, layout = "karyogram", cytoband = TRUE) 
+autoplot(hg19IdeogramCyto, layout = "karyogram", cytoband = TRUE)
+
 
 
 ###################################################

@@ -163,7 +163,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
   if(!missing(ylab))
     p <- c(p, list(ggplot2::ylab(ylab)))
   if(!missing(main))
-    p <- c(p, list(theme(title = main)))
+    p <- c(p, list(labs(title = main)))
   p
 })
 

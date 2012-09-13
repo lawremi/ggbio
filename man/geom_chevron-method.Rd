@@ -127,7 +127,8 @@ ggplot() + geom_chevron(gr, stat = "stepping", aes(group = pair))
 ggplot() + geom_chevron(gr, stat = "stepping", aes(group = pair), group.selfish = FALSE,
                         xlab = "xlab", ylab = "ylab", main = "main")
 
-
+p = qplot(x = mpg, y = cyl, data = mtcars)
+p + labs(title = "asdf")
 ## @knitr offset
 ## ======================================================================
 ##  offset

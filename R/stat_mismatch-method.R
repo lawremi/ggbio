@@ -117,7 +117,7 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome,
     p <- c(p, list(ggplot2::ylab("Counts")))
 
   if(!missing(main))
-    p <- c(p, list(theme(title = main)))
+    p <- c(p, list(labs(title = main)))
   
   p
 })
@@ -153,7 +153,7 @@ setMethod("stat_mismatch", "BamFile", function(data, ...,  bsgenome, which,
       p <- c(p, list(ggplot2::ylab("Counts")))
 
     if(!missing(main))
-      p <- c(p, list(theme(title = main)))
+      p <- c(p, list(labs(title = main)))
     
     p
     

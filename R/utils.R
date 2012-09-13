@@ -436,8 +436,8 @@ sub_names <- function(data, name.expr){
 
 
 getLegendGrob <- function(p){
-  g = ggplotGrob(p2)
-  gg = gtable_filter(g, "guide-box")
+  g <- ggplotGrob(p)
+  gg <- gtable_filter(g, "guide-box")
 }
 
 arrangeGrobByParsingLegend <- function(..., nrow = NULL, ncol = NULL,
@@ -447,7 +447,7 @@ arrangeGrobByParsingLegend <- function(..., nrow = NULL, ncol = NULL,
     lst <- lst[[1]]
   gg <- lapply(lst, getLegendGrob)  
   l.g <- lapply(lst, function(x){
-    ggplotGrob(x + theme(legend.position = "none"))
+    ggplotGrob(x + theme(legend.position = "none", aspect.ratio = 1))
   })
   
   if(!is.null(legend.idx))

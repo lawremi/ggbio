@@ -21,7 +21,7 @@ plotSingleChrom <- function(obj, subchr, zoom.region,
                          xmax = x2, ymin = -3, ymax = 13), color = "red", fill = NA)
   }
   if(!xlabel)
-    p <- p + theme(axis.text.x = theme_blank())
+    p <- p + theme(axis.text.x = element_blank())
   
   p <- p + theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
     scale_y_continuous(breaks = 5, label = subchr) +
@@ -36,7 +36,7 @@ plotSingleChrom <- function(obj, subchr, zoom.region,
   else
     p <- p + ggplot2::ylab(subchr)
   if(!missing(main))
-    p <- p + theme(title = main)
+    p <- p + labs(title = main)
   p
 }
 
@@ -83,7 +83,7 @@ plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + theme(title = main)
+    p <- p + labs(title = main)
   
   p
 }

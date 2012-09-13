@@ -65,7 +65,7 @@ setMethod("stat_table", "GRanges", function(data, ..., xlab, ylab, main,
   if(!missing(ylab))
     p <- c(p, list(ggplot2::ylab(ylab)))
   if(!missing(main))
-    p <- c(p, list(theme(title = main)))
+    p <- c(p, list(labs(title = main)))
   
   p  
 })  
@@ -94,7 +94,7 @@ setMethod("stat_table", "GRangesList", function(data, ...,
   else
     p <- c(p, list(ggplot2::ylab("Score")))
   if(!missing(main))
-    p <- c(p, list(theme(title = main)))
+    p <- c(p, list(labs(title = main)))
   
   p
 })

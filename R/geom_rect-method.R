@@ -151,7 +151,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
   p <- c(p, list(ggplot2::xlab(xlab)))
   
   if(!missing(main))
-    p <- c(p, list(theme(title = main)))
+    p <- c(p, list(labs(title = main)))
   
   p
 })

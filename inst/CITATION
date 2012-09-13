@@ -1,0 +1,19 @@
+citHeader("To cite package 'ggbio' in publications use:")
+citEntry(
+	entry = "article",
+	title = "ggbio: an R package for extending the grammar of graphics for genomic data",
+	author = personList(as.person("Tengfei Yin"),
+	                    as.person("Dianne Cook"),
+                            as.person("Michael Lawrence")),
+        journal = "Genome Biology",
+        volume = "13",
+        number = "8",
+        pages = "R77",
+        year = "2012",
+        publisher = "BioMed Central Ltd",
+
+	textVersion = 
+         paste("Tengfei Yin, Dianne Cook and Michael Lawrence (2012):", 
+               "ggbio: an R package for extending the grammar of graphics for genomic data",
+                "Genome Biology 13:R77" ) 	
+)

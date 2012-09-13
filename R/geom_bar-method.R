@@ -46,6 +46,6 @@ setMethod("geom_bar", "GRanges", function(data,..., xlab, ylab, main){
   if(!missing(ylab))
     p <- c(p, list(ylab(ylab)))
   if(!missing(main))
-    p <- c(p, list(theme(title = main)))
+    p <- c(p, list(labs(title = main)))
   p
 })

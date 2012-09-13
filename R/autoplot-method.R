@@ -121,7 +121,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
     if(!missing(ylab))
       p <- c(p,list(ylab(ylab)))
     if(!missing(main))
-      p <- c(p, list(theme(title = main)))
+      p <- c(p, list(labs(title = main)))
      p <- ggplot() + p
   }  
   if(layout == "karyogram"){
@@ -129,7 +129,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
     if(missing(xlab)){
         xlab <- ""
     }
-    p <- c(p, list(xlab(xlab)))
+    p <- p + ggplot2::xlab(xlab)
     ## FIXME: xlab/ylab/main
   }
   if(layout == "circle"){
@@ -204,7 +204,7 @@ setMethod("autoplot", "GRangesList", function(object, ...,
   if(!missing(ylab))
     p <- p + ylab(ylab)
   if(!missing(main))
-    p <- p + theme(title = main)
+    p <- p + labs(title = main)
   p
 })          
 
@@ -226,7 +226,7 @@ setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + theme(title = main) +
+    p <- p + labs(title = main) +
       theme(strip.background = element_rect(colour = 'NA', fill = 'NA'))+ 
         theme(strip.text.y = element_text(colour = 'white')) 
   p
@@ -287,7 +287,7 @@ setMethod("autoplot", "GappedAlignments", function(object, ...,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + theme(title = main)
+    p <- p + labs(title = main)
   p <- p + facet
   p
 })
@@ -372,7 +372,7 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + theme(title = main) 
+    p <- p + labs(title = main) 
   p
 })
 
@@ -416,7 +416,7 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + theme(title = main) 
+    p <- p + labs(title = main) 
   p  
 })
 
@@ -458,7 +458,7 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
   else
     p <- p + ggplot2::ylab("")
   if(!missing(main))
-    p <- p + theme(title = main)
+    p <- p + labs(title = main)
   p
 })
 
@@ -600,7 +600,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
   ## if(stat == "stepping" | geom == "alignment")
   p <- p + scale_y_continuous(breaks = NULL)
   if(!missing(main))
-    p <- p + theme(title = main)
+    p <- p + labs(title = main)
   p
 })
 
@@ -655,7 +655,7 @@ setMethod("autoplot", "Rle", function(object, ...,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + theme(title = main)
+    p <- p + labs(title = main)
   p
 })
 
@@ -713,7 +713,7 @@ setMethod("autoplot", "RleList", function(object, ...,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + theme(title = main)
+    p <- p + labs(title = main)
   p
   ## if(facetByRow)
   ##   facets <- listName ~ .
@@ -930,146 +930,146 @@ setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
 ##======================================================================
 ##  For VCF
 ##======================================================================
-setMethod("autoplot", "VCF", function(object, ..., genomic.pos = FALSE,
-                                      xlab, ylab, main,
-                                      type = c("geno", "info", "fixed"),
-                                      full.string = FALSE,
-                                      ref.show = TRUE,
-                                      expand = c(1, 1),
-                                      ylabel = TRUE){
-  args <- list(...)
-  args.aes <- parseArgsForAes(args)
-  args.non <- parseArgsForNonAes(args)
-  type <- match.arg(type)
-  hdr <- exptData(object)[["header"]]
-  if(type == "geno"){
-    nms <- rownames(geno(hdr))
-    if("GT" %in% nms){
-      message("use GT for type geno as default")
-      gt <- geno(object)[["GT"]]
-    }else{
-      nm <- nms[1]
-      message("use ", nm, " for type geno as default")
-      gt <- geno(object)[[nm]]
-    }
-    sts <- start(rowData(object))
-    idx <- !duplicated(sts)
-    if(sum(!idx))
-      warning("remove ", sum(!idx), " snp with duplicated position, only keep first one")
-    gt <- gt[idx,]
-    rownames(gt) <- start(rowData(object)[idx])
-    gt.t <- t(gt)
-    p <- autoplot(gt.t, genomic.pos = genomic.pos)
-  }
-  if(type == "info"){
-    df <- fortify(info(object))
-    if(!"y" %in% names(args.aes)){
-      hdr.i <- rownames(info(hdr))
-      if("AF" %in% hdr.i){
-        args.aes$y <- as.name("AF")
-        message("use AF for type info as default")
-      }else{
-        nm <- hdr.i[i]
-        message("use ", nm, " for type info as default")
-        args.aes$y <- as.name(nm)
-      }
-    }
-    if(!"x" %in% names(args)){
-      args.aes$x <- as.name("start")
-    }
-    if(!"color" %in% names(args)){
-      args.non$color <- "black"
-    }
-    if(!"fill" %in% names(args)){
-      args.non$fill <- "black"
-    }
-    p <- ggplot(data = df) + do.call(ggplot2::geom_bar, c(list(stat = "identity"),
-                                   list(do.call(aes, args.aes)),
-                                   args.non))
-  }
-  if(type == "fixed"){
-    fix <- fixed(object)
-    fix <- fix[, !colnames(values(fix)) %in% c("ALT", "REF")]
-    values(fix)$ALT <- unlist(values(alt(object))[, "ALT"])
-    values(fix)$REF <- values(ref(object))[, "REF"]
-    fix2 <- fix        
-    type2 <- vector("character", length  = length(fix))      
-    idx <- width(values(fix)$ALT) > 1    
-    type2[idx] <- "I"
-    type2[!idx] <- as.character(values(fix[!idx])$ALT)
-    values(fix)$type <- type2
-    ## id <- start(fix) < 25238400 & start(fix) > 25238100
-    if(!"color" %in% names(args.non))
-      isDNABaseColor <- TRUE
-    else
-      isDNABaseColor <- FALSE
-    baseColor <- getOption("biovizBase")$DNABasesColor
-    .i <- "black"
-    names(.i) <- "I"
-    baseColor <- c(baseColor, .i)
-    ir <- IRanges(start = start(fix), width = width(values(fix)$ALT))
-    if(!full.string)
-      width(ir[idx,]) <- 1
-    steps <- disjointBins(ir)      
-    values(fix)$stepping <- steps      
-    values(fix)$value <- values(fix)$ALT
-    values(fix)$group <- "ALT"    
-    fix2 <- addStepping(fix2)
-    idx <- width(values(fix2)$REF) > 1        
-    ir <- IRanges(start = start(fix), width = width(values(fix2)$REF))
-    if(!full.string)
-      width(ir[idx,]) <- 1
-    steps <- disjointBins(ir)      
-    values(fix2)$stepping <- steps      
-    type2 <- vector("character", length  = length(fix2))      
-    type2[idx] <- "I"
-    type2[!idx] <- as.character(values(fix[!idx])$REF)
-    values(fix2)$type <- type2
-    values(fix2)$value <- values(fix2)$REF
-    values(fix2)$group <- "REF"
-    .nms <- colnames(values(fix))
-    fix <- c(fix, fix2[, .nms])
-    if(ref.show){
-      facet <- facet_grid(group ~ ., scales = "free_y")
-      }else{
-        fix <- fix[values(fix)$group == "ALT"]
-        facet <- NULL
-      }
-    if(!full.string){
-      ## only show SNP
-      df <- fortify(fix)
-      p <- ggplot() + geom_text(data = df, ..., 
-                                aes(x = start, label = type, color = type,  y = stepping)) +
-                                  scale_color_manual(values = baseColor) +  facet
+## setMethod("autoplot", "VCF", function(object, ..., genomic.pos = FALSE,
+##                                       xlab, ylab, main,
+##                                       type = c("geno", "info", "fixed"),
+##                                       full.string = FALSE,
+##                                       ref.show = TRUE,
+##                                       expand = c(1, 1),
+##                                       ylabel = TRUE){
+##   args <- list(...)
+##   args.aes <- parseArgsForAes(args)
+##   args.non <- parseArgsForNonAes(args)
+##   type <- match.arg(type)
+##   hdr <- exptData(object)[["header"]]
+##   if(type == "geno"){
+##     nms <- rownames(geno(hdr))
+##     if("GT" %in% nms){
+##       message("use GT for type geno as default")
+##       gt <- geno(object)[["GT"]]
+##     }else{
+##       nm <- nms[1]
+##       message("use ", nm, " for type geno as default")
+##       gt <- geno(object)[[nm]]
+##     }
+##     sts <- start(rowData(object))
+##     idx <- !duplicated(sts)
+##     if(sum(!idx))
+##       warning("remove ", sum(!idx), " snp with duplicated position, only keep first one")
+##     gt <- gt[idx,]
+##     rownames(gt) <- start(rowData(object)[idx])
+##     gt.t <- t(gt)
+##     p <- autoplot(gt.t, genomic.pos = genomic.pos)
+##   }
+##   if(type == "info"){
+##     df <- fortify(info(object))
+##     if(!"y" %in% names(args.aes)){
+##       hdr.i <- rownames(info(hdr))
+##       if("AF" %in% hdr.i){
+##         args.aes$y <- as.name("AF")
+##         message("use AF for type info as default")
+##       }else{
+##         nm <- hdr.i[i]
+##         message("use ", nm, " for type info as default")
+##         args.aes$y <- as.name(nm)
+##       }
+##     }
+##     if(!"x" %in% names(args)){
+##       args.aes$x <- as.name("start")
+##     }
+##     if(!"color" %in% names(args)){
+##       args.non$color <- "black"
+##     }
+##     if(!"fill" %in% names(args)){
+##       args.non$fill <- "black"
+##     }
+##     p <- ggplot(data = df) + do.call(ggplot2::geom_bar, c(list(stat = "identity"),
+##                                    list(do.call(aes, args.aes)),
+##                                    args.non))
+##   }
+##   if(type == "fixed"){
+##     fix <- fixed(object)
+##     fix <- fix[, !colnames(values(fix)) %in% c("ALT", "REF")]
+##     values(fix)$ALT <- unlist(values(alt(object))[, "ALT"])
+##     values(fix)$REF <- values(ref(object))[, "REF"]
+##     fix2 <- fix        
+##     type2 <- vector("character", length  = length(fix))      
+##     idx <- width(values(fix)$ALT) > 1    
+##     type2[idx] <- "I"
+##     type2[!idx] <- as.character(values(fix[!idx])$ALT)
+##     values(fix)$type <- type2
+##     ## id <- start(fix) < 25238400 & start(fix) > 25238100
+##     if(!"color" %in% names(args.non))
+##       isDNABaseColor <- TRUE
+##     else
+##       isDNABaseColor <- FALSE
+##     baseColor <- getOption("biovizBase")$DNABasesColor
+##     .i <- "black"
+##     names(.i) <- "I"
+##     baseColor <- c(baseColor, .i)
+##     ir <- IRanges(start = start(fix), width = width(values(fix)$ALT))
+##     if(!full.string)
+##       width(ir[idx,]) <- 1
+##     steps <- disjointBins(ir)      
+##     values(fix)$stepping <- steps      
+##     values(fix)$value <- values(fix)$ALT
+##     values(fix)$group <- "ALT"    
+##     fix2 <- addStepping(fix2)
+##     idx <- width(values(fix2)$REF) > 1        
+##     ir <- IRanges(start = start(fix), width = width(values(fix2)$REF))
+##     if(!full.string)
+##       width(ir[idx,]) <- 1
+##     steps <- disjointBins(ir)      
+##     values(fix2)$stepping <- steps      
+##     type2 <- vector("character", length  = length(fix2))      
+##     type2[idx] <- "I"
+##     type2[!idx] <- as.character(values(fix[!idx])$REF)
+##     values(fix2)$type <- type2
+##     values(fix2)$value <- values(fix2)$REF
+##     values(fix2)$group <- "REF"
+##     .nms <- colnames(values(fix))
+##     fix <- c(fix, fix2[, .nms])
+##     if(ref.show){
+##       facet <- facet_grid(group ~ ., scales = "free_y")
+##       }else{
+##         fix <- fix[values(fix)$group == "ALT"]
+##         facet <- NULL
+##       }
+##     if(!full.string){
+##       ## only show SNP
+##       df <- fortify(fix)
+##       p <- ggplot() + geom_text(data = df, ..., 
+##                                 aes(x = start, label = type, color = type,  y = stepping)) +
+##                                   scale_color_manual(values = baseColor) +  facet
                               
-    }else{
-      df <- fortify(fix)
-      df$type <- factor(df$type, levels = c(names(baseColor)))
-      p <- ggplot() + geom_text(data = df, ..., 
-                                aes(x = start, label = value, color = type, y = stepping)) +
-                                scale_color_manual(values = baseColor) + facet
+##     }else{
+##       df <- fortify(fix)
+##       df$type <- factor(df$type, levels = c(names(baseColor)))
+##       p <- ggplot() + geom_text(data = df, ..., 
+##                                 aes(x = start, label = value, color = type, y = stepping)) +
+##                                 scale_color_manual(values = baseColor) + facet
 
-    }
-  }
-  p <- p + scale_y_continuous(expand = expand)
-  if(!ylabel){
-    if(type == "fixed"){
-    p <- p + scale_y_continuous(breaks = NULL, expand = expand)
-  }else{
-    p <- p + scale_y_continuous(breaks = NULL)
-  }
-  }
+##     }
+##   }
+##   p <- p + scale_y_continuous(expand = expand)
+##   if(!ylabel){
+##     if(type == "fixed"){
+##     p <- p + scale_y_continuous(breaks = NULL, expand = expand)
+##   }else{
+##     p <- p + scale_y_continuous(breaks = NULL)
+##   }
+##   }
   
-  if(missing(xlab))
-    xlab <- ""
-  p <- p + ggplot2::xlab(xlab)
-  if(missing(ylab))
-    ylab <- ""
-  p <- p + ggplot2::ylab(ylab)
-  if(!missing(main))
-    p <- p + theme(title = main)
-  p
-})
+##   if(missing(xlab))
+##     xlab <- ""
+##   p <- p + ggplot2::xlab(xlab)
+##   if(missing(ylab))
+##     ylab <- ""
+##   p <- p + ggplot2::ylab(ylab)
+##   if(!missing(main))
+##     p <- p + labs(title = main)
+##   p
+## })
 
 
 setMethod("autoplot", "matrix", function(object, ...,
@@ -1145,7 +1145,7 @@ setMethod("autoplot", "matrix", function(object, ...,
     ylab <- ""
   p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + theme(title = main)
+    p <- p + labs(title = main)
   
   p
 })

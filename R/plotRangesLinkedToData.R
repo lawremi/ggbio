@@ -82,7 +82,7 @@ plotRangesLinkedToData <- function(data, ..., stat.col, stat.label,
                                                  c(list(do.call(aes, args.dash)),
                                                    linetype = linetype)))
 
-  p.stat <- p.stat  +  theme.stat + theme(panel.grid.minor=theme_blank()) +
+  p.stat <- p.stat  +  theme.stat + theme(panel.grid.minor=element_blank()) +
     labs(colour = "group")
   p.stat <- p.stat + stat.coord.trans
   if(!missing(stat.ylab))

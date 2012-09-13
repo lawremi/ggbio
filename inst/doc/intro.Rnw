@@ -1153,134 +1153,6 @@ autoplot(sset, type = "scatterplot.matrix")
 \clearpage
 
 
-% \subsection{autoplot,VCF}
-% \Robject{VCF}(Variant Call Format) class extends a class we have introduced
-% \Robject{SummarizedExperiment}, and with additional slots, 'fixed' and
-% 'info'. It's defined in package \Rpackage{VariantAnnotation}. 
-
-% We have done some experimental visualization, and features are going to be
-% extended or changed later.
-% \begin{itemize}
-% \item For type 'geno': we get an assay, and test if 'GT' is in. Then we make a
-%   heatmap to show geno types.
-% \item For type 'info': Please specify one variable as y to show as bars.
-% \item For type 'fixed': You can plot ref/alt strings on the plot, default plot
-%   both reference and variants, and if one string is over 1, we will use a black
-%   'I' to indicate that's an indel, then if at each position there are multiple
-%   data, we will show them in different y levels. Argument \Rfunarg{full.string}
-%   control if you want to show full strings of indels or not, even they are shown
-%   as full string, they will still be in balck color, to indicate it's on the
-%   single position. \Rfunarg{ref.show} controls if you want to show REF column in
-%   the data or not, sometimes people may want to just plot \Robject{BSgenome}
-%   object as reference track.
-% \end{itemize}
-
-
-% @ 
-% <<vcf>>=
-% library(VariantAnnotation)
-% vcffile <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
-% vcf <- readVcf(vcffile, "hg19")
-% hdr <- exptData(vcf)[["header"]]
-
-
-
-% ## autoplot(vcf, type = "fixed") + coord_cartesian(xlim = c(50310860, 50310890))
-
-
-% @ %def 
-
-
-% \begin{figure}[!htpb]
-%   \centering
-% @ 
-% <<va-default, fig = TRUE>>=
-% library(VariantAnnotation)
-% vcffile <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
-% vcf <- readVcf(vcffile, "hg19")
-% gt <- geno(vcf)[['GT']]
-% sts <- start(rowData(vcf))
-% idx <- !duplicated(sts)
-% gt <- gt[idx,]
-% rownames(gt) <- start(rowData(vcf)[idx])
-% gt.t <- t(gt)
-% autoplot(gt.t)+ scale_x_continuous()
-
-
-% autoplot(gt.t, genomic.pos = TRUE) 
-
-
-% @ %def 
-%   \caption{default heatmap to show GT for type 'geno'.}
-%   \label{fig:va-default}
-% \end{figure}
-% \clearpage
-
-% \begin{figure}[!htpb]
-%   \centering
-% @ 
-% <<va-info, fig = TRUE>>=
-% autoplot(vcf, type = "info", aes(y  = THETA))
-% @ %def 
-%   \caption{default bar chart for type info, use THETA as y.}
-%   \label{fig:va-info}
-% \end{figure}
-% \clearpage
-
-% \begin{figure}[!htpb]
-%   \centering
-% @ 
-% <<va-fixed, fig = TRUE>>=
-% autoplot(vcf, type = "fixed")
-% @ %def 
-%   \caption{default heatmap to show GT as heatmap for type 'fixed'.}
-%   \label{fig:va-fixed}
-% \end{figure}
-% \clearpage
-
-% \begin{figure}[!htpb]
-%   \centering
-% @ 
-% <<va-fs, fig = TRUE>>=
-% p1 <- autoplot(vcf, type = "fixed") + xlim(50310860, 50310890) 
-% p2 <- autoplot(vcf, type = "fixed", full.string = TRUE) + xlim(50310860, 50310890)
-% tracks("full.string = FALSE" = p1, "full.string = TRUE" = p2)+
-%   scale_y_continuous(breaks = NULL, limits = c(0, 3))
-% @ %def 
-%   \caption{Demonstration of full.string. }
-%   \label{fig:va-fs}
-% \end{figure}
-% \clearpage
-
-% \begin{figure}[!htpb]
-%   \centering
-% @ 
-% <<va-rsw, fig = TRUE>>=
-% p3 <- autoplot(vcf, type = "fixed", ref.show = FALSE) + xlim(50310860, 50310890) +
-%     scale_y_continuous(breaks = NULL, limits = c(0, 2))
-% p3
-% @ %def 
-%   \caption{Demonstration of ref.show. }
-%   \label{fig:va-rs}
-% \end{figure}
-% \clearpage
-% \subsection{autoplot,BSgenome}
-% The \Robject{BSgenome} class is a container for the complete genome sequence of
-% a given organism, it's defined in package \Rpackage{BSgenome}. We use it to plot
-% reference genome, along with other tracks.
-% \begin{figure}[!htpb]
-%   \centering
-% @ 
-% <<bs-v, fig = TRUE>>=
-% library(BSgenome.Hsapiens.UCSC.hg19)
-% data(genesymbol, package = "biovizBase")
-% p1 <- autoplot(Hsapiens, which = resize(genesymbol["ALDOA"], width = 50))
-% p2 <- autoplot(Hsapiens, which = resize(genesymbol["ALDOA"], width = 50), geom = "rect")
-% tracks(text = p1, rect = p2)
-% @ %def   
-%   \caption{plot BSgenome}
-%   \label{fig:bs-v}
-% \end{figure}
 
 \chapter{Ideogram plot}
 \section{Introduction}
@@ -1676,8 +1548,8 @@ print(p2)
 
 \begin{figure}[h!t!p]
   \centering
-  \includegraphics[width = 0.45\textwidth]{tracks-shortread-plot}
-  \includegraphics[width = 0.45\textwidth]{tracks-exons-plot}  
+  \includegraphics[width = 0.45\textwidth]{intro-shortread-plot}
+  \includegraphics[width = 0.45\textwidth]{intro-exons-plot}  
   \caption{Simulated short reads and exons. The plot on the left shows a set of
     short rectangle which represents some short reads. And the plot on the
     right panel, shows two isoforms, rectangle represents exons and chevron
@@ -2756,9 +2628,11 @@ little tricky, we can first store the legend from the plot we just created.
 @ 
 <<legend>>=
 library(gridExtra)
-g = ggplotGrob(p0)
-gg = editGrob(getGrob(g, gPath("guide-box"), 
-  grep=TRUE), vp=viewport())
+g <- ggplotGrob(p0)
+idx <- which(g$layout$name == "guide-box")
+## gg <- editGrob(getGrob(g, gPath("guide-box"), 
+##    grep=TRUE), vp=viewport())
+gg <- g$grobs[[idx]] 
 @ %def 
 Start to creating plots for each sample.
 
@@ -2776,10 +2650,10 @@ lst <- lapply(grl, function(gr.cur){
                            layout_circle(hg19Ideo, geom = "ideo", trackWidth = 1.5,
                          color = "gray70", fill = "gray70") +
                            scale_color_manual(values = cols)  + 
-     opts(title = (unique(values(gr.cur)$individual))) +
-    opts(plot.margin = unit(rep(0, 4), "lines"))
+     labs(title = (unique(values(gr.cur)$individual))) +
+    theme(plot.margin = unit(rep(0, 4), "lines"))
 })
-lst.nolegend <- lapply(lst, function(p) p + opts(legend.position = "none"))
+lst.nolegend <- lapply(lst, function(p) p + theme(legend.position = "none"))
 l.g <- lapply(lst.nolegend, ggplotGrob)
 @ %def
 \clearpage 
@@ -2806,7 +2680,7 @@ keep one legend on the right.
 
 @ 
 <<simple-wrapper, eval = FALSE>>=
-## noitce this code doesn't have opts(legend.position = "none"), which means
+## noitce this code doesn't have theme(legend.position = "none"), which means
 ## we keep the legend for each plot.
 arrangeGrobByParsingLegend(lst, widths = c(4, 1), legend.idx = 1, ncol = 2)
 @ %def   
@@ -3099,7 +2973,7 @@ Then rotate it!
   \centering
 @ 
 <<rotate, fig = TRUE>>=
-plotGrandLinear(gr.snp, aes(y = pvalue)) + opts(axis.text.x=theme_text(angle=-90, hjust=0))
+plotGrandLinear(gr.snp, aes(y = pvalue)) + theme(axis.text.x=element_text(angle=-90, hjust=0))
 @ %def   
   \caption{Rotate the x lable to save space.}
   \label{fig:rotate}
@@ -3199,7 +3073,7 @@ p1 <- ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE, geom = "bar") +
   xlim(6132060,6132120) + ylim(0, 10)
 p2<- ggplot() + stat_mismatch(pgr.match, geom = "segment") +
   xlim(6132060,6132120) + ylim(0, 10)
-tracks(segment = p2, bar = p1) +scale_x_sequnit('mb')
+tracks(segment = p2, bar = p1) +scale_x_sequnit('Mb')
 @ %def    
   \caption{Mismatch summary without coverage}
   \label{fig:pag_v2}

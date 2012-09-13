@@ -50,9 +50,9 @@ txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 ## ==========================================================
 ## create two tracks
 ## full gene model
-p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "gene")
+p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"])
 ## reduced gene model
-p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], geom = "reduced_gene")
+p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], stat = "reduce")
 ## @knitr align.plots
 ## ==========================================================
 ## align.plots

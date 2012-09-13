@@ -115,19 +115,21 @@ setMethod("summary", "Tracks", function(object){
 
 
 setMethod("print", "Tracks", function(x){
+
   grid.newpage()
     grobs <- x@grobs
     N <- length(grobs)
+
     if(x@named)
       nms <- names(x@grobs)
+    else
+      nms <- NULL
+
     lst <- lapply(seq_len(N),
                   function(i) {
-                    ## if(i == 2) browser()
-                    ## ylim <- x@ylim[[i]]
-                    ## s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
                     s <- coord_cartesian(xlim = x@xlim)
                     grobs[[i]] <- grobs[[i]] +
-                      theme(plot.background = theme_rect(colour = NA, fill = x@track.plot.color[i]))
+                      theme(plot.background = element_rect(colour = NA, fill = x@track.plot.color[i]))
                     if(i %in% which(x@xlim.change))
                       grobs[[i]] <- grobs[[i]] + s
                     if(!is.null(theme))
@@ -141,12 +143,12 @@ setMethod("print", "Tracks", function(x){
                     ## xlab
                     if(i %in% 1:(N-1)){
                       grobs[[i]] <- grobs[[i]] + 
-                          theme(axis.text.x = theme_blank()) + xlab("") 
+                          theme(axis.text.x = element_blank()) + xlab("") 
                     }else{
                       if(!is.null(xlab))
                         grobs[[i]] <- grobs[[i]] + xlab(x@xlab)
                       grobs[[i]] <- grobs[[i]] +
-                        theme(axis.title.x = theme_text(vjust = 0))
+                        theme(axis.title.x = element_text(vjust = 0))
                     }
                     grobs[[i]]
                   })

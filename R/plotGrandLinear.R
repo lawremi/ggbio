@@ -2,7 +2,7 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
                             cutoff = NULL, cutoff.color = "red",
                             cutoff.size = 1, legend = FALSE, xlim, ylim, 
                             xlab,
-                            ylab = substitute(y), main, theme){
+                            ylab = substitute(y), main){
 
   if(is.null(geom))
     geom <- "point"
@@ -44,8 +44,8 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
   aes.res <- do.call(aes, args.aes)
   p <- do.call(autoplot, c(list(aes.res), args.non))
 
-  if(!missing(theme))
-    p <- p + theme
+  ## if(!missing(theme))
+  ##   p <- p + theme
   if(!legend)
     p <- p + theme(legend.position = "none")
 
@@ -64,13 +64,13 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
   
   if(!missing(facets)){
     args$facets <- facets
-  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  facet <- .buildFacetsFromArgs(obj, args.facets)
-  p <- p + facet
+    args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
+    facet <- .buildFacetsFromArgs(obj, args.facets)
+    p <- p + facet
   }
-  p <- p +  theme(panel.grid.minor=theme_blank())
+  p <- p +  theme(panel.grid.minor=element_blank())
   if(!missing(main))
-    p <- p + theme(title = main)
+    p <- p + labs(title = main)
   if(!missing(xlim))
     p <- p + xlim(xlim)
   if(!missing(ylim))

@@ -175,7 +175,7 @@ gr.snp <- renameSeqlevels(gr.snp, nms.new)
 seqlengths(gr.snp)
 
 ##  rotate
-plotGrandLinear(gr.snp, aes(y = pvalue)) + opts(axis.text.x=theme_text(angle=-90, hjust=0))
+plotGrandLinear(gr.snp, aes(y = pvalue)) + theme(axis.text.x=element_text(angle=-90, hjust=0))
 
 ##  sessionInfo
 sessionInfo()

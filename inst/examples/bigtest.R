@@ -1504,7 +1504,43 @@ p
 p + geom_line()
 p + geom_point()
 p + geom_area()
+library(ggbio)
+qplot(data = mtcars, x = mpg, y = cyl, facets = .~cyl)
 
 
 
 
+facet_render.grid <- function(facet, panel, coord, theme, geom_grobs) {
+  browser()
+  panel
+  axes <- facet_axes(facet, panel, coord, theme)
+  strips <- facet_strips(facet, panel, theme)
+  panels <- facet_panels(facet, panel, coord, theme, geom_grobs)
+
+  # adjust the size of axes to the size of panel
+  axes$l$heights <- panels$heights
+  axes$b$widths <- panels$widths
+  
+  # adjust the size of the strips to the size of the panels
+  strips$r$heights <- panels$heights
+  strips$t$widths <- panels$widths
+  
+  # Combine components into complete plot
+  top <- strips$t
+  top <- gtable_add_cols(top, strips$r$widths)
+  top <- gtable_add_cols(top, axes$l$widths, pos = 0)
+  
+  center <- cbind(axes$l, panels, strips$r, z = c(2, 1, 3))
+  bottom <- axes$b
+  bottom <- gtable_add_cols(bottom, strips$r$widths)
+  bottom <- gtable_add_cols(bottom, axes$l$widths, pos = 0)
+
+  complete <- rbind(top, center, bottom, z = c(1, 2, 3))
+  complete$respect <- panels$respect
+  complete$name <- "layout"
+  bottom <- axes$b
+  
+  complete
+}
+
+debug(ggplot2:::facet_render.grid)

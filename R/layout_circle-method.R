@@ -89,6 +89,7 @@ setMethod("layout_circle",  "GRanges",
     p <- list(res)
     
   }
+
   if(geom == "text"){
     obj <- transformToGenome(data, space.skip)        
     if("label" %in% names(args.aes)){
@@ -118,7 +119,7 @@ setMethod("layout_circle",  "GRanges",
       values(obj)$.processed.angle <- ags
       args.aes$angle <- as.name(".processed.angle")      
     }
-    names(res) <- NULL
+    names(obj) <- NULL
     df <- as.data.frame(obj)
     args.aes$y <- as.name(".circle.y")
     args.aes$x <- as.name(".circle.x")

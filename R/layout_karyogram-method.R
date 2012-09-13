@@ -96,11 +96,11 @@ setMethod("layout_karyogram", "GRanges",
               
 
               p.ideo <- c(p.ideo,
-                          list(theme(axis.text.y = theme_blank(),
-                                    axis.title.y=theme_blank(),
-                                    axis.ticks = theme_blank(),
-                                    panel.grid.minor = theme_line(colour = NA),
-                                    panel.grid.major = theme_line(colour = NA)),
+                          list(theme(axis.text.y = element_blank(),
+                                    axis.title.y=element_blank(),
+                                    axis.ticks = element_blank(),
+                                    panel.grid.minor = element_line(colour = NA),
+                                    panel.grid.major = element_line(colour = NA)),
                                scale_fill_manual(values = cytobandColor)),
                           list(facet_grid(seqnames ~ .)))
               
@@ -152,12 +152,12 @@ setMethod("layout_karyogram", "GRanges",
           }else{
             p <- list(p.ideo,  facet_grid(facets))
           }
-            o <- theme(axis.text.y = theme_blank(),
-                      axis.title.y=theme_blank(),
-                      axis.ticks = theme_blank(),
-                      panel.grid.minor = theme_line(colour = NA),
-                      panel.grid.major = theme_line(colour = NA),
-                      strip.text.y=theme_text(angle=0))
+            o <- theme(axis.text.y = element_blank(),
+                      axis.title.y=element_blank(),
+                      axis.ticks = element_blank(),
+                      panel.grid.minor = element_line(colour = NA),
+                      panel.grid.major = element_line(colour = NA),
+                      strip.text.y=element_text(angle=0))
             p <- list(p, list(o), list(scale_x_sequnit()))
           })
 

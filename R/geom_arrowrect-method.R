@@ -66,11 +66,14 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
 
 
   if(missing(xlab)) 
-    xlab <- getXLab(data)
+    xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
   
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
+  if(missing(ylab))
+    ylab <- ""
+  
+  p <- c(p, list(ggplot2::ylab()))
+
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
 p  

@@ -1,8 +1,8 @@
 \name{geom_arrowrect}
 \alias{geom_arrowrect}
 \alias{geom_arrowrect,GRanges-method}
-\alias{geom_alignment,missing-method}
-\alias{geom_alignment,uneval-method}
+\alias{geom_arrowrect,missing-method}
+\alias{geom_arrowrect,uneval-method}
 \title{Arrowrect geoms for GRanges object}
 \description{
   Show interval data as rectangle with a arrow head.

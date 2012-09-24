@@ -793,23 +793,23 @@ autoplot(mx, geom = "tile", aes(width = 0.6, height = 0.6)) + theme_clear()
 ###################################################
 ### Views
 ###################################################
-lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
-            seq(10, 0.001, length = 500))
-xVector <- rpois(1e4, lambda)
-xRle <- Rle(xVector)
-v1 <- Views(xRle, start = sample(4.5e3:7.5e3, size = 50, replace = FALSE), width =500)
-autoplot(v1)
-names(v1) <- letters[sample(1:24, size = length(v1), replace = TRUE)]
-autoplot(v1)
-autoplot(v1, geom = "tile")
-## fix
-## facet pack
-% autoplot(v1, geom = "tile", aes(y = row))
-names(v1) <- NULL
-autoplot(v1, geom = "line")
-autoplot(v1, geom = "line", aes(color = row)) + theme(legend.position = "none")
-autoplot(v1, geom = "line", facets = NULL)
-autoplot(v1, geom = "line", facets = NULL, alpha  = 0.1)
+% lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
+%             seq(10, 0.001, length = 500))
+% xVector <- rpois(1e4, lambda)
+% xRle <- Rle(xVector)
+% v1 <- Views(xRle, start = sample(4.5e3:7.5e3, size = 50, replace = FALSE), width =500)
+% autoplot(v1)
+% names(v1) <- letters[sample(1:24, size = length(v1), replace = TRUE)]
+% autoplot(v1)
+% autoplot(v1, geom = "tile")
+% ## fix
+% ## facet pack
+% % autoplot(v1, geom = "tile", aes(y = row))
+% names(v1) <- NULL
+% autoplot(v1, geom = "line")
+% autoplot(v1, geom = "line", aes(color = row)) + theme(legend.position = "none")
+% autoplot(v1, geom = "line", facets = NULL)
+% autoplot(v1, geom = "line", facets = NULL, alpha  = 0.1)
 
 
 ###################################################

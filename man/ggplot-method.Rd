@@ -168,15 +168,15 @@ ggplot(mx, aes(x = x, y = row)) + geom_raster(aes(fill = rownames))
 ## please check autoplot, matrix for more control
 
 ##  Views
-subject <- XInteger(10, 3:-6)
-## equal width
-v1 <- Views(subject, start=4:1, width = 3)
-ggplot(v1) + geom_tile(aes(x = x, y = row, fill = value))
-ggplot(v1) + geom_tile(aes(x = x, y = factor(1), fill = value)) +
-facet_grid(group ~. )
-## unequal width
-v2 <- Views(subject, start=4:1, width = 3:6)  
-ggplot(v2) + geom_tile(aes(x = x, y = row, fill = value))
+% subject <- XInteger(10, 3:-6)
+% ## equal width
+% v1 <- Views(subject, start=4:1, width = 3)
+% ggplot(v1) + geom_tile(aes(x = x, y = row, fill = value))
+% ggplot(v1) + geom_tile(aes(x = x, y = factor(1), fill = value)) +
+% facet_grid(group ~. )
+% ## unequal width
+% v2 <- Views(subject, start=4:1, width = 3:6)  
+% ggplot(v2) + geom_tile(aes(x = x, y = row, fill = value))
 
 ## ExpressionSet
 library(Biobase)

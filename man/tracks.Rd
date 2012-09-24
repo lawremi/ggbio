@@ -377,7 +377,7 @@ bgColor(p1) <- "brown"
 # mutable for "+" method
 tracks(time1 = p1, time2 = p2)
 
-
+bgColor(p1) <- "white"
 ## apply a theme to each track
 tks <- tracks(time1 = p1, time2 = p2) + theme_bw()
 tks

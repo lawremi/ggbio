@@ -1,0 +1,76 @@
+%\VignetteIndexEntry{ggbio: visualization for genomic data with extending the
+%grammar of graphics}
+%\VignetteDepends{}
+%\VignetteKeywords{visualization utilities}
+%\VignettePackage{ggbio}
+\documentclass[10pt]{report}
+
+% \usepackage{times}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{color}
+
+
+
+\setkeys{Gin}{width=0.95\textwidth}
+
+\textwidth=6.5in
+\textheight=8.5in
+\parskip=.3cm
+\parindent = 0cm
+\oddsidemargin=-.1in
+\evensidemargin=-.1in
+\headheight=-.3in
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rcode}[1]{{\texttt{#1}}}
+
+\newcommand{\software}[1]{\textsf{#1}}
+\newcommand{\R}{\software{R}}
+\newcommand{\Bioc}{\software{Bioconductor}}
+\newcommand{\IRanges}{\Rpackage{IRanges}}
+\newcommand{\biovizBase}{\Rpackage{biovizBase}}
+\newcommand{\ggbio}{\Rpackage{ggbio}}
+\newcommand{\visnab}{\Rpackage{visnab}}
+\newcommand{\ggplot}{\Rpackage{ggplot2}}
+\newcommand{\grid}{\Rpackage{grid}}
+\newcommand{\gridExtra}{\Rpackage{gridExtra}}
+\newcommand{\qplot}{\Rfunction{qplot}}
+\newcommand{\autoplot}{\Rfunction{autoplot}}
+\newcommand{\knitr}{\Rpackage{knitr}}
+\newcommand{\tracks}{\Rfunction{tracks}}
+
+
+% my own frambox
+\newcommand{\sfbox}[2][Tips]{
+\begin{center}
+\shadowbox{
+  \parbox{0.8\linewidth}{
+    \textcolor{blue}{#1:}
+    #2
+  }
+  }
+\end{center}
+}
+
+\title{\ggbio{}: visualization toolkits for genomic data}
+\author{Tengfei Yin}
+\date{\today}
+
+\begin{document}
+% \setkeys{Gin}{width=0.6\textwidth}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+This is a fake vignette.
+
+\end{document}

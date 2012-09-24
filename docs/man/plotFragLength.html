@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Plot estimated fragment length for paired-end RNA-seq data</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for plotFragLength {ggbio}"><tr><td>plotFragLength {ggbio}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Plot estimated fragment length for paired-end RNA-seq data</h2>
+
+<h3>Description</h3>
+
+
+<p>Plot estimated fragment length for paired-end RNA-seq data against
+single reduced data model. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'character,GRanges'
+plotFragLength(data, model,
+               gap.ratio = 0.0025,
+               geom = c("segment", "point", "line"),
+               type = c("normal", "cut"),
+               heights = c(400, 100),
+               annotation = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>A character indicate the bam file.
+</p>
+</td></tr>
+<tr valign="top"><td><code>model</code></td>
+<td>
+
+<p>A reduced model to compute estimated fragment length. please see
+details.
+</p>
+</td></tr>
+<tr valign="top"><td><code>gap.ratio</code></td>
+<td>
+
+<p>When type is set to &quot;cut&quot;, it will provide a compact view, which cut
+the common gaps in a certain ratio.
+</p>
+</td></tr>
+<tr valign="top"><td><code>geom</code></td>
+<td>
+
+<p>One or all three geoms could be drawn at the same time. y value of
+&quot;point&quot; and &quot;line&quot; indicate the estimated fragment length. and if
+geom is set to &quot;segment&quot;, the segment is from the left most position
+to paired right most position, should be equal to &quot;isize&quot;.
+</p>
+</td></tr>
+<tr valign="top"><td><code>type</code></td>
+<td>
+
+<p>&quot;normal&quot; return a uncut view, loose but the coordinate is true
+genomic coordinates. &quot;cut&quot; cut the view in a compact way.
+</p>
+</td></tr>
+<tr valign="top"><td><code>heights</code></td>
+<td>
+
+<p>Numeric vector indicate the heights of tracks.
+</p>
+</td></tr>
+<tr valign="top"><td><code>annotation</code></td>
+<td>
+
+<p>A logical value. TRUE shows model, and FALSE shows only fragment
+length with labels.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+<p>We use a easy way to define this estimated fragment length, we
+collect all paired reads and model, reduce model first, then find
+common gaps, remove common gaps between paired-end reads, and compute
+the new estimated fragment length. 
+</p>
+
+
+<h3>Value</h3>
+
+
+<p>A ggplot object when <code>annotation = FALSE</code> and a frame grob if
+<code>annotation = TRUE</code>
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Tengfei Yin</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">## Not run: 
+##D data(genesymbol)
+##D bamfile &lt;- system.file(&quot;extdata&quot;, &quot;SRR027894subRBM17.bam&quot;, package=&quot;biovizBase&quot;)
+##D library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+##D txdb &lt;- TxDb.Hsapiens.UCSC.hg19.knownGene
+##D model &lt;- exonsBy(txdb, by = &quot;tx&quot;)
+##D model.new &lt;- subsetByOverlaps(model, genesymbol[&quot;RBM17&quot;])
+##D exons.rbm17 &lt;- subsetByOverlaps(exons(txdb), genesymbol[&quot;RBM17&quot;])
+##D exons.new &lt;- reduce(exons.rbm17)
+##D plotFragLength(bamfile, exons.new, geom = &quot;line&quot;)
+##D plotFragLength(bamfile, exons.new, geom = c(&quot;point&quot;,&quot;segment&quot;))
+##D plotFragLength(bamfile, exons.new, geom = c(&quot;point&quot;,&quot;segment&quot;), annotation = FALSE)
+##D plotFragLength(bamfile, exons.new, geom = c(&quot;point&quot;,&quot;segment&quot;), type = &quot;cut&quot;,
+##D                gap.ratio = 0.001)
+## End(Not run)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>ggbio</em> version 1.5.12 ]</div>
+</body></html>

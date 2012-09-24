@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Plot single chromosome with cytoband</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for plotSingleChrom {ggbio}"><tr><td>plotSingleChrom {ggbio}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Plot single chromosome with cytoband</h2>
+
+<h3>Description</h3>
+
+
+<p>Plot single chromosome with cytoband. <code>plotIdeogram</code> is synonyms
+to <code>plotSingleChrom</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+plotSingleChrom(obj, subchr, zoom.region, xlab, ylab,
+                 main, xlabel = FALSE, cytoband = TRUE)
+plotIdeogram(obj, subchr, zoom.region, xlab, ylab,
+                 main, xlabel = FALSE, cytoband = TRUE)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>A <code>GenomicRanges</code> object, which include extra
+information about cytoband, check biovizBase::isIdeogram.
+</p>
+</td></tr>
+<tr valign="top"><td><code>subchr</code></td>
+<td>
+
+<p>A single character of chromosome names to show.
+</p>
+</td></tr>
+<tr valign="top"><td><code>zoom.region</code></td>
+<td>
+
+<p>A numeric vector of length 2 indicating zoomed region.
+</p>
+</td></tr>
+<tr valign="top"><td><code>xlab</code></td>
+<td>
+
+<p>Label for x
+</p>
+</td></tr>
+<tr valign="top"><td><code>ylab</code></td>
+<td>
+
+<p>Label for y
+</p>
+</td></tr>
+<tr valign="top"><td><code>main</code></td>
+<td>
+
+<p>Title for plot.
+</p>
+</td></tr>
+<tr valign="top"><td><code>xlabel</code></td>
+<td>
+
+<p>A logical value. Show the x label or not.
+</p>
+</td></tr>
+<tr valign="top"><td><code>cytoband</code></td>
+<td>
+
+<p>If FALSE, plot just blank chromosome without cytoband. default is TRUE.
+</p>
+</td></tr>  
+</table>
+
+
+<h3>Details</h3>
+
+
+<p>User could provide the whole ideogram and use subchr to point to
+particular chromosome.
+</p>
+
+
+<h3>Value</h3>
+
+
+<p>A <code>ggplot</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Tengfei Yin</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">## Not run: 
+##D library(biovizBase)
+##D data(hg19IdeogramCyto, package = &quot;biovizBase&quot;)
+##D biovizBase::isIdeogram(hg19IdeogramCyto) ## return TRUE
+##D plotIdeogram(hg19IdeogramCyto, &quot;chr1&quot;)
+##D plotIdeogram(hg19IdeogramCyto, &quot;chr1&quot;, xlabel = TRUE)
+##D ## zoom
+##D plotIdeogram(hg19IdeogramCyto, &quot;chr1&quot;,  zoom.region = c(1e8, 1.5e8))
+## End(Not run)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>ggbio</em> version 1.5.12 ]</div>
+</body></html>

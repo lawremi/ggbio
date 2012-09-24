@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Plot stacked overview</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for plotStackedOverview {ggbio}"><tr><td>plotStackedOverview {ggbio}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Plot stacked overview</h2>
+
+<h3>Description</h3>
+
+
+<p>Plot stacked overview for genome with or without cytoband. It's a
+wrapper around <code>layout_karyogram</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+plotStackedOverview(obj, ..., xlab, ylab, main, geom = "rect",
+                         cytoband = FALSE, rescale = TRUE,
+                         rescale.range = c(0, 10))
+plotKaryogram(obj, ..., xlab, ylab, main, geom = "rect",
+                         cytoband = FALSE, rescale = TRUE,
+                         rescale.range = c(0, 10))
+</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+
+<p>a <code>GRanges</code> object, which could contain extra
+information about cytoband. If it's missing, will ask user to
+provide species information and download proper data set from UCSC.
+If you want an accurate genome mapping, please provide
+<code>seqlengths</code> with this <code>GRanges</code> object,otherwise it will
+emit a warning and use data space to estimate the chromosome space
+which is very rough.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>arguments passed to graphic functions to control aesthetics. For
+example, if you use geom &quot;point&quot;, you need to provide &quot;y&quot; in
+<code>aes()</code>, and if can also pass <code>color, fill, size</code> etc. to
+control graphics.
+</p>
+</td></tr>
+<tr valign="top"><td><code>xlab</code></td>
+<td>
+
+<p>label for x
+</p>
+</td></tr>
+<tr valign="top"><td><code>ylab</code></td>
+<td>
+
+<p>label for y
+</p>
+</td></tr>
+<tr valign="top"><td><code>main</code></td>
+<td>
+
+<p>title for plot.
+</p>
+</td></tr>
+<tr valign="top"><td><code>geom</code></td>
+<td>
+
+<p>geom plotted on the stacked layout. Default is &quot;rect&quot;, which showing
+interval data as rectangles. It automatically figures out boundary
+so you don't have to provide information in <code>aes</code>, users could specify other supported
+geom works for <code>data.frame</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>cytoband</code></td>
+<td>
+
+<p>logical value. Default is <code>FALSE</code>. If <code>TRUE</code>, plotting cytoband, this
+require your data have arbitrary column as <code>name</code> and
+<code>gieStain</code>. the easiest way is to use <code>getIdeogram</code> to get
+your data. Notice for this function, when cytoband is <code>TRUE</code>,
+it will only plot cytoband without overlaying your data. If you
+really need to overlay extra data on cytoband, please plus
+<code>layout_karyogram</code> for that purpose.
+</p>
+</td></tr>
+<tr valign="top"><td><code>rescale</code></td>
+<td>
+
+<p>logical value. Default is <code>TRUE</code>, which rescale your data into
+the <code>rescale.range</code>, this make sure your data will not be
+plotted outside the stacked overview box.
+</p>
+</td></tr>
+<tr valign="top"><td><code>rescale.range</code></td>
+<td>
+
+<p>Numeric range of length 2. Default is (0, 10), because stacked
+layout draws a white background as chromosome space and this space
+is of height 10. We hide the y-axis since we don't need it for
+stacked overview. Sometime users may want to leave some margin for
+their data, they can use this arguments to control the rescale.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+<p>Stacked overview is just a arbitrary layout for karyogram
+layout, it use facets seqnaems ~ . as default to stack the genome. For
+accurate mapping, you need to provide <code>seqlengths</code> information in
+your <code>GRanges</code> object. Otherwise, data space will be computed for
+stacked overview chromosome background, this is _NOT_ the actual
+chromosome space!.
+</p>
+
+
+<h3>Value</h3>
+
+
+<p>A <code>ggplot</code> object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Tengfei Yin</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">## Not run: 
+##D library(biovizBase)
+##D data(hg19IdeogramCyto, package = &quot;biovizBase&quot;)
+##D library(GenomicRanges)
+##D 
+##D ## you can also get ideogram by biovizBase::getIdeogram
+##D 
+##D ## make shorter and clean labels
+##D old.chrs &lt;- seqnames(seqinfo(hg19IdeogramCyto))
+##D new.chrs &lt;- gsub(&quot;chr&quot;, &quot;&quot;, old.chrs)
+##D ## lst &lt;- as.list(new.chrs)
+##D names(new.chrs) &lt;- old.chrs
+##D new.ideo &lt;- renameSeqlevels(hg19IdeogramCyto, new.chrs)
+##D new.ideo &lt;- keepSeqlevels(new.ideo, c(as.character(1:22) , &quot;X&quot;, &quot;Y&quot;))
+##D new.ideo
+##D 
+##D 
+##D ## sample data
+##D data(darned_hg19_subset500, package = &quot;biovizBase&quot;)
+##D idx &lt;- is.na(values(darned_hg19_subset500)$exReg)
+##D values(darned_hg19_subset500)$exReg[idx] &lt;- &quot;unknown&quot;
+##D 
+##D ## you need to add seqlengths for accruate mapping
+##D chrnames &lt;- unique(as.character(seqnames(darned_hg19_subset500)))
+##D data(hg19Ideogram, package = &quot;biovizBase&quot;)
+##D seqlengths(darned_hg19_subset500) &lt;- seqlengths(hg19Ideogram)[sort(chrnames)]
+##D 
+##D 
+##D dn &lt;- darned_hg19_subset500
+##D values(dn)$score &lt;- rnorm(length(dn))
+##D 
+##D ## plotStackedOverview is a simple wrapper around this functions to
+##D    create a stacked layout
+##D plotStackedOverview(new.ideo, cytoband = TRUE)
+##D 
+##D plotStackedOverview(dn)
+##D plotStackedOverview(dn, aes(color = exReg, fill = exReg))
+##D ## this will did the trick for you to rescale the space
+##D plotStackedOverview(dn, aes(x = midpoint, y = score), geom = &quot;line&quot;)
+##D plotStackedOverview(dn, aes(x = midpoint, y = score), geom = &quot;line&quot;, rescale.range = c(4, 6))
+##D ## no rescale
+##D plotStackedOverview(dn, aes(x = midpoint, y = score), geom = &quot;line&quot;, rescale = FALSE,
+##D                     xlab = &quot;xlab&quot;, ylab = &quot;ylab&quot;, main  = &quot;main&quot;) + ylab(&quot;ylab&quot;)
+##D 
+##D ## no object? will ask you for species and query the data on the fly
+##D plotStackedOverview()
+##D plotStackedOverview(cytoband = TRUE)
+## End(Not run)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>ggbio</em> version 1.5.12 ]</div>
+</body></html>

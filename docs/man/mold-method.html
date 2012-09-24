@@ -1,0 +1,445 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Mold an object to a data frame</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for mold {ggbio}"><tr><td>mold {ggbio}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Mold an object to a data frame</h2>
+
+<h3>Description</h3>
+
+
+<p>S4 method to transform a object to a data.frame.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'eSet'
+mold(data)
+## S4 method for signature 'GRanges'
+mold(data)
+## S4 method for signature 'IRanges'
+mold(data)
+## S4 method for signature 'GRangesList'
+mold(data,
+          indName = "grl_name")
+## S4 method for signature 'IRanges'
+mold(data)
+## S4 method for signature 'Seqinfo'
+mold(data)
+## S4 method for signature 'matrix'
+mold(data)
+## S4 method for signature 'ExpressionSet'
+mold(data)
+## S4 method for signature 'SummarizedExperiment'
+mold(data, assay.id = 1)
+## S4 method for signature 'Views'
+mold(data)
+## S4 method for signature 'Rle'
+mold(data)
+## S4 method for signature 'RleList'
+mold(data)
+</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>oringinal data object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>indName</code></td>
+<td>
+
+<p>character. When mold a <code>GRangesList</code> to a
+<code>GRanges</code> the collapsed list names will be added
+as a column named by <code>indName</code>, default is &quot;grl_name&quot;.
+</p>
+</td></tr>
+<tr valign="top"><td><code>assay.id</code></td>
+<td>
+
+<p>an integer indicates which assay to be used to mold into the data.frame.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+
+<p>For different object, we try to maximize the information kept during
+molding to a data.frame. Most cases, this is different from simply
+use method as.data.frame. 
+</p>
+<dl>
+<dt><code>GRanges</code></dt><dd><p>return a data.frame with
+extra 'midpoint' column, which is (start+end)/2.</p>
+</dd>
+<dt> <code>GRangesList</code></dt><dd><p>return a data.frame with
+extra 'midpoint' column, which is (start+end)/2, and with indName
+indicates which group they are originally from the list.</p>
+</dd>
+<dt><code>IRanges</code></dt><dd><p>return a data.frame with
+extra 'midpoint' column, which is (start+end)/2.</p>
+</dd>
+<dt><code>Seqinfo</code></dt><dd><p>return a data.frame 
+column: seqnames, start, end, width, strand, midpoint, seqlengths,
+isCircular, genome.</p>
+</dd>
+<dt><code>matrix</code></dt><dd><p>return a data.frame with 'x', 'y', and
+'value', 'row', 'col' column. If either colnames or rownames exists, a new
+'colnames' or 'rownames' column will be created and added to the
+data.frame. Notice, 'x' and 'y' are numeric coordinates in the
+matrix while 'col' and 'row' are the same value but are all factors.</p>
+</dd>
+<dt><code>Views</code></dt><dd><p>return a data.frame with
+'x', 'y', and 'value', 'start', 'end', 'width', 'midpoint', 'group'
+column. If either colnames or rownames exists, a new 'colnames' or
+'rownames' column will be created and added to the
+data.frame. This is achieved by coerce it to a matrix
+first. Additional variable 'row' will be added to indicate the
+group, but it actually equals to 'y'.</p>
+</dd>
+<dt><code>ExpressionSet</code></dt><dd><p>parse the matrix by using
+<code>exprs</code> on it and then <code>mold</code> the matrix to a
+data.frame with 'x', 'y', and 'value', 'col', 'row' column, 'colnames' for
+sample data and 'rownames' for features. 'x' and 'y' are numeric coordinates in the
+matrix while 'col' and 'row' are the same value but are all
+factors. The pheno data is also integrated with it.</p>
+</dd>
+<dt><code>Rle</code></dt><dd><p>coerce to a data.frame with
+column 'x', 'y', 'col', 'row', 'value'. 'x' and 'y' are numeric coordinates in the
+matrix while 'col' and 'row' are the same value but are all
+factors.</p>
+</dd>
+<dt><code>RleList</code></dt><dd><p>coerce to a data.frame with
+column 'x', 'y','col', 'row', 'value' and 'group', and 'group' variable
+indicates the original list entry number. 'x' and 'y' are numeric coordinates in the
+matrix while 'col' and 'row' are the same value but are all factors.</p>
+</dd>
+<dt><code>SummarizedExperiment</code></dt><dd><p>parse the matrix by using
+<code>exprs</code> on it and then <code>mold</code> the matrix to a
+data.frame with 'x', 'y', and 'value', 'col', 'row' column, 'colnames' for
+sample data and 'rownames' for features. 'x' and 'y' are numeric coordinates in the
+matrix while 'col' and 'row' are the same value but are all
+factors. The <code>colData</code> and <code>rowData</code> are also integrated with it.</p>
+</dd>
+</dl>
+
+
+
+<h3>Value</h3>
+
+
+<p>a data.frame object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Tengfei Yin</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">set.seed(1)
+N &lt;- 1000
+library(GenomicRanges)
+## GRanges
+gr &lt;- GRanges(seqnames = 
+              sample(c(&quot;chr1&quot;, &quot;chr2&quot;, &quot;chr3&quot;),
+                     size = N, replace = TRUE),
+              IRanges(
+                      start = sample(1:300, size = N, replace = TRUE),
+                      width = sample(70:75, size = N,replace = TRUE)),
+              strand = sample(c(&quot;+&quot;, &quot;-&quot;, &quot;*&quot;), size = N, 
+                replace = TRUE),
+              value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
+              sample = sample(c(&quot;Normal&quot;, &quot;Tumor&quot;), 
+                size = N, replace = TRUE),
+              pair = sample(letters, size = N, 
+                replace = TRUE))
+## GRangesList
+grl &lt;- split(gr, values(gr)$pair)
+head(mold(grl))
+</code></pre>
+
+<pre><code>##   seqnames start end width strand grl_name  value  score sample pair
+## 1     chr2   252 324    73      *        a  3.631 156.58 Normal    a
+## 2     chr2    14  83    70      -        a 14.871  68.92  Tumor    a
+## 3     chr1   272 342    71      +        a  9.060  86.62  Tumor    a
+## 4     chr2    25  95    71      +        a 10.725 117.33 Normal    a
+## 5     chr3    35 105    71      -        a 13.912 113.62 Normal    a
+## 6     chr2   160 230    71      +        a  7.125 105.82  Tumor    a
+##   midpoint
+## 1    288.0
+## 2     48.5
+## 3    307.0
+## 4     60.0
+## 5     70.0
+## 6    195.0
+</code></pre>
+
+<pre><code class="r">head(mold(grl, indName = &quot;group_sample&quot;))
+</code></pre>
+
+<pre><code>##   seqnames start end width strand group_sample  value  score sample pair
+## 1     chr2   252 324    73      *            a  3.631 156.58 Normal    a
+## 2     chr2    14  83    70      -            a 14.871  68.92  Tumor    a
+## 3     chr1   272 342    71      +            a  9.060  86.62  Tumor    a
+## 4     chr2    25  95    71      +            a 10.725 117.33 Normal    a
+## 5     chr3    35 105    71      -            a 13.912 113.62 Normal    a
+## 6     chr2   160 230    71      +            a  7.125 105.82  Tumor    a
+##   midpoint
+## 1    288.0
+## 2     48.5
+## 3    307.0
+## 4     60.0
+## 5     70.0
+## 6    195.0
+</code></pre>
+
+<pre><code class="r">## IRanges
+ir &lt;- ranges(gr)
+head(mold(ir))
+</code></pre>
+
+<pre><code>##   start end width midpoint
+## 1   160 234    75    197.0
+## 2   206 280    75    243.0
+## 3   115 189    75    152.0
+## 4   287 358    72    322.5
+## 5    36 106    71     71.0
+## 6    12  81    70     46.5
+</code></pre>
+
+<pre><code class="r">## Seqinfo
+seqlengths(gr) &lt;- c(400, 500, 420)
+head(mold(seqinfo(gr)))
+</code></pre>
+
+<pre><code>##      seqnames start end width strand midpoint seqlengths isCircular genome
+## chr1     chr1     1 400   400      *    200.5        400         NA   &lt;NA&gt;
+## chr2     chr2     1 500   500      *    250.5        500         NA   &lt;NA&gt;
+## chr3     chr3     1 420   420      *    210.5        420         NA   &lt;NA&gt;
+</code></pre>
+
+<pre><code class="r">## matrix
+mx &lt;- matrix(1:12, nrow = 3)
+head(mold(mx))
+</code></pre>
+
+<pre><code>##   x y value row col
+## 1 1 1     1   1   1
+## 2 2 1     4   1   2
+## 3 3 1     7   1   3
+## 4 4 1    10   1   4
+## 5 1 2     2   2   1
+## 6 2 2     5   2   2
+</code></pre>
+
+<pre><code class="r">colnames(mx)
+</code></pre>
+
+<pre><code>## NULL
+</code></pre>
+
+<pre><code class="r">colnames(mx) &lt;- letters[1:ncol(mx)]
+mx
+</code></pre>
+
+<pre><code>##      a b c  d
+## [1,] 1 4 7 10
+## [2,] 2 5 8 11
+## [3,] 3 6 9 12
+</code></pre>
+
+<pre><code class="r">head(mold(mx))
+</code></pre>
+
+<pre><code>##   x y value row col colnames
+## 1 1 1     1   1   1        a
+## 2 2 1     4   1   2        b
+## 3 3 1     7   1   3        c
+## 4 4 1    10   1   4        d
+## 5 1 2     2   2   1        a
+## 6 2 2     5   2   2        b
+</code></pre>
+
+<pre><code class="r">rownames(mx)
+</code></pre>
+
+<pre><code>## NULL
+</code></pre>
+
+<pre><code class="r">rownames(mx) &lt;- LETTERS[1:nrow(mx)]
+head(mold(mx))
+</code></pre>
+
+<pre><code>##   x y value row col colnames rownames
+## 1 1 1     1   1   1        a        A
+## 2 2 1     4   1   2        b        A
+## 3 3 1     7   1   3        c        A
+## 4 4 1    10   1   4        d        A
+## 5 1 2     2   2   1        a        B
+## 6 2 2     5   2   2        b        B
+</code></pre>
+
+<pre><code class="r">## ExpressionSet
+library(Biobase)
+data(sample.ExpressionSet)
+sample.ExpressionSet
+</code></pre>
+
+<pre><code>## ExpressionSet (storageMode: lockedEnvironment)
+## assayData: 500 features, 26 samples 
+##   element names: exprs, se.exprs 
+## protocolData: none
+## phenoData
+##   sampleNames: A B ... Z (26 total)
+##   varLabels: sex type score
+##   varMetadata: labelDescription
+## featureData: none
+## experimentData: use &#39;experimentData(object)&#39;
+## Annotation: hgu95av2
+</code></pre>
+
+<pre><code class="r">set.seed(1)
+## select 50 features
+idx &lt;- sample(seq_len(dim(sample.ExpressionSet)[1]), size = 50)
+eset &lt;- sample.ExpressionSet[idx,]
+head(mold(eset))
+</code></pre>
+
+<pre><code>##   x y value row col colnames rownames    sex    type score
+## A 1 1 177.1   1   1        A 31372_at Female Control  0.75
+## B 2 1 171.2   1   2        B 31372_at   Male    Case  0.40
+## C 3 1 277.2   1   3        C 31372_at   Male Control  0.73
+## D 4 1 190.2   1   4        D 31372_at   Male    Case  0.42
+## E 5 1 138.4   1   5        E 31372_at Female    Case  0.93
+## F 6 1 174.0   1   6        F 31372_at   Male Control  0.22
+</code></pre>
+
+<pre><code class="r">## Rle
+library(IRanges)
+lambda &lt;- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
+            seq(10, 0.001, length = 500))
+xVector &lt;- rpois(1e4, lambda)
+xRle &lt;- Rle(xVector)
+head(mold(xRle))
+</code></pre>
+
+<pre><code>##   value x y row col
+## 1     0 1 1   1   1
+## 2     0 2 1   1   2
+## 3     0 3 1   1   3
+## 4     0 4 1   1   4
+## 5     0 5 1   1   5
+## 6     0 6 1   1   6
+</code></pre>
+
+<pre><code class="r">## RleList
+xRleList &lt;- RleList(xRle, 2L * xRle)
+xRleList
+</code></pre>
+
+<pre><code>## SimpleRleList of length 2
+## [[1]]
+## numeric-Rle of length 10000 with 829 runs
+##   Lengths:  729    1  208    1 1599    1 ...    1    1    1    5    1 4512
+##   Values :    0    1    0    1    0    1 ...    1    0    1    0    1    0
+## 
+## [[2]]
+## numeric-Rle of length 10000 with 829 runs
+##   Lengths:  729    1  208    1 1599    1 ...    1    1    1    5    1 4512
+##   Values :    0    2    0    2    0    2 ...    2    0    2    0    2    0
+</code></pre>
+
+<pre><code class="r">head(mold(xRleList))
+</code></pre>
+
+<pre><code>##   value x y row col group
+## 1     0 1 1   1   1     1
+## 2     0 2 1   1   2     1
+## 3     0 3 1   1   3     1
+## 4     0 4 1   1   4     1
+## 5     0 5 1   1   5     1
+## 6     0 6 1   1   6     1
+</code></pre>
+
+<pre><code class="r">names(xRleList) &lt;- c(&quot;a&quot; ,&quot;b&quot;)
+xRleList
+</code></pre>
+
+<pre><code>## SimpleRleList of length 2
+## $a
+## numeric-Rle of length 10000 with 829 runs
+##   Lengths:  729    1  208    1 1599    1 ...    1    1    1    5    1 4512
+##   Values :    0    1    0    1    0    1 ...    1    0    1    0    1    0
+## 
+## $b
+## numeric-Rle of length 10000 with 829 runs
+##   Lengths:  729    1  208    1 1599    1 ...    1    1    1    5    1 4512
+##   Values :    0    2    0    2    0    2 ...    2    0    2    0    2    0
+</code></pre>
+
+<pre><code class="r">head(mold(xRleList))
+</code></pre>
+
+<pre><code>##   value x y row col group
+## 1     0 1 1   1   1     a
+## 2     0 2 1   1   2     a
+## 3     0 3 1   1   3     a
+## 4     0 4 1   1   4     a
+## 5     0 5 1   1   5     a
+## 6     0 6 1   1   6     a
+</code></pre>
+
+<pre><code class="r">## SummerizedExperiments
+library(GenomicRanges)
+nrows &lt;- 200; ncols &lt;- 6
+counts &lt;- matrix(runif(nrows * ncols, 1, 1e4), nrows)
+counts2 &lt;- matrix(runif(nrows * ncols, 1, 1e4), nrows)
+rowData &lt;- GRanges(rep(c(&quot;chr1&quot;, &quot;chr2&quot;), c(50, 150)),
+                   IRanges(floor(runif(200, 1e5, 1e6)), width=100),
+                   strand=sample(c(&quot;+&quot;, &quot;-&quot;), 200, TRUE))
+colData &lt;- DataFrame(Treatment=rep(c(&quot;ChIP&quot;, &quot;Input&quot;), 3),
+                     row.names=LETTERS[1:6])
+sset &lt;- SummarizedExperiment(assays=SimpleList(counts=counts,
+                                               counts2 = counts2),
+                             rowData=rowData, colData=colData)
+head(mold(sset))
+</code></pre>
+
+<pre><code>##     x y value row col colnames  cd.e seqnames  start    end width strand
+## 1   1 1  1627   1   1        A  ChIP     chr1 527305 527404   100      -
+## 1.1 2 1  8700   1   2        B Input     chr1 527305 527404   100      -
+## 1.2 3 1  8447   1   3        C  ChIP     chr1 527305 527404   100      -
+## 1.3 4 1  4958   1   4        D Input     chr1 527305 527404   100      -
+## 1.4 5 1  8776   1   5        E  ChIP     chr1 527305 527404   100      -
+## 1.5 6 1  9604   1   6        F Input     chr1 527305 527404   100      -
+</code></pre>
+
+<pre><code class="r">## VCF
+library(VariantAnnotation)
+vcffile &lt;- system.file(&quot;extdata&quot;, &quot;chr22.vcf.gz&quot;, package=&quot;VariantAnnotation&quot;)
+vcf &lt;- readVcf(vcffile, &quot;hg19&quot;)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>ggbio</em> version 1.5.12 ]</div>
+</body></html>

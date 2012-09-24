@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Plot Ranges Linked with Data</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for plotRangesLinkedToData {ggbio}"><tr><td>plotRangesLinkedToData {ggbio}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Plot Ranges Linked with Data</h2>
+
+<h3>Description</h3>
+
+
+<p>Plot GRanges object structure and linked to a even spaced paralell
+coordinates plot which represting the data in elementeMetadata.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+plotRangesLinkedToData(data, ..., stat.col, stat.label,
+                                   stat.ylab,
+                                   sig, sig.col = c("black", "red"),
+                                   stat.coord.trans = coord_trans(),
+                                   annotation = list(),
+                                   width.ratio = 0.8,
+                                   track.skip = -1,
+                                   theme.stat = theme_grey(),
+                                   theme.align = theme_gray(),
+                                   linetype = 3, 
+                                   heights)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>GRanges object with a DataFrame as elementMetadata.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Parameters passed to control lines in top plot.
+</p>
+</td></tr>
+<tr valign="top"><td><code>stat.col</code></td>
+<td>
+
+<p>integer (variable position starting in DataFrame of data, start from
+1) or strings (variable names) which indicate the column names.
+</p>
+</td></tr>
+<tr valign="top"><td><code>stat.label</code></td>
+<td>
+
+<p>Labels of the columns, if missing, use stat.col.
+</p>
+</td></tr>
+<tr valign="top"><td><code>stat.ylab</code></td>
+<td>
+
+<p>y label for stat track(the top track).
+</p>
+</td></tr>
+<tr valign="top"><td><code>sig</code></td>
+<td>
+
+<p>a character of element meta data column of logical value, indicates
+which row is signficant. and will be shown in link lines and rectangle.
+</p>
+</td></tr>
+<tr valign="top"><td><code>sig.col</code></td>
+<td>
+
+<p>colors for significant, valid when you specify &quot;sig&quot; argument, the
+first color indicates <code>FALSE</code>, non-significant, the second
+color indicates <code>TRUE</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>stat.coord.trans</code></td>
+<td>
+
+<p>transformation used for top plot.
+</p>
+</td></tr>
+<tr valign="top"><td><code>annotation</code></td>
+<td>
+
+<p>A list of ggplot object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>width.ratio</code></td>
+<td>
+
+<p>Control the segment length of statistic layer.
+</p>
+</td></tr>
+<tr valign="top"><td><code>track.skip</code></td>
+<td>
+
+<p>skip between tracks.
+</p>
+</td></tr>
+<tr valign="top"><td><code>theme.stat</code></td>
+<td>
+
+<p>top plot theme.
+</p>
+</td></tr>
+<tr valign="top"><td><code>theme.align</code></td>
+<td>
+
+<p>alignment themes.
+</p>
+</td></tr>
+<tr valign="top"><td><code>linetype</code></td>
+<td>
+
+<p>linetype
+</p>
+</td></tr>
+<tr valign="top"><td><code>heights</code></td>
+<td>
+
+<p>Heights of each track.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+<p>Inspired by some graphics produced in some other packages, for example
+in package DEXseq, the author provides graphics with gene
+models and linked to an even spaced statistics summary. This is useful
+because we always plot everything along the genomic coordinates, but
+genomic features like exons are not evenly distributed, so we could
+actually treat the statistics associated with exons like categorical
+data, and show them as &quot;Paralell Coordinates Plots&quot;. This is one
+special layout which represent the data in a nice manner and also keep
+the genomic structure information. With abliity of <code>tracks</code>,
+it's possible to generate such type of a graphic along with other
+annotations.
+</p>
+<p>The data we want is a normal <code>GRanges</code> object, and make sure
+the intervals are not overlaped with each other(currently), and you
+may have multiple columns which store the statistics for multiple
+samples, then we produce the graphic we introduced above and users
+could pass other annotation track in the function which will be shown
+below the main linked track. 
+</p>
+<p>The reason you need to pass annotation into the function instead of
+binding them by <code>tracks</code> later is because binding manually
+with annotation tracks is tricky and this function doesn't return a
+ggplot object. 
+</p>
+
+
+<h3>Value</h3>
+
+
+<p>return a frame grob; side-effect (plotting) if plot=T.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Tengfei Yin</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">## Not run: 
+##D library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+##D library(ggbio)
+##D data(genesymbol, package = &quot;biovizBase&quot;)
+##D txdb &lt;- TxDb.Hsapiens.UCSC.hg19.knownGene
+##D model &lt;- exonsBy(txdb, by = &quot;tx&quot;)
+##D model17 &lt;- subsetByOverlaps(model, genesymbol[&quot;RBM17&quot;])
+##D exons &lt;- exons(txdb)
+##D exon17 &lt;- subsetByOverlaps(exons, genesymbol[&quot;RBM17&quot;])
+##D ## reduce to make sure there is no overlap
+##D ## just for example
+##D exon.new &lt;- reduce(exon17)
+##D ## suppose
+##D values(exon.new)$sample1 &lt;- rnorm(length(exon.new), 10, 3)
+##D values(exon.new)$sample2 &lt;- rnorm(length(exon.new), 10, 10)
+##D values(exon.new)$score &lt;- rnorm(length(exon.new))
+##D values(exon.new)$significant &lt;- sample(c(T,F), size =
+##D length(exon.new),replace = TRUE)
+##D plotRangesLinkedToData(exon.new, stat.col = c(&quot;sample1&quot;, &quot;sample2&quot;))
+##D plotRangesLinkedToData(exon.new, stat.col = 1:2)
+##D plotRangesLinkedToData(exon.new, stat.col = 1:2, size = 3, linetype = 4)
+##D plotRangesLinkedToData(exon.new, stat.col = 1:2, size = 3, linetype = 4,
+##D                        sig = &quot;significant&quot;)
+##D plotRangesLinkedToData(exon.new, stat.col = 1:2, size = 3, linetype = 4,
+##D                        sig = &quot;significant&quot;, sig.col = c(&quot;red&quot;,
+##D &quot;gray90&quot;))
+## End(Not run)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>ggbio</em> version 1.5.12 ]</div>
+</body></html>

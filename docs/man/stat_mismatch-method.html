@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Calculate mismatch summary</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for stat_mismatch {ggbio}"><tr><td>stat_mismatch {ggbio}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Calculate mismatch summary</h2>
+
+<h3>Description</h3>
+
+
+<p>Calculate mismatch summary  
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## for GRanges
+## S4 method for signature 'GRanges'
+stat_mismatch(data, ..., bsgenome, 
+              xlab, ylab, main,
+              geom = c("segment", "bar"),
+              show.coverage = TRUE)
+## for BamFile
+## S4 method for signature 'BamFile'
+stat_mismatch(data, ..., bsgenome, which,
+              xlab, ylab, main,
+              geom = c("segment", "bar"),
+              show.coverage = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>A <code>GRanges</code> or <code>BamFile</code> object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Extra parameters such as aes() passed to <code>geom_rect</code>,
+<code>geom_alignment</code>, or <code>geom_segment</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>bsgenome</code></td>
+<td>
+
+<p><code>BSgenome</code> object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>which</code></td>
+<td>
+
+<p><code>GRanges</code> object to subset the data.
+</p>
+</td></tr>
+<tr valign="top"><td><code>xlab</code></td>
+<td>
+
+<p>Label for x
+</p>
+</td></tr>
+<tr valign="top"><td><code>ylab</code></td>
+<td>
+
+<p>Label for y
+</p>
+</td></tr>
+<tr valign="top"><td><code>main</code></td>
+<td>
+
+<p>Title for plot.
+</p>
+</td></tr>
+<tr valign="top"><td><code>geom</code></td>
+<td>
+
+<p>The geometric object to use display the data. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>show.coverage</code></td>
+<td>
+
+<p>whether to show coverage as background or not.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+
+<p>A 'Layer'.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Tengfei Yin</p>
+
+<hr><div align="center">[Package <em>ggbio</em> version 1.5.12 ]</div>
+</body></html>

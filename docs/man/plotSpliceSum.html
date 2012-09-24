@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Plot Splice Summary from RNA-seq data</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for plotSpliceSum {ggbio}"><tr><td>plotSpliceSum {ggbio}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Plot Splice Summary from RNA-seq data</h2>
+
+<h3>Description</h3>
+
+
+<p>Plot splice summary by simply counting overlaped junction read in
+weighted way or not.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## For character,GRangesList
+## S4 method for signature 'character,GRangesList'
+plotSpliceSum(data, model, ..., weighted = TRUE)
+## For character,TranscriptDb
+## S4 method for signature 'character,TranscriptDb'
+plotSpliceSum(data, model, which,
+      ..., weighted = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>A character specifying the bam file path of RNA-seq data.
+</p>
+</td></tr>
+<tr valign="top"><td><code>model</code></td>
+<td>
+
+<p>A GRangesList which represting different isoforms, or a TranscriptDb
+object. In the second case, users need to pass &quot;which&quot; argument
+which is a GRanges object to specify the region. And we get
+connonical model internally.
+</p>
+</td></tr>
+<tr valign="top"><td><code>which</code></td>
+<td>
+
+<p>A GRanges object specifying the region you want to get model from
+the TranscriptDb object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>weighted</code></td>
+<td>
+
+<p>If <code>TRUE</code>, weighted by simply add 1/cases matched to each model
+and if <code>FALSE</code>, simply add 1 to every case.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Extra arugments passed to <code>qplot</code> function. such as,
+<code>offset</code> which control the height of chevron.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+
+<p>Internally we use biovizBase:::spliceSummary for simple counting, but
+we encourage users to use their own robust way to make slicing summary
+and store it as GRangesList, then plot the summary by <code>qplot</code>
+function. 
+</p>
+
+
+<h3>Value</h3>
+
+
+<p>A ggplot object.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Tengfei Yin</p>
+
+
+<h3>See Also</h3>
+
+
+<p><code>qplot</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">## Not run: 
+##D bamfile &lt;- system.file(&quot;extdata&quot;, &quot;SRR027894subRBM17.bam&quot;, package=&quot;biovizBase&quot;)
+##D library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+##D txdb &lt;- TxDb.Hsapiens.UCSC.hg19.knownGene
+##D data(genesymbol)
+##D exons &lt;- exonsBy(txdb, by = &quot;tx&quot;)
+##D exons.rbm17 &lt;- subsetByOverlaps(exons, genesymbol[&quot;RBM17&quot;])
+##D plotSpliceSum(bamfile, exons.rbm17)
+##D plotSpliceSum(bamfile, exons.rbm17, weighted = FALSE, offset = 0.01)
+##D plotSpliceSum(bamfile, txdb, which = genesymbol[&quot;RBM17&quot;])
+##D plotSpliceSum(bamfile, txdb, which = genesymbol[&quot;RBM17&quot;], offset = 0.01)
+##D plotSpliceSum(bamfile, txdb, which = genesymbol[&quot;RBM17&quot;],
+##D               show.label = TRUE,
+##D               label.type = &quot;count&quot;)
+## End(Not run)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>ggbio</em> version 1.5.12 ]</div>
+</body></html>

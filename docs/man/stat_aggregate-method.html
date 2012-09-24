@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Generates summaries on the specified windows</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="highlight.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for stat_aggregate {ggbio}"><tr><td>stat_aggregate {ggbio}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Generates summaries on the specified windows</h2>
+
+<h3>Description</h3>
+
+
+<p>Generates summaries on the specified windows  
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+
+## S4 method for signature 'GRanges'
+stat_aggregate(data, ..., xlab, ylab, main, by, FUN, start = NULL,
+                 end = NULL, width = NULL, y = NULL, frequency = NULL,
+                 delta = NULL, simplify = TRUE, window = NULL, facets =
+                 NULL, type = c("mean", "median", "max", "min", "sum",
+                 "count", "identity"), geom = NULL)
+
+</pre>
+
+
+<h3>Arguments</h3>
+
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>A <code>GRanges</code> or <code>data.frame</code> object.
+</p>
+</td></tr>
+<tr valign="top"><td><code>xlab</code></td>
+<td>
+
+<p>Label for x
+</p>
+</td></tr>
+<tr valign="top"><td><code>ylab</code></td>
+<td>
+
+<p>Label for y
+</p>
+</td></tr>
+<tr valign="top"><td><code>main</code></td>
+<td>
+
+<p>Title for plot.
+</p>
+</td></tr>
+<tr valign="top"><td><code>by</code></td>
+<td>
+
+<p>An object with 'start', 'end', and 'width' methods. Passed to <code>aggreagate</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>FUN</code></td>
+<td>
+
+<p>The function, found via 'match.fun', to be applied to each window of
+'x'. Passed to <code>aggreagate</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>start</code></td>
+<td>
+
+<p>Start of the window. If 'by' is missing, then must supply two of the
+'start', 'end', 'width'. If 'window' is provided then you don't have
+to specify it.
+</p>
+</td></tr>
+<tr valign="top"><td><code>end</code></td>
+<td>
+
+<p>End of the window. If 'by' is missing, then must supply two of the
+'start', 'end', 'width'. If 'window' is provided then you don't have
+to specify it.
+</p>
+</td></tr>
+<tr valign="top"><td><code>width</code></td>
+<td>
+
+<p>Width of the window. If 'by' is missing, then must supply two of the
+'start', 'end', 'width'. If 'window' is provided then you don't have
+to specify it.
+</p>
+</td></tr>
+<tr valign="top"><td><code>y</code></td>
+<td>
+
+<p>A character indicate the varialbe column for which aggregation is
+taken on. Notice for geom like 'boxplot', we don't compute or
+aggregate the variable, we simply want to use the idenitcal y as y
+axis, in that case please put y in the <code>aes</code> mapping function.
+</p>
+</td></tr>
+<tr valign="top"><td><code>frequency</code></td>
+<td>
+
+<p>Optional arguments that specify the sampling frequency within the window.    
+</p>
+</td></tr>
+<tr valign="top"><td><code>delta</code></td>
+<td>
+
+<p>Optional arguments that specify the sampling increment within the window.    
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Arguments passed to plot function. such as aes() and color.
+</p>
+</td></tr>
+<tr valign="top"><td><code>simplify</code></td>
+<td>
+
+<p>A logical value specifying whether or not the
+result should be simplified to a vector or matrix if
+possible.    
+</p>
+</td></tr>
+<tr valign="top"><td><code>window</code></td>
+<td>
+
+<p>Integer value indicate window size. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>facets</code></td>
+<td>
+
+<p>Faceting formula to use.
+</p>
+</td></tr>
+<tr valign="top"><td><code>type</code></td>
+<td>
+
+</td></tr>
+<tr valign="top"><td><code>geom</code></td>
+<td>
+
+<p>The geometric object to use display the data. 
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+
+<p>A 'Layer'.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Tengfei Yin</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">library(GenomicRanges)
+set.seed(1)
+N &lt;- 1000
+## ======================================================================
+##  simmulated GRanges
+## ======================================================================
+gr &lt;- GRanges(seqnames = 
+              sample(c(&quot;chr1&quot;, &quot;chr2&quot;, &quot;chr3&quot;),
+                     size = N, replace = TRUE),
+              IRanges(
+                      start = sample(1:300, size = N, replace = TRUE),
+                      width = sample(70:75, size = N,replace = TRUE)),
+              strand = sample(c(&quot;+&quot;, &quot;-&quot;, &quot;*&quot;), size = N, 
+                replace = TRUE),
+              value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
+              sample = sample(c(&quot;Normal&quot;, &quot;Tumor&quot;), 
+                size = N, replace = TRUE),
+              pair = sample(letters, size = N, 
+                replace = TRUE))
+## 36,37 doesn&#39;t work
+## ggplot(gr) + stat_aggregate(y = &quot;value&quot;,fill = &quot;gray40&quot;)
+## ggplot(gr) + stat_aggregate(window = 30,  y = &quot;value&quot;,fill = &quot;gray40&quot;, geom = &quot;histogram&quot;)
+## ggplot(gr) + stat_aggregate(window = 100, fill = &quot;gray40&quot;,y = &quot;value&quot;,
+##                           type = &quot;max&quot;, geom = &quot;histogram&quot;)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>ggbio</em> version 1.5.12 ]</div>
+</body></html>

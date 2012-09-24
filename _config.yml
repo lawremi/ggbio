@@ -1,7 +1,0 @@
-lsi:            false
-pygments:       true
-permalink:      pretty
-extensions:     true
-exclude:        ['Rakefile', 'README.markdown', 'TODO.markdown', '_drafts']
-markdown:    redcarpet
-url:         /ggbio

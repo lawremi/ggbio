@@ -74,7 +74,6 @@
 
 library(ggbio)
 
-
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -102,10 +101,10 @@ ggplot(gr) + stat_coverage(geom = "point")
 ggplot(gr) + stat_coverage(geom = "area")
 ggplot(gr) + stat_coverage(aes(y = ..coverage..), geom = "histogram")
 
-% ggplot(gr) + stat_coverage(aes(y = ..coverage..)) + geom_point(aes(x =
-% midpoint, y = ..coverage..))
+ggplot(gr) + stat_coverage(aes(y = ..coverage..)) + geom_point()
 
 ## for bam file
+## TBD
 }
 \author{Tengfei Yin}
 

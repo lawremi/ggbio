@@ -1,5 +1,7 @@
 \name{stat_stepping}
 \alias{stat_stepping}
+\alias{stat_stepping,missing-method}
+\alias{stat_stepping,uneval-method}
 \alias{stat_stepping,GRanges-method}
 \title{Calculate stepping levels}
 \description{
@@ -39,12 +41,12 @@
   A 'Layer'.
 }
 \examples{
-## @knitr load
+
 set.seed(1)
 N <- 50
-require(ggbio)
+
 require(GenomicRanges)
-## @knitr simul
+##  simul
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -62,23 +64,25 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
-## @knitr default 
+##  default 
+ggplot(gr) + stat_stepping()
+## or
 ggplot() + stat_stepping(gr)
 
-## @knitr facet_aes
-ggplot() + stat_stepping(gr, aes(color = strand, fill = strand),
+##  facet_aes
+ggplot(gr) + stat_stepping(aes(color = strand, fill = strand),
                                  facets = sample ~ seqnames)
 
-## @knitr geom_segment
-ggplot() + stat_stepping(gr, aes(color = strand),
+##  geom_segment
+ggplot(gr) + stat_stepping(aes(color = strand),
                          geom = "segment", xlab = "Genomic coord", ylab = "y", main = "hello")
 
 
-## @knitr geom_alignment
-ggplot() + stat_stepping(gr, geom = "alignment")
+##  geom_alignment
+ggplot(gr) + stat_stepping(geom = "alignment")
 
-## @knitr geom_alignment_group
-ggplot() + stat_stepping(gr, aes(group = pair),geom = "alignment")
+##  geom_alignment_group
+% ggplot(gr) + stat_stepping(aes(group = pair),geom = "alignment")
 }
 \author{Tengfei Yin}
 

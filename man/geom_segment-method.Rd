@@ -2,6 +2,8 @@
 \alias{geom_segment}
 \alias{geom_segment,data.frame-method}
 \alias{geom_segment,GRanges-method}
+\alias{geom_segment,missing-method}
+\alias{geom_segment,uneval-method}
 \title{Segment geoms for GRanges object}
 \description{
   Show interval data as segments.
@@ -49,12 +51,11 @@
   A 'Layer'.
 }
 \examples{
-## @knitr load
+
 set.seed(1)
 N <- 100
-require(ggbio)
 require(GenomicRanges)
-## @knitr simul
+
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -73,7 +74,6 @@ gr <- GRanges(seqnames =
                 replace = TRUE))
 
 
-## @knitr data.frame
 ## ======================================================================
 ##  data.frame call ggplot2::geom_segment
 ## ======================================================================
@@ -81,35 +81,38 @@ ggplot() + geom_segment(data = mtcars, aes(x = mpg, y = wt, xend = mpg + 10, yen
                        fill = cyl))
 
 
-## @knitr default
+
 ## ======================================================================
 ##  default
-## ======================================================================
+##
+##  ======================================================================
+ggplot(gr) + geom_segment()
+## or
 ggplot() + geom_segment(gr)
 
-## @knitr facet_aes
+
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot() + geom_segment(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
+ggplot(gr) + geom_segment(facets = sample ~ seqnames, aes(color = strand, fill = strand))
 
-## @knitr stat:identity
+
 ## ======================================================================
 ##  stat:identity
 ## ======================================================================
-ggplot() + geom_segment(gr, stat = "identity", aes(y = value))
+ggplot(gr) + geom_segment(stat = "identity", aes(y = value))
 
-## @knitr stat:stepping
+
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot() + geom_segment(gr, stat = "stepping", aes(y = value, group = pair))
+ggplot(gr) + geom_segment(stat = "stepping", aes(y = value, group = pair))
 
-## @knitr group.selfish
+
 ## ======================================================================
 ##  group.selfish controls when 
 ## ======================================================================
-ggplot() + geom_segment(gr, stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
+ggplot(gr) + geom_segment(stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
 }
 \author{Tengfei Yin}
 

@@ -1,6 +1,8 @@
 \name{geom_arrow}
 \alias{geom_arrow}
 \alias{geom_arrow,GRanges-method}
+\alias{geom_arrow,missing-method}
+\alias{geom_arrow,uneval-method}
 \title{Arrow geoms for GRanges object}
 \description{
   Show interval data as arrows.
@@ -62,12 +64,9 @@
   A 'Layer'.
 }
 \examples{
-## @knitr load
 set.seed(1)
 N <- 100
-require(ggbio)
 require(GenomicRanges)
-## @knitr simul
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -85,43 +84,42 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
-## @knitr default
+
 ## ======================================================================
 ##  default
 ## ======================================================================
+ggplot(gr) + geom_arrow()
+# or
 ggplot() + geom_arrow(gr)
 
-## @knitr facet_aes
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot() + geom_arrow(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
+ggplot(gr) + geom_arrow(facets = sample ~ seqnames, aes(color = strand, fill = strand))
 
-## @knitr stat:identity
 ## ======================================================================
 ##  stat:identity
 ## ======================================================================
-ggplot() + geom_arrow(gr, stat = "identity", aes(y = value))
+ggplot(gr) + geom_arrow(stat = "identity", aes(y = value))
 
-## @knitr stat:stepping
+
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot() + geom_arrow(gr, stat = "stepping", aes(y = value, group = pair))
+ggplot(gr) + geom_arrow(stat = "stepping", aes(y = value, group = pair))
 
-## @knitr group.selfish
 ## ======================================================================
 ##  group.selfish 
 ## ======================================================================
-ggplot() + geom_arrow(gr, stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
+ggplot(gr) + geom_arrow(stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
 
 
-## @knitr options
+
 ## ======================================================================
 ## other options to control arrow angle, density, ...
 ## ======================================================================
 library(grid)
-ggplot() + geom_arrow(gr, stat = "stepping", aes(y = value, group = pair),
+ggplot(gr) + geom_arrow(stat = "stepping", aes(y = value, group = pair),
                       arrow.rate = 0.01, legnth = unit(0.3, "cm"), agnle = 45,
                       group.selfish = FALSE)
 

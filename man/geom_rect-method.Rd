@@ -2,6 +2,8 @@
 \alias{geom_rect}
 \alias{geom_rect,data.frame-method}
 \alias{geom_rect,GRanges-method}
+\alias{geom_rect,missing-method}
+\alias{geom_rect,uneval-method}
 \title{Rect geoms for GRanges object}
 \description{
   Show interval data as rectangle.
@@ -54,12 +56,10 @@
   A 'Layer'.
 }
 \examples{
-## @knitr load
 set.seed(1)
 N <- 100
-require(ggbio)
 require(GenomicRanges)
-## @knitr simul
+
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -78,7 +78,7 @@ gr <- GRanges(seqnames =
                 replace = TRUE))
 
 
-## @knitr data.frame
+
 ## ======================================================================
 ##  data.frame call ggplot2::geom_rect
 ## ======================================================================
@@ -86,35 +86,37 @@ ggplot() + geom_rect(data = mtcars, aes(xmin = mpg, ymin = wt, xmax = mpg + 10, 
                        fill = cyl))
 
 
-## @knitr default
+
 ## ======================================================================
 ##  default
 ## ======================================================================
+ggplot(gr) + geom_rect()
+# or
 ggplot() + geom_rect(gr)
 
-## @knitr facet_aes
+
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot() + geom_rect(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
+ggplot(gr) + geom_rect(facets = sample ~ seqnames, aes(color = strand, fill = strand))
 
-## @knitr stat:identity
+
 ## ======================================================================
 ##  stat:identity
 ## ======================================================================
-ggplot() + geom_rect(gr, stat = "identity", aes(y = value))
+ggplot(gr) + geom_rect(stat = "identity", aes(y = value))
 
-## @knitr stat:stepping
+
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot() + geom_rect(gr, stat = "stepping", aes(y = value, group = pair))
+ggplot(gr) + geom_rect(stat = "stepping", aes(y = value, group = pair))
 
-## @knitr group.selfish
+
 ## ======================================================================
 ##  group.selfish controls when 
 ## ======================================================================
-ggplot() + geom_rect(gr, stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
+ggplot(gr) + geom_rect(stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
 }
 \author{Tengfei Yin}
 

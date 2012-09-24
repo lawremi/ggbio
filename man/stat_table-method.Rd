@@ -1,5 +1,7 @@
 \name{stat_table}
 \alias{stat_table}
+\alias{stat_table,missing-method}
+\alias{stat_table,uneval-method}
 \alias{stat_table,GRanges-method}
 \alias{stat_table,GRangesList-method}
 \title{Tabulate a GRanges object}
@@ -44,12 +46,12 @@
   A 'Layer'.
 }
 \examples{
-## @knitr load
+##  load
 set.seed(1)
 N <- 100
 require(ggbio)
 require(GenomicRanges)
-## @knitr simul
+##  simul
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -69,10 +71,10 @@ gr <- GRanges(seqnames =
 
 gr <- c(gr[seqnames(gr) == "chr1"][sample(1:10, size = 1e4, replace = TRUE)],gr)
 
-## @knitr default
-ggplot() + stat_table(gr)
-ggplot() + stat_table(gr, geom = "segment", aes(y = ..score.., color = ..score..))
-ggplot() + stat_table(gr, aes(color = score))
+##  default
+ggplot(gr) + stat_table()
+ggplot(gr) + stat_table(geom = "segment", aes(y = ..score.., color = ..score..))
+ggplot(gr) + stat_table(aes(color = score))
 }
 \author{Tengfei Yin}
 

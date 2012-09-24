@@ -1,5 +1,7 @@
 \name{stat_coverage}
 \alias{stat_coverage}
+\alias{stat_coverage,missing-method}
+\alias{stat_coverage,uneval-method}
 \alias{stat_coverage,GRanges-method}
 \alias{stat_coverage,GRangesList-method}
 \alias{stat_coverage,BamFile-method}
@@ -16,10 +18,11 @@
               facets = NULL, geom = NULL)
 
 # for Bamfile
-\S4method{stat_coverage}{BamFile}(data, ..., maxBinSize = 2^14, xlim,
-                         which, xlab, ylab, main, facets = NULL, 
-                        geom = NULL,  method = c("estimate", "raw"))
-
+\S4method{stat_coverage}{BamFile}(data, ..., maxBinSize = 2^14,
+               xlim, which, xlab, ylab,
+               main, facets = NULL, geom = NULL,
+               method = c("estimate", "raw"),
+               space.skip = 0.1, coord = c("linear", "genome"))
 }
 \arguments{
   \item{data}{
@@ -57,15 +60,21 @@
   \item{which}{
     \code{GRanges} which defines region to subset the results.
   }
+  \item{space.skip}{
+    used for coordinate genome, skip between chromosomes.
+  }
+  \item{coord}{
+    coordinate system.
+  }
 }
 \value{
   A 'Layer'.
 }
 \examples{
-## @knitr load
+
 library(ggbio)
 
-## @knitr simul
+
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -86,12 +95,17 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
-
-## @knitr geom
+ggplot(gr) + stat_coverage()
 ggplot() + stat_coverage(gr)
-ggplot() + stat_coverage(gr, geom = "point")
-ggplot() + stat_coverage(gr, geom = "area")
-ggplot() + stat_coverage(gr, aes(y = ..coverage..), geom = "histogram")
+
+ggplot(gr) + stat_coverage(geom = "point")
+ggplot(gr) + stat_coverage(geom = "area")
+ggplot(gr) + stat_coverage(aes(y = ..coverage..), geom = "histogram")
+
+% ggplot(gr) + stat_coverage(aes(y = ..coverage..)) + geom_point(aes(x =
+% midpoint, y = ..coverage..))
+
+## for bam file
 }
 \author{Tengfei Yin}
 

@@ -2,18 +2,18 @@
 \alias{rescale}
 \alias{rescale,numeric-method}
 \alias{rescale,ggplot-method}
+\alias{rescale,gg-method}
 \title{rescale ggplot object}
 \description{
   Rescale a numeric vector or ggplot object, could be used for static
   zoom-in in ggbio.
 }
 \usage{
-## For signature numeric
 \S4method{rescale}{numeric}(x, to = c(0, 1),
       from = range(x, na.rm = TRUE))
 
-## For signature ggplot
 \S4method{rescale}{ggplot}(x, xlim, ylim, sx = 1, sy = 1)
+\S4method{rescale}{gg}(x, xlim, ylim, sx = 1, sy = 1)
 }
 \arguments{
 \item{x}{

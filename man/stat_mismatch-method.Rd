@@ -1,5 +1,7 @@
 \name{stat_mismatch}
 \alias{stat_mismatch}
+\alias{stat_mismatch,missing-method}
+\alias{stat_mismatch,uneval-method}
 \alias{stat_mismatch,GRanges-method}
 \alias{stat_mismatch,BamFile-method}
 \title{Calculate mismatch summary}

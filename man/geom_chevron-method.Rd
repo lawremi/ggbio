@@ -1,6 +1,8 @@
 \name{geom_chevron}
 \alias{geom_chevron}
 \alias{geom_chevron,GRanges-method}
+\alias{geom_chevron,missing-method}
+\alias{geom_chevron,uneval-method}
 \title{Chevron geoms for GRanges object}
 \description{
   Break normal intervals stroed in \code{GRanges} object and show them
@@ -72,12 +74,10 @@ of chevron to show statistics summary.
 }
 
 \examples{
-## @knitr load
 set.seed(1)
 N <- 100
-require(ggbio)
 require(GenomicRanges)
-## @knitr simul
+
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -96,40 +96,42 @@ gr <- GRanges(seqnames =
                 replace = TRUE))
 
 
-## @knitr default
+
 ## ======================================================================
 ##  default
-## ======================================================================
+##
+##  ======================================================================
+ggplot(gr) + geom_chevron()
+## or
 ggplot() + geom_chevron(gr)
 
-## @knitr facet_aes
+
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot() + geom_chevron(gr, facets = sample ~ seqnames, aes(color = strand))
+ggplot(gr) + geom_chevron(facets = sample ~ seqnames, aes(color = strand))
 
-## @knitr stat:identity
+
 ## ======================================================================
 ##  stat:identity
 ## ======================================================================
-ggplot() + geom_chevron(gr, stat = "identity", aes(y = value))
+ggplot(gr) + geom_chevron(stat = "identity", aes(y = value))
 
-## @knitr stat:stepping
+
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot() + geom_chevron(gr, stat = "stepping", aes(group = pair))
+ggplot(gr) + geom_chevron(stat = "stepping", aes(group = pair))
 
-## @knitr group.selfish
+
 ## ======================================================================
 ##  group.selfish controls when 
 ## ======================================================================
-ggplot() + geom_chevron(gr, stat = "stepping", aes(group = pair), group.selfish = FALSE,
+ggplot(gr) + geom_chevron(stat = "stepping", aes(group = pair), group.selfish = FALSE,
                         xlab = "xlab", ylab = "ylab", main = "main")
 
-p = qplot(x = mpg, y = cyl, data = mtcars)
-p + labs(title = "asdf")
-## @knitr offset
+p <- qplot(x = mpg, y = cyl, data = mtcars)
+
 ## ======================================================================
 ##  offset
 ## ======================================================================
@@ -137,26 +139,26 @@ gr2 <- GRanges("chr1", IRanges(c(1, 10, 20), width = 5))
 gr2.p <- gaps(gr2)
 ## resize to connect them
 gr2.p <- resize(gr2.p, fix = "center", width = width(gr2.p)+2)
-## @knitr offset:default
-ggplot() + geom_rect(gr2) + geom_chevron(gr2.p)
 
-## @knitr offset:0
+ggplot(gr2) + geom_rect() + geom_chevron(gr2.p)
+
+
 ## notice the rectangle height is 0.8
 ## offset = 0 just like a line
-ggplot() + geom_rect(gr2) + geom_chevron(gr2.p, offset = 0)
+ggplot(gr2) + geom_rect() + geom_chevron(gr2.p, offset = 0)
 
-## @knitr offset:0.4
+
 ## equal height
-ggplot() + geom_rect(gr2) + geom_chevron(gr2.p, offset = 0.4)
+ggplot(gr2) + geom_rect() + geom_chevron(gr2.p, offset = 0.4)
 
-## @knitr chevron.height:default
+
 ## ======================================================================
 ##  chevron.height
 ## ======================================================================
 values(gr2.p)$score <- c(100, 200)
-ggplot() + geom_rect(gr2) + geom_chevron(gr2.p, offset = "score")
+ggplot(gr2) + geom_rect() + geom_chevron(gr2.p, offset = "score")
 ## chevron.height
-ggplot() + geom_rect(gr2) + geom_chevron(gr2.p, offset = "score",
+ggplot(gr2) + geom_rect() + geom_chevron(gr2.p, offset = "score",
                                          chevron.height.rescale = c(0.4, 10))
  
 }

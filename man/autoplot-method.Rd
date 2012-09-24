@@ -14,20 +14,23 @@
 \alias{autoplot,RleList-method}
 \alias{autoplot,GenomicRangesList-method}
 \alias{autoplot,matrix-method}
+\alias{autoplot,Views-method}
 \alias{autoplot,ExpressionSet-method}
 \alias{autoplot,SummarizedExperiment-method}
 \alias{autoplot,VCF-method}
 
 
-
 \title{Generic autoplot function}
 
 \description{
-  To visualize different objects describing biological data,
-  we develop this generic function, and developed new types of geoms to
-  each one. Try to make simple API and following the grammar of graphics,
-  use higher level graphic package like ggplot2 to produce high quality
-  graphics.
+  
+  \code{autoplot} is a generic function to visualize various data
+  object, it tries to give better default graphics and customized
+  choices for each data type, quick and convenient to explore your
+  genomic data compare to low level \code{ggplot} method, it is much
+  simpler and easy to produce fairly complicate graphics, though you may
+  lose some flexibility for each layer.
+  
 }
 
 \usage{
@@ -51,16 +54,19 @@
 \S4method{autoplot}{GappedAlignments}(object, ..., xlab, ylab, main, which,
       geom = NULL, stat = NULL)
 
-\S4method{autoplot}{BamFile}(object, ..., which,
-           xlab, ylab, main, bsgenome, geom = "line", stat = "coverage",
-           method = c("estimate", "raw"), resize.extra = 10, show.coverage = TRUE)
+\S4method{autoplot}{BamFile}(object, ..., which, xlab, ylab, main,
+              bsgenome, geom = "line", stat = "coverage",
+              method = c("estimate", "raw"),
+              coord = c("linear", "genome"), resize.extra = 10,
+              space.skip = 0.1, show.coverage = TRUE)
 
 \S4method{autoplot}{character}(object, ..., xlab, ylab, main, which, asRangedData = FALSE)
 
-\S4method{autoplot}{TranscriptDb}(object, which, ..., xlab, ylab, main,
-          truncate.gaps = FALSE, truncate.fun = NULL, ratio = 0.0025,
-          geom = c("gene"), stat = c("identity", "reduce"),
-          names.expr = "tx_name(gene_id)")
+\S4method{autoplot}{TranscriptDb}(object, which, ..., xlab, ylab, main, truncate.gaps =
+                 FALSE, truncate.fun = NULL, ratio = 0.0025, geom =
+                 c("alignment"), stat = c("identity", "reduce"),
+                 names.expr = "tx_name(gene_id)")
+
 
 
 \S4method{autoplot}{BSgenome}(object, which, ...,
@@ -75,20 +81,27 @@
          facetByRow = TRUE, stat = c("bin", "identity", "slice"),
          geom = NULL, type = c("viewSums", "viewMins", "viewMaxs", "viewMeans"))
 
-\S4method{autoplot}{matrix}(object, label = TRUE, genomic.pos = FALSE)
+\S4method{autoplot}{matrix}(object, ..., xlab, ylab, main, geom = c("raster",
+                 "tile"), axis.text.angle = NULL, hjust = 0,
+                   na.value = NULL)
+
 
 \S4method{autoplot}{ExpressionSet}(object, ..., type = c("heatmap", "none",
-          "scatterplot.matrix", "pcp", "MA", "boxplot",
-          "mean-sd", "volcano", "NUSE", "RLE"), test.method = "t")
+                 "scatterplot.matrix", "pcp", "MA", "boxplot",
+                 "mean-sd", "volcano", "NUSE", "RLE"), test.method =
+                 "t", rotate = FALSE, pheno.plot = FALSE, main_to_pheno
+                 = 4.5, padding = 0.2)
 
-\S4method{autoplot}{SummarizedExperiment}(object, ...,
-           type = c("heatmap", "link", "pcp",
-           "boxplot", "scatterplot.matrix"))
 
-\S4method{autoplot}{VCF}(object, ..., genomic.pos = FALSE,
-          xlab, ylab, main, type = c("geno", "info", "fixed"),
-          full.string = FALSE, ref.show = TRUE,
-          expand = c(1, 1), ylabel = TRUE)
+\S4method{autoplot}{SummarizedExperiment}(object, ..., type = c("heatmap", "link", "pcp",
+                 "boxplot", "scatterplot.matrix"), pheno.plot = FALSE,
+                 main_to_pheno = 4.5, padding = 0.2, assay.id = 1)
+
+
+\S4method{autoplot}{VCF}(object, ..., genomic.pos = FALSE, xlab, ylab, main,
+                 type = c("geno", "info", "fixed"), full.string =
+                 FALSE, ref.show = TRUE, expand = c(1, 1), ylabel =
+                 TRUE, assay.id = 1)
 
 \S4method{autoplot}{GenomicRangesList}(object, args = list(), trackWidth,
                     radius = 10, grid = FALSE, trackSkip = 1, layout = c("circle"))
@@ -98,6 +111,30 @@
 \arguments{
   \item{object}{
     object to be plot.
+  }
+  \item{axis.text.angle}{
+    axis text angle.
+  }
+  \item{hjust}{
+    horizontal just for axis text.
+  }
+  \item{na.value}{
+    color for NA value.
+  }
+  \item{rotate}{
+    
+  }
+  \item{pheno.plot}{
+    show pheno plot or not.
+  }
+  \item{main_to_pheno}{
+    main matrix plot width to pheno plot width ratio.
+  }
+  \item{padding}{
+    padding between plots.
+  }
+  \item{assay.id}{
+    index for assay you are going to use.
   }
   \item{geom}{
     Geom to use (Single character for now). Please see section Geometry
@@ -250,9 +287,6 @@ indicate whether you want to adding grid background or not.
   \item{single.ideo}{
     for object 'Seqinfo', if length of object is 1, then this control
     whether to use \code{plotSingleChrom} or \code{layout_karyogram}.
-  }
-  \item{label}{
-    For matrix, you want to label by column names/rownames or not.
   }
 }
 \value{
@@ -716,101 +750,130 @@ autoplot(test_bed, aes(fill = name))
 
 
 ###################################################
-### code chunk number 34: matrix-default
+###  matrix
 ###################################################
+rm(volcano)
+volcano <- volcano[20:70, 20:60] - 150
 autoplot(volcano)
+autoplot(volcano, xlab = "xlab", main = "main", ylab = "ylab")
+autoplot(volcano)+scale_fill_fold_change()
 
-
-###################################################
-### code chunk number 35: matrix-default-scale
-###################################################
-autoplot(volcano-150)+scale_fill_fold_change()
-
-
-###################################################
-### code chunk number 36: matrix-default-gene
-###################################################
 colnames(volcano) <- sort(sample(1:300, size = ncol(volcano), replace = FALSE))
-autoplot(volcano-150, genomic.pos = TRUE)+scale_fill_fold_change()
+autoplot(volcano)+scale_fill_fold_change()
+
+rownames(volcano) <- letters[sample(1:24, size = nrow(volcano), replace = TRUE)]
+autoplot(volcano)+scale_fill_fold_change()
+
+autoplot(volcano, geom = "tile")
+
+colnames(volcano) <- lapply(letters[sample(1:24, size = ncol(volcano),
+replace = TRUE)],
+function(x){
+   paste(rep(x, 7), collapse = "")
+})
+## when length > 4
+autoplot(volcano)
+autoplot(volcano, axis.text.angle =  -40)
+
+## when character is the value
+x <- sample(c(letters[1:3], NA), size = 100, replace = TRUE)
+mx <- matrix(x, nrow = 5)
+autoplot(mx)
+## tile gives you a white margin
+rownames(mx) <- LETTERS[1:5]
+autoplot(mx, geom = "tile", color = "white") 
+colnames(mx) <- LETTERS[1:20]
+autoplot(mx, geom = "tile", color = "white")
+autoplot(mx, geom = "tile", color = "white", size = 1)
+## weird, though works
+autoplot(mx, geom = "tile", aes(width = 0.6, height = 0.6))
+autoplot(mx, geom = "tile", aes(width = 0.6, height = 0.6), na.value = "white")
+autoplot(mx, geom = "tile", aes(width = 0.6, height = 0.6)) + theme_clear()
+
+###################################################
+### Views
+###################################################
+lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
+            seq(10, 0.001, length = 500))
+xVector <- rpois(1e4, lambda)
+xRle <- Rle(xVector)
+v1 <- Views(xRle, start = sample(4.5e3:7.5e3, size = 50, replace = FALSE), width =500)
+autoplot(v1)
+names(v1) <- letters[sample(1:24, size = length(v1), replace = TRUE)]
+autoplot(v1)
+autoplot(v1, geom = "tile")
+## fix
+## facet pack
+% autoplot(v1, geom = "tile", aes(y = row))
+names(v1) <- NULL
+autoplot(v1, geom = "line")
+autoplot(v1, geom = "line", aes(color = row)) + theme(legend.position = "none")
+autoplot(v1, geom = "line", facets = NULL)
+autoplot(v1, geom = "line", facets = NULL, alpha  = 0.1)
 
 
 ###################################################
-### code chunk number 37: autoplot.Rnw:832-838
+### ExpressionSet
 ###################################################
 library(Biobase)
 data(sample.ExpressionSet)
 sample.ExpressionSet
 set.seed(1)
+## select 50 features
 idx <- sample(seq_len(dim(sample.ExpressionSet)[1]), size = 50)
 eset <- sample.ExpressionSet[idx,]
+eset
+autoplot(as.matrix(pData(eset)))
 
-
-###################################################
-### code chunk number 38: eset-default
-###################################################
+## default heatmap
 p1 <- autoplot(eset)
-p1
-
-
-###################################################
-### code chunk number 39: eset-default-scale
-###################################################
 p2 <- p1 + scale_fill_fold_change()
 p2
+autoplot(eset)
+autoplot(eset, geom = "tile", color = "white", size = 2)
+autoplot(eset, geom = "tile", aes(width = 0.6, height = 0.6))
 
+autoplot(eset, pheno.plot = TRUE)
+idx <- order(pData(eset)[,1])
+eset2 <- eset[,idx]
+autoplot(eset2, pheno.plot = TRUE)
 
-###################################################
-### code chunk number 40: eset-default-pcp
-###################################################
+## parallel coordainte plot
 autoplot(eset, type = "pcp")
 
-
-###################################################
-### code chunk number 41: eset-default-boxplot
-###################################################
+## boxplot
 autoplot(eset, type = "boxplot")
 
 
-###################################################
-### code chunk number 42: eset-default-sm
-###################################################
+## scatterplot.matrix
+## slow, be carefull
 autoplot(eset[, 1:7], type = "scatterplot.matrix")
 
-
-###################################################
-### code chunk number 43: eset-default-ms
-###################################################
+## mean-sd
 autoplot(eset, type = "mean-sd")
 
 
-###################################################
-### code chunk number 44: eset-default-volcano
-###################################################
+## volcano
 autoplot(eset, type = "volcano", fac = pData(sample.ExpressionSet)$type)
 
 
 ###################################################
-### code chunk number 45: sset
+### SummarizedExperiment
 ###################################################
+library(GenomicRanges)
 nrows <- 200; ncols <- 6
 counts <- matrix(runif(nrows * ncols, 1, 1e4), nrows)
+counts2 <- matrix(runif(nrows * ncols, 1, 1e4), nrows)
 rowData <- GRanges(rep(c("chr1", "chr2"), c(50, 150)),
                    IRanges(floor(runif(200, 1e5, 1e6)), width=100),
                    strand=sample(c("+", "-"), 200, TRUE))
 colData <- DataFrame(Treatment=rep(c("ChIP", "Input"), 3),
                      row.names=LETTERS[1:6])
-sset <- SummarizedExperiment(assays=SimpleList(counts=counts),
+sset <- SummarizedExperiment(assays=SimpleList(counts=counts,
+                                               counts2 = counts2),
                              rowData=rowData, colData=colData)
-
-
-
-
-
-
-###################################################
-### code chunk number 46: sset-heatmap
-###################################################
 autoplot(sset) + scale_fill_fold_change()
+autoplot(sset, pheno.plot = TRUE)
 
 
 ###################################################
@@ -832,53 +895,31 @@ autoplot(sset, type = "scatterplot.matrix")
 
 
 ###################################################
-### code chunk number 50: vcf
+### vcf
 ###################################################
-% library(VariantAnnotation)
-% vcffile <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
-% vcf <- readVcf(vcffile, "hg19")
-% hdr <- exptData(vcf)[["header"]]
+library(VariantAnnotation)
+vcffile <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
+vcf <- readVcf(vcffile, "hg19")
+hdr <- exptData(vcf)[["header"]]
+hdr
+## autoplot(vcf, type = "fixed") + coord_cartesian(xlim = c(50310860, 50310890))
+
+autoplot(vcf)
 
 
+autoplot(vcf, type = "info", aes(y  = THETA))
 
-% ## autoplot(vcf, type = "fixed") + coord_cartesian(xlim = c(50310860, 50310890))
-
-
-
-
-% ###################################################
-% ### code chunk number 51: va-default
-% ###################################################
-% autoplot(vcf)
+autoplot(vcf, type = "fixed")
 
 
-% ###################################################
-% ### code chunk number 52: va-info
-% ###################################################
-% autoplot(vcf, type = "info", aes(y  = THETA))
+np1 <- autoplot(vcf, type = "fixed") + xlim(50310860, 50310890) 
+p2 <- autoplot(vcf, type = "fixed", full.string = TRUE) + xlim(50310860, 50310890)
+tracks("full.string = FALSE" = p1, "full.string = TRUE" = p2)+
+  scale_y_continuous(breaks = NULL, limits = c(0, 3))
 
-
-% ###################################################
-% ### code chunk number 53: va-fixed
-% ###################################################
-% autoplot(vcf, type = "fixed")
-
-
-% ###################################################
-% ### code chunk number 54: va-fs
-% ###################################################
-% np1 <- autoplot(vcf, type = "fixed") + xlim(50310860, 50310890) 
-% p2 <- autoplot(vcf, type = "fixed", full.string = TRUE) + xlim(50310860, 50310890)
-% tracks("full.string = FALSE" = p1, "full.string = TRUE" = p2)+
-%   scale_y_continuous(breaks = NULL, limits = c(0, 3))
-
-
-% ###################################################
-% ### code chunk number 55: va-rsw
-% ###################################################
-% p3 <- autoplot(vcf, type = "fixed", ref.show = FALSE) + xlim(50310860, 50310890) +
-%     scale_y_continuous(breaks = NULL, limits = c(0, 2))
-% p3
+p3 <- autoplot(vcf, type = "fixed", ref.show = FALSE) + xlim(50310860, 50310890) +
+    scale_y_continuous(breaks = NULL, limits = c(0, 2))
+p3
 
 
 ###################################################

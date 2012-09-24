@@ -2,10 +2,10 @@
 \alias{scale_x_sequnit}
 \title{scale x by unit}
 \description{
-  scale x by unit 'mb','kb', 'bp'.
+  scale x by unit 'Mb','kb', 'bp'.
 }
 \usage{
-scale_x_sequnit(unit = c("mb", "kb", "bp"))
+scale_x_sequnit(unit = c("Mb", "kb", "bp"))
 }
 \arguments{
   \item{unit}{

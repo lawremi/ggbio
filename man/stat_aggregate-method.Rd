@@ -1,6 +1,8 @@
 \name{stat_aggregate}
 \alias{stat_aggregate}
 \alias{stat_aggregate,GRanges-method}
+\alias{stat_aggregate,missing-method}
+\alias{stat_aggregate,uneval-method}
 \title{Generates summaries on the specified windows}
 \description{
 Generates summaries on the specified windows  
@@ -87,11 +89,10 @@ Generates summaries on the specified windows
   A 'Layer'.
 }
 \examples{
-## @knitr load
-library(ggbio)
+
+
 library(GenomicRanges)
 
-## @knitr simul
 set.seed(1)
 N <- 1000
 ## ======================================================================
@@ -112,10 +113,10 @@ gr <- GRanges(seqnames =
                 replace = TRUE))
 
 ## 36,37 doesn't work
-ggplot() + stat_aggregate(gr, y = "value",fill = "gray40")
-ggplot() + stat_aggregate(gr, window = 30,  y = "value",fill = "gray40", geom = "histogram")
-ggplot() + stat_aggregate(gr, window = 100, fill = "gray40",y = "value",
-                          type = "max", geom = "histogram")
+## ggplot(gr) + stat_aggregate(y = "value",fill = "gray40")
+## ggplot(gr) + stat_aggregate(window = 30,  y = "value",fill = "gray40", geom = "histogram")
+## ggplot(gr) + stat_aggregate(window = 100, fill = "gray40",y = "value",
+##                           type = "max", geom = "histogram")
 
 }
 \author{Tengfei Yin}

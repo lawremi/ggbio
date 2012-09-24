@@ -1,5 +1,7 @@
 \name{stat_bin}
 \alias{stat_bin}
+\alias{stat_bin,missing-method}
+\alias{stat_bin,uneval-method}
 \alias{stat_bin,data.frame-method}
 \alias{stat_bin,Rle-method}
 \alias{stat_bin,RleList-method}
@@ -68,31 +70,32 @@ xRle <- Rle(xVector)
 xRleList <- RleList(xRle, 2L * xRle)
 
 ggplot() + stat_bin(xRle)
-ggplot() + stat_bin(xRle, nbin = 100)
-ggplot() + stat_bin(xRle, binwidth = 200)
+ggplot(xRle) + stat_bin()
+ggplot(xRle) + stat_bin(nbin = 100)
+ggplot(xRle) + stat_bin(binwidth = 200)
 
-p1 <- ggplot() + stat_bin(xRle, type = "viewMeans")
-p2 <- ggplot() + stat_bin(xRle, type = "viewSums")
+p1 <- ggplot(xRle) + stat_bin(type = "viewMeans")
+p2 <- ggplot(xRle) + stat_bin(type = "viewSums")
 ## y scale are different.
 tracks(viewMeans = p1, viewSums = p2)
 
-ggplot() + stat_bin(xRle, geom = "heatmap")
-ggplot() + stat_bin(xRle, nbin = 100, geom = "heatmap")
-ggplot() + stat_bin(xRle, binwidth = 200, geom = "heatmap")
+ggplot(xRle) + stat_bin(geom = "heatmap")
+ggplot(xRle) + stat_bin(nbin = 100, geom = "heatmap")
+ggplot(xRle) + stat_bin(binwidth = 200, geom = "heatmap")
 
 ## for RleList
-ggplot() + stat_bin(xRleList)
-ggplot() + stat_bin(xRleList, nbin = 100)
-ggplot() + stat_bin(xRleList, binwidth = 200)
+ggplot(xRleList) + stat_bin()
+ggplot(xRleList) + stat_bin(nbin = 100)
+ggplot(xRleList) + stat_bin(binwidth = 200)
 
-p1 <- ggplot() + stat_bin(xRleList, type = "viewMeans")
-p2 <- ggplot() + stat_bin(xRleList, type = "viewSums")
+p1 <- ggplot(xRleList) + stat_bin(type = "viewMeans")
+p2 <- ggplot(xRleList) + stat_bin(type = "viewSums")
 ## y scale are different.
 tracks(viewMeans = p1, viewSums = p2)
 
-ggplot() + stat_bin(xRleList, geom = "heatmap")
-ggplot() + stat_bin(xRleList, nbin = 100, geom = "heatmap")
-ggplot() + stat_bin(xRleList, binwidth = 200, geom = "heatmap")
+ggplot(xRleList) + stat_bin(geom = "heatmap")
+ggplot(xRleList) + stat_bin(nbin = 100, geom = "heatmap")
+ggplot(xRleList) + stat_bin(binwidth = 200, geom = "heatmap")
 }
 \author{Tengfei Yin}
 

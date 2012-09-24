@@ -1,5 +1,7 @@
 \name{stat_reduce}
 \alias{stat_reduce}
+\alias{stat_reduce,missing-method}
+\alias{stat_reduce,uneval-method}
 \alias{stat_reduce,GRanges-method}
 \alias{stat_reduce,IRanges-method}
 \alias{stat_reduce,TranscriptDb-method}
@@ -80,8 +82,17 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
-ggplot() + stat_reduce(gr)
+ggplot(gr) + stat_reduce()
 autoplot(gr, stat = "reduce")
+strand(gr) <- "*"
+ggplot(gr) + stat_reduce()
+
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+data(genesymbol, package = "biovizBase")
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+## made a track comparing full/reduce stat.
+ggplot(txdb) + stat_reduce(which = genesymbol["RBM17"])
+
 }
 \author{Tengfei Yin}
 

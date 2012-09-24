@@ -1,6 +1,8 @@
 \name{layout_circle}
 \alias{layout_circle}
 \alias{layout_circle,GRanges-method}
+\alias{layout_circle,missing-method}
+\alias{layout_circle,uneval-method}
 \title{Create a circle layout}
 \description{
   Create a circle layout.
@@ -16,6 +18,7 @@
                  "B", "sci"), grid.n = 5, grid.background = "gray70",
                  grid.line = "white", grid = FALSE)
 
+\S4method{layout_circle}{missing}(data, ...)
 }
 \arguments{
   \item{data}{
@@ -83,9 +86,7 @@
 }
 \examples{
 N <- 100
-require(ggbio)
-require(GenomicRanges)
-## @knitr simul
+library(GenomicRanges)
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -105,11 +106,22 @@ gr <- GRanges(seqnames =
 
 seqlengths(gr) <- c(400, 500, 700)
 values(gr)$to.gr <- gr[sample(1:length(gr), size = length(gr))]
+
+## doesn't pass gr to the ggplot
 ggplot() + layout_circle(gr, geom = "ideo", fill = "gray70", radius = 7, trackWidth = 3) +
   layout_circle(gr, geom = "bar", radius = 10, trackWidth = 4, aes(fill = score, y = score)) +
   layout_circle(gr, geom = "point", color = "red", radius = 14,
                 trackWidth = 3, grid = TRUE, aes(y = score)) +
-    layout_circle(gr, geom = "link", linked.to = "to.gr", radius = 6, trackWidth = 1)
+    layout_circle(gr, geom = "link", linked.to = "to.gr", radius = 6,
+trackWidth = 1)
+
+## more formal API
+ggplot(gr) + layout_circle(geom = "ideo", fill = "gray70", radius = 7, trackWidth = 3) +
+  layout_circle(geom = "bar", radius = 10, trackWidth = 4, aes(fill = score, y = score)) +
+  layout_circle(geom = "point", color = "red", radius = 14,
+                trackWidth = 3, grid = TRUE, aes(y = score)) +
+    layout_circle(geom = "link", linked.to = "to.gr", radius = 6, trackWidth = 1)
+
 }
 \author{Tengfei Yin}
 

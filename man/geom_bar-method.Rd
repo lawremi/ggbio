@@ -2,6 +2,8 @@
 \alias{geom_bar}
 \alias{geom_bar,data.frame-method}
 \alias{geom_bar,GRanges-method}
+\alias{geom_bar,missing-method}
+\alias{geom_bar,chevron-method}
 \title{Segment geoms for GRanges object}
 \description{
   Show interval data as vertical bar, width equals to interval width and
@@ -40,11 +42,10 @@
   A 'Layer'.
 }
 \examples{
-## @knitr load
-library(ggbio)
+## load
 library(GenomicRanges)
 
-## @knitr simul
+## simul
 set.seed(123)
 gr.b <- GRanges(seqnames = "chr1", IRanges(start = seq(1, 100, by = 10),
                   width = sample(4:9, size = 10, replace = TRUE)),
@@ -55,9 +56,12 @@ gr.b2 <- GRanges(seqnames = "chr2", IRanges(start = seq(1, 100, by = 10),
 gr.b <- c(gr.b, gr.b2)
 ## default use score as y
 
-## @knitr bar
+## bar
+ggplot(gr.b) + geom_bar(aes(fill = value))
+## or
 ggplot() + geom_bar(gr.b, aes(fill = value))
-ggplot() + geom_bar(gr.b,  aes(y = value))
+ggplot(gr.b) + geom_bar(aes(y = value))
 ## equal to
 autoplot(gr.b, geom = "bar")
 }
+

@@ -1,17 +1,19 @@
 \name{geom_arrowrect}
 \alias{geom_arrowrect}
 \alias{geom_arrowrect,GRanges-method}
+\alias{geom_alignment,missing-method}
+\alias{geom_alignment,uneval-method}
 \title{Arrowrect geoms for GRanges object}
 \description{
   Show interval data as rectangle with a arrow head.
 }
 \usage{
-\S4method{geom_arrowrect}{GRanges}(data, ...,
-                          xlab, ylab, main, facets = NULL,
-                          stat = c("stepping", "identity"),
-                          rect.height = NULL,
-                          arrow.head = 0.06,
-                          group.selfish = TRUE)
+\S4method{geom_arrowrect}{GRanges}(data, ..., xlab, ylab, main,
+              facets = NULL, stat = c("stepping", "identity"),
+              rect.height = NULL, arrow.head = 0.06,
+              arrow.head.rate = arrow.head,  arrow.head.fix = NULL,
+              group.selfish = TRUE)
+
 }
 \arguments{
   \item{data}{
@@ -43,6 +45,12 @@
   \item{arrow.head}{
     Arrow head to body ratio.
   }
+  \item{arrow.head.rate}{
+    Arrow head to body ratio. same with arrow.head.
+  }
+  \item{arrow.head.fix}{
+    fixed length of arrow head.
+  }
   \item{group.selfish}{
     Passed to \code{addStepping}, control whether to show each group as
   unique level or not. If set to \code{FALSE}, if two groups are not
@@ -54,12 +62,9 @@
   A 'Layer'.
 }
 \examples{
-## @knitr load
 set.seed(1)
 N <- 100
-require(ggbio)
 require(GenomicRanges)
-## @knitr simul
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -78,35 +83,35 @@ gr <- GRanges(seqnames =
                 replace = TRUE))
 
 
-## @knitr default
 ## ======================================================================
 ##  default
 ## ======================================================================
+ggplot(gr) + geom_arrowrect()
+## or
 ggplot() + geom_arrowrect(gr)
 
-## @knitr facet_aes
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot() + geom_arrowrect(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
+ggplot(gr) + geom_arrowrect(facets = sample ~ seqnames, aes(color = strand, fill = strand))
 
-## @knitr stat:identity
+
 ## ======================================================================
 ##  stat:identity
 ## ======================================================================
-ggplot() + geom_arrowrect(gr, stat = "identity", aes(y = value))
+ggplot(gr) + geom_arrowrect(stat = "identity", aes(y = value))
 
-## @knitr stat:stepping
+
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot() + geom_arrowrect(gr, stat = "stepping", aes(y = value, group = pair))
+ggplot(gr) + geom_arrowrect(stat = "stepping", aes(y = value, group = pair))
 
-## @knitr group.selfish
+
 ## ======================================================================
 ##  group.selfish controls when 
 ## ======================================================================
-ggplot() + geom_arrowrect(gr, stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
+ggplot(gr) + geom_arrowrect(gr, stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
 }
 \author{Tengfei Yin}
 

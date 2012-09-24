@@ -1,21 +1,31 @@
 \name{geom_alignment}
 \alias{geom_alignment}
 \alias{geom_alignment,GRanges-method}
+\alias{geom_alignment,missing-method}
+\alias{geom_alignment,uneval-method}
+\alias{geom_alignment,TranscriptDb-method}
 \title{Alignment geoms for GRanges object}
 \description{
   Show interval data as alignment.
 }
 \usage{
 % for GRanges
-\S4method{geom_alignment}{GRanges}(data,..., xlab, ylab, main,
-               facets = NULL, stat = c("stepping", "identity"),
-               main.geom = c("rect", "arrowrect"),
-               gap.geom = c("chevron", "arrow", "segment"),
-               rect.height = NULL,  group.selfish = TRUE)
+\S4method{geom_alignment}{GRanges}(data, ..., xlab, ylab, main, facets = NULL, stat =
+                 c("stepping", "identity"), range.geom = c("rect",
+                 "arrowrect"), gap.geom = c("chevron", "arrow",
+                 "segment"), rect.height = NULL, group.selfish = TRUE)
+
+\S4method{geom_alignment}{TranscriptDb}(data, ..., which, xlim, truncate.gaps = FALSE,
+                 truncate.fun = NULL, ratio = 0.0025, xlab, ylab, main,
+                 facets = NULL, geom = "alignment",
+                 stat = c("identity", "reduce"),
+                 range.geom = "rect", gap.geom = "arrow",
+                 utr.geom = "rect", names.expr = "tx_name(gene_id)")
+
 }
 \arguments{
   \item{data}{
-    A \code{GRanges} or \code{data.frame} object.
+    A \code{GRanges} or \code{data.frame} or \code{TranscriptDb} object.
   }
   \item{...}{
     Extra parameters such as aes() passed.
@@ -33,12 +43,13 @@
     Faceting formula to use.
   }
   \item{stat}{
+    For \code{\linkS4class{GRanges}}:
     Character vector specifying statistics to use. "stepping" with
     randomly assigned stepping levels as y varialbe. "identity" allow
     users to specify \code{y} value in \code{aes}.
-  }
-  \item{main.geom}{
-    Geom for 'main' intervals which is the data you passed.
+
+    For  \code{\linkS4class{TranscriptDb}}:
+    defualt "identity" give full gene model and "reduce" for reduced model.    
   }
   \item{gap.geom}{
     Geom for 'gap' computed from the data you passed based on the group information.
@@ -51,18 +62,42 @@
   unique level or not. If set to \code{FALSE}, if two groups are not
   overlapped with each other, they will probably be layout in the same
   level to save space.
-  }  
+}
+  \item{which}{
+    \code{GRanges} object to subset the \code{TranscriptDb} object.
+  }
+  \item{xlim}{
+    Limits for x, to subset the \code{TranscriptDb} object.
+  }
+  \item{truncate.gaps}{
+    logical value indicate to truncate gaps or not.
+  }
+  \item{truncate.fun}{
+    shrinkage function. Please see \code{shrinkagefun} in package biovizBase.
+  }
+  \item{ratio}{
+    used in \code{maxGap}.
+  }
+  \item{geom}{
+    geometric object. only support "gene" now.
+  }
+  \item{range.geom}{
+    geom for main intevals or exons.
+  }
+  \item{utr.geom}{
+    geom for utr region.
+  }
+  \item{names.expr}{
+    Expression for showing y label.
+  }
 }
 \value{
   A 'Layer'.
 }
 \examples{
-## @knitr load
 set.seed(1)
 N <- 100
-require(ggbio)
 require(GenomicRanges)
-## @knitr simul
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
@@ -81,36 +116,48 @@ gr <- GRanges(seqnames =
                 replace = TRUE))
 
 
-## @knitr default
 ## ======================================================================
 ##  default
 ## ======================================================================
+ggplot(gr) + geom_alignment()
+## or
 ggplot() + geom_alignment(gr)
 
-## @knitr facet_aes
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot() + geom_alignment(gr, facets = sample ~ seqnames, aes(color = strand, fill = strand))
+ggplot(gr) + geom_alignment(facets = sample ~ seqnames, aes(color = strand, fill = strand))
 
-## @knitr stat:stepping
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot() + geom_alignment(gr, stat = "stepping", aes(group = pair))
+ggplot(gr) + geom_alignment(stat = "stepping", aes(group = pair))
 
-## @knitr group.selfish
 ## ======================================================================
 ##  group.selfish controls when 
 ## ======================================================================
-ggplot() + geom_alignment(gr, stat = "stepping", aes(group = pair), group.selfish = FALSE)
+ggplot(gr) + geom_alignment(stat = "stepping", aes(group = pair), group.selfish = FALSE)
 
-## @knitr main_gap
 ## =======================================
 ##  main/gap geom
 ## =======================================
-ggplot() + geom_alignment(gr, main.geom = "arrowrect", gap.geom = "chevron")
+ggplot(gr) + geom_alignment(range.geom = "arrowrect", gap.geom = "chevron")
 
+## =======================================
+##  For TranscriptDb
+## =======================================
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+data(genesymbol, package = "biovizBase")
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+## made a track comparing full/reduce stat.
+p1 <- ggplot(txdb) + geom_alignment(which = genesymbol["RBM17"])
+p2 <- ggplot(txdb) + geom_alignment(which = genesymbol["RBM17"], stat = "reduce")
+tracks(full = p1, reduce = p2, heights = c(3, 1))
+tracks(full = p1, reduce = p2, heights = c(3, 1)) + theme_tracks_sunset()
+tracks(full = p1, reduce = p2, heights = c(3, 1)) +
+     theme_tracks_sunset(axis.line.color = NA)
+## change y labels
+ggplot(txdb) + geom_alignment(which = genesymbol["RBM17"], names.expr = "tx_id:::gene_id")
 }
 \author{Tengfei Yin}
 

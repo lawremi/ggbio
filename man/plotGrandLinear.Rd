@@ -14,8 +14,7 @@ association they are.
 plotGrandLinear(obj, ..., facets, space.skip = 0.01, geom = NULL,
                  cutoff = NULL, cutoff.color = "red", cutoff.size = 1,
                  legend = FALSE, xlim, ylim, xlab, ylab =
-                 substitute(y), main, theme)
-
+                 substitute(y), main)
 }
 \arguments{
   \item{obj}{
@@ -62,9 +61,6 @@ plotGrandLinear(obj, ..., facets, space.skip = 0.01, geom = NULL,
   }
   \item{main}{
     title.
-  }
-  \item{theme}{
-    theme options.
   }
 }
 \value{

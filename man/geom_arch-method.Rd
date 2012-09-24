@@ -2,6 +2,8 @@
 \alias{geom_arch}
 \alias{geom_arch,data.frame-method}
 \alias{geom_arch,GRanges-method}
+\alias{geom_arch,missing-method}
+\alias{geom_arch,uneval-method}
 \title{Arch geoms for GRanges object}
 \description{
   Show interval data as arches.
@@ -64,13 +66,10 @@ aes() to it to map variable to height of arches.
 }
 
 \examples{
-## @knitr load
 set.seed(1)
 N <- 100
-library(ggbio)
 library(GenomicRanges)
 
-## @knitr simul
 ## =======================================
 ##  simmulated GRanges
 ## =======================================
@@ -88,17 +87,17 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
-## @knitr default
 ## =======================================
 ##  default
 ## =======================================
+ggplot(gr) + geom_arch()
+# or
 ggplot() + geom_arch(gr)
 
-## @knitr facet_aes
 ## =======================================
 ##  facetting and aesthetics
 ## =======================================
-ggplot() + geom_arch(gr, aes(color = value, height = value, size = value),
+ggplot(gr) + geom_arch(aes(color = value, height = value, size = value),
                      alpha = 0.2, facets = sample ~ seqnames)
 
 

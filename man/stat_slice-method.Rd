@@ -1,5 +1,7 @@
 \name{stat_slice}
 \alias{stat_slice}
+\alias{stat_slice,missing-method}
+\alias{stat_slice,uneval-method}
 \alias{stat_slice,Rle-method}
 \alias{stat_slice,RleList-method}
 \title{Slice Rle/RleList to view them as bar or heatmap.}
@@ -90,24 +92,24 @@ xVector <- rpois(1e4, lambda)
 xRle <- Rle(xVector)
 xRleList <- RleList(xRle, 2L * xRle)
 
-ggplot() + stat_slice(xRle, lower = 5)
-ggplot() + stat_slice(xRle, lower = 5, geom = "bar")
-ggplot() + stat_slice(xRle, lower = 5, geom = "heatmap")
+ggplot(xRle) + stat_slice(lower = 5)
+ggplot(xRle) + stat_slice(lower = 5, geom = "bar")
+ggplot(xRle) + stat_slice(lower = 5, geom = "heatmap")
 
-p1 <- ggplot() + stat_slice(xRle, type = "viewMeans", lower = 5,
+p1 <- ggplot(xRle) + stat_slice(type = "viewMeans", lower = 5,
                             geom = "bar")
-p2 <- ggplot() + stat_slice(xRle, type = "viewSums", lower = 5,
+p2 <- ggplot(xRle) + stat_slice(type = "viewSums", lower = 5,
                             geom = "bar")
 ## y scale are different.
 tracks(viewMeans = p1, viewSums = p2)
 
-ggplot() + stat_slice(xRleList, lower = 5)
-ggplot() + stat_slice(xRleList, lower = 5, geom = "bar")
-ggplot() + stat_slice(xRleList, lower = 5, geom = "heatmap")
+ggplot(xRleList) + stat_slice(lower = 5)
+ggplot(xRleList) + stat_slice(lower = 5, geom = "bar")
+ggplot(xRleList) + stat_slice(lower = 5, geom = "heatmap")
 
-p1 <- ggplot() + stat_slice(xRleList, type = "viewMeans", lower = 5,
+p1 <- ggplot(xRleList) + stat_slice(type = "viewMeans", lower = 5,
                             geom = "bar")
-p2 <- ggplot() + stat_slice(xRleList, type = "viewSums", lower = 5,
+p2 <- ggplot(xRleList) + stat_slice(type = "viewSums", lower = 5,
                             geom = "bar")
 ## y scale are different.
 tracks(viewMeans = p1, viewSums = p2)

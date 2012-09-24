@@ -1,9 +1,13 @@
 \name{tracks}
 \alias{tracks}
+\alias{alignPlots}
+\alias{align.plots}
 \alias{Tracks-class}
 \alias{xlim}
 \alias{xlim,Tracks-method}
 \alias{xlim,numeric-method}
+\alias{xlim,IRanges-method}
+\alias{xlim,GRanges-method}
 \alias{xlim<-}
 \alias{xlim<-,Tracks,numeric-method}
 \alias{xlim<-,Tracks,IRanges-method}
@@ -22,69 +26,230 @@
 \alias{reset,Tracks-method}
 \alias{backup}
 \alias{backup,Tracks-method}
+\alias{bgColor}
+\alias{bgColor<-}
+\alias{bgColor,gg-method}
+\alias{bgColor,gtable-method}
+\alias{bgColor<-,gg,character-method}
+\alias{bgColor<-,gtable,character-method}
+\alias{fixed}
+\alias{fixed<-}
+\alias{fixed,gg-method}
+\alias{fixed<-,gg,logical-method}
+\alias{fixed,gtable-method}
+\alias{fixed<-,gtable,logical-method}
+\alias{labeled}
+\alias{labeled<-}
+\alias{labeled,gg-method}
+\alias{labeled<-,gg,logical-method}
+\alias{labeled,gtable-method}
+\alias{labeled,text-method}
+\alias{labeled,gTree-method}
+\alias{labeled<-,gtable,logical-method}
+\alias{mutable}
+\alias{mutable<-}
+\alias{mutable,gg-method}
+\alias{mutable<-,gg,logical-method}
+\alias{mutable,gtable-method}
+\alias{mutable<-,gtable,logical-method}
+\alias{hasAxis}
+\alias{hasAxis<-}
+\alias{hasAxis,gg-method}
+\alias{hasAxis<-,gg,logical-method}
+\alias{hasAxis,gtable-method}
+\alias{hasAxis<-,gtable,logical-method}
+\alias{height}
+\alias{height<-}
+\alias{height,gg-method}
+\alias{height<-,gg,numericORunit-method}
+\alias{height,gtable-method}
+\alias{height<-,gtable,numericORunit-method}
 \title{Tracks for genomic graphics}
 \usage{
-tracks(..., heights, xlim, xlab = NULL,                
-       opts = NULL, track.skip = -1,
-       xlim.change = NULL,
-       track.plot.color = rep("white", nrow),
-       label.bg.color =  "white",
-       label.bg.fill = "gray80",
-       label.text.color = "black",
-       label.text.cex = 1,                   
-       label.width = unit(4, "line"))
-
-\S4method{summary}{Tracks}(object)
-\S4method{print}{Tracks}(x)
-\S4method{show}{Tracks}(object)
-\S4method{Arith}{Tracks,ANY}(e1, e2)
-\S4method{xlim}{numeric}(obj, ...)
-\S4method{xlim}{Tracks}(obj, ...)
-xlim(x) <- value
-\S4method{update}{Tracks}(object, xlim)
-\S4method{reset}{Tracks}(obj)
-\S4method{backup}{Tracks}(obj)
-
+tracks(..., heights, xlim, xlab = NULL, main = NULL,
+            title = NULL, theme = NULL, fixed = NULL,
+            track.plot.color = NULL,
+            track.bg.color = NULL,
+            main.height = unit(2, "lines"),
+            scale.height = unit(2, "lines"),
+            xlab.height = unit(2, "lines"),
+            padding = unit(0, "lines"),
+            label.bg.color =  "white",
+            label.bg.fill = "gray80",
+            label.text.color = "black",
+            label.text.cex = 1,                   
+            label.width = unit(2.5, "lines"))
 }
 \arguments{
-  \item{...}{plots of class ggplot2, trellis, or grobs, and valid
-    arguments to grid.layout.}
+  \item{...}{plots of class ggplot, generated from ggplot2 or ggbio.}
   \item{heights}{numeric vector of the same length of passed graphic
     object to indicate the ratio of each track.}
-  \item{xlim}{limits on x. could be \code{IRanges}, \code{GRanges}, \code{numeric} value}
+  \item{xlim}{limits on x. could be \code{\linkS4class{IRanges}}, \code{\linkS4class{GRanges}}, \code{numeric} value}
   \item{xlab}{label for x axis.}
-  \item{opts}{Option list or theme applied to each track.}
-  \item{track.skip}{Numeric value, skip between tracks, unit is 'lines'.}
-  \item{xlim.change}{Vector of logical value of the same length as
-    passed graphic objects, to control whether we adjust that track with
-    each other or just leave it as it is. This could be useful when you
-    pass a single chromosome view on top of the tracks.}
-  \item{track.plot.color}{plot background color for each track, default is
-    white}
-  \item{label.bg.color}{track labeling background rectangle border color}
-  \item{label.bg.fill}{track labeling background fill color}
-  \item{label.text.color}{track labeling text color}
-  \item{label.text.cex}{track labeling text size}
-  \item{label.width}{track labeling size}  
-  \item{obj}{
-    \code{Tracks} object.
+  \item{main}{title for the tracks.}
+  \item{title}{title for the tracks, alias like main.}
+  \item{theme}{theme object used for building tracks, this will
+    set to default, which could be reseted later. }
+  \item{fixed}{vector of logical value, indicates whether the
+    scale of passed graphics are fixed or not, useful for attaching
+    unchanged plots to the tracks, like ideogram. Please check utilities
+    section below.}
+  \item{track.plot.color}{
+    Vector of characters of length 1 or the same length of passed plots,
+    background color for each track, default is white.
   }
-  \item{object}{
-    \code{Tracks} object.
+  \item{track.bg.color}{
+    background color for the whole tracks.
   }
-  \item{x}{
-    \code{Tracks} object.
+  \item{main.height}{
+    unit. Height to control the title track height.
   }
-  \item{value}{
-    Replaced xlim value.
+  \item{scale.height}{
+    unit. Height to control the scale track height.
   }
-  \item{e1}{
-    \code{Tracks} object on the left of '+'.
+  \item{xlab.height}{
+    unit. Height to control the xlab track height.
+  }        
+  \item{padding}{
+    single numeric value or unit, if numeric value, the unit would be
+    "lines" by default.
+  }          
+  \item{label.bg.color}{
+    track labeling background rectangle border color.
   }
-  \item{e2}{
-    \code{option} object like in 'ggplot2', on the right of '+'.
+  \item{label.bg.fill}{
+    track labeling background fill color.
+  }
+  \item{label.text.color}{
+    track labeling text color.
+  }
+  \item{label.text.cex}{
+    track labeling text size.
+  }
+  \item{label.width}{
+    track labeling size.
+  } 
+}
+\section{Track class}{
+
+  constructor \code{tracks} will return a Tracks object, which has
+  following slots.
+  \describe{
+  \item{\code{grobs}}{
+    a \code{ggplotGrobList} object contains a list of \code{ggplot}
+  object, which is our passed graphics.
+  }
+  \item{\code{backup}}{
+    a backup of all the slots for holding the original tracks, so users
+  could edit it and reset it back at any time later, and \code{backup}
+  method will reset the backupped copy.
+  }
+  \item{\code{ylim}}{
+    y limits for each plot.
+  }
+  \item{\code{labeled}}{
+    vector of logical value indicates whether a track is labeled or not,
+  for \code{labeled} attributes please check utilities section.
+  }
+  \item{\code{mutable}}{
+    vector of logical value indicates whether a track is mutable for
+  theme editing or not, for \code{mutable} attributes please check utilities section.
+  }
+  \item{\code{hasAxis}}{
+    vector of logical value indicates whether a track has axis or  not,
+    for \code{hasAxis} attributes please check utilities section.
+  }
+  \item{\code{heights, xlim, xlab, main, title, theme, fixed, track.plot.color,
+    track.bg.color, main.height, scale.height, xlab.height, padding,
+    label.bg.color, label.bg.fill, label.text.color, label.text.cex, label.width}}{
+    those slots are described in arguments section for constructor.
+  }
   }
 }
+
+\section{Utilities}{
+  Please check examples for usage.
+  \describe{
+    \item{\code{summary(object)}}{
+      summary information about tracks object.
+    }
+    \item{\code{fixed(x)}, \code{fixed(x) <- value}}{ \code{x} is the
+      ggplot object, this controls if a track has a fixed x scale or not, if the \code{fixed}
+      attributes is \code{TRUE}, then when you pass this plot to a
+      tracks, this plot won't be re-aligned with other tracks and will
+      keep the original x-axis, this allow you to pass some plot like
+      ideogram. \code{fixed} function will return a logical value 
+    }
+    \item{\code{labeled(x), labeled(x) <- value}}{\code{x} is the
+      ggplot object,  if you pass named graphics into \code{tracks}, it will create the
+      labels on the left for you. Several ways supported to name it. You can
+      pass a list of graphics with names. Or you can use
+      \code{tracks('name1' = p1, 'name 2' = p2, ...)}  with quotes for
+      complicated words or simply \code{tracks(part1 = p1, part = p2, ...)}. 
+    }
+    \item{\code{mutable(x), mutable(x) <- value}}{
+      \code{x} is the ggplot object, this controls whether a plot in the
+      tracks mutable to theme changing or not, when you use \code{+}
+      method for Tracks object, add-on edit will only be applied to the
+      the mutable plots.
+    }
+    \item{\code{bgColor(x), bgColor(x) <- value}}{
+      \code{x} is the ggplot object, this change the background color
+      for single plot shown in the tracks.
+    }
+    \item{\code{xlim(x), xlim(x) <- value}}{
+      when \code{x} is the numeric value, it calls
+      ggplot2::coord_cartesian(xlim = ...) method, we doesn't use
+      ggplot2::xlim() for the reason it will cut data outside the range,
+      and we believe the best behavior would be zoom-in/out like
+      most browser. when \code{x} is \code{\linkS4class{IRanges}},
+      \code{\linkS4class{GRanges}}, it get the range and passed to
+      ggplot2::coord_cartesian function.
+      
+      when \code{x} is Tracks object, \code{xlim(x)} will
+      return x limits for that tracks. \code{xlim(x) <- value}
+      replace method only works for Tracks object. \code{value} could be
+      \code{numeric}, \code{\linkS4class{IRanges}},
+	\code{\linkS4class{GRanges}} object. This will change the x
+      limits associated with tracks.
+
+      \code{+ xlim(obj)}:\code{obj} is the numeric range, or \code{\linkS4class{IRanges}},
+      \code{\linkS4class{GRanges}} object.
+
+      \code{+ coord_cartesian()}:
+      please read manual in ggplot2, this controls both xlim an
+      ylim, only accept numerical range.
+    }
+    \item{\code{+}}{
+      The most nice features about \code{\linkS4class{Tracks}} object is
+      the one inherited from ggplot2's components additive features,
+      with \code{+} method you can use any \code{theme} object and
+      utilities in ggplot2 package, to add them on a
+      \code{\linkS4class{Tracks}} object, for example, if x is our
+      \code{\linkS4class{Tracks}} object, \code{x + theme} would  apply
+      theme to any plots in the tracks except those are immutable.
+    }
+  }  
+}
+
+\section{Backup and reset}{
+  \describe{
+    \item{reset(obj)}{
+      \code{obj} is the Tracks object, this reset the tracks back to
+      original or backuped version.
+    }
+    \item{backup(obj)}{
+      \code{obj} is the Tracks object, this clear previous backup and
+      use current setting for a new backup.
+    }
+    \item{update(obj, xlim)}{
+      \code{obj} is the Tracks object, this allow a quick tweak with
+      xlim when the plot is shown on your screen.     
+    }
+  }
+}
+
+
 \description{
   \code{tracks} is a conventient constructor for bindind graphics as trakcs. You dont' have
   to worry about adjusting different graphics, \code{tracks} did that for you. It's NOT
@@ -100,124 +265,193 @@ xlim(x) <- value
   the same x axis in order to form your hypothesis. This function leaves you the
   flexibility to construct each tracks separately with worrying your alignments
   later.
-
-  ggbio provide a set of utilities to reset, backup, and apply options to
-  tracks, please see examples below.
-
-  If you pass named graphics into \code{tracks}, it will create the
-  labels on the left for you. Several ways supported to name it. You can
-  pass a list of graphics with names. Or you can use
-  \code{tracks('fun part1' = p1, 'fun part2' = p2, ...)} or
-  \code{tracks(part1 = p1, part = p2, ...)}. Please see examples below.
 }
-\details{\code{tracks} function has some extra special features.
+
+\details{
+  \code{tracks} did following modification for passed plots.
   \itemize{
     \item{}{
-      Only keep the bottom x axis based on assumption that all tracks are on the
-      same space, but still keep x ticks. For simply wrapping, please use `align.plots`.
+      remove x-axis, ticks, xlab and tile, for each track and add a
+      scale track at bottom. We suppose a new xlab and title would be
+      provided by the \code{tracks} function for the whole tracks, but we
+      still keep y axis.
     }
     \item{}{
-      `ncol` which defines columns is always 1, because binding tracks in the
-      context of genomic data is almost always one single column. Multiple column
-      alignments are not supported yet.
+      align x-scale limits to make sure every plots sitting on exactly
+      the same x scale.
+    }
+    \item{}{
+      squeezing plots together a little bit.
+    }
+    \item{
+      labeling tracks if names provided, please check utilities section
+      about \code{labeled} method.
+    }
+    \item{
+      return a track object. This would allow many features introduced
+      in this manual.
     }
   }
-  also has some utilities.
-  \itemize{
-    \item{xlim}{
-    }
-    \item{reset,backup}{
-      \code{reset} and {backup} help you play with options and appearance of the tracks,
-      you could save certain status by calling {backup}, and get backup version back
-      by calling {reset}.
-    }
-    \item{summary}{
-      \code{summary} give you meta information about tracks.
-    }
-    \item{update}{
-      \code{update} allow you to
-      update a plot xlim on the fly, you can simply keep the plot window and run
-      \code{update} to tweak with the view. Other wise you need to revise the tracks object
-      and print it again.
-    }
-    \item{show,print}{
-      show plots on your screen.
-    }
-  }
-  }
+}
+
+
 \seealso{\code{\link{align.plots}}}
 \value{
  A \code{Tracks} object.
 }
 \examples{
-## please check out the vignette about creating tracks.
-##  load
-## ==========================================================
-## Load packages
-## ==========================================================
-## Load gene features for human
-library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-data(genesymbol, package = "biovizBase")
-txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+## load ggbio automatically load ggplot2
+library(ggbio)
+## make a simulated time series data set
+df1 <- data.frame(time = 1:100, score = sin((1:100)/20)*10)
+p1 <- qplot(data = df1, x = time, y = score, geom = "line")
+df2 <- data.frame(time = 30:120, score = sin((30:120)/20)*10, value = rnorm(120-30 + 1))
+p2 <- ggplot(data = df2, aes(x = time, y = score)) + 
+  geom_line() + geom_point(size = 4, aes(color = value))
+## check p2
+p1
+## check p2
+p2
 
-##  tracks
-## ==========================================================
-## Create tracks
-## ==========================================================
-## create two tracks
-## full gene model
-p1 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"])
-## reduced gene model
-p2 <- ggplot() + stat_gene(txdb, which = genesymbol["RBM17"], stat = "reduce")
-## building tracks
-obj <- tracks(full = p1, reduce = p2, heights = c(3, 1))
-## showing 
-obj
+## binding
+tracks(p1, p2)
 
-##  reset
-## ==========================================================
-## test reset/backup
-## ==========================================================
-## create tracks
-obj <- tracks(p1, p2, heights = c(3, 1))
-## show it
-obj
-## three ways to change x limits, IRanges/GRanges/numeric
-xlim(obj) <- IRanges(start = 6145000, end = 6150000)
-xlim(obj) <- GRanges("chr1", c(start = 6145000, end = 6150000))
-xlim(obj) <- c(6145000, 6150000)
-## show it
-obj
-## reset to original setting
-obj <- reset(obj)
-## get back
-obj
-## we could save a statue of the tracks to backup and then
-## reset will get that copy back
-xlim(obj) <- c(6145000, 6150000)
-obj <- backup(obj)
-obj@xlim <- c(6135000, 6150000)
-obj
-obj <- reset(obj)
-obj
+## or
+tks <- tracks(p1, p2)
+tks
 
-##  utils
-## ==========================================================
-## utils
-## ==========================================================
-## summary information about a track
-summary(obj)
-## update a x limits on the fly, this is useful when you try to
-## keep the view open and tweak with limits on the fly.
-update(obj, xlim  = c(6130000, 6150000))
+## labeling: default labeling a named graphic
+## simply pass a name with it
+tracks(time1 = p1, time2 = p2)
+## or pass a named list with it
+lst <- list(time1 = p1, time2 = p2)
+tracks(lst)
 
-## opts
-## ==========================================================
-## options
-## ==========================================================
-## To make it easy, you could just apply any *options* by using "+"
-## and this will apply it to every plot in the track.
-obj + theme_bw()
+## more complicated case please use quotes
+tracks(time1 = p1, "second time" = p2)
+
+## set heights
+tracks(time1 = p1, time2 = p2, heights = c(1, 3))
+
+## if you want to disable label arbitrarily
+## default label is always TRUE
+labeled(p2) 
+labeled(p2) <- FALSE
+## set labeled to FALSE, remove label even the plot has a name
+tracks(time1 = p1, time2 = p2)
+labeled(p2) <- TRUE
+
+## fix a plot, not synchronize with other plots
+p3 <- p1
+## default is always FALSE
+fixed(p3)
+## set to TRUE
+fixed(p3) <- TRUE
+fixed(p3)
+
+tracks(time1 = p1, time2 = p2, "time3(fixed)" = p3) 
+
+
+fixed(p3) <- FALSE
+## otherwise you could run
+tracks(time1 = p1, time2 = p2, "time3(fixed)" = p3, fixed = c(F, F, T))
+
+
+## control axis
+hasAxis(p1)
+hasAxis(p1) <- TRUE
+# ready for weird looking
+tracks(time1 = p1, time2 = p2)
+
+
+
+## mutable
+mutable(p1)
+tracks(time1 = p1, time2 = p2) + theme_bw()
+mutable(p1) <- FALSE
+# mutable for "+" method
+tracks(time1 = p1, time2 = p2) + theme_bw()
+
+## bgColor
+bgColor(p1)
+tracks(time1 = p1, time2 = p2)
+bgColor(p1) <- "brown"
+# mutable for "+" method
+tracks(time1 = p1, time2 = p2)
+
+
+## apply a theme to each track
+tks <- tracks(time1 = p1, time2 = p2) + theme_bw()
+tks
+reset(tks)
+
+## store it with tracks
+tks <- tracks(time1 = p1, time2 = p2, theme = theme_bw())
+tks
+tks <- tks + theme_gray()
+tks
+## reset will be introduced later
+reset(tks)
+
+## apply a pre-defiend theme for tracks!
+tracks(time1 = p1, time2 = p2) + theme_track_sunset()
+tracks(p1, p2) + theme_track_sunset()
+
+## change limits
+tracks(time1 = p1, time2 = p2) + xlim(c(1, 40))
+tracks(time1 = p1, time2 = p2) + xlim(1, 40)
+tracks(time1 = p1, time2 = p2) + coord_cartesian(xlim = c(1, 40))
+# change y
+tracks(time1 = p1, time2 = p2) + xlim(1, 40) + ylim(0, 10)
+library(GenomicRanges)
+gr <- GRanges("chr", IRanges(1, 40))
+# GRanges
+tracks(time1 = p1, time2 = p2) + xlim(gr)
+# IRanges
+tracks(time1 = p1, time2 = p2) + xlim(ranges(gr))
+tks <- tracks(time1 = p1, time2 = p2)
+xlim(tks)
+xlim(tks) <- c(1, 35)
+xlim(tks) <- gr
+xlim(tks) <- ranges(gr)
+
+## xlab, title
+tracks(time1 = p1, time2 = p2, xlab = "time")
+tracks(time1 = p1, time2 = p2, main = "title")
+tracks(time1 = p1, time2 = p2, title = "title")
+tracks(time1 = p1, time2 = p2, xlab = "time", title = "title") + theme_tracks_sunset()
+
+
+## backup and restore
+tks <- tracks(time1 = p1, time2 = p2)
+tks
+tks <- tks + xlim(1, 40)
+tks
+reset(tks)
+tks <- tks + xlim(1, 40)
+tks
+tks <- backup(tks)
+tks <- tks + theme_bw()
+tks
+reset(tks)
+
+## update
+## show it on the fly, save your time to re-print
+tks <- tracks(time1 = p1, time2 = p2)
+tks
+update(tks, xlim = c(1, 40))
+
+## padding(need to be fixed for more delicate control)
+tracks(time1 = p1, time2 = p2, padding = 2)
+
+## track color
+tracks(time1 = p1, time2 = p2, track.bg.color = "yellow")
+tracks(time1 = p1, time2 = p2, track.plot.color = c("yellow", "brown"))
+
+## alignPlots simply align the panel, without adjusting the xlims
+alignPlots(p1, p2)
+
+alignPlots(p1, p2 + theme(legend.position = "none"), vertical = FALSE)
 }
 \author{Tengfei Yin}
 

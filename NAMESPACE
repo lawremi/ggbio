@@ -31,11 +31,11 @@ importMethodsFrom(IRanges,  split,
                   unlist, psetdiff,
                   range, endoapply,
                   as.data.frame,
-                  length, as.list,
+                  length, as.list, as.matrix,
                   "[","[<-","[[", "[[<-","$",
                   show)
 
-importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL)
+importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL, Views, ViewsList)
 
 ## ## GenomicRanges
 
@@ -76,18 +76,23 @@ importFrom(GenomicFeatures,
 importMethodsFrom(rtracklayer, import)
 
 ## VariantAnnotation
-## importClassesFrom(VariantAnnotation, VCF)
-## importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref, "ref<-",
-##                   alt, "alt<-", info, "info<-", geno, "geno<-",  readVcf) 
+importClassesFrom(VariantAnnotation, VCF)
+importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref, "ref<-",
+                  alt, "alt<-", info, "info<-", geno, "geno<-",  readVcf) 
 
 
 ## ============================================================
 ## Export
 ## ============================================================
 ## utils
-exportMethods(autoplot, rescale, fortify,
-              xlim, "xlim<-", update, reset, backup)
-export(arrangeGrobByParsingLegend)
+exportMethods(autoplot, rescale, mold, fixed, "fixed<-", 
+              xlim, "xlim<-", update, reset, backup,
+              bgColor, "bgColor<-", labeled, "labeled<-",
+              mutable, "mutable<-", height, "height<-",
+              hasAxis, "hasAxis<-", ggplot)
+
+
+export(arrangeGrobByParsingLegend, ggbio)
 
 ## scale
 export(scale_x_sequnit, scale_fill_giemsa, scale_fill_fold_change)
@@ -133,6 +138,7 @@ export(tracks,
        plotGrandLinear,
        plotRangesLinkedToData)
 
-export(theme_null, theme_alignment)
+export(theme_null, theme_alignment, theme_clear, theme_tracks_sunset,
+       theme_pack_panels, theme_noexpand)
 
  

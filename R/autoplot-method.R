@@ -789,7 +789,7 @@ setMethod("autoplot", "ExpressionSet", function(object, ...,
     p <- .ggpcp(df) + geom_line(...) + xlab("Sample Name")
   }
   if(type == "boxplot"){
-    p <- ggpcp(df) + geom_boxplot(aes(group=variable), ...)+ xlab("Sample Name")
+    p <- .ggpcp(df) + geom_boxplot(aes(group=variable), ...)+ xlab("Sample Name")
   }
   if(type == "MA"){
     stop("not impleenmted yet")
@@ -1372,11 +1372,11 @@ setMethod("autoplot", "SummarizedExperiment", function(object, ...,
   }
   if(type == "pcp"){
     df <- as.data.frame(res)
-    p <- ggpcp(df) + geom_line(...) + xlab("Sample Name")
+    p <- .ggpcp(df) + geom_line(...) + xlab("Sample Name")
   }
   if(type == "boxplot"){
     df <- as.data.frame(res)
-    p <- ggpcp(df, ...) + geom_boxplot(aes(group=variable))+ xlab("Sample Name")
+    p <- .ggpcp(df, ...) + geom_boxplot(aes(group=variable))+ xlab("Sample Name")
   }
   if(type == "scatterplot.matrix"){
     df <- as.data.frame(res)

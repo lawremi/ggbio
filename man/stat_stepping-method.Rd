@@ -79,7 +79,7 @@ ggplot(gr) + stat_stepping(aes(color = strand),
 
 
 ##  geom_alignment
-ggplot(gr) + stat_stepping(geom = "alignment")
+## ggplot(gr) + stat_stepping(geom = "alignment")
 
 ##  geom_alignment_group
 ##  ggplot(gr) + stat_stepping(aes(group = pair),geom = "alignment")

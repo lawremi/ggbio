@@ -300,8 +300,6 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
  A \code{Tracks} object.
 }
 \examples{
-## load ggbio automatically load ggplot2
-library(ggbio)
 ## make a simulated time series data set
 df1 <- data.frame(time = 1:100, score = sin((1:100)/20)*10)
 p1 <- qplot(data = df1, x = time, y = score, geom = "line")
@@ -354,7 +352,7 @@ tracks(time1 = p1, time2 = p2, "time3(fixed)" = p3)
 
 fixed(p3) <- FALSE
 ## otherwise you could run
-tracks(time1 = p1, time2 = p2, "time3(fixed)" = p3, fixed = c(F, F, T))
+tracks(time1 = p1, time2 = p2, "time3(fixed)" = p3, fixed = c(FALSE, FALSE, TRUE))
 
 
 ## control axis
@@ -394,8 +392,8 @@ tks
 reset(tks)
 
 ## apply a pre-defiend theme for tracks!
-tracks(time1 = p1, time2 = p2) + theme_track_sunset()
-tracks(p1, p2) + theme_track_sunset()
+tracks(time1 = p1, time2 = p2) + theme_tracks_sunset()
+ tracks(p1, p2) + theme_tracks_sunset()
 
 ## change limits
 tracks(time1 = p1, time2 = p2) + xlim(c(1, 40))

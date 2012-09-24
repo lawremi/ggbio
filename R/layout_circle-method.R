@@ -1,4 +1,5 @@
 setGeneric("layout_circle", function(data,...) standardGeneric("layout_circle"))
+
 setMethod("layout_circle",  "GRanges",
           function(data, ..., geom = c("point","line", "link", "ribbon","rect", "bar",
                                        "segment","hist", "scale", 
@@ -94,7 +95,7 @@ setMethod("layout_circle",  "GRanges",
     obj <- transformToGenome(data, space.skip)        
     if("label" %in% names(args.aes)){
       lbs <- as.character(args.aes$label)
-      if(!lbs %in% c(colnames(fortify(obj[1,])),"start", "end", "seqnames","width"))
+      if(!lbs %in% c(colnames(mold(obj[1,])),"start", "end", "seqnames","width"))
         stop("label must be one of column names")
     }else{
       stop("missing label argument in aes()")
@@ -302,7 +303,7 @@ setMethod("layout_circle",  "GRanges",
   }
   if(grid)
     p <- c(p.grid, p)
-  p <- c(p, list(theme(aspect.ratio = 1), theme_null()))
+  p <- c(p, list(theme_null(), theme(aspect.ratio = 1)))
   p 
 })
 

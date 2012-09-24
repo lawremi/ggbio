@@ -1,10 +1,6 @@
 ## FIXME: add ..coverage.., and a new way
 setGeneric("stat_slice", function(data, ...) standardGeneric("stat_slice"))
 
-setMethod("stat_slice", "missing", function(data, ...){
-  return(match.call())
-})
-
 setMethod("stat_slice", "Rle", function(data, ...,
                                         xlab, ylab, main,
                                         na.rm = FALSE,
@@ -126,6 +122,7 @@ setMethod("stat_slice", "Rle", function(data, ...,
     p <- c(p, list(ggplot2::ylab("y")))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
+  p <- setStat(p)  
   p
 })
 
@@ -295,5 +292,7 @@ setMethod("stat_slice", "RleList", function(data, ...,
     p <- c(p, list(ggplot2::ylab("y")))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
-  c(list(p), list(facet))
+  p <- c(list(p), list(facet))
+  p <- setStat(p)
+  p
 })

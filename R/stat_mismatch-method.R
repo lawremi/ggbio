@@ -1,8 +1,4 @@
 setGeneric("stat_mismatch", function(data, ...) standardGeneric("stat_mismatch"))
-## this require a special GenomicRanges
-setMethod("stat_mismatch", "missing", function(data, ...){
-  return(match.call())
-})
 
 setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome,
                                                      xlab, ylab, main,
@@ -36,7 +32,7 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome,
 
   
   ## df <- as.data.frame(data)
-  df <- fortify(data)
+  df <- mold(data)
   df.unmatch <- df[!df$match, ]
   ## add two end point?
   pos <- min(df$start):max(df$end)
@@ -118,7 +114,7 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome,
 
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
-  
+  p <- setStat(p)  
   p
 })
 
@@ -154,7 +150,7 @@ setMethod("stat_mismatch", "BamFile", function(data, ...,  bsgenome, which,
 
     if(!missing(main))
       p <- c(p, list(labs(title = main)))
-    
+  p <- setStat(p)
     p
     
   })

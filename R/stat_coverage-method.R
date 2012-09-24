@@ -1,18 +1,10 @@
 ## FIXME: add ..coverage.., and a new way
 setGeneric("stat_coverage", function(data, ...) standardGeneric("stat_coverage"))
 
-setMethod("stat_coverage", "missing", function(data, ...){
-  return(match.call())
-})
-
-setMethod("stat_coverage", "uneval", function(data, ...){
-  return(match.call())
-})
-
-setMethod("stat_coverage", "IRanges", function(data, ...){
-  fake_gr <- GRanges("null", data)
-  stat_coverage(fake_gr, ...)
-})
+## setMethod("stat_coverage", "IRanges", function(data, ...){
+##   fake_gr <- GRanges("null", data)
+##   stat_coverage(fake_gr, ...)
+## })
 
 setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
                                                xlab, ylab, main,
@@ -98,7 +90,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   p <- .changeStrandColor(p, args.aes)
   p <- c(list(p) , list(facet))
   if(missing(xlab)) 
-    xlab <- getXLab(data)
+    xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
 
 
@@ -109,7 +101,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
 
-  
+  p <- setStat(p)    
   p
 })
 
@@ -141,6 +133,8 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
     p <- c(p, list(ggplot2::ylab("Coverage")))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
+
+  p <- setStat(p)    
   p
 })
 
@@ -230,7 +224,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
     })
     res <- unlist(res)
   }
-  res <- fortify(res)
+  res <- mold(res)
   aes.res <- do.call(aes, args.aes)
   args.res <- c(list(data = res),
                 list(aes.res),
@@ -263,7 +257,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
     facet <- facet_null()
     p <- c(p, list(facet))
   }
-  
+  p <- setStat(p)  
   p
   
 })

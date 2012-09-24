@@ -76,7 +76,7 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
   if(!missing(ylim))
     p <- p + ylim(ylim)
   if(missing(xlab))
-    xlab <- getXLab(obj)
+    xlab <- ""
   p <- p + ggplot2::xlab(xlab)
   p
 }

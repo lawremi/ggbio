@@ -1,9 +1,5 @@
 setGeneric("stat_aggregate", function(data, ...) standardGeneric("stat_aggregate"))
 
-setMethod("stat_aggregate", "missing", function(data, ...){
-  return(match.call())
-})
-
 setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by, FUN, start = NULL,
                                                       end = NULL, width = NULL,  y = NULL,
                                                       frequency = NULL, delta = NULL,
@@ -157,13 +153,14 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
    }
   p <- c(list(p) , list(facet))
   if(missing(xlab)) 
-    xlab <- getXLab(data)
+    xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
   
   if(!missing(ylab))
     p <- c(p, list(ggplot2::ylab(ylab)))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
+  p <- setStat(p)
   p
 })
 

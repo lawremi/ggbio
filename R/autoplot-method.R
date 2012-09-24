@@ -8,7 +8,7 @@ formals.facets <- union(formals.facet_grid, formals.facet_wrap)
 .ggbio.geom <- c("rect", "chevron", "alignment", "arrowrect", "arrow",
                  "segment", "arch", "bar")
 .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate", "table",
-                 "gene", "mismatch", "reduce")
+                 "gene", "mismatch", "reduce", "bin", "slice")
 
 ## ======================================================================
 ##        For "Granges"
@@ -77,7 +77,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
      (!is.null(stat) && stat %in% .ggbio.stat)){
      args.non$data <- object
   }else{
-    args.non$data <- fortify(object)
+    args.non$data <- mold(object)
     if(!"x" %in% names(args.aes))
       args.aes$x <- as.name("midpoint")
   }
@@ -142,6 +142,8 @@ setMethod("autoplot", "GRanges", function(object, ...,
                                 labels = ss$labels)
   }
   p <- p + facet
+  p$.data <- object
+  p <- ggbio(p)
   p
 })
 
@@ -164,13 +166,10 @@ setMethod("autoplot", "GRangesList", function(object, ...,
   args.non <- parseArgsForNonAes(args)
   args.non$group.selfish <- group.selfish
   if(type == "none")  {
-    ## geom <- match.arg(geom)
     if(is.null(geom) & is.null(stat))
       geom <- "alignment"
     args.non$geom <- geom
     gr <- flatGrl(object, indName)
-    ## default or not?
-    ## args.aes$group <- substitute(.grl.name)
     if(!"group" %in% names(args.aes))
       args.aes$group <- as.name(indName)
     aes.res <- do.call(aes, args.aes)
@@ -194,9 +193,6 @@ setMethod("autoplot", "GRangesList", function(object, ...,
       do.call(stat_coverage, c(list(data = gr),
                                list(fill = coverage.fill, color = coverage.col)))
   }
-  ## if(!missing(xlab))
-  ##   p <- p + xlab(xlab)
-  
   if(missing(xlab)) {
         xlab <- ""
   }
@@ -726,11 +722,31 @@ setMethod("autoplot", "RleList", function(object, ...,
 ##======================================================================
 ##  For ExpressionSet/eSet??
 ##======================================================================
-setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("heatmap","none",
-                                    "scatterplot.matrix", "pcp", "MA", "boxplot",
-                                    "mean-sd", "volcano",
-                                    "NUSE", "RLE"),
-                     test.method = "t"){
+
+.ggpcp <- function(data, vars = names(data), ...){
+  scaled <- as.data.frame(lapply(data[, vars], ggplot2:::rescale01))
+  data <- ggplot2:::cunion(scaled, data)
+  data$ROWID <- 1:nrow(data)
+  molten <- reshape2::melt(data, m = vars)
+  ggplot(molten, aes_string(x = "variable", y = "value", group = "ROWID"), 
+         ...)
+}
+
+## setGeneric("phenoPlot", "")
+## phenoPlot <- function(){
+  
+## }
+
+setMethod("autoplot", "ExpressionSet", function(object, ...,
+                                                type = c("heatmap","none",
+                                                  "scatterplot.matrix", "pcp", "MA", "boxplot",
+                                                  "mean-sd", "volcano",
+                                                  "NUSE", "RLE"),
+                                                test.method = "t",
+                                                rotate = FALSE,
+                                                pheno.plot = FALSE,
+                                                main_to_pheno = 4.5,
+                                                padding = 0.2){
 
   args <- list(...)
   type <- match.arg(type)
@@ -740,14 +756,40 @@ setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("heatmap",
     p <- plotmatrix(df, ...)
   }
   if(type == "heatmap"){
+    ## add pheno type data
+    if(!pheno.plot){
     colnames(df.exp) <- rownames(pData(object))
-    p <- autoplot(df.exp) + ylab("Features") + xlab("Samples")
+    p <- autoplot(df.exp, ...) + ylab("Features") + xlab("Samples")
+    }else{
+      colnames(df.exp) <- rownames(pData(object))
+      p <- autoplot(t(df.exp), ...) + xlab("Features") + ylab("Samples")
+      pd <- pData(object)
+      s <- list(theme(axis.text.y = element_blank(),
+                      axis.ticks.y = element_blank()) ,
+                theme(legend.position = "top",
+                      plot.margin = unit(c(1, padding, 0.5, padding), "lines")),
+                guides(fill = guide_legend(bycol = TRUE,
+                         byrow = FALSE, ncol =  1,
+                         title.theme = element_blank())))
+
+      
+      N <- ncol(pd)
+      hts <- rep(1/N, N)
+      hts <- c(hts, main_to_pheno)
+      l <- lapply(1:N, function(i){
+        autoplot(as.matrix(pd[, i, drop  = FALSE])) + s
+      })
+      ry <- c(rep(TRUE, N), FALSE)
+      l <- c(l, list(p))
+      return(do.call(alignPlots, c(l, list(vertical = FALSE, remove.y.axis = ry,
+                                           widths = hts))))
+    }
   }
   if(type == "pcp"){
-    p <- ggpcp(df) + geom_line() + xlab("Sample Name")
+    p <- .ggpcp(df) + geom_line(...) + xlab("Sample Name")
   }
   if(type == "boxplot"){
-    p <- ggpcp(df) + geom_boxplot(aes(group=variable))+ xlab("Sample Name")
+    p <- ggpcp(df) + geom_boxplot(aes(group=variable), ...)+ xlab("Sample Name")
   }
   if(type == "MA"){
     stop("not impleenmted yet")
@@ -803,7 +845,7 @@ setMethod("autoplot", "ExpressionSet", function(object, ..., type = c("heatmap",
 
   }
   if(type == "none"){
-    df.l <- fortify(object)
+    df.l <- mold(object)
     p <- qplot(data = df.l, ...)
   }
   p
@@ -930,214 +972,137 @@ setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
 ##======================================================================
 ##  For VCF
 ##======================================================================
-## setMethod("autoplot", "VCF", function(object, ..., genomic.pos = FALSE,
-##                                       xlab, ylab, main,
-##                                       type = c("geno", "info", "fixed"),
-##                                       full.string = FALSE,
-##                                       ref.show = TRUE,
-##                                       expand = c(1, 1),
-##                                       ylabel = TRUE){
-##   args <- list(...)
-##   args.aes <- parseArgsForAes(args)
-##   args.non <- parseArgsForNonAes(args)
-##   type <- match.arg(type)
-##   hdr <- exptData(object)[["header"]]
-##   if(type == "geno"){
-##     nms <- rownames(geno(hdr))
-##     if("GT" %in% nms){
-##       message("use GT for type geno as default")
-##       gt <- geno(object)[["GT"]]
-##     }else{
-##       nm <- nms[1]
-##       message("use ", nm, " for type geno as default")
-##       gt <- geno(object)[[nm]]
-##     }
-##     sts <- start(rowData(object))
-##     idx <- !duplicated(sts)
-##     if(sum(!idx))
-##       warning("remove ", sum(!idx), " snp with duplicated position, only keep first one")
-##     gt <- gt[idx,]
-##     rownames(gt) <- start(rowData(object)[idx])
-##     gt.t <- t(gt)
-##     p <- autoplot(gt.t, genomic.pos = genomic.pos)
-##   }
-##   if(type == "info"){
-##     df <- fortify(info(object))
-##     if(!"y" %in% names(args.aes)){
-##       hdr.i <- rownames(info(hdr))
-##       if("AF" %in% hdr.i){
-##         args.aes$y <- as.name("AF")
-##         message("use AF for type info as default")
-##       }else{
-##         nm <- hdr.i[i]
-##         message("use ", nm, " for type info as default")
-##         args.aes$y <- as.name(nm)
-##       }
-##     }
-##     if(!"x" %in% names(args)){
-##       args.aes$x <- as.name("start")
-##     }
-##     if(!"color" %in% names(args)){
-##       args.non$color <- "black"
-##     }
-##     if(!"fill" %in% names(args)){
-##       args.non$fill <- "black"
-##     }
-##     p <- ggplot(data = df) + do.call(ggplot2::geom_bar, c(list(stat = "identity"),
-##                                    list(do.call(aes, args.aes)),
-##                                    args.non))
-##   }
-##   if(type == "fixed"){
-##     fix <- fixed(object)
-##     fix <- fix[, !colnames(values(fix)) %in% c("ALT", "REF")]
-##     values(fix)$ALT <- unlist(values(alt(object))[, "ALT"])
-##     values(fix)$REF <- values(ref(object))[, "REF"]
-##     fix2 <- fix        
-##     type2 <- vector("character", length  = length(fix))      
-##     idx <- width(values(fix)$ALT) > 1    
-##     type2[idx] <- "I"
-##     type2[!idx] <- as.character(values(fix[!idx])$ALT)
-##     values(fix)$type <- type2
-##     ## id <- start(fix) < 25238400 & start(fix) > 25238100
-##     if(!"color" %in% names(args.non))
-##       isDNABaseColor <- TRUE
-##     else
-##       isDNABaseColor <- FALSE
-##     baseColor <- getOption("biovizBase")$DNABasesColor
-##     .i <- "black"
-##     names(.i) <- "I"
-##     baseColor <- c(baseColor, .i)
-##     ir <- IRanges(start = start(fix), width = width(values(fix)$ALT))
-##     if(!full.string)
-##       width(ir[idx,]) <- 1
-##     steps <- disjointBins(ir)      
-##     values(fix)$stepping <- steps      
-##     values(fix)$value <- values(fix)$ALT
-##     values(fix)$group <- "ALT"    
-##     fix2 <- addStepping(fix2)
-##     idx <- width(values(fix2)$REF) > 1        
-##     ir <- IRanges(start = start(fix), width = width(values(fix2)$REF))
-##     if(!full.string)
-##       width(ir[idx,]) <- 1
-##     steps <- disjointBins(ir)      
-##     values(fix2)$stepping <- steps      
-##     type2 <- vector("character", length  = length(fix2))      
-##     type2[idx] <- "I"
-##     type2[!idx] <- as.character(values(fix[!idx])$REF)
-##     values(fix2)$type <- type2
-##     values(fix2)$value <- values(fix2)$REF
-##     values(fix2)$group <- "REF"
-##     .nms <- colnames(values(fix))
-##     fix <- c(fix, fix2[, .nms])
-##     if(ref.show){
-##       facet <- facet_grid(group ~ ., scales = "free_y")
-##       }else{
-##         fix <- fix[values(fix)$group == "ALT"]
-##         facet <- NULL
-##       }
-##     if(!full.string){
-##       ## only show SNP
-##       df <- fortify(fix)
-##       p <- ggplot() + geom_text(data = df, ..., 
-##                                 aes(x = start, label = type, color = type,  y = stepping)) +
-##                                   scale_color_manual(values = baseColor) +  facet
-                              
-##     }else{
-##       df <- fortify(fix)
-##       df$type <- factor(df$type, levels = c(names(baseColor)))
-##       p <- ggplot() + geom_text(data = df, ..., 
-##                                 aes(x = start, label = value, color = type, y = stepping)) +
-##                                 scale_color_manual(values = baseColor) + facet
-
-##     }
-##   }
-##   p <- p + scale_y_continuous(expand = expand)
-##   if(!ylabel){
-##     if(type == "fixed"){
-##     p <- p + scale_y_continuous(breaks = NULL, expand = expand)
-##   }else{
-##     p <- p + scale_y_continuous(breaks = NULL)
-##   }
-##   }
-  
-##   if(missing(xlab))
-##     xlab <- ""
-##   p <- p + ggplot2::xlab(xlab)
-##   if(missing(ylab))
-##     ylab <- ""
-##   p <- p + ggplot2::ylab(ylab)
-##   if(!missing(main))
-##     p <- p + labs(title = main)
-##   p
-## })
-
-
-setMethod("autoplot", "matrix", function(object, ...,
-                                         xlab, ylab, main,
-                                         label = TRUE,
-                                         genomic.pos = FALSE,
-                                         geom = c("raster","tile", "line"),
-                                         facet = FALSE,
-                                         compact = TRUE,
-                                         strip.bg = FALSE, strip.text.y = TRUE){
-
-  geom <- match.arg(geom)
-  x <- seq_len(ncol(object))
-  if(genomic.pos | !is.null(colnames(object))){
-    if(!is.null(colnames(object))){
-      message("using genomic position, parsing column names as position")      
-      cnms <- as.numeric(colnames(object))
-      if(all(!is.na(cnms))){
-        x <- cnms[x]
-      }else{
-        message("NA found in column names, use default")
-      }
+setMethod("autoplot", "VCF", function(object, ..., genomic.pos = FALSE,
+                                      xlab, ylab, main,
+                                      type = c("geno", "info", "fixed"),
+                                      full.string = FALSE,
+                                      ref.show = TRUE,
+                                      expand = c(1, 1),
+                                      ylabel = TRUE,
+                                      assay.id = 1){
+  args <- list(...)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  type <- match.arg(type)
+  hdr <- exptData(object)[["header"]]
+  if(type == "geno"){
+    nms <- rownames(geno(hdr))
+    if("GT" %in% nms){
+      message("use GT for type geno as default")
+      gt <- geno(object)[["GT"]]
     }else{
-      message("No column names found, use default")
+      nm <- nms[1]
+      message("use ", nm, " for type geno as default")
+      gt <- geno(object)[[nm]]
+    }
+    sts <- start(rowData(object))
+    idx <- !duplicated(sts)
+    if(sum(!idx))
+      warning("remove ", sum(!idx), " snp with duplicated position, only keep first one")
+    gt <- gt[idx,]
+    rownames(gt) <- start(rowData(object)[idx])
+    gt.t <- t(gt)
+    p <- autoplot(gt.t, genomic.pos = genomic.pos)
+  }
+  if(type == "info"){
+    df <- mold(info(object))
+    if(!"y" %in% names(args.aes)){
+      hdr.i <- rownames(info(hdr))
+      if("AF" %in% hdr.i){
+        args.aes$y <- as.name("AF")
+        message("use AF for type info as default")
+      }else{
+        nm <- hdr.i[i]
+        message("use ", nm, " for type info as default")
+        args.aes$y <- as.name(nm)
+      }
+    }
+    if(!"x" %in% names(args)){
+      args.aes$x <- as.name("start")
+    }
+    if(!"color" %in% names(args)){
+      args.non$color <- "black"
+    }
+    if(!"fill" %in% names(args)){
+      args.non$fill <- "black"
+    }
+    p <- ggplot(data = df) + do.call(ggplot2::geom_bar, c(list(stat = "identity"),
+                                   list(do.call(aes, args.aes)),
+                                   args.non))
+  }
+  if(type == "fixed"){
+    fix <- fixed(object)
+    fix <- fix[, !colnames(values(fix)) %in% c("ALT", "REF")]
+    values(fix)$ALT <- unlist(values(alt(object))[, "ALT"])
+    values(fix)$REF <- values(ref(object))[, "REF"]
+    fix2 <- fix        
+    type2 <- vector("character", length  = length(fix))      
+    idx <- width(values(fix)$ALT) > 1    
+    type2[idx] <- "I"
+    type2[!idx] <- as.character(values(fix[!idx])$ALT)
+    values(fix)$type <- type2
+    ## id <- start(fix) < 25238400 & start(fix) > 25238100
+    if(!"color" %in% names(args.non))
+      isDNABaseColor <- TRUE
+    else
+      isDNABaseColor <- FALSE
+    baseColor <- getOption("biovizBase")$DNABasesColor
+    .i <- "black"
+    names(.i) <- "I"
+    baseColor <- c(baseColor, .i)
+    ir <- IRanges(start = start(fix), width = width(values(fix)$ALT))
+    if(!full.string)
+      width(ir[idx,]) <- 1
+    steps <- disjointBins(ir)      
+    values(fix)$stepping <- steps      
+    values(fix)$value <- values(fix)$ALT
+    values(fix)$group <- "ALT"    
+    fix2 <- addStepping(fix2)
+    idx <- width(values(fix2)$REF) > 1        
+    ir <- IRanges(start = start(fix), width = width(values(fix2)$REF))
+    if(!full.string)
+      width(ir[idx,]) <- 1
+    steps <- disjointBins(ir)      
+    values(fix2)$stepping <- steps      
+    type2 <- vector("character", length  = length(fix2))      
+    type2[idx] <- "I"
+    type2[!idx] <- as.character(values(fix[!idx])$REF)
+    values(fix2)$type <- type2
+    values(fix2)$value <- values(fix2)$REF
+    values(fix2)$group <- "REF"
+    .nms <- colnames(values(fix))
+    fix <- c(fix, fix2[, .nms])
+    if(ref.show){
+      facet <- facet_grid(group ~ ., scales = "free_y")
+      }else{
+        fix <- fix[values(fix)$group == "ALT"]
+        facet <- NULL
+      }
+    if(!full.string){
+      ## only show SNP
+      df <- mold(fix)
+      p <- ggplot() + geom_text(data = df, ..., 
+                                aes(x = start, label = type, color = type,  y = stepping)) +
+                                  scale_color_manual(values = baseColor) +  facet
+                              
+    }else{
+      df <- mold(fix)
+      df$type <- factor(df$type, levels = c(names(baseColor)))
+      p <- ggplot() + geom_text(data = df, ..., 
+                                aes(x = start, label = value, color = type, y = stepping)) +
+                                scale_color_manual(values = baseColor) + facet
+
     }
   }
-  y <- seq_len(nrow(object))
-  df <- expand.grid(x = x, y = y)
-  if(mode(object) == "numeric"){
-    df$value <- as.numeric(t(object))
+  p <- p + scale_y_continuous(expand = expand)
+  if(!ylabel){
+    if(type == "fixed"){
+    p <- p + scale_y_continuous(breaks = NULL, expand = expand)
   }else{
-    df$value <- as.character(t(object))
+    p <- p + scale_y_continuous(breaks = NULL)
   }
-  if(geom == "raster"){
-    p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
-        geom_raster(...)
-    p <- p + theme_noexpand() + scale_x_continuous(breaks = NULL, expand = c(0, 0))
-    if(label & !is.null(rownames(object))){
-      y.lab <- rownames(object)
-      p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
-    }
-    if(label & !is.null(colnames(object)) & !genomic.pos){
-      x.lab <- colnames(object)
-      p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
-    }
   }
-  if(geom == "tile"){
-    p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
-      geom_tile(...)
-    p <- p + theme_noexpand() + scale_x_continuous(breaks = NULL, expand = c(0, 0))
-    if(label & !is.null(rownames(object))){
-      y.lab <- rownames(object)
-      p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
-    }
-    if(label & !is.null(colnames(object)) & !genomic.pos){
-      x.lab <- colnames(object)
-      p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
-    }
-  }
-  if(geom == "line"){
-    p <- ggplot(data = df, aes(x = x, group = y ,y = value)) + geom_line(...)
-    if(facet){
-      p <- p + facet_grid(y ~ .)
-      if(compact)
-        p <- p + facet_grid(y ~ .) + theme_pack_panels(strip.bg = strip.bg,
-                                                       strip.text.y = strip.text.y)
-    }
-  }
+  
   if(missing(xlab))
     xlab <- ""
   p <- p + ggplot2::xlab(xlab)
@@ -1146,17 +1111,196 @@ setMethod("autoplot", "matrix", function(object, ...,
   p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
     p <- p + labs(title = main)
-  
   p
 })
 
-.transformSeqinfo <- function(obj){
-  ss <- seqlengths(obj)
-  res <- GRanges(seqnames(obj), IRanges(start = 1, end = ss))
-  res <- keepSeqlevels(res, names(ss))
-  seqlengths(res) <- ss
-  res
-}
+
+## setMethod("autoplot", "matrix", function(object, ...,
+##                                          xlab, ylab, main,
+##                                          label = TRUE,
+##                                          geom = c("raster","tile", "line"),
+##                                          facet = FALSE,
+##                                          compact = TRUE,
+##                                          strip.bg = FALSE, strip.text.y = TRUE){
+
+##   geom <- match.arg(geom)
+##   df <- mold(object)
+##   if(geom == "raster"){
+##     p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
+##         geom_raster(...)
+##     p <- p + theme_noexpand() + scale_x_continuous(breaks = NULL, expand = c(0, 0))
+##     if(label & !is.null(rownames(object))){
+##       y.lab <- rownames(object)
+##       p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+##     }
+##     if(label & !is.null(colnames(object)) & !genomic.pos){
+##       x.lab <- colnames(object)
+##       p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
+##     }
+##   }
+##   if(geom == "tile"){
+##     p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
+##       geom_tile(...)
+##     p <- p + theme_noexpand() + scale_x_continuous(breaks = NULL, expand = c(0, 0))
+##     if(label & !is.null(rownames(object))){
+##       y.lab <- rownames(object)
+##       p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+##     }
+##     if(label & !is.null(colnames(object)) & !genomic.pos){
+##       x.lab <- colnames(object)
+##       p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
+##     }
+##   }
+##   if(geom == "line"){
+##     p <- ggplot(data = df, aes(x = x, group = y ,y = value)) + geom_line(...)
+##     if(facet){
+##       p <- p + facet_grid(y ~ .)
+##       if(compact)
+##         p <- p + facet_grid(y ~ .) + theme_pack_panels(strip.bg = strip.bg,
+##                                                        strip.text.y = strip.text.y)
+##     }
+##   }
+##   if(missing(xlab))
+##     xlab <- ""
+##   p <- p + ggplot2::xlab(xlab)
+##   if(missing(ylab))
+##     ylab <- ""
+##   p <- p + ggplot2::ylab(ylab)
+##   if(!missing(main))
+##     p <- p + labs(title = main)
+  
+##   p
+## })
+
+setMethod("autoplot", "matrix", function(object, ...,
+                                         xlab, ylab, main,
+                                         geom = c("raster","tile"),
+                                         axis.text.angle = NULL,
+                                         hjust = 0,
+                                         na.value = NULL){
+
+  max.c <- 10
+  geom <- match.arg(geom)
+  df <- mold(object)
+  if(geom == "raster"){
+    p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
+        geom_raster(...)
+    p <- p + theme_noexpand()
+    ## + scale_x_continuous(breaks = NULL, expand = c(0, 0))
+    if("rownames" %in% colnames(df)){
+      y.lab <- rownames(object)
+      y <- seq_len(nrow(object))
+      p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+    }
+    if("colnames" %in% colnames(df)){
+      x.lab <- colnames(object)
+      if(max(sapply(x.lab, nchar))>max.c){
+        if(is.null(axis.text.angle))
+          axis.text.angle <- -90
+      }
+      x <- seq_len(ncol(object))
+      p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
+    }
+  }
+  if(geom == "tile"){
+    p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
+      geom_tile(...)
+    p <- p + theme_noexpand()    
+    if("rownames" %in% colnames(df)){
+      y.lab <- rownames(object)
+      y <- seq_len(nrow(object))
+      p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+    }
+    if("colnames" %in% colnames(df)){
+      x.lab <- colnames(object)
+      if(max(sapply(x.lab, nchar))> max.c){
+        if(is.null(axis.text.angle))
+          axis.text.angle <- -90
+      }
+      x <- seq_len(ncol(object))
+      p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
+    }
+  }
+
+  if(missing(xlab))
+    xlab <- ""
+  p <- p + ggplot2::xlab(xlab)
+  if(missing(ylab))
+    ylab <- ""
+  p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + labs(title = main)
+  if(is.null(axis.text.angle))
+    axis.text.angle <- 0
+  p <- p + theme(axis.text.x=element_text(angle = axis.text.angle, hjust = hjust))
+  if(!is.null(na.value)){
+    p <-  p + scale_fill_discrete(na.value = na.value)
+  }
+  p
+})
+
+setMethod("autoplot", "Views", function(object, ...,
+                                         xlab, ylab, main,
+                                         geom = c("raster", "tile", "line"),
+                                         axis.text.angle = NULL,
+                                         hjust = 0,
+                                         na.value = NULL,
+                                         facets = row ~ .){
+
+  geom <- match.arg(geom)
+  p <- switch(geom,
+              raster = {
+                p <- ggplot(object, aes(group = row, x = x, y = y, fill = value)) +
+                  geom_raster(...)
+                p <- p + theme_noexpand()
+                if(!is.null(names(object))){
+                  y.lab <- names(object)
+                  y <- seq_len(length(object))
+                  p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+                }
+                p
+              },
+              tile = {
+                p <- ggplot(object, aes(group = row, x = x, y = y, fill = value)) +
+                  geom_tile(...)
+                if(!is.null(names(object))){
+                  y.lab <- names(object)
+                  y <- seq_len(length(object))
+                  p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+                }
+                p
+              },
+              line = {
+                p <- ggplot(object, aes(group = row, x = x, y = value)) +
+                  geom_line(...)
+                if(!is.null(names(object))){
+                  y.lab <- names(object)
+                  y <- seq_len(length(object))
+                  p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+                }
+                 if(!is.null(facets)){
+                  p <- p + facet_grid(facets)
+                  p <- p + theme_pack_panels()
+                }
+                p
+              })
+  if(missing(xlab))
+    xlab <- ""
+  p <- p + ggplot2::xlab(xlab)
+  if(missing(ylab))
+    ylab <- ""
+  p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + labs(title = main)
+  if(is.null(axis.text.angle))
+    axis.text.angle <- 0
+  p <- p + theme(axis.text.x=element_text(angle = axis.text.angle, hjust = hjust))
+  if(!is.null(na.value)){
+    p <-  p + scale_fill_discrete(na.value = na.value)
+  }
+  p
+})
+
 
 setMethod("autoplot", "Seqinfo", function(object, single.ideo = TRUE, ... ){
   obj <- .transformSeqinfo(object)
@@ -1176,30 +1320,69 @@ setMethod("autoplot", "Seqinfo", function(object, single.ideo = TRUE, ... ){
 setMethod("autoplot", "SummarizedExperiment", function(object, ...,
                                                        type = c("heatmap", "link",
                                                          "pcp", "boxplot",
-                                                         "scatterplot.matrix")){
+                                                         "scatterplot.matrix"),
+                                                       pheno.plot = FALSE,
+                                                       main_to_pheno = 4.5,
+                                                       padding = 0.2,
+                                                       assay.id = 1){
+  
   type <- match.arg(type)
+  ays <- assays(object)
+  stopifnot(length(assay.id) == 1 || length(assay.id) <= length(ays))
+  if(length(ays) > 1)
+    message("Assay index: ", assay.id, " used")
+  res <- ays[[assay.id]]  
   if(type == "heatmap"){
-    res <- assay(object)
-    colnames(res) <- colnames(object)
-    p <- autoplot(res, ...) + ylab("Features") + xlab("Samples")
+    res <- ays[[assay.id]]
+    if(!pheno.plot){
+      colnames(res) <- colnames(object)
+      p <- autoplot(res, ...) + ylab("Features") + xlab("Samples")
+    }else{
+      colnames(res) <- colnames(object)
+      p <- autoplot(t(res), ...) + xlab("") + ylab("Samples")
+      object <- sset
+      pd <- colData(object)
+      s <- list(theme(axis.text.y = element_blank(),
+                      axis.ticks.y = element_blank()) ,
+                theme(legend.position = "top",
+                      plot.margin = unit(c(1, padding, 0.5, padding), "lines")),
+                guides(fill = guide_legend(bycol = TRUE,
+                         byrow = FALSE, ncol =  1,
+                         title.theme = element_blank())))
+
+      N <- ncol(pd)
+      hts <- rep(1/N, N)
+      hts <- c(hts, main_to_pheno)
+      l <- lapply(1:N, function(i){
+        autoplot(as.matrix(pd[, i, drop  = FALSE])) + s
+      })
+      ry <- c(rep(TRUE, N), FALSE)
+      l <- c(l, list(p))
+      return(do.call(alignPlots, c(l, list(vertical = FALSE, remove.y.axis = ry,
+                                           widths = hts))))
+    }
+    
   }
   if(type == "link"){
     ## res <- rowData(object)
     ## values(res) <- assay(object)
-    ## plotRangesLinkedToData(res[seqnames(res) == "chr1"], stat.col = seq_len(length(values(res))))
+    ## plotRangesLinkedToData(res[seqnames(res) == "chr1"],
+    ## stat.col = seq_len(length(values(res))))
     stop("not implemented yet")
   }
   if(type == "pcp"){
-    df <- as.data.frame(assay(object))
+    df <- as.data.frame(res)
     p <- ggpcp(df) + geom_line(...) + xlab("Sample Name")
   }
   if(type == "boxplot"){
-    df <- as.data.frame(assay(object))
+    df <- as.data.frame(res)
     p <- ggpcp(df, ...) + geom_boxplot(aes(group=variable))+ xlab("Sample Name")
   }
   if(type == "scatterplot.matrix"){
-    df <- as.data.frame(assay(object))
+    df <- as.data.frame(res)
     p <- plotmatrix(df, ...)    
   }
   p
 })
+
+

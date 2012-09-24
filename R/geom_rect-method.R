@@ -1,7 +1,4 @@
 setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
-setMethod("geom_rect", "missing", function(data, ...){
-  return(match.call())
-})
 
 setMethod("geom_rect", "data.frame", function(data, ...){
   ggplot2::geom_rect(data = data, ...)
@@ -43,7 +40,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
                          dt <- addStepping(dt, extend.size = es)
                      })
     res <- unlist(res)
-    df <- fortify(res)
+    df <- mold(res)
 
     args.aes <- args.aes[!(names(args.aes) %in% c("xmin", "xmax", "ymin", "ymax", "data"))]
     args.non <- args.non[!(names(args.non) %in% c("xmin", "xmax", "ymax", "ymax", "data"))]
@@ -121,7 +118,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
       args.aes$ymin <- substitute(y + rect.height, list(y = .y, rect.height = rect.height))
       args.aes$ymax <- substitute(y - rect.height , list(y = .y, rect.height = rect.height))
     }
-    df <- fortify(data)
+    df <- mold(data)
 
     ## overcome 1 pixel problem
     args.aes.seg <- args.aes.seg[names(args.aes.seg) != "group"]
@@ -147,7 +144,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
   p <- c(list(p) , list(facet))
 
   if(missing(xlab)) 
-    xlab <- getXLab(data)
+    xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
   
   if(!missing(main))

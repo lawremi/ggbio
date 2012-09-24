@@ -1,9 +1,5 @@
 setGeneric("stat_stepping", function(data, ...) standardGeneric("stat_stepping"))
 
-setMethod("stat_stepping", "missing", function(data, ...){
-  return(match.call())
-})
-
 setMethod("stat_stepping", "GRanges", function(data, ...,
                                                xlab, ylab, main,
                                                facets = NULL,
@@ -26,7 +22,7 @@ setMethod("stat_stepping", "GRanges", function(data, ...,
     p <- NULL
   }
   if(missing(xlab)) 
-    xlab <- getXLab(data)
+    xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
 
   if(!missing(ylab))
@@ -36,7 +32,7 @@ setMethod("stat_stepping", "GRanges", function(data, ...,
   
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
-
+  p <- setStat(p)
   p
 })
 

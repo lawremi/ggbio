@@ -3,8 +3,8 @@ setOldClass("gg")
 setOldClass("uneval")
 setClass("ggbio", contains = c("gg", "ggplot"))
 
-ggbio <- function(...){
-  new("ggbio", ...)  
+ggbio <- function(x){
+  new("ggbio", x)  
 }
 
 setMethod("+", c("ggbio"), function(e1, e2){
@@ -18,14 +18,30 @@ setMethod("+", c("ggbio"), function(e1, e2){
   }else{
     object <- e2
   }
-  ggplot2:::add_ggplot(e1, object, e2name)
+  res <- ggplot2:::add_ggplot(e1, object, e2name)
+  res <- ggbio(res)
+  res
 })
-?popViewport
+
+setStat <- function(x){
+  attr(x, "isStat") <- TRUE
+  x
+}
+isStat <- function(x){
+  res <- attr(x, "isStat")
+  if(is.null(res))
+    res <- FALSE
+  res
+}
+
 ## search for proto class, the data and mapping
+
 mapToGG <- function(p, object){
-    protos <- returnProto(object) 
-    p$mapping <- protos[[1]]$mapping
-    p$data <- protos[[1]]$data
+    protos <- returnProto(object)
+    if(isStat(object) == TRUE){
+      p$mapping <- protos[[1]]$mapping
+      p$data <- protos[[1]]$data
+    }
     p
 }
 

@@ -1,4 +1,5 @@
 getLimits <- function(obj){
+
   x <- y <- xmin <- ymin <- xmax <- ymax <- xend <- yend <- NULL
   ## x
   if(!is.null(obj$mapping$x) && length(obj$data))
@@ -31,8 +32,8 @@ getLimits <- function(obj){
     yend <- NULL
 
   ## if(length(obj$layer)>1){
-  l.res <- getLimitsFromLayer(obj)
-  
+  l.res <- suppressWarnings(getLimitsFromLayer(obj))
+
   res <- suppressWarnings(list(xlim = c(min(c(l.res$xmin, x, xmin)),
                                  max(c(l.res$xmax,x, xmax, xend))),
                                ylim = c(min(c(l.res$ymin, y, ymin)),
@@ -311,10 +312,10 @@ setMethod("highlight", "GRanges", function(obj, col = "red", fill = "red", alpha
 ## matrix
 scale_fill_fold_change<- function(){
   s <- scale_fill_gradient2(low = "blue", mid = "white", high = "red")
-  res <- c(list(s), list(guides(fill = guide_colorbar())),
-                       list(scale_x_continuous(expand = c(0, 0))),
-                       list(scale_y_continuous(expand = c(0, 0))),
-           list(theme(panel.border=element_rect(colour="black",size=0.2))))
+  ## res <- c(list(s), list(guides(fill = guide_colorbar())),
+           ##             list(scale_x_continuous(expand = c(0, 0))),
+           ##             list(scale_y_continuous(expand = c(0, 0))),
+           ## list(theme(panel.border=element_rect(colour="black",size=0.2))))
 }
 
 need_color <- function(args){
@@ -326,8 +327,6 @@ need_color <- function(args){
     return(TRUE)
   }
 }
-
-
 
 
 trans_seq <- function(unit = c("Mb", "kb", "bp")){
@@ -467,4 +466,14 @@ coord_genome <- function(){
   list(facet_grid(.~seqnames),
        theme_pack_panels(),
        scale_x_continuous(breaks = NULL))       
+}
+
+
+
+.transformSeqinfo <- function(obj){
+  ss <- seqlengths(obj)
+  res <- GRanges(seqnames(obj), IRanges(start = 1, end = ss))
+  res <- keepSeqlevels(res, names(ss))
+  seqlengths(res) <- ss
+  res
 }

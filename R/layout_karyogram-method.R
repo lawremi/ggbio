@@ -42,7 +42,7 @@ setMethod("layout_karyogram", "GRanges",
               ## TODO: change to
               if(!isIdeogram(data))
                 stop("Need cytoband information, please check the getIdeogram function")
-              df <- fortify(data)
+              df <- mold(data)
               df.rect <- subset(df, gieStain != "acen")
               df.tri <- subset(df, gieStain == "acen")
               df.tri.p <- df.tri[substr(df.tri$name, 1, 1) == "p",]
@@ -125,7 +125,7 @@ setMethod("layout_karyogram", "GRanges",
                                                       list(fill = "white", color = "black")))
             }
             if(!is.null(geom)){
-              df <- fortify(data)              
+              df <- mold(data)              
             if(geom == "rect"){
               args.aes.rect <- c(args.aes, list(xmin = substitute(start),
                                        xmax = substitute(end),

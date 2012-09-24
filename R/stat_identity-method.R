@@ -1,7 +1,4 @@
 setGeneric("stat_identity", function(data, ...) standardGeneric("stat_identity"))
-setMethod("stat_identity", "missing", function(data, ...){
-  return(match.call())
-})
 
 setMethod("stat_identity", "data.frame", function(data, ...){
   ggplot2::stat_identity(data = data, ...)
@@ -16,7 +13,7 @@ setMethod("stat_identity", "GRanges", function(data, ..., geom = NULL){
     geom <- "segment"
   if(!geom %in% gr.geoms){
     args$geom <- geom
-    data <- fortify(data)
+    data <- mold(data)
     args$data <- data
     p <- do.call(ggplot2::stat_identity, args)
   }else{
@@ -26,6 +23,7 @@ setMethod("stat_identity", "GRanges", function(data, ..., geom = NULL){
     p <- do.call(.geom.fun, args)
   }
   p <- c(list(p), list(facet))
+  p <- setStat(p)  
   p
 })
 
@@ -56,6 +54,7 @@ setMethod("stat_identity", "Rle", function(data, ...,
     p <- c(p, list(ggplot2::ylab("y")))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
+  p <- setStat(p)  
   p
 })
 
@@ -100,7 +99,10 @@ setMethod("stat_identity", "RleList", function(data, ...,
     p <- c(p, list(ggplot2::ylab("y")))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
-  c(list(p), list(facet))
+
+  p <- c(list(p), list(facet))
+  p <- setStat(p)
+  p
 })
 
 

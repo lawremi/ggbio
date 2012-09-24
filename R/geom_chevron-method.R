@@ -1,7 +1,4 @@
 setGeneric("geom_chevron", function(data, ...) standardGeneric("geom_chevron"))
-setMethod("geom_chevron", "missing", function(data, ...){
-  return(match.call())
-})
 
 setMethod("geom_chevron", "GRanges", 
           function(data, ...,
@@ -88,6 +85,7 @@ setMethod("geom_chevron", "GRanges",
                                       xend = substitute(end),
                                       y = substitute(stepping + y.offset),
                                       yend = substitute(stepping + yend.offset)))
+
               args.res <- c(list(data = df), list(do.call(aes, args)),
                             args.non)
               p <- c(list(do.call(ggplot2::geom_segment, args.res)), list(ggplot2::ylab("")))
@@ -153,7 +151,7 @@ setMethod("geom_chevron", "GRanges",
             }
             p <- c(list(p) , list(facet))
             if(missing(xlab)) 
-              xlab <- getXLab(data)
+              xlab <- ""
             p <- c(p, list(ggplot2::xlab(xlab)))
             if(!missing(ylab))
               p <- c(p, list(ggplot2::ylab(ylab)))

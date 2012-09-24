@@ -1,7 +1,4 @@
 setGeneric("geom_bar", function(data, ...) standardGeneric("geom_bar"))
-setMethod("geom_bar", "missing", function(data, ...){
-  return(match.call())
-})
 
 setMethod("geom_bar", "data.frame", function(data, ...){
   ggplot2::geom_bar(data  = data, ...)
@@ -32,7 +29,7 @@ setMethod("geom_bar", "GRanges", function(data,..., xlab, ylab, main){
     args.aes$ymin <- 0
     args.aes$ymax <- as.name(.y)
     aes.res <- do.call(aes, args.aes)
-    p <- list(do.call(geom_rect, c(list(data = fortify(data)),
+    p <- list(do.call(geom_rect, c(list(data = mold(data)),
                                   list(aes.res),
                                   args.non)))
 
@@ -41,7 +38,7 @@ setMethod("geom_bar", "GRanges", function(data,..., xlab, ylab, main){
   }
   p <- c(p, list(facet))
   if(missing(xlab)) 
-    xlab <- getXLab(data)
+    xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
   if(!missing(ylab))
     p <- c(p, list(ylab(ylab)))

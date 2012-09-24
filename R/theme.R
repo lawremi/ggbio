@@ -124,16 +124,17 @@ theme_clear <- function(grid.y = FALSE,
 }
 
 
-theme_track_sunset <- function(bg = "#fffedb", alpha = 1){
-  res <- theme_clear(grid.x.major = FALSE)
+theme_tracks_sunset <- function(bg = "#fffedb", alpha = 1, ...){
+  res <- theme_clear(grid.x.major = FALSE, ...)
   attr(res, "track.plot.color") <- sapply(bg, scales::alpha, alpha)
+  attr(res, "track.bg.color") <- bg
   attr(res, "label.text.color") <- "white"
   attr(res, "label.bg.fill") <- "#a52a2a"
   res
 }
 
 
-theme_track_fancy <- function(bg = c("white", "#F2C545"), alpha = 0.3,
+theme_tracks_fancy <- function(bg = c("white", "#F2C545"), alpha = 0.3,
                               label.bg.fill = c("gray80", "darkblue"),
                               label.text.color = "white"){
   res <- theme_clear(grid.x.major = FALSE)

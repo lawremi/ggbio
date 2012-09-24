@@ -1,11 +1,6 @@
 ## FIXME: the group.selfish doesn't work
 setGeneric("geom_arrow", function(data, ...) standardGeneric("geom_arrow"))
 
-setMethod("geom_arrow", "missing", function(data, ...){
-  return(match.call())
-})
-
-
 setMethod("geom_arrow", "GRanges", function(data, ...,
                                             xlab, ylab, main, 
                                             angle = 30,
@@ -49,7 +44,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
         res <- unlist(res)
         data <- res
       }
-      df <- fortify(data)
+      df <- mold(data)
       lst <- apply(df, 1, function(x){
         x <- as.data.frame(t(x))
         x.s <- as.numeric(as.character(x$start))
@@ -109,7 +104,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
       args.aes$y <-  args.aes$yend <- .y
     }
       
-      df <- fortify(data)
+      df <- mold(data)
 
       lst <- apply(df, 1, function(x){
 
@@ -164,7 +159,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
     p <- c(list(p) , list(facet))
 
   if(missing(xlab)) 
-    xlab <- getXLab(data)
+    xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
   
   if(!missing(ylab))

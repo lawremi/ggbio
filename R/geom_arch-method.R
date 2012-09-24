@@ -1,9 +1,5 @@
 setGeneric("geom_arch", function(data, ...) standardGeneric("geom_arch"))
 
-setMethod("geom_arch", "missing", function(data, ...){
-  return(match.call())
-})
-
 setMethod("geom_arch", "data.frame", function(data, ..., 
                                               n = 25, max.height = 10){
 
@@ -92,7 +88,7 @@ setMethod("geom_arch", "GRanges", function(data, ...,
 
   ## note rect.height = 0.4 is default cross ggbio
   ## need to make sure they are connected by two nearest point of rectangle
-  df <- fortify(data)
+  df <- mold(data)
   if("height" %in% names(args.aes))
     signs <- sign(eval(args.aes$height, df))
   else
@@ -116,7 +112,7 @@ setMethod("geom_arch", "GRanges", function(data, ...,
     p <- NULL
   }
   if(missing(xlab)) 
-    xlab <- getXLab(data)
+    xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
   if(!missing(ylab))
     p <- c(p, list(ggplot2::ylab(ylab)))

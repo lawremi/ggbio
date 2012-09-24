@@ -1,12 +1,5 @@
-## FIXME: stat should be removed?
-## facets??
 ## ..score..
 setGeneric("stat_table", function(data, ...) standardGeneric("stat_table"))
-
-setMethod("stat_table", "missing", function(data, ...){
-  return(match.call())
-})
-
 
 setMethod("stat_table", "GRanges", function(data, ..., xlab, ylab, main,
                                             geom = NULL, stat = NULL){
@@ -59,14 +52,14 @@ setMethod("stat_table", "GRanges", function(data, ..., xlab, ylab, main,
   }
 
   if(missing(xlab)) 
-    xlab <- getXLab(data)
+    xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
 
   if(!missing(ylab))
     p <- c(p, list(ggplot2::ylab(ylab)))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
-  
+  p <- setStat(p)  
   p  
 })  
 
@@ -95,6 +88,6 @@ setMethod("stat_table", "GRangesList", function(data, ...,
     p <- c(p, list(ggplot2::ylab("Score")))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
-  
+  p <- setStat(p)  
   p
 })

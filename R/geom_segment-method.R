@@ -1,7 +1,4 @@
 setGeneric("geom_segment", function(data, ...) standardGeneric("geom_segment"))
-setMethod("geom_segment", "missing", function(data, ...){
-  return(match.call())
-})
 
 setMethod("geom_segment", "data.frame", function(data, ...){
   ggplot2::geom_segment(data  = data, ...)
@@ -40,7 +37,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
                          dt <- addStepping(dt, extend.size = es)
                      })
     res <- unlist(res)
-    df <- fortify(res)
+    df <- mold(res)
 
     args.aes <- args.aes[!(names(args.aes) %in% c("x", "xend", "y", "yend", "data"))]
     args.non <- args.non[!(names(args.non) %in% c("x", "xend", "yend", "yend", "data"))]
@@ -82,7 +79,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
       args.aes$xend <- as.name("end")
       args.aes$y <- args.aes$yend <- .y
     }
-    df <- fortify(data)
+    df <- mold(data)
     args.aes <- args.aes[names(args.aes) != "group"]
     args.aes <- args.aes[names(args.aes) != "size"]
     
@@ -97,7 +94,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
   p <- c(list(p) , list(facet))
 
   if(missing(xlab)) 
-    xlab <- getXLab(data)
+    xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
   
   if(!missing(ylab))

@@ -1,7 +1,4 @@
 setGeneric("geom_arrowrect", function(data, ...) standardGeneric("geom_arrowrect"))
-setMethod("geom_arrowrect", "missing", function(data, ...){
-  return(match.call())
-})
 
 setMethod("geom_arrowrect", "GRanges", function(data, ...,
                                                   xlab, ylab, main,
@@ -9,8 +6,8 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
                                                   stat = c("stepping", "identity"),
                                                   rect.height = NULL,
                                                   arrow.head = 0.06,
-                                                  arrow.head.rate = arrow.head,                                                
-                                                 arrow.head.fix = NULL,                                                
+                                                  arrow.head.rate = arrow.head,
+                                                 arrow.head.fix = NULL,
                                                   group.selfish = TRUE){
 
   stat <- match.arg(stat)
@@ -72,7 +69,7 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
   if(missing(ylab))
     ylab <- ""
   
-  p <- c(p, list(ggplot2::ylab()))
+  p <- c(p, list(ggplot2::ylab(ylab)))
 
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
@@ -93,7 +90,7 @@ breakGrTo5polyDf <- function(object, arrow.head = 0.02,
   }else{
     ah <- arrow.head.fix
   }
-  df <- fortify(object)
+  df <- mold(object)
   df$.id <- seq_len(nrow(df))
   res <- do.call(rbind,lapply(1:5, function(i) df))
   res <- res[order(res$.id), ]

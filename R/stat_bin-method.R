@@ -1,9 +1,4 @@
 setGeneric("stat_bin", function(data, ...) standardGeneric("stat_bin"))
-
-setMethod("stat_bin", "missing", function(data, ...){
-  return(match.call())
-})
-
 setMethod("stat_bin", "data.frame", function(data, ...){
   ggplot2::stat_bin(data = data, ...)
 })
@@ -241,5 +236,7 @@ setMethod("stat_bin", "RleList", function(data, ..., binwidth, nbin = 30,
     p <- c(p, list(ggplot2::ylab("y")))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
-  c(list(p), list(facet))
+  p <- c(list(p), list(facet))
+  p <- setStat(p)
+  p
 })

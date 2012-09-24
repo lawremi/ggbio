@@ -1,9 +1,5 @@
 setGeneric("stat_reduce", function(data, ...) standardGeneric("stat_reduce"))
 
-setMethod("stat_reduce", "missing", function(data, ...){
-  return(match.call())
-})
-
 setMethod("stat_reduce", "GRanges", function(data, ...,
                                                xlab, ylab, main,
                                                drop.empty.ranges = FALSE,
@@ -25,7 +21,7 @@ setMethod("stat_reduce", "GRanges", function(data, ...,
   p <- list(do.call(stat_stepping, args.res))
 
   if(missing(xlab)) 
-    xlab <- getXLab(data)
+    xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
 
 
@@ -35,7 +31,7 @@ setMethod("stat_reduce", "GRanges", function(data, ...,
     p <- c(p, list(ggplot2::ylab("")))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
-  
+  p <- setStat(p)  
 p
 })
 
@@ -76,13 +72,15 @@ setMethod("stat_reduce", "IRanges", function(data, ...,
     p <- c(p, list(ggplot2::ylab("")))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
-  
+    p <- setStat(p)
 p
 })
 
 
 setMethod("stat_reduce", "TranscriptDb", function(data, ...){
-  stat_gene(data, ..., stat = "reduce")
+  p <- geom_alignment(data, ..., stat = "reduce")
+  p <- setStat(p)
+  p
 }) 
 
 

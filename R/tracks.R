@@ -7,6 +7,10 @@ setOldClass("grob")
 setClassUnion("themeORNULL", c("theme", "NULL"))
 setClassUnion("optionsORNULL", c("options", "NULL"))
 setClassUnion("numericORunit", c("numeric", "unit"))
+setClass("ideogram", contains = c("gg", "ggplot"))
+ideogram <- function(x){
+  new("ideogram", x)  
+}
 
 ## suppose to store original graphics
 setClass("ggplotGrobList", prototype = prototype(elementType = "ggplot"),
@@ -86,9 +90,10 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     })
   }
 
-
+  ideo <- !sapply(dots, is, "ideogram")
+  
   if(missing(xlim)){
-    lst <- lapply(dots[!fixed], function(obj){
+    lst <- lapply(dots[!fixed & ideo], function(obj){
       res <- getLimits(obj)
       data.frame(xmin = res$xlim[1], xmax = res$xlim[2])
     })
@@ -145,10 +150,11 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     heights <- parseHeight(heights, length(dots))
   
   fixs <- sapply(dots, fixed)
-  ylim <- lapply(dots[!fixs], function(grob){
+
+  ylim <- lapply(dots[!fixs & ideo], function(grob){
      scales::expand_range(getLimits(grob)$ylim, mul = 0.05)
   })
-  
+
   ## if(is.null(names(dots)))
   ##   labeled <- rep(FALSE
   ## else
@@ -201,12 +207,9 @@ setMethod("summary", "Tracks", function(object){
 
 setMethod("print", "Tracks", function(x){
   grid.newpage()
-    ## need to uniform mutable, labeled, hasAxis, bgColor if changed.
-    ## sometime people may change slots without useing accessor.
-    ## TODO
     grobs <- x@grobs
     N <- length(grobs)
-    if(any(!is.null(x@labeled)))
+    if(any(x@labeled))
       nms <- names(x@grobs)
     else
       nms <- NULL
@@ -228,8 +231,8 @@ setMethod("print", "Tracks", function(x){
                     grobs[[i]]
                   })
 
-
-    names(lst) <- nms
+    if(!is.null(nms))
+      names(lst) <- nms
     if(any(x@labeled))
       res <- do.call(alignPlots, c(lst, list(heights = x@heights,
                                              padding = x@padding,
@@ -310,11 +313,11 @@ setOldClass("position_c")
 setMethod("Arith", signature = c("Tracks", "position_c"), function(e1, e2) {
   if("x" %in% e2$aesthetics){
     if(!is.null(e2$limits))
-      e1@xlim <- e2$limits
+        e1@xlim <- e2$limits
   }
   N <- length(e1@grobs)  
   for(i in 1:N){
-    e1@grobs[[i]] <- e1@grobs[[i]] + e2
+      e1@grobs[[i]] <- e1@grobs[[i]] + e2
   }
   e1
 })
@@ -326,12 +329,14 @@ setMethod("Arith", signature = c("Tracks", "cartesian"), function(e1, e2) {
     e1@xlim <- e2$limits$x
   if(!is.null(e2$limits$y)){  
     for(i in seq_len(length(e1@ylim))){
-      e1@ylim[[i]] <- e2$limits$y    
+      if(!fixed(e1@grobs[[i]]) && !is(e1@grobs[[i]], "ideogram"))
+        e1@ylim[[i]] <- e2$limits$y
     }
   }
   N <- length(e1@grobs)
   for(i in 1:N){
-    e1@grobs[[i]] <- e1@grobs[[i]] + e2
+    if(!fixed(e1@grobs[[i]]))
+      e1@grobs[[i]] <- e1@grobs[[i]] + e2
   }
   e1
 })
@@ -357,7 +362,10 @@ setMethod("xlim", "IRanges", function(obj, ...){
 setMethod("xlim", "GRanges", function(obj, ...){
   xlim <- c(start(ranges(reduce(obj, ignore.strand = TRUE))),
             end(ranges(reduce(obj, ignore.strand = TRUE))))
-  ggplot2::coord_cartesian(xlim = xlim)
+  res <- ggplot2::coord_cartesian(xlim = xlim)
+  chr <- unique(as.character(seqnames(obj)))
+  attr(res, "chr") <- chr
+  res
 })
 
 setMethod("xlim", "Tracks", function(obj, ...){
@@ -403,7 +411,6 @@ setReplaceMethod("xlim", c("Tracks", "numeric"), function(x, value){
   x
 })
 
-
 setMethod("update", "Tracks", function(object, xlim){
   xlim(object) <- xlim
   object@xlim <- xlim
@@ -430,7 +437,6 @@ setMethod("backup", "Tracks", function(obj){
 })
 
 
-
 ## TODO: adust due to left/right legend
 alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        heights = NULL, height = NULL, width = NULL,
@@ -452,8 +458,6 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        remove.x.axis = FALSE                       
                        ){
 
-
-  
   if(is.numeric(scale.height) && !is.unit(scale.height))
     scale.height <- unit(scale.height, "lines")
 
@@ -468,7 +472,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     widths <- width
   
   ggl <- list(...)
-  
+ggl[[1]]  
   if(length(ggl)){
     if(length(ggl) == 1 && is.list(ggl[[1]])){
       ggl <- ggl[[1]]
@@ -492,7 +496,13 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   }
 
   ## add a plot with axis and remove later
-  ggl <- c(ggl, list(ggl[[1]] + theme_gray()))
+  if(add.scale){
+    idx.fix <- which(!sapply(ggl, fixed) & !sapply(ggl, is, "ideogram"))[1]
+    if(is.na(idx.fix))
+      idx.fix <- 1
+    ggl <- c(ggl, list(ggl[[idx.fix]] + theme_gray()))
+  }
+
   ## parse grobs
   grobs <- lapply(ggl, function(x){
     gg <- ggplotGrobAttr(x)
@@ -578,9 +588,10 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     grobs[[i]] <- copyAttr(.grob, grobs[[i]])
   })
   names(grobs) <- .nms
-  g.last <- grobs[[length(grobs)]]
-  grobs <- grobs[-length(grobs)]
-
+  if(add.scale){
+    g.last <- grobs[[length(grobs)]]
+    grobs <- grobs[-length(grobs)]
+  }
   if(add.scale){
     g <- g.last$grobs[[1]]$children[[1]]$children$layout
     g.s <- scaleGrob(g)
@@ -611,6 +622,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   }
   lbs <- sapply(grobs, labeled)
   nms <- names(grobs)
+
   if(any(remove.y.axis)){
     for(i in which(remove.y.axis))
       grobs[[i]] <- removeYAxis(grobs[[i]])
@@ -619,7 +631,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     for(i in which(remove.x.axis))
       grobs[[i]] <- removeXAxis(grobs[[i]])
   }
-  
+
   ## add lables
   if(vertical){
     if(any(!is.null(nms)))
@@ -657,15 +669,13 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     }else if(!is.unit(heights)){
       stop("heights must be unit or numeric value")
     }
-
     ## TODO check main later
     if(length(main))
-        heights <- unit.c(main.height, heights)
+      heights <- unit.c(main.height, heights)
     if(add.scale)    
       heights <- unit.c(heights, scale.height)
     if(length(xlab))
       heights <- unit.c(heights, xlab.height)
-      
     tab <- gtable(widths, heights)
     for(i in 1:length(grobs)){
       tab <- gtable_add_grob(tab, grobs[[i]], t = i, r = 1, l  = 1)
@@ -698,7 +708,6 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
       tab <- gtable_add_grob(tab, grobs[[i]], l = i, t = 1, b = 1)
     }
   }
-  
   if(plot){
     grid.newpage()
     grid.draw(tab)
@@ -935,8 +944,6 @@ setMethod("bgColor", "gg", function(x){
   else
     return(bg)
 })
-
-
 setReplaceMethod("bgColor", c("gg", "character"), function(x, value){
   attr(x, "bgcolor") <- value
   x
@@ -950,8 +957,20 @@ setMethod("bgColor", "gtable", function(x){
     return(bg)
 })
 
-
 setReplaceMethod("bgColor", c("gtable", "character"), function(x, value){
+  attr(x, "bgcolor") <- value
+  x
+})
+
+setMethod("bgColor", "ideogram", function(x){
+  bg <- attr(x, "bgcolor")
+  if(is.null(bg))
+    return("white")
+  else
+    return(bg)
+})
+
+setReplaceMethod("bgColor", c("ideogram", "character"), function(x, value){
   attr(x, "bgcolor") <- value
   x
 })
@@ -965,7 +984,22 @@ setMethod("fixed", "gg", function(x){
     return(res)
 })
 
+
 setReplaceMethod("fixed", c("gg", "logical"), function(x, value){
+  attr(x, "fixed") <- value
+  x
+})
+
+setMethod("fixed", "ideogram", function(x){
+  res <- attr(x, "fixed")
+  if(is.null(res))
+    return(FALSE)
+  else
+    return(res)
+})
+
+
+setReplaceMethod("fixed", c("ideogram", "logical"), function(x, value){
   attr(x, "fixed") <- value
   x
 })
@@ -995,6 +1029,19 @@ setMethod("labeled", "gg", function(x){
 })
 
 setReplaceMethod("labeled", c("gg", "logical"), function(x, value){
+  attr(x, "labeled") <- value
+  x
+})
+
+setMethod("labeled", "ideogram", function(x){
+  bg <- attr(x, "labeled")
+  if(is.null(bg))
+    return(TRUE)
+  else
+    return(bg)
+})
+
+setReplaceMethod("labeled", c("ideogram", "logical"), function(x, value){
   attr(x, "labeled") <- value
   x
 })
@@ -1046,6 +1093,19 @@ setReplaceMethod("mutable", c("gg", "logical"), function(x, value){
   x
 })
 
+setMethod("mutable", "ideogram", function(x){
+  mt <- attr(x, "mutable")
+  if(is.null(mt))
+    return(TRUE)
+  else
+    return(mt)
+})
+
+setReplaceMethod("mutable", c("ideogram", "logical"), function(x, value){
+  attr(x, "mutable") <- value
+  x
+})
+
 
 setMethod("mutable", "gtable", function(x){
   mt <- attr(x, "mutable")
@@ -1072,6 +1132,19 @@ setMethod("hasAxis", "gg", function(x){
 })
 
 setReplaceMethod("hasAxis", c("gg", "logical"), function(x, value){
+  attr(x, "hasAxis") <- value
+  x
+})
+
+setMethod("hasAxis", "ideogram", function(x){
+  mt <- attr(x, "hasAxis")
+  if(is.null(mt))
+    return(FALSE)
+  else
+    return(mt)
+})
+
+setReplaceMethod("hasAxis", c("ideogram", "logical"), function(x, value){
   attr(x, "hasAxis") <- value
   x
 })
@@ -1107,6 +1180,28 @@ setMethod("height", "gg", function(x){
 })
 
 setReplaceMethod("height", c("gg", "numericORunit"), function(x, value){
+  if(length(value) != 1)
+    stop("height value can only be of length 1.")
+  if(is.numeric(value) && !is.unit(value))
+    value <- unit(value, "null")
+  attr(x, "height") <- value
+  x
+})
+
+setMethod("height", "ideogram", function(x){
+  ht <- attr(x, "height")
+  if(is.null(ht))
+    return(unit(1, "null"))
+  else if(is.numeric(ht)  && !is.unit(ht)){
+    return(unit(mt, "null"))
+  }else if(is.unit(ht)){
+    return(ht)
+  }else{
+    stop("height attribute must be numeric or ")
+  }
+})
+
+setReplaceMethod("height", c("ideogram", "numericORunit"), function(x, value){
   if(length(value) != 1)
     stop("height value can only be of length 1.")
   if(is.numeric(value) && !is.unit(value))
@@ -1186,7 +1281,6 @@ getAxisHeight <- function(p, base){
   h1 <- sum(ggplotGrobAttr(p)$height)
   h2 <- sum(ggplotGrobAttr(p2)$height)
   .h <- convertUnit(h1, "cm", value = TRUE)/convertUnit(h2, "cm", value = TRUE) * .base
-  print(.h)
   unit(.h, "null")
 }
 

@@ -1,8 +1,18 @@
 plotSingleChrom <- function(obj, subchr, zoom.region,
                             xlab, ylab, main, xlabel = FALSE,
-                            cytoband = TRUE){
+                            color = "red", fill = "red", alpha = 0.7,
+                            cytoband = TRUE, aspect.ratio = NULL, genome){
+  if(missing(obj)){
+    obj <- getIdeogram(genome = genome, subchr = subchr, cytoband = cytoband)
+  }
   ## do we need subchr here
+  obj.ori <- obj
   if(!missing(subchr)){
+    obj <- obj[seqnames(obj) == subchr]
+    obj <- keepSeqlevels(obj, subchr)
+  }else{
+    subchr <- sort(unique(as.character(seqnames(obj))))[1]
+    message("use ", subchr, " automatically")
     obj <- obj[seqnames(obj) == subchr]
     obj <- keepSeqlevels(obj, subchr)
   }
@@ -10,7 +20,8 @@ plotSingleChrom <- function(obj, subchr, zoom.region,
     stop("Mulptiple chromosome information found")
   if(!isIdeogram(obj))
     cytoband <- FALSE
-  p <- ggplot() + layout_karyogram(obj, cytoband = cytoband) 
+  p <- ggplot() + layout_karyogram(obj, cytoband = cytoband)
+  p.ideo <- p
   if(!missing(zoom.region)){
     if(length(zoom.region) != 2)
       stop("zoom.region must be a numeric vector of length 2")
@@ -18,27 +29,114 @@ plotSingleChrom <- function(obj, subchr, zoom.region,
                           x2 = zoom.region[2],
                           seqnames = unique(as.character(seqnames(obj))))
     p <- p + ggplot2::geom_rect(data = zoom.df, aes(xmin = x1,
-                         xmax = x2, ymin = -3, ymax = 13), color = "red", fill = NA)
+                         xmax = x2, ymin = -0.1, ymax = 10.1), color = color, fill = fill,
+                                alpha = alpha)
   }
-  if(!xlabel)
-    p <- p + theme(axis.text.x = element_blank())
-  
   p <- p + theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
     scale_y_continuous(breaks = 5, label = subchr) +
       theme(strip.background = element_rect(colour = 'NA', fill = 'NA'))+ 
         theme(strip.text.y = element_text(colour = 'white'))   + theme(legend.position = "none")+
           ggplot2::xlab("")
 
-  if(!missing(xlab))
+  
+  if(!missing(xlab)){
     p <- p + ggplot2::xlab(xlab)
-  if(!missing(ylab))
+    attr(p, "xlab") <- xlab
+  }else{
+    attr(p, "xlab") <- ""
+  }
+  if(!missing(ylab)){
     p <- p + ggplot2::ylab(ylab)
-  else
+    attr(p, "ylab") <- ylab
+  }else{
     p <- p + ggplot2::ylab(subchr)
-  if(!missing(main))
+  }
+  if(!missing(main)){
     p <- p + labs(title = main)
+    attr(p, "main") <- main 
+  }else{
+    attr(p, "main") <- ""
+  }
+  p <- p + theme(aspect.ratio = aspect.ratio, axis.ticks.y = element_blank())
+
+  if(!xlabel)
+    p <- p + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+  
+  attr(p, "ideogram") <- p.ideo
+  attr(p, "xlabel") <- xlabel
+  attr(p, "ideogram.data") <- obj.ori
+  attr(p, "subchr") <- subchr
+  attr(p, "aspect.ratio") <- aspect.ratio
+  attr(p, "color") <- color
+  attr(p, "fill") <- fill
+  attr(p, "alpha") <- alpha
+  p <- ideogram(p)
   p
 }
+
+setMethod("+", c("ideogram"), function(e1, e2){
+  ## p <- attr(e1, "ideogram")
+  obj <- attr(e1, "ideogram.data")
+  if("chr" %in% names(attributes(e2))){
+    subchr <- attr(e2, "chr")
+  }else{
+    subchr <- attr(e1, "subchr")
+  }
+  aspect.ratio <- attr(e1, "aspect.ratio")
+  xlabel <- attr(e1, "xlabel")
+  xlab <- attr(e1, "xlab") 
+  ylab <- attr(e1, "ylab")
+  main <- attr(e1, "main")
+  color <- attr(e1, "color") 
+  fill <- attr(e1, "fill")
+  alpha <- attr(e1, "alpha")
+  
+  zoom.region <- e2$limits$x
+  if(length(zoom.region)){
+    zoom.df <- data.frame(x1 = zoom.region[1],
+                          x2 = zoom.region[2],
+                          seqnames = base::unique(as.character(GenomicRanges::seqnames(obj))))
+    p <- plotSingleChrom(obj, subchr, zoom.region,
+                         xlab = xlab, ylab = ylab, main = main, xlabel = xlabel,
+                         color = color, fill = fill, alpha = alpha,
+                         cytoband = TRUE, aspect.ratio = aspect.ratio)  
+  }else{
+    p <- e1
+  }
+  p
+})
+
+## "+.ideogram" <- function(e1, e2){
+## }
+
+## setMethod("+", c("ideogram"), function(e1, e2){
+##     p <- attr(e1, "ideogram")
+##   obj <- attr(e1, "ideogram.data")
+##   if("chr" %in% names(attributes(e2))){
+##     subchr <- attr(e2, "chr")
+##   }else{
+##     subchr <- attr(e1, "subchr")
+##   }
+##   aspect.ratio <- attr(e1, "aspect.ratio")
+##   xlabel <- attr(e1, "xlabel")
+##   xlab <- attr(p, "xlab") 
+##   ylab <- attr(p, "ylab")
+##   main <- attr(p, "main")
+##   if(is.null(xlab))
+##     xlab <- ""
+##   if(is.null(ylab))
+##     ylab <- ""
+##   if(is.null(main))
+##     main <- ""
+##   zoom.region <- e2$limits$x
+##   zoom.df <- data.frame(x1 = zoom.region[1],
+##                         x2 = zoom.region[2],
+##                         seqnames = base::unique(as.character(GenomicRanges::seqnames(obj))))
+##   p <- plotSingleChrom(obj, subchr, zoom.region,
+##                        xlab = xlab, ylab = ylab, main = main, xlabel = xlabel,
+##                        cytoband = TRUE, aspect.ratio = aspect.ratio)  
+##   p
+## })
 
 plotIdeogram <- plotSingleChrom
 
@@ -52,7 +150,7 @@ plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
   args.non <- parseArgsForNonAes(args)
   facets <- seqnames ~ .
   if(missing(obj)){
-    obj <- getIdeogram(cytobands = cytobands)
+    obj <- getIdeogram(cytoband = cytoband)
     cat("-------get following seqnames------\n")
     message(paste(seqnames(seqinfo(obj)), collapse = "\n"))
     ## obj <- keepSeqlevels(obj, unique(seqnames()))

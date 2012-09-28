@@ -1,8 +1,6 @@
 setOldClass("ggplot")
 setOldClass("gg")
-setOldClass("uneval")
 setClass("ggbio", contains = c("gg", "ggplot"))
-
 ggbio <- function(x){
   new("ggbio", x)  
 }

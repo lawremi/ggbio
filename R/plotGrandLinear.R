@@ -2,7 +2,7 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
                             cutoff = NULL, cutoff.color = "red",
                             cutoff.size = 1, legend = FALSE, xlim, ylim, 
                             xlab,
-                            ylab = substitute(y), main){
+                            ylab, main){
 
   if(is.null(geom))
     geom <- "point"
@@ -44,12 +44,11 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
   aes.res <- do.call(aes, args.aes)
   p <- do.call(autoplot, c(list(aes.res), args.non))
 
-  ## if(!missing(theme))
-  ##   p <- p + theme
   if(!legend)
     p <- p + theme(legend.position = "none")
 
-  p <- p + ylab(ylab) 
+  if(!missing(ylab))
+    p <- p + ylab(ylab) 
   if(!is.null(cutoff))
     p <-  p + geom_hline(yintercept = cutoff, color = cutoff.color,
                          size = cutoff.size)

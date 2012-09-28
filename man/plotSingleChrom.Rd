@@ -1,13 +1,17 @@
 \name{plotSingleChrom}
 \alias{plotSingleChrom}
 \alias{plotIdeogram}
+\alias{ideogram-class}
+\alias{+,ideogram,ANY-method}
 \title{Plot single chromosome with cytoband}
 \usage{
-plotSingleChrom(obj, subchr, zoom.region, xlab, ylab,
-                 main, xlabel = FALSE, cytoband = TRUE)
-plotIdeogram(obj, subchr, zoom.region, xlab, ylab,
-                 main, xlabel = FALSE, cytoband = TRUE)
+plotSingleChrom(obj, subchr, zoom.region, xlab, ylab, main, xlabel =
+                 FALSE, color = "red", fill = "red", alpha = 0.7,
+                 cytoband = TRUE, aspect.ratio = NULL, genome)
 
+plotIdeogram(obj, subchr, zoom.region, xlab, ylab, main, xlabel =
+                 FALSE, color = "red", fill = "red", alpha = 0.7,
+                 cytoband = TRUE, aspect.ratio = NULL, genome)       
 }
 \description{
   Plot single chromosome with cytoband. \code{plotIdeogram} is synonyms
@@ -44,9 +48,24 @@ plotIdeogram(obj, subchr, zoom.region, xlab, ylab,
   \item{xlabel}{
     A logical value. Show the x label or not.
   }
+  \item{color}{
+    color for highlight region.
+  }
+  \item{fill}{
+    fill color for highlight region.
+  }
+  \item{alpha}{
+    alpha for highlight regio.
+  }  
   \item{cytoband}{
     If FALSE, plot just blank chromosome without cytoband. default is TRUE.
-  }  
+es  }
+  \item{aspect.ratio}{
+    aspect ratio for the chromosome ideogram plot, default is NULL.
+  }
+  \item{genome}{
+    genome character passed to \code{\link{getIdeogram}}
+  }
 }
 \examples{
 \dontrun{

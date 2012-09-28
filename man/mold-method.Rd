@@ -152,10 +152,10 @@ rownames(mx) <- LETTERS[1:nrow(mx)]
 head(mold(mx))
 
 % ## Views
-% subject <- XInteger(10, 3:-6)
+% subject <- c(10, 3:-6)
 % ## equal width
 % v1 <- Views(subject, start=4:1, width = 3)
-% head(mold(v1))
+% mold(v1)
 % names(v1) <- letters[1:4]
 % head(mold(v1))
 

@@ -906,129 +906,184 @@ getNR <- function(x, type = c("NUSE", "RLE"),range = 0, ...){
 ##======================================================================
 ## TODO for circular layout first
 ## need to name the aes list otherwise following the order
-setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
-                                                    trackWidth,
-                                                    radius = 10,
-                                                    grid = FALSE,
-                                                    trackSkip = 1,
-                                                    layout = c("circle")){
+## setMethod("autoplot", "GenomicRangesList", function(object, args = list(),
+##                                                     trackWidth,
+##                                                     radius = 10,
+##                                                     grid = FALSE,
+##                                                     trackSkip = 1,
+##                                                     layout = c("circle")){
 
-  layout <- match.arg(layout)
-  message("Take 'genome' coordinate transformation")
-  if(layout == "circle"){
-  if(missing(trackWidth)){
-    trackWidth <- rep(5, length(object))
-    idx <- which(unlist(lapply(args, function(arg){
-      arg$geom == "link"
-    })))
-    trackWidth[1] <- 1
-  }else{
-    if(length(trackWidth) > length(object)){
-      warning("Unequal lengths of trackWidth, removing extra track width")
-      trackWidth <- trackWidth[1:length(object)]
+##   layout <- match.arg(layout)
+##   message("Take 'genome' coordinate transformation")
+##   if(layout == "circle"){
+##   if(missing(trackWidth)){
+##     trackWidth <- rep(5, length(object))
+##     idx <- which(unlist(lapply(args, function(arg){
+##       arg$geom == "link"
+##     })))
+##     trackWidth[1] <- 1
+##   }else{
+##     if(length(trackWidth) > length(object)){
+##       warning("Unequal lengths of trackWidth, removing extra track width")
+##       trackWidth <- trackWidth[1:length(object)]
 
-    }
-    if(length(trackWidth) < length(object)){
-      warning("Unequal lengths of trackWidth, adding default 5 to  extra track width")
-      trackWidth <- c(trackWidth, rep(5, length(object) - length(trackWidth)))
-    }
-  }
-    if(length(trackSkip) == 1){
-      trackSkip <- rep(trackSkip, length(object))
-    }else{
-      if(length(trackSkip) != length(object))
-        stop("trackSkip must be of length 1 or of the same length
-              as object")
-    }
+##     }
+##     if(length(trackWidth) < length(object)){
+##       warning("Unequal lengths of trackWidth, adding default 5 to  extra track width")
+##       trackWidth <- c(trackWidth, rep(5, length(object) - length(trackWidth)))
+##     }
+##   }
+##     if(length(trackSkip) == 1){
+##       trackSkip <- rep(trackSkip, length(object))
+##     }else{
+##       if(length(trackSkip) != length(object))
+##         stop("trackSkip must be of length 1 or of the same length
+##               as object")
+##     }
   
-    if(length(radius) == 1){
-      radius <- radius + c(0, cumsum(trackWidth)[-length(trackWidth)]) +
-        cumsum(trackSkip)
-    }else{
-      if(length(radius) != length(object))
-        stop("radius must be of length 1 showing innermost radius or of the same length
-              as object")
-    }
+##     if(length(radius) == 1){
+##       radius <- radius + c(0, cumsum(trackWidth)[-length(trackWidth)]) +
+##         cumsum(trackSkip)
+##     }else{
+##       if(length(radius) != length(object))
+##         stop("radius must be of length 1 showing innermost radius or of the same length
+##               as object")
+##     }
 
   
-    if(length(grid) == 1){
-      grid <- rep(grid, length(object))
-    }else{
-      if(length(grid) != length(object))
-        stop("grid must of length 1 or of the same length
-              as object")
-    }
+##     if(length(grid) == 1){
+##       grid <- rep(grid, length(object))
+##     }else{
+##       if(length(grid) != length(object))
+##         stop("grid must of length 1 or of the same length
+##               as object")
+##     }
   
-    p <- ggplot()
+##     p <- ggplot()
   
-    for(i in 1:length(object)){
-      p <- p + do.call(layout_circle, c(list(data = object[[i]]), radius = radius[i],
-                                        trackWidth = trackWidth[i], grid = grid[i],
-                                        args[[i]]))
-    }}
-    p
-}) 
+##     for(i in 1:length(object)){
+##       p <- p + do.call(layout_circle, c(list(data = object[[i]]), radius = radius[i],
+##                                         trackWidth = trackWidth[i], grid = grid[i],
+##                                         args[[i]]))
+##     }}
+##     p
+## }) 
 
 ##======================================================================
 ##  For VCF
 ##======================================================================
-setMethod("autoplot", "VCF", function(object, ..., genomic.pos = FALSE,
+
+setMethod("autoplot", "VCF", function(object, ...,
                                       xlab, ylab, main,
+                                      assay.id,                                      
                                       type = c("geno", "info", "fixed"),
                                       full.string = FALSE,
                                       ref.show = TRUE,
-                                      expand = c(1, 1),
-                                      ylabel = TRUE,
-                                      assay.id = 1){
+                                      genome.axis = TRUE,
+                                      transpose = TRUE){
+  
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   type <- match.arg(type)
   hdr <- exptData(object)[["header"]]
+  
   if(type == "geno"){
     nms <- rownames(geno(hdr))
-    if("GT" %in% nms){
-      message("use GT for type geno as default")
-      gt <- geno(object)[["GT"]]
-    }else{
-      nm <- nms[1]
-      message("use ", nm, " for type geno as default")
-      gt <- geno(object)[[nm]]
-    }
+    message(paste(nms, collapse = ","), " could be used for 'geno' type")
+    if(missing(assay.id)){
+      if("GT" %in% nms){
+        message("use GT for type geno as default")
+        gt <- geno(object)[["GT"]]
+      }else{
+        nm <- nms[1]
+        message("use ", nm, " for type geno as default")
+        gt <- geno(object)[[nm]]
+      }}else{
+        if(is.numeric(assay.id))
+          nm <- nms[assay.id]
+        if(is.character(assay.id)){
+          if(!assay.id %in% nms){
+            stop(assay.id, " is not in ", nms)
+          }
+          nm <- assay.id
+        }
+        gt <- geno(object)[[nm]]
+      }
     sts <- start(rowData(object))
     idx <- !duplicated(sts)
+    ## is this a right thing to do ?
     if(sum(!idx))
-      warning("remove ", sum(!idx), " snp with duplicated position, only keep first one")
-    gt <- gt[idx,]
-    rownames(gt) <- start(rowData(object)[idx])
-    gt.t <- t(gt)
-    p <- autoplot(gt.t, genomic.pos = genomic.pos)
+      message("Index: ", paste(which(!idx), collapse = ","),
+              " snp with duplicated start position may be masked by each other")
+    ## gt <- gt[idx,]
+    rownames(gt) <- start(rowData(object))    
+    ## rownames(gt) <- start(rowData(object)[idx])
+
+    if(!"color" %in% names(args.aes) && !"color" %in% names(args.non))
+      args.aes$color <- as.name("value")
+    if(!"colnames.label" %in% names(args.non)){
+      if(transpose)
+        args.non$colnames.label <- FALSE
+      else
+        args.non$colnames.label <- TRUE
+    }
+    if(genome.axis){
+      gt <- t(gt)
+      args.aes$x <- substitute(as.numeric(colnames))    
+      aes.args <- do.call(aes, args.aes)
+      p <- do.call(autoplot, c(list(object = gt),
+                               list(aes.args),
+                               args.non))
+    }else{
+      if(transpose)
+        gt <- t(gt)
+      aes.args <- do.call(aes, args.aes)
+      p <- do.call(autoplot, c(list(object = gt),
+                                 list(aes.args),
+                                 args.non))
+    }
+
   }
   if(type == "info"){
+    colClasses <- function(x){
+      sapply(values(info(x))@listData, class)
+    }
+    cls <- colClasses(object)
+    idx.cls <- which(cls %in% c("numeric", "integer", "character", "factor"))
+    
     df <- mold(info(object))
+    
     if(!"y" %in% names(args.aes)){
       hdr.i <- rownames(info(hdr))
-      if("AF" %in% hdr.i){
-        args.aes$y <- as.name("AF")
-        message("use AF for type info as default")
+      if(missing(assay.id)){
+        if("AF" %in% hdr.i){
+          message("use AF for type info as default")
+          args.aes$y <- as.name("AF")
+        }else{
+          nm <- hdr.i[idx[1]]
+          message("use ", nm, " for type info as default")
+          args.aes$y <- as.name(nm)
+        }
       }else{
-        nm <- hdr.i[i]
-        message("use ", nm, " for type info as default")
-        args.aes$y <- as.name(nm)
+        if(is.numeric(assay.id))
+          assay.id <- hdr.i[assay.id]
+        message("use ", assay.id, " for type info as default")
+        args.aes$y <- as.name(assay.id)
       }
     }
-    if(!"x" %in% names(args)){
+    if(!"x" %in% names(args.aes)){
       args.aes$x <- as.name("start")
     }
-    if(!"color" %in% names(args)){
-      args.non$color <- "black"
+    if(!"colour" %in% names(args.aes) && !"colour" %in% names(args.non) &&
+       !"color" %in% names(args.aes) && !"color" %in% names(args.non) ){
+      args.non$colour <- "black"
     }
-    if(!"fill" %in% names(args)){
-      args.non$fill <- "black"
-    }
-    p <- ggplot(data = df) + do.call(ggplot2::geom_bar, c(list(stat = "identity"),
-                                   list(do.call(aes, args.aes)),
-                                   args.non))
+    message("Other options for potential mapping(only keep numeric/integer/character/factor variable): ")
+
+      p <- ggplot(data = df) + do.call(ggplot2::geom_bar, c(list(stat = "identity"),
+                    list(do.call(aes, args.aes)),
+                    args.non))
   }
   if(type == "fixed"){
     fix <- fixed(object)
@@ -1091,17 +1146,17 @@ setMethod("autoplot", "VCF", function(object, ..., genomic.pos = FALSE,
       p <- ggplot() + geom_text(data = df, ..., 
                                 aes(x = start, label = value, color = type, y = stepping)) +
                                 scale_color_manual(values = baseColor) + facet
-
+      
     }
   }
-  p <- p + scale_y_continuous(expand = expand)
-  if(!ylabel){
-    if(type == "fixed"){
-    p <- p + scale_y_continuous(breaks = NULL, expand = expand)
-  }else{
-    p <- p + scale_y_continuous(breaks = NULL)
-  }
-  }
+  ## p <- p + scale_y_continuous(expand = expand)
+  ## if(!ylabel){
+  ##   if(type == "fixed"){
+  ##   p <- p + scale_y_continuous(breaks = NULL, expand = expand)
+  ## }else{
+  ##   p <- p + scale_y_continuous(breaks = NULL)
+  ## }
+  ## }
   
   if(missing(xlab))
     xlab <- ""
@@ -1115,84 +1170,69 @@ setMethod("autoplot", "VCF", function(object, ..., genomic.pos = FALSE,
 })
 
 
-## setMethod("autoplot", "matrix", function(object, ...,
-##                                          xlab, ylab, main,
-##                                          label = TRUE,
-##                                          geom = c("raster","tile", "line"),
-##                                          facet = FALSE,
-##                                          compact = TRUE,
-##                                          strip.bg = FALSE, strip.text.y = TRUE){
 
-##   geom <- match.arg(geom)
-##   df <- mold(object)
-##   if(geom == "raster"){
-##     p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
-##         geom_raster(...)
-##     p <- p + theme_noexpand() + scale_x_continuous(breaks = NULL, expand = c(0, 0))
-##     if(label & !is.null(rownames(object))){
-##       y.lab <- rownames(object)
-##       p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
-##     }
-##     if(label & !is.null(colnames(object)) & !genomic.pos){
-##       x.lab <- colnames(object)
-##       p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
-##     }
-##   }
-##   if(geom == "tile"){
-##     p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
-##       geom_tile(...)
-##     p <- p + theme_noexpand() + scale_x_continuous(breaks = NULL, expand = c(0, 0))
-##     if(label & !is.null(rownames(object))){
-##       y.lab <- rownames(object)
-##       p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
-##     }
-##     if(label & !is.null(colnames(object)) & !genomic.pos){
-##       x.lab <- colnames(object)
-##       p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
-##     }
-##   }
-##   if(geom == "line"){
-##     p <- ggplot(data = df, aes(x = x, group = y ,y = value)) + geom_line(...)
-##     if(facet){
-##       p <- p + facet_grid(y ~ .)
-##       if(compact)
-##         p <- p + facet_grid(y ~ .) + theme_pack_panels(strip.bg = strip.bg,
-##                                                        strip.text.y = strip.text.y)
-##     }
-##   }
-##   if(missing(xlab))
-##     xlab <- ""
-##   p <- p + ggplot2::xlab(xlab)
-##   if(missing(ylab))
-##     ylab <- ""
-##   p <- p + ggplot2::ylab(ylab)
-##   if(!missing(main))
-##     p <- p + labs(title = main)
-  
-##   p
-## })
+colorizeArgs <- function(args.non, args.aes){
+  if(!"color" %in% names(args.non) && !"color" %in% names(args.aes)){
+    if("fill" %in% names(args.aes)){
+      args.aes$color <- args.aes$fill
+    }else if("fill" %in% names(args.non)){
+      args.non$color <- args.non$fill
+    }else{
+      args.non$color <- "black"
+    }
+  }
+  list(args.aes = args.aes, args.non = args.non)
+}
 
 setMethod("autoplot", "matrix", function(object, ...,
                                          xlab, ylab, main,
-                                         geom = c("raster","tile"),
+                                         geom = c("tile", "raster"),
                                          axis.text.angle = NULL,
-                                         hjust = 0,
-                                         na.value = NULL){
+                                         hjust = 0.5,
+                                         na.value = NULL,
+                                         rownames.label = TRUE,
+                                         colnames.label = TRUE,
+                                         axis.text.x = TRUE,
+                                         axis.text.y = TRUE){
 
+  
+  args <- list(...)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+   
+  if(!"x" %in% names(args.aes))
+    args.aes$x <- as.name("x")
+
+  if(!"y" %in% names(args.aes))
+    args.aes$y <- as.name("y")
+
+  if(!"fill" %in% names(args.aes))
+    args.aes$fill <- as.name("value")
+
+  if(!"width" %in% names(args.aes))
+    args.aes$width <- 1
+
+  if(!"height" %in% names(args.aes))
+    args.aes$height <- 1
+   
+  ## args2 <- colorizeArgs(args.non, args.aes)
+  ## args.aes <- args2$args.aes
+  ## args.non <- args2$args.non
+
+  aes.args <- do.call(aes, args.aes)
   max.c <- 10
   geom <- match.arg(geom)
   df <- mold(object)
+   
   if(geom == "raster"){
-    p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
-        geom_raster(...)
+    p <- ggplot(data = df) + do.call(geom_raster, c(args.non, list(aes.args)))
     p <- p + theme_noexpand()
-    ## + scale_x_continuous(breaks = NULL, expand = c(0, 0))
-    if("rownames" %in% colnames(df)){
+    if("rownames" %in% colnames(df) && rownames.label){
       y.lab <- rownames(object)
       y <- seq_len(nrow(object))
       p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
     }
-    if("colnames" %in% colnames(df)){
+    if("colnames" %in% colnames(df) && colnames.label){
       x.lab <- colnames(object)
       if(max(sapply(x.lab, nchar))>max.c){
         if(is.null(axis.text.angle))
@@ -1201,27 +1241,34 @@ setMethod("autoplot", "matrix", function(object, ...,
       x <- seq_len(ncol(object))
       p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
     }
+
   }
   if(geom == "tile"){
-    p <- ggplot(data = df, aes(x = x, y = y ,fill = value)) +
-      geom_tile(...)
-    p <- p + theme_noexpand()    
-    if("rownames" %in% colnames(df)){
+    p <- ggplot(data = df) + do.call(geom_tile, c(args.non, list(aes.args)))
+    p <- p + theme_noexpand()
+    if("rownames" %in% colnames(df) && rownames.label){
       y.lab <- rownames(object)
       y <- seq_len(nrow(object))
       p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
     }
-    if("colnames" %in% colnames(df)){
+    if("colnames" %in% colnames(df) && colnames.label){
       x.lab <- colnames(object)
       if(max(sapply(x.lab, nchar))> max.c){
         if(is.null(axis.text.angle))
           axis.text.angle <- -90
       }
       x <- seq_len(ncol(object))
+      idx <- match(x, df$x)
+      x <- eval(args.aes$x, df)[idx]
+      x <- eval(args.aes$x, df)[idx]      
       p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
     }
+    p
   }
-
+  if(!axis.text.x)
+    p <- p + scale_x_continuous(breaks = NULL, label = NULL, expand = c(0, 0))
+  if(!axis.text.y)
+    p <- p + scale_y_continuous(breaks = NULL, label = NULL, expand = c(0, 0))    
   if(missing(xlab))
     xlab <- ""
   p <- p + ggplot2::xlab(xlab)
@@ -1263,6 +1310,7 @@ setMethod("autoplot", "Views", function(object, ...,
               tile = {
                 p <- ggplot(object, aes(group = row, x = x, y = y, fill = value)) +
                   geom_tile(...)
+                p <- p + theme_noexpand()                
                 if(!is.null(names(object))){
                   y.lab <- names(object)
                   y <- seq_len(length(object))
@@ -1273,11 +1321,6 @@ setMethod("autoplot", "Views", function(object, ...,
               line = {
                 p <- ggplot(object, aes(group = row, x = x, y = value)) +
                   geom_line(...)
-                if(!is.null(names(object))){
-                  y.lab <- names(object)
-                  y <- seq_len(length(object))
-                  p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
-                }
                  if(!is.null(facets)){
                   p <- p + facet_grid(facets)
                   p <- p + theme_pack_panels()

@@ -12,7 +12,6 @@
 \alias{autoplot,character-method}
 \alias{autoplot,Rle-method}
 \alias{autoplot,RleList-method}
-\alias{autoplot,GenomicRangesList-method}
 \alias{autoplot,matrix-method}
 \alias{autoplot,Views-method}
 \alias{autoplot,ExpressionSet-method}
@@ -81,9 +80,11 @@
          facetByRow = TRUE, stat = c("bin", "identity", "slice"),
          geom = NULL, type = c("viewSums", "viewMins", "viewMaxs", "viewMeans"))
 
-\S4method{autoplot}{matrix}(object, ..., xlab, ylab, main, geom = c("raster",
-                 "tile"), axis.text.angle = NULL, hjust = 0,
-                   na.value = NULL)
+\S4method{autoplot}{matrix}(object, ..., xlab, ylab, main,
+              geom = c("tile", "raster"), axis.text.angle = NULL,
+              hjust = 0.5, na.value = NULL,
+              rownames.label = TRUE, colnames.label = TRUE,
+              axis.text.x = TRUE, axis.text.y = TRUE)
 
 
 \S4method{autoplot}{ExpressionSet}(object, ..., type = c("heatmap", "none",
@@ -98,13 +99,15 @@
                  main_to_pheno = 4.5, padding = 0.2, assay.id = 1)
 
 
-\S4method{autoplot}{VCF}(object, ..., genomic.pos = FALSE, xlab, ylab, main,
-                 type = c("geno", "info", "fixed"), full.string =
-                 FALSE, ref.show = TRUE, expand = c(1, 1), ylabel =
-                 TRUE, assay.id = 1)
+\S4method{autoplot}{VCF}(object, ...,
+              xlab, ylab, main,
+              assay.id,                                      
+              type = c("geno", "info", "fixed"),
+              full.string = FALSE,
+              ref.show = TRUE,
+              genome.axis = TRUE,
+              transpose = TRUE)
 
-\S4method{autoplot}{GenomicRangesList}(object, args = list(), trackWidth,
-                    radius = 10, grid = FALSE, trackSkip = 1, layout = c("circle"))
 
 }
 
@@ -112,11 +115,29 @@
   \item{object}{
     object to be plot.
   }
+  \item{transpose}{
+    logical value, defaut TRUE, always make features from VCF as x, so
+    we can use it to map to genomic position.
+  }
   \item{axis.text.angle}{
     axis text angle.
   }
+  \item{axis.text.x}{
+    logical value indicates whether to show x axis and labels or not.
+  }
+  \item{axis.text.y}{
+    logical value indicates whether to show y axis and labels or not.    
+  }
   \item{hjust}{
     horizontal just for axis text.
+  }
+  \item{rownames.label}{
+    logical value indicates whether to show rownames of matrix as y
+  label or not.
+  }
+  \item{colnames.label}{
+    logical value indicates whether to show colnames of matrix as y
+  label or not.    
   }
   \item{na.value}{
     color for NA value.
@@ -198,24 +219,6 @@
 
   For ExpreesionSet, ploting types.
 }
-\item{args}{
-  a list of arguments list which applied to each track.
-}
-\item{trackWidth}{
-  Numeric values indicate width for each track, if it's only one value, then applied the same
-value to each track, otherwise, the track must be of the same length of
-track numbers.
-}
-\item{radius}{
-  numeric value indicate inner radius of the innermost circle.
-}
-\item{grid}{
-  logical value of length 1 or the same lengths of tracks numbers,
-indicate whether you want to adding grid background or not.
-}
-\item{trackSkip}{
-  numeric values indicate skipped region between tracks.
-}
 \item{layout}{
   Layout including linear, circular and karyogram. for \code{GenomicRangesList}, it only supports circular layout.
 }
@@ -227,9 +230,6 @@ indicate whether you want to adding grid background or not.
   when object is character, it may be imported by \code{import} function
   in package rtracklayer, then asRangedData passed to \code{import}
   function.  If FALSE, coerce object to \code{GRanges}.
-}
-\item{ylabel}{
- logical value indicates to show y labels or not.
 }
 \item{test.method}{
   test method
@@ -272,17 +272,17 @@ indicate whether you want to adding grid background or not.
   \item{nbin}{
     number of bins.
   }
-  \item{genomic.pos}{
-    logical value. If TRUE, treat column names of matrix as position.
+  \item{genome.axis}{
+    logical value, if TRUE, whenever possible, try to parse genomic postition
+    for each column(e.g. SummarizedExperiment), show column as exatcly
+    the genomic position instead of showing them side by side and
+    indexed from 1.
   }
   \item{full.string}{
     logical value. If TRUE, show full string of indels in plot for VCF.
   }
   \item{ref.show}{
     logical value. If TRUE, show REF in VCF at bottom track.
-  }
-  \item{expand}{
-    expand passed to scale_y_continuous().
   }
   \item{single.ideo}{
     for object 'Seqinfo', if length of object is 1, then this control
@@ -752,28 +752,39 @@ autoplot(test_bed, aes(fill = name))
 ###################################################
 ###  matrix
 ###################################################
-rm(volcano)
 volcano <- volcano[20:70, 20:60] - 150
 autoplot(volcano)
 autoplot(volcano, xlab = "xlab", main = "main", ylab = "ylab")
-autoplot(volcano)+scale_fill_fold_change()
+## special scale theme for 0-centered values
+autoplot(volcano, geom = "raster")+scale_fill_fold_change()
 
+## when a matrix has colnames and rownames label them by default
 colnames(volcano) <- sort(sample(1:300, size = ncol(volcano), replace = FALSE))
 autoplot(volcano)+scale_fill_fold_change()
 
 rownames(volcano) <- letters[sample(1:24, size = nrow(volcano), replace = TRUE)]
-autoplot(volcano)+scale_fill_fold_change()
+autoplot(volcano)
 
-autoplot(volcano, geom = "tile")
+## even with row/col names, you could also disable it and just use numeric index
+autoplot(volcano, colnames.label = FALSE)
+autoplot(volcano, rownames.label = FALSE, colnames.label = FALSE)
 
+## don't want the axis has label??
+autoplot(volcano, axis.text.x = FALSE)
+autoplot(volcano, axis.text.y = FALSE)
+
+
+# or totally remove axis
 colnames(volcano) <- lapply(letters[sample(1:24, size = ncol(volcano),
 replace = TRUE)],
 function(x){
    paste(rep(x, 7), collapse = "")
 })
-## when length > 4
+
+## Oops, overlapped
 autoplot(volcano)
-autoplot(volcano, axis.text.angle =  -40)
+## tweak with it.
+autoplot(volcano, axis.text.angle =  -45, hjust = 0)
 
 ## when character is the value
 x <- sample(c(letters[1:3], NA), size = 100, replace = TRUE)
@@ -781,35 +792,32 @@ mx <- matrix(x, nrow = 5)
 autoplot(mx)
 ## tile gives you a white margin
 rownames(mx) <- LETTERS[1:5]
-autoplot(mx, geom = "tile", color = "white") 
+autoplot(mx, color = "white") 
 colnames(mx) <- LETTERS[1:20]
-autoplot(mx, geom = "tile", color = "white")
-autoplot(mx, geom = "tile", color = "white", size = 1)
-## weird, though works
-autoplot(mx, geom = "tile", aes(width = 0.6, height = 0.6))
-autoplot(mx, geom = "tile", aes(width = 0.6, height = 0.6), na.value = "white")
-autoplot(mx, geom = "tile", aes(width = 0.6, height = 0.6)) + theme_clear()
+autoplot(mx, color = "white")
+autoplot(mx, color = "white", size = 2)
+## weird in aes(), though works
+## default tile is flexible
+autoplot(mx, aes(width = 0.6, height = 0.6))
+autoplot(mx, aes(width = 0.6, height = 0.6), na.value = "white")
+autoplot(mx,  aes(width = 0.6, height = 0.6)) + theme_clear()
 
 ###################################################
 ### Views
 ###################################################
-% lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
-%             seq(10, 0.001, length = 500))
-% xVector <- rpois(1e4, lambda)
-% xRle <- Rle(xVector)
-% v1 <- Views(xRle, start = sample(4.5e3:7.5e3, size = 50, replace = FALSE), width =500)
-% autoplot(v1)
-% names(v1) <- letters[sample(1:24, size = length(v1), replace = TRUE)]
-% autoplot(v1)
-% autoplot(v1, geom = "tile")
-% ## fix
-% ## facet pack
-% % autoplot(v1, geom = "tile", aes(y = row))
-% names(v1) <- NULL
-% autoplot(v1, geom = "line")
-% autoplot(v1, geom = "line", aes(color = row)) + theme(legend.position = "none")
-% autoplot(v1, geom = "line", facets = NULL)
-% autoplot(v1, geom = "line", facets = NULL, alpha  = 0.1)
+lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
+            seq(10, 0.001, length = 500))
+xVector <- dnorm(1:5e3, mean = 1e3, sd = 200)
+xRle <- Rle(xVector)
+v1 <- Views(xRle, start = sample(.4e3:.6e3, size = 50, replace = FALSE), width =1000)
+autoplot(v1)
+names(v1) <- letters[sample(1:24, size = length(v1), replace = TRUE)]
+autoplot(v1)
+autoplot(v1, geom = "tile", aes(width = 0.5, height = 0.5))
+autoplot(v1, geom = "line")
+autoplot(v1, geom = "line", aes(color = row)) + theme(legend.position = "none")
+autoplot(v1, geom = "line", facets = NULL)
+autoplot(v1, geom = "line", facets = NULL, alpha  = 0.1)
 
 
 ###################################################
@@ -877,19 +885,19 @@ autoplot(sset, pheno.plot = TRUE)
 
 
 ###################################################
-### code chunk number 47: sset-pcp
+### pcp
 ###################################################
 autoplot(sset, type = "pcp")
 
 
 ###################################################
-### code chunk number 48: sset-boxplot
+### boxplot
 ###################################################
 autoplot(sset, type = "boxplot")
 
 
 ###################################################
-### code chunk number 49: sset-sm
+### scatterplot matrix
 ###################################################
 autoplot(sset, type = "scatterplot.matrix")
 
@@ -900,23 +908,34 @@ autoplot(sset, type = "scatterplot.matrix")
 library(VariantAnnotation)
 vcffile <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
 vcf <- readVcf(vcffile, "hg19")
-hdr <- exptData(vcf)[["header"]]
-hdr
-## autoplot(vcf, type = "fixed") + coord_cartesian(xlim = c(50310860, 50310890))
-
+## default use type 'geno'
+## default use genome position
 autoplot(vcf)
-
-
+## or disable it
+autoplot(vcf, genome.axis = FALSE)
+## not transpose
+autoplot(vcf, genome.axis = FALSE, transpose = FALSE, rownames.label = FALSE)
+autoplot(vcf)
+## use
+autoplot(vcf, assay.id = "DS")
+## equivalent to 
+autoplot(vcf, assay.id = 2)
+\dontrun{
+## doesn't work when assay.id cannot find
+autoplot(vcf, assay.id = "NO")
+}
+## use AF or first
+autoplot(vcf, type = "info")
+## geom bar
 autoplot(vcf, type = "info", aes(y  = THETA))
-
+autoplot(vcf, type = "info", aes(y  = THETA, fill = VT, color = VT)) 
 autoplot(vcf, type = "fixed")
+autoplot(vcf, type = "fixed", size = 10) + xlim(c(50310860, 50310890)) + ylim(0.75, 1.25)
 
-
-np1 <- autoplot(vcf, type = "fixed") + xlim(50310860, 50310890) 
+p1 <- autoplot(vcf, type = "fixed") + xlim(50310860, 50310890) 
 p2 <- autoplot(vcf, type = "fixed", full.string = TRUE) + xlim(50310860, 50310890)
 tracks("full.string = FALSE" = p1, "full.string = TRUE" = p2)+
   scale_y_continuous(breaks = NULL, limits = c(0, 3))
-
 p3 <- autoplot(vcf, type = "fixed", ref.show = FALSE) + xlim(50310860, 50310890) +
     scale_y_continuous(breaks = NULL, limits = c(0, 2))
 p3

@@ -13,8 +13,7 @@ association they are.
 \usage{
 plotGrandLinear(obj, ..., facets, space.skip = 0.01, geom = NULL,
                  cutoff = NULL, cutoff.color = "red", cutoff.size = 1,
-                 legend = FALSE, xlim, ylim, xlab, ylab =
-                 substitute(y), main)
+                 legend = FALSE, xlim, ylim, xlab, ylab, main)
 }
 \arguments{
   \item{obj}{

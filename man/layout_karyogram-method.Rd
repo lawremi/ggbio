@@ -150,7 +150,7 @@ autoplot(dn2, layout = "karyogram", aes(color = exReg, fill = exReg))
 ### code chunk number 10: low-default
 ###################################################
 ## plot ideogram
-p <- ggplot() + layout_karyogram(hg19, cytoband = TRUE)
+p <- ggplot(hg19) + layout_karyogram(cytoband = TRUE)
 p
 ## eqevelant autoplot(hg19, layout = "karyogram", cytoband = TRUE)
 

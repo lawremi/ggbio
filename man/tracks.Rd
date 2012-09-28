@@ -30,18 +30,24 @@
 \alias{bgColor<-}
 \alias{bgColor,gg-method}
 \alias{bgColor,gtable-method}
+\alias{bgColor,ideogram-method}
 \alias{bgColor<-,gg,character-method}
 \alias{bgColor<-,gtable,character-method}
+\alias{bgColor<-,ideogram,character-method}
 \alias{fixed}
 \alias{fixed<-}
 \alias{fixed,gg-method}
+\alias{fixed,ideogram-method}
 \alias{fixed<-,gg,logical-method}
+\alias{fixed<-,ideogram,logical-method}
 \alias{fixed,gtable-method}
 \alias{fixed<-,gtable,logical-method}
 \alias{labeled}
 \alias{labeled<-}
 \alias{labeled,gg-method}
 \alias{labeled<-,gg,logical-method}
+\alias{labeled,ideogram-method}
+\alias{labeled<-,ideogram,logical-method}
 \alias{labeled,gtable-method}
 \alias{labeled,text-method}
 \alias{labeled,gTree-method}
@@ -50,18 +56,24 @@
 \alias{mutable<-}
 \alias{mutable,gg-method}
 \alias{mutable<-,gg,logical-method}
+\alias{mutable,ideogram-method}
+\alias{mutable<-,ideogram,logical-method}
 \alias{mutable,gtable-method}
 \alias{mutable<-,gtable,logical-method}
 \alias{hasAxis}
 \alias{hasAxis<-}
 \alias{hasAxis,gg-method}
 \alias{hasAxis<-,gg,logical-method}
+\alias{hasAxis,ideogram-method}
+\alias{hasAxis<-,ideogram,logical-method}
 \alias{hasAxis,gtable-method}
 \alias{hasAxis<-,gtable,logical-method}
 \alias{height}
 \alias{height<-}
 \alias{height,gg-method}
 \alias{height<-,gg,numericORunit-method}
+\alias{height,ideogram-method}
+\alias{height<-,ideogram,numericORunit-method}
 \alias{height,gtable-method}
 \alias{height<-,gtable,numericORunit-method}
 \title{Tracks for genomic graphics}
@@ -360,6 +372,8 @@ hasAxis(p1)
 hasAxis(p1) <- TRUE
 # ready for weird looking
 tracks(time1 = p1, time2 = p2)
+# set it back
+hasAxis(p1) <- FALSE
 
 
 
@@ -369,6 +383,7 @@ tracks(time1 = p1, time2 = p2) + theme_bw()
 mutable(p1) <- FALSE
 # mutable for "+" method
 tracks(time1 = p1, time2 = p2) + theme_bw()
+mutable(p1) <- TRUE
 
 ## bgColor
 bgColor(p1)
@@ -376,8 +391,9 @@ tracks(time1 = p1, time2 = p2)
 bgColor(p1) <- "brown"
 # mutable for "+" method
 tracks(time1 = p1, time2 = p2)
-
+# set it back
 bgColor(p1) <- "white"
+
 ## apply a theme to each track
 tks <- tracks(time1 = p1, time2 = p2) + theme_bw()
 tks

@@ -3,7 +3,7 @@
 setOldClass("uneval")
 .geoms <- paste0("geom_", .ggbio.geom)
 .stats <- paste0("stat_", .ggbio.stat)
-.layouts <-  c("layout_circle")
+.layouts <-  c("layout_circle", "layout_karyogram")
 
 .gr.name <- c(.geoms, .stats, .layouts)
 

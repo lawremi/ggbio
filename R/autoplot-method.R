@@ -1088,15 +1088,15 @@ setMethod("autoplot", "VCF", function(object, ...,
   if(type == "fixed"){
     fix <- fixed(object)
     fix <- fix[, !colnames(values(fix)) %in% c("ALT", "REF")]
-    values(fix)$ALT <- unlist(values(alt(object))[, "ALT"])
-    values(fix)$REF <- values(ref(object))[, "REF"]
+    values(fix)$ALT <- as.character(unlist(alt(object)))
+    values(fix)$REF <- as.character(ref(object))
     fix2 <- fix        
     type2 <- vector("character", length  = length(fix))      
     idx <- width(values(fix)$ALT) > 1    
     type2[idx] <- "I"
     type2[!idx] <- as.character(values(fix[!idx])$ALT)
     values(fix)$type <- type2
-    ## id <- start(fix) < 25238400 & start(fix) > 25238100
+
     if(!"color" %in% names(args.non))
       isDNABaseColor <- TRUE
     else
@@ -1149,15 +1149,6 @@ setMethod("autoplot", "VCF", function(object, ...,
       
     }
   }
-  ## p <- p + scale_y_continuous(expand = expand)
-  ## if(!ylabel){
-  ##   if(type == "fixed"){
-  ##   p <- p + scale_y_continuous(breaks = NULL, expand = expand)
-  ## }else{
-  ##   p <- p + scale_y_continuous(breaks = NULL)
-  ## }
-  ## }
-  
   if(missing(xlab))
     xlab <- ""
   p <- p + ggplot2::xlab(xlab)

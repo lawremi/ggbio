@@ -1,3 +1,38 @@
+CHANGES IN VERSION 1.5.16
+------------------------
+
+NEW FEATURES
+
+    o ggplot generic method added.
+
+    o mold generic method added for molding object to data.frame.
+
+    o support ggplot(data) + stat_* style, original data being kept.
+
+    o tracks function updated, API is enhenced, utilities could control attributes
+      of plots and trakcs.
+
+    o autoplot now support: VCF, SummarizedExperiments, matrix, where when genomic position is 
+      provided, options to visualize a heatmap sitting on the genomic position.
+
+    o theme could define track based themes.
+
+    o ideogram: support + xlim method, when embeded with tracks, automatically update zoomed region.
+
+    o pheno.plot added to SuumarizedExperiemnts and ExpressionSet.
+
+
+SIGNIFICANT USER-LEVEL CHANGES
+
+    o align.plots is deprecated, alignPlots created
+
+Notes
+
+    o updated website for ggbio: 
+      http://tengfei.github.com/ggbio
+      manuals and vignettes and paper added      
+
+
 CHANGES IN VERSION 1.1.8
 ------------------------
 

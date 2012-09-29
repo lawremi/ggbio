@@ -1558,25 +1558,14 @@ hdr <- exptData(vcf)[["header"]]
 @ %def 
 
 
-\begin{figure}[!htpb]
-  \centering
 <<va-default, fig = TRUE>>=
 library(VariantAnnotation)
 vcffile <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
 vcf <- readVcf(vcffile, "hg19")
-gt <- geno(vcf)[['GT']]
-sts <- start(rowData(vcf))
-idx <- !duplicated(sts)
-gt <- gt[idx,]
-rownames(gt) <- start(rowData(vcf)[idx])
-gt.t <- t(gt)
-autoplot(gt.t)+ scale_x_continuous()
-autoplot(gt.t, genomic.pos = TRUE) 
+library(ggbio)
+autoplot(vcf)
+autoplot(vcf, genome.axis = FALSE) 
 @ %def 
-  \caption{default heatmap to show GT for type 'geno'.}
-  \label{fig:va-default}
-\end{figure}
-% \clearpage
 
 \begin{figure}[!htpb]
   \centering

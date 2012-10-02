@@ -23,11 +23,13 @@ to <code>plotSingleChrom</code>.
 <h3>Usage</h3>
 
 <pre>
-plotSingleChrom(obj, subchr, zoom.region, xlab, ylab,
-                 main, xlabel = FALSE, cytoband = TRUE)
-plotIdeogram(obj, subchr, zoom.region, xlab, ylab,
-                 main, xlabel = FALSE, cytoband = TRUE)
+plotSingleChrom(obj, subchr, zoom.region, xlab, ylab, main, xlabel =
+                 FALSE, color = "red", fill = "red", alpha = 0.7,
+                 cytoband = TRUE, aspect.ratio = NULL, genome)
 
+plotIdeogram(obj, subchr, zoom.region, xlab, ylab, main, xlabel =
+                 FALSE, color = "red", fill = "red", alpha = 0.7,
+                 cytoband = TRUE, aspect.ratio = NULL, genome)       
 </pre>
 
 
@@ -78,12 +80,42 @@ information about cytoband, check biovizBase::isIdeogram.
 <p>A logical value. Show the x label or not.
 </p>
 </td></tr>
+<tr valign="top"><td><code>color</code></td>
+<td>
+
+<p>color for highlight region.
+</p>
+</td></tr>
+<tr valign="top"><td><code>fill</code></td>
+<td>
+
+<p>fill color for highlight region.
+</p>
+</td></tr>
+<tr valign="top"><td><code>alpha</code></td>
+<td>
+
+<p>alpha for highlight regio.
+</p>
+</td></tr>  
 <tr valign="top"><td><code>cytoband</code></td>
 <td>
 
 <p>If FALSE, plot just blank chromosome without cytoband. default is TRUE.
+es  </p>
+</td></tr>
+<tr valign="top"><td><code>aspect.ratio</code></td>
+<td>
+
+<p>aspect ratio for the chromosome ideogram plot, default is NULL.
 </p>
-</td></tr>  
+</td></tr>
+<tr valign="top"><td><code>genome</code></td>
+<td>
+
+<p>genome character passed to <code>getIdeogram</code>
+</p>
+</td></tr>
 </table>
 
 
@@ -121,5 +153,5 @@ particular chromosome.
 </code></pre>
 
 
-<hr><div align="center">[Package <em>ggbio</em> version 1.5.12 ]</div>
+<hr><div align="center">[Package <em>ggbio</em> version 1.5.20 ]</div>
 </body></html>

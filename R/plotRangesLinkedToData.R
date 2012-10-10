@@ -8,7 +8,6 @@ plotRangesLinkedToData <- function(data, ..., stat.col, stat.label,
                                    stat.coord.trans = coord_trans(),
                                    annotation = list(),
                                    width.ratio = 0.8,
-                                   track.skip = -1,
                                    theme.stat = theme_grey(),
                                    theme.align = theme_gray(),
                                    linetype = 3, 
@@ -122,16 +121,19 @@ plotRangesLinkedToData <- function(data, ..., stat.col, stat.label,
        scale_fill_manual(values = c("FALSE" = sig.col[1], "TRUE" = sig.col[2])) +
          theme(legend.position = "none")
 }
+  p.link <- p.link +   theme(plot.margin = unit(c(0, 1,
+                    0,  0.5), "lines"),
+                  panel.margin = unit(c(0, 0.25, 0, 0.25), "lines")
+                  ) 
+
   if(length(annotation)){
     ## annotation <- lapply(annotation, function(p) p + theme_bw())
     ## tracks(p.stat,p.link,p.single)
     args.tracks <- c(c(list(p.stat, p.link, p.single), annotation),
-                     list(heights = heights),
-                     list(track.skip = track.skip))
+                     list(heights = heights))
   }else{
     args.tracks <- c(list(p.stat, p.link, p.single),
-                     list(heights = heights),
-                     list(track.skip = track.skip))
+                     list(heights = heights))
   }
   do.call(tracks, args.tracks)
 }

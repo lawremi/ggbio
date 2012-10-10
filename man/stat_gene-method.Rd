@@ -19,7 +19,9 @@
 \value{
   A 'Layer'.
 }
+\seealso{\code{\link{geom_alignment}}}
 \examples{
+\dontrun{
 ## loading package
 ## Deprecated
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
@@ -41,7 +43,9 @@ p2 <- ggplot(txdb) + stat_gene(which = genesymbol["RBM17"], stat = "reduce")
 tracks(full = p1, reduce = p2, heights = c(3, 1))
 
 ## change y labels
-ggplot(txdb) + stat_gene(which = genesymbol["RBM17"], names.expr = "tx_id:::gene_id")
+ggplot(txdb) + stat_gene(which = genesymbol["RBM17"], names.expr =
+"tx_id:::gene_id")
+}
 }
 \author{Tengfei Yin}
 

@@ -406,17 +406,8 @@ Faceting in ggbio package is a little differnt from ggplot2 in several ways
 }
 \author{Tengfei Yin}
 \examples{
-### R code from vignette source 'autoplot.Rnw'
-
-###################################################
-### code chunk number 1: load
-###################################################
 library(ggbio)
 
-
-###################################################
-### code chunk number 2: simul
-###################################################
 set.seed(1)
 N <- 1000
 library(GenomicRanges)
@@ -475,6 +466,7 @@ autoplot(gr[idx], geom = "arch", aes(color = value), facets = sample ~ seqnames)
 ###################################################
 ### code chunk number 7: gr-group
 ###################################################
+library(ggbio)
 gra <- GRanges("chr1", IRanges(c(1,7,20), end = c(4,9,30)), group = c("a", "a", "b"))
 ## if you desn't specify group, then group based on stepping levels, and gaps are computed without
 ## considering extra group method

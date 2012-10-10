@@ -68,7 +68,6 @@ setMethod("autoplot", "GRanges", function(object, ...,
         args$geom <- geom
       }
   }
-
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
 
@@ -103,16 +102,15 @@ setMethod("autoplot", "GRanges", function(object, ...,
   ##   get the right function
   ## ------------------------------
     aes.res <- do.call(aes, args.aes)
-    args.res <- c(list(aes.res), args.non)
+    ## args.res <- c(list(aes.res), args.non)
     .fun <- getDrawFunFromGeomStat(geom, stat)
     .xlim <- c(start(range(object, ignore.strand = TRUE)),
                end(range(object, ignore.strand = TRUE)))
-    
-    p <- list(do.call(.fun, args.res))
-    p <- c(p, list(scale_by_xlim(.xlim)))
+    p <- list(do.call(.fun, c(args.non, list(aes.res))))
+    if(!is.null(stat) && stat != "aggregate")
+      p <- c(p, list(scale_by_xlim(.xlim)))
     if(!legend)
       p <- c(p, list(theme(legend.position = "none")))
-
     if(missing(xlab)){
         xlab <- ""
     }
@@ -122,7 +120,11 @@ setMethod("autoplot", "GRanges", function(object, ...,
       p <- c(p,list(ylab(ylab)))
     if(!missing(main))
       p <- c(p, list(labs(title = main)))
-     p <- ggplot() + p
+    ## if("x" %in% names(args.aes))
+    args.aes <- args.aes[names(args.aes) %in% c("x", "y")]
+    aes.res <- do.call(aes, args.aes)
+    p <- do.call(ggplot, c(list(data = object),
+                            list(aes.res))) + p
   }  
   if(layout == "karyogram"){
     p <- plotStackedOverview(object, ...,  geom = geom)
@@ -133,7 +135,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
     ## FIXME: xlab/ylab/main
   }
   if(layout == "circle"){
-    p <- ggplot() + layout_circle(object, ..., geom = geom, space.skip = space.skip)
+    p <- ggplot(object) + layout_circle(object, geom = geom, space.skip = space.skip, ...) 
   }
   ## test scale
   if(is_coord_truncate_gaps(object) | is_coord_genome(object)){
@@ -141,7 +143,8 @@ setMethod("autoplot", "GRanges", function(object, ...,
     p <- p + scale_x_continuous(breaks = ss$breaks,
                                 labels = ss$labels)
   }
-  p <- p + facet
+  if(length(stat) && stat != "aggregate")
+    p <- p + facet
   p$.data <- object
   p <- ggbio(p)
   p
@@ -444,7 +447,7 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
     args.non$which <- which
   aes.res <- do.call(aes, args.aes)
   args.res <- c(args.non,list(aes.res))
-  p <- ggplot() + do.call(stat_gene, args.res)
+  p <- ggplot() + do.call(geom_alignment, args.res)
   if(!missing(xlab))
     p <- p + xlab(xlab)
   else

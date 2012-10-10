@@ -1,22 +1,25 @@
 setGeneric("stat_aggregate", function(data, ...) standardGeneric("stat_aggregate"))
 
-setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by, FUN, start = NULL,
-                                                      end = NULL, width = NULL,  y = NULL,
-                                                      frequency = NULL, delta = NULL,
-                                                       simplify = TRUE,
-                                                      window = NULL, facets = NULL, 
-                                                      type = c("mean", "median","max",
-                                                        "min", "sum", "count", "identity"),
-                                                      geom = NULL){
+setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by, FUN,
+                                                maxgap=0L, minoverlap=1L,
+                                                type=c("any", "start", "end", "within", "equal"),
+                                                select=c("all", "first", "last", "arbitrary"),
+                                                y = NULL,
+                                                window = NULL, facets = NULL, 
+                                                method = c("mean", "median","max",
+                                                  "min", "sum", "count", "identity"),
+                                                geom = NULL){
 
 
 
 
-
+  type <- match.arg(type)
+  select <- match.arg(select)
+  
   if(is.null(geom))
     geom <- "histogram"
 
-  if(all(is.null(c(start, end, width, window))))
+  if(is.null(window))
     window <- as.integer(width(range(ranges(data)))/20)
 
   args <- list(...)
@@ -26,6 +29,9 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
   args.non <- parseArgsForNonAes(args)
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
 
+  if(!length(y) && "y" %in% names(args.aes))
+    y <- as.character(args.aes$y)
+    
   if(!("scales" %in% names(args.facets)))
     args.facets$scales <- "free_x"
   facet <- .buildFacetsFromArgs(data, args.facets)
@@ -35,16 +41,16 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
                                         "end", "data", "width", "delta",
                                         "simplify", "type", "geom", "window")]
 
-  type <- match.arg(type)
+  method <- match.arg(method)
 
 
   if(geom %in% c("boxplot"))
-    type <- "identity"
+    method <- "identity"
 
   if(missing(FUN)){
-    if(!(type %in% c("count", "identity")) & is.null(y))
-      stop("need to provide y value for type ", type)
-    .FUN <- switch(type,
+    if(!(method %in% c("count", "identity")) & is.null(y))
+      stop("need to provide y value for method ", method)
+    .FUN <- switch(method,
                    identity = {
                      function(x){
                        x
@@ -52,11 +58,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
                    },
                    mean = {
                      function(x){
-                       if(length(x)){
                          mean(values(x)[, y])
-                       }else{
-                         NULL
-                       }
                      }
                    },
                    median = {
@@ -87,53 +89,68 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
   }else{
     .FUN <- FUN
   }
-  
+
+
   lst <- lapply(grl, function(dt){
-    if(!is.null(window)){
         snm <- unique(seqnames(dt))
-        seqs <- seq(from = min(start(dt)), to = max(start(dt)), by = window)
+        seqs <- seq(from = min(start(dt)), to = max(end(dt)), by = window)
         .by <- IRanges(start = seqs,
                        width = window)
-        .by
+        if(select != "all"){
+          hits <- findOverlaps(ranges(dt), .by, 
+                               maxgap = maxgap, minoverlap = minoverlap,
+                               type = type, select = select)
+          res <- rep(NA, length(.by))
+          names(res) <- c(1:length(.by))
+          res2 <- unlist(lapply(split(dt, hits), .FUN))
+          res[names(res2)] <- res2
+        }else{
+          hits <- findOverlaps(ranges(dt), .by, maxgap = maxgap, minoverlap = minoverlap,
+                               type = type, select = select)
+          res <- rep(NA, length(.by))
+          names(res) <- c(1:length(.by))
+          res2 <- unlist(lapply(base::by(as.data.frame(hits), subjectHits(hits), function(x){
+            x[,1]
+          }), function(id){
+            x <- dt[id]
+            .FUN(x)
+          }))
+          res[names(res2)] <- res2          
+        }
       if(!geom %in% c("boxplot")){
-        res <- aggregate(dt, by = .by, FUN = .FUN)
         df <- as.data.frame(.by)
         df$.value <- res
         df$.mid <- start(.by) + width(.by)/2
         df$seqnames <-snm
       }else{
+        if(select != "all"){
         grq <- GRanges(snm, .by)
-        idx <- findOverlaps(dt, grq, select = "first")
+        idx <- findOverlaps(dt, grq, maxgap = maxgap, minoverlap = minoverlap,
+                               type = type, select = select)
         values(dt)$.mid <- start(grq[idx]) + width(grq[idx])
         df <- as.data.frame(dt)
+      }else{
+        grq <- GRanges(snm, .by)
+        idx <- findOverlaps(dt, grq, maxgap = maxgap, minoverlap = minoverlap,
+                               type = type, select = select)
+        dt <- dt[queryHits(idx)]
+        values(dt)$.mid <- start(grq[subjectHits(idx)]) +
+          width(grq[subjectHits(idx)])
+        df <- as.data.frame(dt)
       }
-    }else{
-      if(!geom %in% c("boxplot")){
-      res <- aggregate(dt,  FUN = .FUN, start = start,
-                       end = end, width = width, frequency = frequency,
-                       delta = delta, simplyfy = simplyfy)
-      df <- as.data.frame(.by)
-      df$.value <- res
-      df$.mid <- start(.by) + width(.by)/2
-      df$seqnames <-snm
-    }else{
-      .by <- IRanges(start = start, end = end, width = width)
-      grq <- GRanges(snm, .by)
-      idx <- findOverlaps(dt, grq, select = "first")
-      values(dt)$.mid <- start(grq[idx]) + width(grq[idx])
-      df <- as.data.frame(dt)
-    }
-    }
-    df
+      }
+       df 
   })
-
   res <- do.call(rbind, lst)
+  if(".value" %in% colnames(res)  && all(is.na(res$.value))){
+    stop("no hits found, please tweak with parametters select and type.")
+  }
   if(!geom %in% c("boxplot", "histogram", "bar")){
     args.aes$x <- substitute(.mid)
     args.aes$y <- substitute(.value)
   }else{
     ## args.aes$x <- substitute(as.factor(.mid))
-    args.aes$x <- substitute(.mid)
+    args.aes$x <- substitute(factor(.mid))
     if(geom == "boxplot"){
     if(!"y" %in% names(args.aes))
       stop("for geom boxplot, y must be provied in aes()")
@@ -160,7 +177,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
     p <- c(p, list(ggplot2::ylab(ylab)))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
-  p <- setStat(p)
+  p <- ggbio:::setStat(p)
   p
 })
 

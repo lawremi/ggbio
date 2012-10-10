@@ -12,7 +12,6 @@ plotRangesLinkedToData(data, ..., stat.col, stat.label,
                                    stat.coord.trans = coord_trans(),
                                    annotation = list(),
                                    width.ratio = 0.8,
-                                   track.skip = -1,
                                    theme.stat = theme_grey(),
                                    theme.align = theme_gray(),
                                    linetype = 3, 
@@ -53,9 +52,6 @@ plotRangesLinkedToData(data, ..., stat.col, stat.label,
   }
   \item{width.ratio}{
     Control the segment length of statistic layer.
-  }
-  \item{track.skip}{
-    skip between tracks.
   }
   \item{theme.stat}{
     top plot theme.
@@ -99,7 +95,6 @@ with annotation tracks is tricky and this function doesn't return a
 ggplot object. 
 }
 \examples{
-\dontrun{
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(ggbio)
 data(genesymbol, package = "biovizBase")
@@ -115,17 +110,15 @@ exon.new <- reduce(exon17)
 values(exon.new)$sample1 <- rnorm(length(exon.new), 10, 3)
 values(exon.new)$sample2 <- rnorm(length(exon.new), 10, 10)
 values(exon.new)$score <- rnorm(length(exon.new))
-values(exon.new)$significant <- sample(c(T,F), size =
-length(exon.new),replace = TRUE)
+values(exon.new)$significant <- sample(c(TRUE,FALSE), size = length(exon.new),replace = TRUE)
+
 plotRangesLinkedToData(exon.new, stat.col = c("sample1", "sample2"))
 plotRangesLinkedToData(exon.new, stat.col = 1:2)
 plotRangesLinkedToData(exon.new, stat.col = 1:2, size = 3, linetype = 4)
 plotRangesLinkedToData(exon.new, stat.col = 1:2, size = 3, linetype = 4,
                        sig = "significant")
 plotRangesLinkedToData(exon.new, stat.col = 1:2, size = 3, linetype = 4,
-                       sig = "significant", sig.col = c("red",
-"gray90"))
-}
+                        sig = "significant", sig.col = c("gray90","red"))
 }
 \author{Tengfei Yin}
 

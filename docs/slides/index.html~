@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <head>
+    <link type="text/css" rel="stylesheet" href="../../css/mystyles.css"> </script>
+</head>
+<body>
+<div class = "container">
+<div id = "header">
+<div id = "icon">
+<h1 class = "icon">GGBIO</h1>
+</div>
+<div id = "div-nav">
+<nav>
+  <a class = "nav" style = "border-left-style:dotted; border-left-width:1px"
+  href="http://tengfei.github.com/ggbio"> Home </a>
+  <a class = "nav" style = "background-color:#EAEAEA"  href="../../docs/index.html"> DOCUMENTATION </a>
+  <a class = "nav" href="../../download.html"> DOWNLOAD </a>
+  <a class = "nav" href="../../support.html"> SUPPORT </a>
+  <a class = "nav" href="../../about.html"> ABOUT </a>
+</nav>
+</div>
+</div>
+<div id = "shadow">
+</div>
+<div class = "content">
+<h2>Slides</h2>
+<p> When you read the slides, please pay attention to the date, some API may
+  changes overtime, please always use vignette and manual as current standard.</p>
+<h3> Presentation in Japan, by Michael Lawrence, 2011</h3>
+<iframe src="http://www.slideshare.net/slideshow/embed_code/14689970?hostedIn=slideshare&page=upload"
+	width="476" height="400" frameborder="0" marginwidth="0"
+	marginheight="0" scrolling="no"></iframe>
+
+<h3> Presentation in Houston, by Dianne Cook, 2011</h3>
+<iframe src="http://www.slideshare.net/slideshow/embed_code/14689971?hostedIn=slideshare&page=upload"
+	width="476" height="400" frameborder="0" marginwidth="0"
+	marginheight="0" scrolling="no"></iframe>
+
+
+</div>
+<div id = "footer">
+<footer>
+&copy; 2011-2012 <a href="http://tengfei.name">Tengfei Yin</a>
+</footer>
+</div>
+</body>
+</html>

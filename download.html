@@ -43,6 +43,13 @@ get depends on the bioconductor installer, which is implemented in
 package <b>BiocInstaller</b> and its version decides which version
 of <b>Bioconductor</b> you got.</p>
 
+To check homepage on bioconductor
+
+<p> <a href = "http://www.bioconductor.org/packages/2.11/bioc/html/ggbio.html">Bioconductor
+2.11 (released): ggbio</a> <p>
+
+<p> <a href = "http://bioconductor.org/packages/devel/bioc/html/ggbio.html">Bioconductor 2.12 (developmental): ggbio</a> <p>
+
 <pre>
 <code>
 source("http://bioconductor.org/biocLite.R")
@@ -62,13 +69,13 @@ biocLite("ggbio")
 </pre>
 
 <p>Or you can check all released bioc packages <a href =
-					       http://www.bioconductor.org/packages/release/BiocViews.html#___Software>here</a>.</p>
+http://www.bioconductor.org/packages/release/BiocViews.html#___Software>here</a>.</p>
 
 <p>To install developmental version, run</p>
 <pre>
 <code>
-library("BiocInstaller")
-useDevel(TRUE)
+source("http://bioconductor.org/biocLite.R")
+biocLite("BiocUpgrade")
 biocLite("ggbio")
 </code>
 </pre>

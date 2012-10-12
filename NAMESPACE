@@ -18,7 +18,7 @@ importFrom(Hmisc, bezier)
 ## GenomicRanges
 ## IRanges
 importFrom(IRanges, IRanges,  disjointBins,
-           matchMatrix, findOverlaps, subsetByOverlaps,
+           findOverlaps, subsetByOverlaps,
            "elementMetadata", "elementMetadata<-",
            start, width, end,  resize, metadata, "metadata<-",
            "values", "values<-",

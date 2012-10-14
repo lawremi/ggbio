@@ -16,11 +16,17 @@ ideogram <- function(x){
 setClass("ggplotGrobList", prototype = prototype(elementType = "ggplot"),
          contains = "list")
 
+reduceListOfGrobs <- function(x) {
+  firstElementIsListOfGrobs <-
+    length(x) == 1 && is.list(x[[1L]]) && !is(x[[1L]], "ggplot")
+  if (firstElementIsListOfGrobs)
+    x <- x[[1]]
+  x
+}
 
 ggplotGrobList <- function(...){
   items <- list(...)
-  if (length(items) == 1 && is.list(items[[1L]]) && !is(items[[1L]], "ggplot"))
-    items <- items[[1L]]
+  items <- reduceListOfGrobs(items)
   if (!all(sapply(items, is, "ggplot")))
     stop("all elements in '...' must be Item objects")
   new("ggplotGrobList", items)
@@ -76,8 +82,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     main <- title
   
   dots <- list(...)
-  if(length(dots) == 1 && is.list(dots[[1]]) && !is(dots[[1]], "ggplot"))
-    dots <- dots[[1]]
+  dots <- reduceListOfGrobs(dots)
 
   nms <- names(dots)
   if(is.null(fixed)){
@@ -206,7 +211,7 @@ setMethod("summary", "Tracks", function(object){
 
 
 setMethod("print", "Tracks", function(x){
-  grid.newpage()
+  ##grid.newpage()
     grobs <- x@grobs
     N <- length(grobs)
     if(any(x@labeled))
@@ -474,11 +479,10 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   ggl <- list(...)
 ggl[[1]]  
   if(length(ggl)){
-    if(length(ggl) == 1 && is.list(ggl[[1]])){
-      ggl <- ggl[[1]]
-    }}else{
-      return(ggplot())
-    }
+    ggl <- reduceListOfGrobs(ggl)
+  } else{
+    return(ggplot())
+  }
 
   N <- length(ggl)
 
@@ -491,7 +495,7 @@ ggl[[1]]
   }
   stopifnot(length(track.plot.color) != N || length(track.plot.color) != 1)
   
-  if(length(track.plot.color) == 1){
+  if(length(track.plot.color) == 1L){
       track.plot.color <- rep(track.plot.color, N)
   }
 
@@ -709,7 +713,7 @@ ggl[[1]]
     }
   }
   if(plot){
-    grid.newpage()
+    ##grid.newpage()
     grid.draw(tab)
   }else{
     tab

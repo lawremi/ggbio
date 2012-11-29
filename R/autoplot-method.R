@@ -1050,7 +1050,7 @@ setMethod("autoplot", "VCF", function(object, ...,
   }
   if(type == "info"){
     colClasses <- function(x){
-      sapply(values(info(x))@listData, class)
+      sapply(info(x)@listData, class)
     }
     cls <- colClasses(object)
     idx.cls <- which(cls %in% c("numeric", "integer", "character", "factor"))

@@ -211,7 +211,7 @@ setMethod("summary", "Tracks", function(object){
 
 
 setMethod("print", "Tracks", function(x){
-  ##grid.newpage()
+  
     grobs <- x@grobs
     N <- length(grobs)
     if(any(x@labeled))
@@ -238,6 +238,7 @@ setMethod("print", "Tracks", function(x){
 
     if(!is.null(nms))
       names(lst) <- nms
+    grid.newpage()    
     if(any(x@labeled))
       res <- do.call(alignPlots, c(lst, list(heights = x@heights,
                                              padding = x@padding,
@@ -477,15 +478,15 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     widths <- width
   
   ggl <- list(...)
-ggl[[1]]  
+
   if(length(ggl)){
-    ggl <- reduceListOfGrobs(ggl)
-  } else{
-    return(ggplot())
-  }
+    if(length(ggl) == 1  && !is.ggplot(ggl[[1]]) && is.list(ggl[[1]])){
+      ggl <- ggl[[1]]
+    }}else{
+      return(ggplot())
+    }
 
   N <- length(ggl)
-
   ## plot background 
   if(is.null(track.plot.color)){
     if(is.null(track.bg.color))
@@ -493,9 +494,10 @@ ggl[[1]]
     else
       track.plot.color <- rep(track.bg.color, length(ggl))
   }
-  stopifnot(length(track.plot.color) != N || length(track.plot.color) != 1)
   
-  if(length(track.plot.color) == 1L){
+  stopifnot(length(track.plot.color) == N | length(track.plot.color) == 1)
+  
+  if(length(track.plot.color) == 1){
       track.plot.color <- rep(track.plot.color, N)
   }
 

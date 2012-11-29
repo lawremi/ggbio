@@ -14,6 +14,7 @@
                  space.skip = 0.015, direction = c("clockwise",
                  "anticlockwise"), link.fun = function(x, y, n = 30)
                  bezier(x, y, evaluation = n), rect.inter.n = 60, rank,
+                 ylim = NULL, 
                  scale.n = 60, scale.unit = NULL, scale.type = c("M",
                  "B", "sci"), grid.n = 5, grid.background = "gray70",
                  grid.line = "white", grid = FALSE)
@@ -57,6 +58,9 @@
   }
   \item{rank}{
     For default equal trackWidth, use rank to specify the circle orders.
+  }
+  \item{ylim}{
+    Numeric range to control y limits.
   }
   \item{scale.n}{
     Approximate number of ticks you want to show on the whole
@@ -103,6 +107,7 @@ gr <- GRanges(seqnames =
                 size = N, replace = TRUE),
               pair = sample(letters, size = N, 
                 replace = TRUE))
+
 
 seqlengths(gr) <- c(400, 500, 700)
 values(gr)$to.gr <- gr[sample(1:length(gr), size = length(gr))]

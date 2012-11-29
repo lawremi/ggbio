@@ -2,12 +2,12 @@ setGeneric("layout_circle", function(data,...) standardGeneric("layout_circle"))
 
 setMethod("layout_circle",  "GRanges",
           function(data, ..., geom = c("point","line", "link", "ribbon","rect", "bar",
-                                       "segment","hist", "scale", 
+                                       "segment","hist", "scale",  "heatmap", 
                                 "ideogram", "text"), linked.to,
                           radius = 10, trackWidth = 5, 
                           space.skip = 0.015, direction = c("clockwise", "anticlockwise"),
                           link.fun = function(x, y, n = 30) bezier(x, y, evaluation = n),
-                   rect.inter.n = 60, rank, 
+                   rect.inter.n = 60, rank,  ylim = NULL, 
                    scale.n = 60, scale.unit = NULL, scale.type = c("M", "B", "sci"),
                    grid.n = 5, grid.background = "gray70", grid.line = "white",
                    grid = FALSE){
@@ -100,7 +100,7 @@ setMethod("layout_circle",  "GRanges",
     }else{
       stop("missing label argument in aes()")
     }
-    obj <- transformToCircle(obj, y = as.character(args.aes$y), radius= radius,
+    obj <- transformToCircle(obj, y = as.character(args.aes$y), radius= radius, ylim = ylim, 
                              trackWidth = trackWidth,
                      direction = direction)
     ## compute angle
@@ -139,7 +139,7 @@ setMethod("layout_circle",  "GRanges",
     }else{
       .y <- as.character(args.aes$y)
     }
-    obj <- transformToCircle(obj, y = .y, radius= radius, trackWidth = trackWidth,
+    obj <- transformToCircle(obj, y = .y, radius= radius, trackWidth = trackWidth, ylim = ylim, 
                      direction = direction)
     names(obj) <- NULL
     df <- as.data.frame(obj)
@@ -155,7 +155,7 @@ setMethod("layout_circle",  "GRanges",
     if(!"y" %in% names(args.aes))
       stop("y is missing in aes()")
     obj <- transformToGenome(data, space.skip)    
-    obj <- transformToCircle(obj, y = as.character(args.aes$y),
+    obj <- transformToCircle(obj, y = as.character(args.aes$y), ylim = ylim, 
                              radius= radius, trackWidth = trackWidth,
                      direction = direction)
     names(obj) <- NULL
@@ -183,6 +183,21 @@ setMethod("layout_circle",  "GRanges",
     res <- do.call(geom_path, args.tot)
     p <- list(res)
   }
+
+  if(geom == "heatmap"){
+    res <- biovizBase:::transformToSegInCircle2(data, y = as.character(args.aes$y),
+                    space.skip = space.skip, trackWidth = trackWidth,
+                    radius = radius, direction = direction)
+    names(res) <- NULL    
+    df <- as.data.frame(res)
+    args.aes$y <- as.name(".circle.y")
+    args.aes$x <- as.name(".circle.x")
+    args.aes$group <- as.name(".biovizBase.group")    
+    aes <- do.call("aes", args.aes)
+    args.tot <- c(list(data = df), list(aes), args.non)
+    res <- do.call(geom_path, args.tot)
+    p <- list(res)
+  }
   
   if(geom == "scale"){
     ## like ideogram
@@ -195,6 +210,7 @@ setMethod("layout_circle",  "GRanges",
     res <- c(res, res0)
     res <- transformToGenome(res, space.skip)    
     res <- transformToCircle(res, y = "scale.y", radius= radius, trackWidth = trackWidth,
+                             ylim = ylim, 
                      direction = direction)
     names(res) <- NULL
     df <- as.data.frame(res)

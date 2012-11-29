@@ -21,7 +21,7 @@ setMethod("layout_karyogram", "GRanges",
                 .y.r <- range(.y)
                 .ideo.range <- expand_range(.y.r, mul = 0.05)
               }else{
-                  .ideo.range <- c(0, rect.height)
+                .ideo.range <- c(0, rect.height)
               }
             }else{
               if("y" %in% names(args.aes)){
@@ -134,7 +134,7 @@ setMethod("layout_karyogram", "GRanges",
               args.aes.seg <- c(args.aes, list(x = substitute(start),
                                                xend = substitute(start),
                                                y = .ideo.range[1],
-                                                   yend = .ideo.range[2]))
+                                               yend = .ideo.range[2]))
 
               ## this hack is to get over 1-pixel problem
               p.addon <- do.call(ggplot2::geom_segment,

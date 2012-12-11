@@ -1054,8 +1054,9 @@ setMethod("autoplot", "VCF", function(object, ...,
     }
     cls <- colClasses(object)
     idx.cls <- which(cls %in% c("numeric", "integer", "character", "factor"))
-    
-    df <- mold(info(object))
+    temp <- granges(object)
+    values(temp) <- info(object)
+    df <- mold(temp)
     
     if(!"y" %in% names(args.aes)){
       hdr.i <- rownames(info(hdr))

@@ -68,6 +68,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
         args$geom <- geom
       }
   }
+  
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
 
@@ -144,6 +145,8 @@ setMethod("autoplot", "GRanges", function(object, ...,
                                 labels = ss$labels)
   }
   if(length(stat) && stat != "aggregate")
+    p <- p + facet
+  if(geom %in% .ggbio.geom)
     p <- p + facet
   p$.data <- object
   p <- ggbio(p)
@@ -1090,8 +1093,11 @@ setMethod("autoplot", "VCF", function(object, ...,
                     args.non))
   }
   if(type == "fixed"){
+    temp <- granges(object)
     fix <- fixed(object)
-    fix <- fix[, !colnames(values(fix)) %in% c("ALT", "REF")]
+    fix <- fix[, !colnames(fix) %in% c("ALT", "REF")]
+    values(temp) <- fix
+    fix <- temp
     values(fix)$ALT <- as.character(unlist(alt(object)))
     values(fix)$REF <- as.character(ref(object))
     fix2 <- fix        

@@ -85,7 +85,7 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
             main.height = unit(2, "lines"),
             scale.height = unit(2, "lines"),
             xlab.height = unit(2, "lines"),
-            padding = unit(0, "lines"),
+            padding = unit(-1, "lines"),
             label.bg.color =  "white",
             label.bg.fill = "gray80",
             label.text.color = "black",
@@ -283,20 +283,22 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
   \code{tracks} did following modification for passed plots.
   \itemize{
     \item{}{
-      remove x-axis, ticks, xlab and tile, for each track and add a
-      scale track at bottom. We suppose a new xlab and title would be
-      provided by the \code{tracks} function for the whole tracks, but we
-      still keep y axis.
+
+      remove x-axis, ticks, xlab and tile for each track and add scales
+  at bottom. We suppose a new xlab and title would be provided by the
+  \code{tracks} function for the whole tracks, but we still keep
+  individual's y axis.
+      
     }
     \item{}{
       align x-scale limits to make sure every plots sitting on exactly
       the same x scale.
     }
     \item{}{
-      squeezing plots together a little bit.
+      squeezing plots together to some extent.
     }
     \item{
-      labeling tracks if names provided, please check utilities section
+      labeling tracks if names are provided, please check utilities section
       about \code{labeled} method.
     }
     \item{

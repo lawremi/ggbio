@@ -1,0 +1,317 @@
+% \VignetteIndexEntry{Ideogram}
+% \VignetteDepends{} 
+% \VignetteKeywords{visualization utilities} 
+% \VignettePackage{ggbio}
+\documentclass[11pt,a4paper]{article}
+% \usepackage{times}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{color}
+\SweaveOpts{eval=FALSE} 
+% \setkeys{Gin}{width=0.95\textwidth}
+
+\textwidth=6.5in
+\textheight=8.5in
+\parskip=.3cm
+\parindent = 0cm
+\oddsidemargin=-.1in
+\evensidemargin=-.1in
+\headheight=-.3in
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rcode}[1]{{\texttt{#1}}}
+
+\newcommand{\software}[1]{\textsf{#1}}
+\newcommand{\R}{\software{R}}
+\newcommand{\Bioc}{\software{Bioconductor}}
+\newcommand{\IRanges}{\Rpackage{IRanges}}
+\newcommand{\biovizBase}{\Rpackage{biovizBase}}
+\newcommand{\ggbio}{\Rpackage{ggbio}}
+\newcommand{\visnab}{\Rpackage{visnab}}
+\newcommand{\ggplot}{\Rpackage{ggplot2}}
+\newcommand{\grid}{\Rpackage{grid}}
+\newcommand{\gridExtra}{\Rpackage{gridExtra}}
+\newcommand{\qplot}{\Rfunction{qplot}}
+\newcommand{\autoplot}{\Rfunction{autoplot}}
+\newcommand{\knitr}{\Rpackage{knitr}}
+\newcommand{\tracks}{\Rfunction{tracks}}
+\newcommand{\chipseq}{\Rpackage{chipseq}}
+
+
+% my own frambox
+\newcommand{\sfbox}[2][Tips]{
+\begin{center}
+\shadowbox{
+  \parbox{0.8\linewidth}{
+    \textcolor{blue}{#1:}
+    #2
+  }
+  }
+\end{center}
+}
+
+\title{How to make ideogram plot}
+\author{Tengfei Yin}
+\date{\today}
+
+\begin{document}
+% \setkeys{Gin}{width=0.6\textwidth}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+<<setup, include=FALSE, cache=FALSE, eval = TRUE>>=
+library(knitr)
+opts_chunk$set(fig.path='./figures/ggbio-', 
+               fig.align='center', fig.show='asis', 
+               eval = TRUE, fig.width = 5,
+               fig.height = 5)
+options(replace.assign=TRUE,width=90)
+@
+
+
+<<options,echo=FALSE>>=
+options(width=72)
+@
+
+\section{Introduction}
+Ideograms are a schematic representation of chromosomes showing the relative
+size and banding patterns of the chromosomes.  Single chromosome ideogram
+overview is widely used in most track-based genome browsers, usually on top of
+all tracks, and use an indicator such as a highlighted window to indicate
+current zoomed region being viewed for tracks below, in this case, users won't
+lose too much context when zoomed into certain region.
+
+\section{Usage}
+\subsection{Visualization of ideogram for single chromosome}
+For single chromosome ideogram, we require they have been arranged into a
+\Robject{GRanges} object in order to be visualized in \ggbio{}. We will
+introduce how to get those ideogram on-line and manually later. Let's first take
+a look at what the data looks like.
+
+We have two types of ideogram, which have different requirements for data, let's
+first introduce the most commonly used one: \textit{Ideogram with cytoband}. It
+could be visualized with banding information, and require extra columns such as
+\begin{itemize}
+\item name: start with p or q. to tell the different arms of chromosomes. such
+  as \textbf{p36.22} and \textbf{q12}.
+\item gieStain: dye color of cytoband. such as \textbf{gneg}.
+\end{itemize}
+Keep in mind, now, the data need to be transformed into a \Robject{GRanges}
+object. In the following example, we use a default data set in \ggbio{} called
+\textit{hg19IdeogramCyto} to show human ideogram. And a function called
+\Rfunction{isIdeogram} in package \Rpackage{biovizBase} could be used to check
+on your data, to see if it contain sufficient information about cytoband and
+arms or not.
+
+\sfbox{
+  after \ggbio{} 1.5.14, if you doesn't provide any data, you can just provide
+  genome to get it on the fly, or provide nothing, it will give you a list to
+  choose from.
+}
+
+
+<<no-data, eval = FALSE>>=
+p <- plotIdeogram()
+@ %def 
+\begin{verbatim}
+Please specify genome 
+
+  1: hg19       2: hg18       3: hg17       4: hg16       5: felCat4
+  6: felCat3    7: galGal4    8: galGal3    9: galGal2   10: panTro3
+ 11: panTro2   12: panTro1   13: bosTau7   14: bosTau6   15: bosTau4
+ 16: bosTau3   17: bosTau2   18: canFam3   19: canFam2   20: canFam1
+ 21: loxAfr3   22: fr3       23: fr2       24: fr1       25: nomLeu1
+ 26: gorGor3   27: cavPor3   28: equCab2   29: equCab1   30: petMar1
+ 31: anoCar2   32: anoCar1   33: calJac3   34: calJac1   35: oryLat2
+ 36: myoLuc2   37: mm10      38: mm9       39: mm8       40: mm7    
+ 41: hetGla1   42: monDom5   43: monDom4   44: monDom1   45: ponAbe2
+ 46: chrPic1   47: ailMel1   48: susScr2   49: ornAna1   50: oryCun2
+ 51: rn5       52: rn4       53: rn3       54: rheMac2   55: oviAri1
+ 56: gasAcu1   57: echTel1   58: tetNig2   59: tetNig1   60: melGal1
+ 61: macEug2   62: xenTro3   63: xenTro2   64: xenTro1   65: taeGut1
+ 66: danRer7   67: danRer6   68: danRer5   69: danRer4   70: danRer3
+ 71: ci2       72: ci1       73: braFlo1   74: strPur2   75: strPur1
+ 76: apiMel2   77: apiMel1   78: anoGam1   79: droAna2   80: droAna1
+ 81: droEre1   82: droGri1   83: dm3       84: dm2       85: dm1    
+ 86: droMoj2   87: droMoj1   88: droPer1   89: dp3       90: dp2    
+ 91: droSec1   92: droSim1   93: droVir2   94: droVir1   95: droYak2
+ 96: droYak1   97: caePb2    98: caePb1    99: cb3      100: cb1    
+101: ce10     102: ce6      103: ce4      104: ce2      105: caeJap1
+106: caeRem3  107: caeRem2  108: priPac1  109: aplCal1  110: sacCer3
+111: sacCer2  112: sacCer1  
+
+Selection: 
+\end{verbatim}
+
+Or you could specify \Rfunarg{genome} argument, if you don't specify
+\Rfunarg{subchr} argument, it will try to parse all information automatically.
+
+\sfbox{after first plotting, the data is automatically hooked with the graphic
+  object, when you do edit and zooming, it will not download it anymore.}
+
+
+<<ideo-hg19, fig = TRUE>>=
+library(ggbio)
+## requrie connection
+p <- plotIdeogram(genome = "hg19", aspect.ratio = 1/20)
+p
+## the data stored with p, won't download again for zooming
+attr(p, "ideogram.data")
+@ %def 
+
+We will introduce a method to download the data manualy or on the fly and use it
+through the vignette by a function called \Rfunction{getIdoegram}.  The data
+\textit{hg19IdeogramCyto} is a default data with \ggbio{} for convenient
+use. The argument \Rfunarg{aspect.ratio} controls the height/width ratio if you
+want a fixed plot no matter how you resize the window.
+
+\sfbox{
+  \Rfunarg{aspect.ratio} by default is NULL, for the reason, when it's passed to
+  \tracks{} function, it will cause some issue if you pass a fixed aspect.ratio
+  plot in it.
+}
+
+<<load>>=
+library(biovizBase)
+data(hg19IdeogramCyto)
+## data structure
+hg19IdeogramCyto
+## return TRUE, if the object could be visualized by ggbio
+biovizBase::isIdeogram(hg19IdeogramCyto) 
+@ %def 
+
+When the data is ready to be plotted, as you can tell, most time you only want
+to visualize a single chromosome, so you need to specify it. To visualize it, in
+\ggbio{}, there two functions to do it, \Rfunction{plotIdeogram},
+\Rfunction{plotSingleChrom}, they are just synonyms. If the graphic device is
+big, resize it to proper size or bind it in tracks use specified height. The
+plot is shown in Figure \ref{fig:ideo-ori}
+
+xlim accpet 
+\begin{itemize}
+\item nuemric range
+\item IRanges
+\item GRanges object, when it's GRanges object, it will change the
+  chromosome if it is not what it is before.
+\end{itemize}
+
+\Rfunction{plotIdeogram} return an object with class 'ideogram', this is
+special, it have \textbf{different} response to \Rcode{xlim}, instead zoom into
+a particular region on the chromosome plot, it adds a highlighted rectangle
+around it. 
+
+<<fig = TRUE>>=
+plotIdeogram(hg19IdeogramCyto, "chr1", aspect.ratio = 1/20, zoom.region = c(1e7, 5e7))
+plotIdeogram(hg19IdeogramCyto, "chr1", aspect.ratio = 1/20, 
+             zoom.region = c(1e7, 5e7), fill = NA, color = "blue" )
+p <- plotIdeogram(hg19IdeogramCyto, "chr1", aspect.ratio = 1/20) 
+class(p)
+p + xlim(1e7, 5e7)
+library(GenomicRanges)
+p + xlim(IRanges(5e7, 7e7))
+## change seqnames
+p + xlim(GRanges("chr2", IRanges(1e7, 5e7)))
+@ %def 
+
+
+
+Default ideogram has no X-scale label, to add axis text, you have to specify argument
+\Rfunarg{xlabel} to \Rcode{TRUE}.
+\begin{figure}[!htpb]
+  \centering
+
+<<ideo-ori-xlabel, fig = TRUE>>=
+plotIdeogram(hg19IdeogramCyto, "chr1", xlabel = TRUE, aspect.ratio = 1/20)
+@ %def  
+  \caption{Idoegram for human chromosome 1 with x scale labeled.}
+  \label{fig:idoe-ori-xlabel}
+\end{figure}
+
+Some time, you don't want to visualize a chromosome with cytobands, or you
+cannot find any information about cytobands, in this case, you can simply
+visualize a blank chromosome just to indicate the position. \ggbio{} has several
+ways to do it.
+
+\begin{itemize}
+\item Use argument \Rfunarg{cytoband}. Set it to \Rcode{FALSE}.
+\item Pass a GRanges with no extra column such as \textbf{name, gieStain}. it
+  will automatically parse and estimate the chromosome lengths. It is
+  \textbf{IMPORTANT} that to create an accurate lengths for chromosomes, you
+  need to either make sure the ranges you passed covers all chromosomes or you
+  need to specify the \Rcode{seqlengths} for our \Robject{GRanges} object.
+\end{itemize}
+
+So please make sure the \Robject{GRanges} object you passed has an accurate
+seglengths information, or you are confident the ranges(for example, cytoband)
+will cover all the chromosome space, otherwise, you will end up with some very
+inaccurate chromosome lengths and you may NEVER notice from the plot. A example
+of this is shown in Figure \ref{fig:idoe-ori-nocyto}.
+
+<<ideo-ori-nocyto, fig = TRUE>>=
+library(GenomicRanges)
+## there are no seqlengths
+seqlengths(hg19IdeogramCyto)
+## so directly plot will try to aggregate and estimate lengths of chromosomes, 
+## this is not accurate
+data(hg19IdeogramCyto)
+p1 <- plotIdeogram(hg19IdeogramCyto, "chr1", cytoband = FALSE, xlabel = TRUE, 
+                   aspect.ratio = 1/20)
+p1
+@ %def  
+
+
+There is another data set called \textbf{hg19Ideogram}, with no cytoband
+information, but with accurate seqlegnths information.
+
+
+<<hg19-nocyto>>=
+data(hg19Ideogram)
+head(hg19Ideogram)
+@ %def 
+
+\subsection{Get ideogram or customize the colors}
+We only provide default cytoband ideogram information for human, but what if you
+want to create your ideogram yourself? There is a high possibility that it's
+already in UCSC data base, and we can use package \Rpackage{rtracklayer} to
+download the data from the server.
+\begin{itemize}
+\item \Rfunction{ucscGenomes} function in package \Rpackage{rtracklayer} will
+  list all available UCSC genomes.
+\item You can also use \biovizBase{}'s \Rfunction{getIdeogram} function without
+  any arguments, that will give you some items names you can choose from. This
+  function is a convenient wrapper over some functionality in
+  \Rpackage{rtracklayer}.
+\item Keep in mind, not all available genomes have cytoband information and not
+  all of them have the same default dye names as humans.
+\end{itemize}
+
+To update the cytoband color with complete definition, simply replace the
+pre-defined color set.
+<<cyto-color, eval = FALSE>>=
+optlist <- getOption("biovizBase")
+## suppose cyto.new is your new defined color
+optlist$cytobandColor <- cyto.new
+options(biovizBase = optlist)
+@ %def 
+
+\subsection{Plot ideogram directly from Seqinfo}
+
+<<fig = TRUE>>=
+data(hg19Ideogram)
+seqs <- seqinfo(hg19Ideogram)
+class(seqs)
+p1 <- autoplot(seqs["chr1"], aspect.ratio = 1/20)
+p1
+@ %def 
+
+
+\end{document}

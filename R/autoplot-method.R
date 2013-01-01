@@ -146,7 +146,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
   }
   if(length(stat) && stat != "aggregate")
     p <- p + facet
-  if(geom %in% .ggbio.geom)
+  if(!geom %in% .ggbio.geom)
     p <- p + facet
   p$.data <- object
   p <- ggbio(p)
@@ -1352,7 +1352,7 @@ setMethod("autoplot", "Seqinfo", function(object, single.ideo = TRUE, ... ){
     p <- ggplot() + layout_karyogram(obj)
   if(length(obj) == 1){
     if(single.ideo)
-      p <- plotSingleChrom(obj, as.character(seqnames(obj)))
+      p <- plotSingleChrom(obj, as.character(seqnames(obj)), ...)
     else
       p <- ggplot() + layout_karyogram(obj)
   }

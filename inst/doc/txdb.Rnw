@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{txdb} 
+% \VignetteIndexEntry{Part 3: How to visualize genomic features} 
 % \VignetteDepends{} 
 % \VignetteKeywords{visualization utilities} 
 % \VignettePackage{ggbio}

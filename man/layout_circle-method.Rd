@@ -9,7 +9,7 @@
 }
 \usage{
 \S4method{layout_circle}{GRanges}(data, ..., geom = c("point", "line", "link", "ribbon",
-                 "rect", "bar", "segment", "hist", "scale", "ideogram",
+                 "rect", "bar", "segment", "hist", "scale", "heatmap", "ideogram",
                  "text"), linked.to, radius = 10, trackWidth = 5,
                  space.skip = 0.015, direction = c("clockwise",
                  "anticlockwise"), link.fun = function(x, y, n = 30)

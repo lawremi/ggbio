@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{overview} 
+% \VignetteIndexEntry{Part 4: overview layout(circular, karyogram, Manhattan)} 
 % \VignetteDepends{} 
 % \VignetteKeywords{visualization utilities} 
 % \VignettePackage{ggbio}

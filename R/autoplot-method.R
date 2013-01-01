@@ -146,7 +146,7 @@ setMethod("autoplot", "GRanges", function(object, ...,
   }
   if(length(stat) && stat != "aggregate")
     p <- p + facet
-  if(!geom %in% .ggbio.geom)
+  if((!is.null(geom) && !geom %in% .ggbio.geom) & is.null(stat))
     p <- p + facet
   p$.data <- object
   p <- ggbio(p)

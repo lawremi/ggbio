@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{Ideogram}
+% \VignetteIndexEntry{Part 2: How to make ideogram plot}
 % \VignetteDepends{} 
 % \VignetteKeywords{visualization utilities} 
 % \VignettePackage{ggbio}

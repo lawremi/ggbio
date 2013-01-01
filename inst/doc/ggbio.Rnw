@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{Index 0: Introduction and quick start} 
+% \VignetteIndexEntry{Part 0: Introduction and quick start} 
 % \VignetteDepends{} 
 % \VignetteKeywords{visualization utilities} 
 % \VignettePackage{ggbio}

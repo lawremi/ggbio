@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{Case study} 
+% \VignetteIndexEntry{Part 5:Case study} 
 % \VignetteDepends{} 
 % \VignetteKeywords{visualization utilities} 
 % \VignettePackage{ggbio}

@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{tracks}
+% \VignetteIndexEntry{Part 1: how to build tracks}
 % \VignetteDepends{} 
 % \VignetteKeywords{visualizationutilities} 
 %  \VignettePackage{ggbio}

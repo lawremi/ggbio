@@ -60,5 +60,4 @@ for(method in .gr.name){
     })
   }
   ufun(method)
-  
 }

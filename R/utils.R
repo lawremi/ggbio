@@ -477,3 +477,14 @@ coord_genome <- function(){
   seqlengths(res) <- ss
   res
 }
+
+## subset chr
+setGeneric("subsetByChrs", function(obj, ...) starndardGeneric("subByChr"))
+setMethod("subsetByChrs", "GRanges", function(obj, chr){
+  if(missing(chr))
+    chr <- as.character(seqnames(obj)[1])
+  res <- obj[seqnames(obj) %in% chr]
+  res <- keepSeqlevels(res, chr)
+  res  
+})
+

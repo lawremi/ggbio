@@ -14,7 +14,7 @@ formals.facets <- union(formals.facet_grid, formals.facet_wrap)
 ##        For "Granges"
 ## ======================================================================
 
-setMethod("autoplot", "GRanges", function(object, ...,
+setMethod("autoplot", "GRanges", function(object, ..., chr,
                                           xlab, ylab, main,
                                           truncate.gaps = FALSE,
                                           truncate.fun = NULL,
@@ -28,6 +28,9 @@ setMethod("autoplot", "GRanges", function(object, ...,
                                           ){
 
 
+  if(!missing(chr))
+    object <- subsetByChrs(object, chr)
+  
   coord <- match.arg(coord)
   args <- list(...)
   
@@ -1346,15 +1349,19 @@ setMethod("autoplot", "Views", function(object, ...,
 })
 
 
-setMethod("autoplot", "Seqinfo", function(object, single.ideo = TRUE, ... ){
+setMethod("autoplot", "Seqinfo", function(object, chr, single.ideo = TRUE, ... ){
+  if(!missing(chr))
+    object <- subsetByChrs(object, chr)
   obj <- .transformSeqinfo(object)
   if(length(obj) > 1)
     p <- ggplot() + layout_karyogram(obj)
   if(length(obj) == 1){
-    if(single.ideo)
+    if(single.ideo){
       p <- plotSingleChrom(obj, as.character(seqnames(obj)), ...)
-    else
+      class(p) <- c("gg",  "ggplot")
+    }else{
       p <- ggplot() + layout_karyogram(obj)
+    }
   }
   p
 })

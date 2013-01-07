@@ -33,7 +33,7 @@
 }
 
 \usage{
-\S4method{autoplot}{GRanges}(object, ..., xlab, ylab, main, truncate.gaps = FALSE,
+\S4method{autoplot}{GRanges}(object, ..., chr, xlab, ylab, main, truncate.gaps = FALSE,
                  truncate.fun = NULL, ratio = 0.0025, space.skip = 0.1,
                  legend = TRUE, geom = NULL, stat = NULL, coord =
                  c("default", "genome", "truncate_gaps"), layout =
@@ -48,7 +48,7 @@
 
 \S4method{autoplot}{IRanges}(object, ..., xlab, ylab, main)
 
-\S4method{autoplot}{Seqinfo}(object, single.ideo = TRUE, ... )
+\S4method{autoplot}{Seqinfo}(object, chr, single.ideo = TRUE, ... )
 
 \S4method{autoplot}{GappedAlignments}(object, ..., xlab, ylab, main, which,
       geom = NULL, stat = NULL)
@@ -107,13 +107,16 @@
               ref.show = TRUE,
               genome.axis = TRUE,
               transpose = TRUE)
-
-
 }
 
 \arguments{
   \item{object}{
     object to be plot.
+  }
+  \item{chr}{
+    characters indicate chromosome names, used to subset the object by
+  chromosomes, this will reduce both the data  and the levels of
+  seqnames. 
   }
   \item{transpose}{
     logical value, defaut TRUE, always make features from VCF as x, so

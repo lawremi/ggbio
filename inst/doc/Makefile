@@ -1,7 +1,7 @@
 # Makefile to use knitr for package vignettes
 
 # put all PDF targets here, separated by spaces
-PDFS= ggbio.pdf
+PDFS= p0_ggbio.pdf p1_tracks.pdf p2_ideogram.pdf p3_overview.pdf p4_txdb.pdf p5_case.pdf
 
 all: $(PDFS) 
 

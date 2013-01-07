@@ -90,6 +90,12 @@ all tracks, and use an indicator such as a highlighted window to indicate
 current zoomed region being viewed for tracks below, in this case, users won't
 lose too much context when zoomed into certain region.
 
+\sfbox{ NOTE: ideogram introduced in this vignette, aim to be embedded in
+  \textbf{tracks}, it is a very special class called 'ideogram', if you want to
+  plot one or more chromosomes that you can add flexible data(layer by layer) on
+  it, you have to check karyogram overview which is included in vignette
+  'overview'. }
+
 \section{Usage}
 \subsection{Visualization of ideogram for single chromosome}
 For single chromosome ideogram, we require they have been arranged into a

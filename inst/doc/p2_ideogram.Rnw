@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{Part 2: How to make ideogram plot}
+% \VignetteIndexEntry{Part 2: Single chromosome ideogram and karyogram overview.}
 % \VignetteDepends{} 
 % \VignetteKeywords{visualization utilities} 
 % \VignettePackage{ggbio}
@@ -57,7 +57,7 @@
 \end{center}
 }
 
-\title{How to make ideogram plot}
+\title{Single chromosome ideogram and karyogram overview.}
 \author{Tengfei Yin}
 \date{\today}
 
@@ -84,46 +84,43 @@ options(width=72)
 
 \section{Introduction}
 Ideograms are a schematic representation of chromosomes showing the relative
-size and banding patterns of the chromosomes.  Single chromosome ideogram
-overview is widely used in most track-based genome browsers, usually on top of
-all tracks, and use an indicator such as a highlighted window to indicate
-current zoomed region being viewed for tracks below, in this case, users won't
-lose too much context when zoomed into certain region.
+size and banding patterns of the chromosomes.  Kayogram overview shows a grid of
+chromosomes and let you render more data as different types of geoms on it to
+observe distribution of events.
 
-\sfbox{ NOTE: ideogram introduced in this vignette, aim to be embedded in
-  \textbf{tracks}, it is a very special class called 'ideogram', if you want to
-  plot one or more chromosomes that you can add flexible data(layer by layer) on
-  it, you have to check karyogram overview which is included in vignette
-  'overview'. }
-
-\section{Usage}
-\subsection{Visualization of ideogram for single chromosome}
-For single chromosome ideogram, we require they have been arranged into a
-\Robject{GRanges} object in order to be visualized in \ggbio{}. We will
-introduce how to get those ideogram on-line and manually later. Let's first take
-a look at what the data looks like.
-
-We have two types of ideogram, which have different requirements for data, let's
-first introduce the most commonly used one: \textit{Ideogram with cytoband}. It
-could be visualized with banding information, and require extra columns such as
 \begin{itemize}
-\item name: start with p or q. to tell the different arms of chromosomes. such
-  as \textbf{p36.22} and \textbf{q12}.
-\item gieStain: dye color of cytoband. such as \textbf{gneg}.
+\item \textbf{Single Chromosome Ideogram:} it is widely used in most track-based
+  genome browsers, usually on top of all tracks, and use an indicator such as a
+  highlighted window to indicate current zoomed region being viewed for different
+  data tracks below, in this case, users won't lose too much context when zoomed
+  into certain region. It is a very special class called 'ideogram',
+  \textbf{mainly} aim to be used to be embeded into tracks, if you want to plot
+  one or more chromosomes that you can add flexible data plot(layer by layer) on
+  it, you have to check karyogram overview.
+\item \textbf{Karyogram Overview:} could be used to plot one or more than one
+  chromosomes as an overview for your data, support multiple chromosome or
+  single chromosome cross multiple samples comparison, please check the examples
+  in this vignette. This should be used as an individual plot, not to be
+  embedded into tracks. More important, the returned object is a normal 'ggplot'
+  object, could be revised easily in anyway.
 \end{itemize}
-Keep in mind, now, the data need to be transformed into a \Robject{GRanges}
-object. In the following example, we use a default data set in \ggbio{} called
-\textit{hg19IdeogramCyto} to show human ideogram. And a function called
-\Rfunction{isIdeogram} in package \Rpackage{biovizBase} could be used to check
-on your data, to see if it contain sufficient information about cytoband and
-arms or not.
 
-\sfbox{
-  after \ggbio{} 1.5.14, if you doesn't provide any data, you can just provide
-  genome to get it on the fly, or provide nothing, it will give you a list to
-  choose from.
-}
 
+\section{Single chromosome visualization}
+\subsection{Single chromosome use to be embedded in tracks.}
+\Rfunction{plotIdeogram} is a wrapper function around some functionality in
+package \Rpackage{rtracklayer} to help download cytoband table from UCSC
+automatically and return a graphic object with class 'ideogram'.
+
+\begin{itemize}
+\item If you doesn't pass genome name, it is going to ask your option from
+  available genomes. NOTE: not all genome has cytoband information, if
+  nocytoband information is available, only seqlengths information will be
+  returned and a message will be issued. And you can always use
+  \Rfunarg{cytoband} argument to control it. If 
+\item if argument \Rfunarg{subchr} is not specified, the first chromosomes is
+  going to be used.
+\end{itemize}
 
 <<no-data, eval = FALSE>>=
 p <- plotIdeogram()
@@ -158,33 +155,43 @@ Please specify genome
 Selection: 
 \end{verbatim}
 
-Or you could specify \Rfunarg{genome} argument, if you don't specify
-\Rfunarg{subchr} argument, it will try to parse all information automatically.
 
-\sfbox{after first plotting, the data is automatically hooked with the graphic
-  object, when you do edit and zooming, it will not download it anymore.}
+After first plotting, the data is automatically hooked with the graphic object,
+when you do edit and zooming, it will not download it anymore, and you can even
+change the view to another chromosomes. That's the special part about object
+with class 'ideogram'.
 
 
-<<ideo-hg19, fig = TRUE>>=
+<<ideo-hg19, fig = TRUE, warning = FALSE>>=
 library(ggbio)
 ## requrie connection
-p <- plotIdeogram(genome = "hg19", aspect.ratio = 1/20)
+p <- plotIdeogram(genome = "hg19")
 p
 ## the data stored with p, won't download again for zooming
 attr(p, "ideogram.data")
 @ %def 
 
-We will introduce a method to download the data manualy or on the fly and use it
-through the vignette by a function called \Rfunction{getIdoegram}.  The data
-\textit{hg19IdeogramCyto} is a default data with \ggbio{} for convenient
-use. The argument \Rfunarg{aspect.ratio} controls the height/width ratio if you
-want a fixed plot no matter how you resize the window.
 
-\sfbox{
-  \Rfunarg{aspect.ratio} by default is NULL, for the reason, when it's passed to
-  \tracks{} function, it will cause some issue if you pass a fixed aspect.ratio
-  plot in it.
-}
+\sfbox{ \Rfunarg{aspect.ratio} by default is 1/20, if you set it to
+  \Rcode{NULL}, you have to resize the graphic device manually. You can always
+  set the aspect.ration in theme() function of \ggplot{} by
+  \Rcode{+theme(aspect.ratio = )}}
+
+You can always download the data manualy and save it and use it later, the
+function used called \Rfunction{getIdoegram}.  The data
+\textit{hg19IdeogramCyto} is a default data with \ggbio{} for convenient use. 
+
+If a \Rclass{GRanges} object satisfy with elementMeta columns:
+\begin{itemize}
+\item name: start with p or q. to tell the different arms of chromosomes. such
+  as \textbf{p36.22} and \textbf{q12}.
+\item gieStain: dye color of cytoband. such as \textbf{gneg}.
+\end{itemize}
+We say it's a ideogram \Rclass{GRanges} object. It's not a special class, just
+it could be recongnized by function
+\Rfunction{plotIdeogram}. \Rfunction{isIdeogram} in package
+\Rpackage{biovizBase} could be used to check on your data, to see if it contain
+sufficient information about cytoband and arms or not.
 
 <<load>>=
 library(biovizBase)
@@ -193,54 +200,45 @@ data(hg19IdeogramCyto)
 hg19IdeogramCyto
 ## return TRUE, if the object could be visualized by ggbio
 biovizBase::isIdeogram(hg19IdeogramCyto) 
+plotIdeogram(hg19IdeogramCyto)
 @ %def 
 
-When the data is ready to be plotted, as you can tell, most time you only want
-to visualize a single chromosome, so you need to specify it. To visualize it, in
-\ggbio{}, there two functions to do it, \Rfunction{plotIdeogram},
-\Rfunction{plotSingleChrom}, they are just synonyms. If the graphic device is
-big, resize it to proper size or bind it in tracks use specified height. The
-plot is shown in Figure \ref{fig:ideo-ori}
+Here comes more special features about the single chromosome ideogram object, it
+all aims to be conventient when it's embeded in tracks. Just a reminder, for a
+normal \ggbio{} plot or \ggplot{} plot object, when you set limmits, it zooms in
+certain ranges. But, for a 'ideogram' object, set limits will only add
+highlights rectangle!
 
-xlim accpet 
+xlim accpet
 \begin{itemize}
 \item nuemric range
 \item IRanges
-\item GRanges object, when it's GRanges object, it will change the
-  chromosome if it is not what it is before.
+\item GRanges object, when it's GRanges object, it will change the chromosome if
+  it is not what it is before.
 \end{itemize}
 
-\Rfunction{plotIdeogram} return an object with class 'ideogram', this is
-special, it have \textbf{different} response to \Rcode{xlim}, instead zoom into
-a particular region on the chromosome plot, it adds a highlighted rectangle
-around it. 
-
 <<fig = TRUE>>=
-plotIdeogram(hg19IdeogramCyto, "chr1", aspect.ratio = 1/20, zoom.region = c(1e7, 5e7))
-plotIdeogram(hg19IdeogramCyto, "chr1", aspect.ratio = 1/20, 
-             zoom.region = c(1e7, 5e7), fill = NA, color = "blue" )
-p <- plotIdeogram(hg19IdeogramCyto, "chr1", aspect.ratio = 1/20) 
+plotIdeogram(hg19IdeogramCyto, "chr1", zoom.region = c(1e7, 5e7))
+## change color
+plotIdeogram(hg19IdeogramCyto, "chr1", 
+             zoom.region = c(1e7, 5e7), fill = NA, color = "blue", size = 2, 
+             zoom.offset = 3)
+p <- plotIdeogram(hg19IdeogramCyto, "chr1") 
 class(p)
 p + xlim(1e7, 5e7)
 library(GenomicRanges)
 p + xlim(IRanges(5e7, 7e7))
-## change seqnames
+## change visualized chromosomes
 p + xlim(GRanges("chr2", IRanges(1e7, 5e7)))
 @ %def 
 
 
 
-Default ideogram has no X-scale label, to add axis text, you have to specify argument
-\Rfunarg{xlabel} to \Rcode{TRUE}.
-\begin{figure}[!htpb]
-  \centering
-
+Default ideogram has no X-scale label, to add axis text, you have to specify
+argument \Rfunarg{xlabel} to \Rcode{TRUE}.
 <<ideo-ori-xlabel, fig = TRUE>>=
-plotIdeogram(hg19IdeogramCyto, "chr1", xlabel = TRUE, aspect.ratio = 1/20)
+plotIdeogram(hg19IdeogramCyto, "chr1", xlabel = TRUE)
 @ %def  
-  \caption{Idoegram for human chromosome 1 with x scale labeled.}
-  \label{fig:idoe-ori-xlabel}
-\end{figure}
 
 Some time, you don't want to visualize a chromosome with cytobands, or you
 cannot find any information about cytobands, in this case, you can simply
@@ -254,54 +252,48 @@ ways to do it.
   \textbf{IMPORTANT} that to create an accurate lengths for chromosomes, you
   need to either make sure the ranges you passed covers all chromosomes or you
   need to specify the \Rcode{seqlengths} for our \Robject{GRanges} object.
+\item  use autoplot,Seqinfo with type = 'ideogram' to make sure it returns a
+  ideogram object. Or you can always use \Rfunction{ideogram} function to turn a
+  plot to an ideogram object.
 \end{itemize}
 
 So please make sure the \Robject{GRanges} object you passed has an accurate
 seglengths information, or you are confident the ranges(for example, cytoband)
 will cover all the chromosome space, otherwise, you will end up with some very
-inaccurate chromosome lengths and you may NEVER notice from the plot. A example
-of this is shown in Figure \ref{fig:idoe-ori-nocyto}.
+inaccurate chromosome lengths and you may NEVER notice from the plot.
 
 <<ideo-ori-nocyto, fig = TRUE>>=
-library(GenomicRanges)
 ## there are no seqlengths
+data(hg19IdeogramCyto)
 seqlengths(hg19IdeogramCyto)
 ## so directly plot will try to aggregate and estimate lengths of chromosomes, 
 ## this is not accurate
-data(hg19IdeogramCyto)
-p1 <- plotIdeogram(hg19IdeogramCyto, "chr1", cytoband = FALSE, xlabel = TRUE, 
-                   aspect.ratio = 1/20)
+p1 <- plotIdeogram(hg19IdeogramCyto, "chr1", cytoband = FALSE, xlabel = TRUE) 
 p1
 @ %def  
 
 
-There is another data set called \textbf{hg19Ideogram}, with no cytoband
-information, but with accurate seqlegnths information.
-
-
 <<hg19-nocyto>>=
-data(hg19Ideogram)
+library(biovizBase)
+library(ggbio)
+data(hg19Ideogram, package= "biovizBase")
 head(hg19Ideogram)
+library(GenomicRanges)
+## default is karyogram
+autoplot(seqinfo(hg19Ideogram)[paste0("chr", 1:13)])
+## single ideogram
+p <- autoplot(seqinfo(hg19Ideogram), subchr = "chr1")
+class(p)
+p <- ggbio:::ideogram(p)
+class(p)
 @ %def 
 
 \subsection{Get ideogram or customize the colors}
-We only provide default cytoband ideogram information for human, but what if you
-want to create your ideogram yourself? There is a high possibility that it's
-already in UCSC data base, and we can use package \Rpackage{rtracklayer} to
-download the data from the server.
-\begin{itemize}
-\item \Rfunction{ucscGenomes} function in package \Rpackage{rtracklayer} will
-  list all available UCSC genomes.
-\item You can also use \biovizBase{}'s \Rfunction{getIdeogram} function without
-  any arguments, that will give you some items names you can choose from. This
-  function is a convenient wrapper over some functionality in
-  \Rpackage{rtracklayer}.
-\item Keep in mind, not all available genomes have cytoband information and not
-  all of them have the same default dye names as humans.
-\end{itemize}
+We only provide default cytoband ideogram information and trying to cover all
+the cases might be encountered in real world, but what if you want to create
+your ideogram yourself?To update the cytoband color with complete definition,
+simply replace the pre-defined color set.
 
-To update the cytoband color with complete definition, simply replace the
-pre-defined color set.
 <<cyto-color, eval = FALSE>>=
 optlist <- getOption("biovizBase")
 ## suppose cyto.new is your new defined color
@@ -309,15 +301,281 @@ optlist$cytobandColor <- cyto.new
 options(biovizBase = optlist)
 @ %def 
 
-\subsection{Plot ideogram directly from Seqinfo}
+\section{Karyogram overview}
+\subsection{Introduction}
+A karyotype is the number and appearance of chromosomes in the nucleus of a
+eukaryotic cell\footnote{http://en.wikipedia.org/wiki/Karyotype}. It's one
+overview option when we want to show distribution of certain events on the
+genome, for example, binding sites for one protein. Particular pattern might be
+easier to observe from graphics, such as
+\begin{itemize}
+\item Clusterred events.
+\item Large missing chunk of data on particular chromosome.
+\end{itemize}
+
+\Robject{GRanges} or \Robject{Seqinfo} object is also an ideal container for
+storing data needed for karyogram plot. Here is the strategy we used for
+generating ideogram templates.
+\begin{itemize}
+\item \Robject{seqlengths} is not required, but highly recommended for plotting
+  karyogram. If a \Robject{GRanges} object contains \Robject{seqlengths}, we
+  know exactly how long each chromosome is, and will use this information to
+  plot genome space, particularly we plot all levels included in it, not just
+  DATA space.
+\item If a \Robject{GRanges} has no \Robject{seqlengths}, we will issue a
+  warning and try to estimate the chromosome lengths from data included. This is
+  NOT accurate most time, so please pay attention to what you are going to
+  visualize and make sure set \Robject{seqlengths} before hand.
+\end{itemize}
+
+\subsection{\Rfunction{autoplot}}
+Let's first introduce how to use \autoplot{} to generate karyogram graphic. 
+
+The most easy one is just plot Seqinfo by using \autoplot{}.
 
 <<fig = TRUE>>=
-data(hg19Ideogram)
-seqs <- seqinfo(hg19Ideogram)
-class(seqs)
-p1 <- autoplot(seqs["chr1"], aspect.ratio = 1/20)
-p1
+chrs <- paste0("chr", 1:20)
+p <- autoplot(seqinfo(hg19Ideogram)[chrs])
+p
+@
+
+Then you could add additional more data(\Rclass{GRanges} object) on this
+overview, for examle, if you have a set of cytoband information, and
+\Rfunction{scale\_fill\_giemsa} did the trick to correct the color.
+
+<<fig = TRUE>>=
+hg19c <- hg19IdeogramCyto
+hg19c <- ggbio:::subsetByChrs(hg19c, chrs)
+p + layout_karyogram(hg19c, aes(fill = gieStain))
+p + layout_karyogram(hg19c, aes(fill = gieStain)) +  scale_fill_giemsa()
 @ %def 
 
+
+Even more typical karyogram overview with cytoband, this will even show the
+arms, two required columns are required 'name' and 'gieStain'.
+
+<<default, fig = TRUE>>=
+data(hg19IdeogramCyto, package = "biovizBase")
+head(hg19IdeogramCyto)
+autoplot(hg19IdeogramCyto, layout = "karyogram", cytoband = TRUE) 
+@ %def   
+
+% To understand why we call it kayogram, let's first visualize some cytoband. We
+% use \Rfunarg{layout} argument to specify this special layout "karyogram". And
+% under this layout, \Rfunarg{cytoband} argument is acceptable, default is
+% \Rcode{FALSE}, if set to \Rcode{TRUE}, we assume your have additional
+% information associated with the data, stored in column \Rcode{gieStain}, it will
+% try to fill colors based on this variable according to a pre-set staining
+% colors. You may notice, this data set doesn't contain seqlengths information,
+% but the data space actually cover the real space, so it's not going to be a
+% problem.
+
+% <<default, fig = TRUE>>=
+% data(hg19IdeogramCyto, package = "biovizBase")
+% autoplot(hg19IdeogramCyto, layout = "karyogram", cytoband = TRUE) 
+% @ %def   
+
+% You may want to change the order of chromosomes, \Rfunction{keepSeqlevels} are
+% convenient for this purpose, it's defined in package \Rpackage{GenomicRanges}.
+
+% <<change-order, fig = TRUE>>=
+% hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X", "Y")))
+% head(hg19)
+% autoplot(hg19, layout = "karyogram", cytoband = TRUE)
+% @ %def   
+
+% This \Robject{GRanges} object is special, contains two required colomns, 'name'
+% and 'giestain', in this case, \Rfunarg{cytoband} argument could set to
+% \Rcode{TRUE}, and we draw special ideogram not just rectangles but show
+% \textbf{centromere} as possible.
+
+% If we set it to \Rcode{FALSE}, we treat it as a normal \Robject{GRanges},
+% nothing special with cytoband and arm information. So to show the cytoband, we
+% need to specify which color column variable to fill as cytoband, function
+% \Rfunction{aes} use an unevaluated expression like \Rcode{fill = gieStain},
+% \textit{gieStain} is column name which store cytoband color, notice that we
+% don't use quotes around it, this means it's not something defined globally, but
+% some column name defined in the data. The system will usually automatically
+% assign categorical colors to represent this variable. But instead, cytoband
+% already have some pre-defined colors which mimic the color you observed under
+% microscope. Function \Rfunction{scale\_fill\_giemsa} did this trick to correct
+% the color. If it's first time you observe usage by \Rcode{+}, it's a very
+% popular API in package \ggplot{}\footnote{http://had.co.nz/ggplot2/}, which
+% could add graphics layer by layer or revise a existing graphic.
+% \begin{figure}[!htpb]
+%   \centering
+% <<cyto-normal, fig = TRUE>>=
+% library(GenomicRanges)
+% ## it's a 'ideogram'
+% biovizBase::isIdeogram(hg19)
+% ## set to FALSE
+% autoplot(hg19, layout = "karyogram", cytoband = FALSE, aes(fill = gieStain)) +
+%   scale_fill_giemsa()
+% @ %def   
+% \caption{Cytoband on karyogram layout. We treat it as normal \Robject{GRanges}
+%   data set, so we fill with gieStain color, and use
+%   \Rfunction{scale\_fill\_giemsa} to use customized color. Notice the difference
+%   if it's not a 'ideogram' object. we don't draw centromere particularly.}
+% \label{fig:cytoband-custom}
+% \end{figure}
+% % \clearpage
+
+% Let's try a different data set which is not an 'ideogram', but a normal
+% \Robject{GRanges} object that most people will have, extra data such as
+% statistical values or categorical levels are stored in element data columns used
+% for aesthetics mapping.
+
+We use a default data in package \Rpackage{biovizBase}, which is a subset of RNA
+editing set in human. The data involved in this \Robject{GRanges} is sparse, so
+we cannot simply use it to make karyogram, otherwise, the estimated chromosome
+lengths will be very rough and inaccurate. So what we need to do is:
+\begin{enumerate}
+\item Adding seqlegnths to this \Robject{GRanges} object. If you adding
+  seqlengths to object, we have two ways to show chromosome space as karyogram. 
+  \\\Rcode{autoplot(object, layout = 'karyogram')} or 
+  \\\Rcode{autoplot(seqinfo(object))}.
+\item Changing the order of chromosomes.  
+\item Visualize it and map variable to different aesthetics.  
+\end{enumerate}
+
+<<load-RNAediting, fig = TRUE>>=
+data(darned_hg19_subset500, package = "biovizBase")
+dn <- darned_hg19_subset500
+head(dn)
+## add seqlengths
+## we have seqlegnths information in another data set
+data(hg19Ideogram, package = "biovizBase")
+seqlengths(dn) <- seqlengths(hg19Ideogram)[names(seqlengths(dn))]
+## now we have seqlengths
+head(dn)
+## then we change order
+dn <- keepSeqlevels(dn, paste0("chr", c(1:22, "X")))
+autoplot(dn, layout = "karyogram")
+## this equivalent to 
+## autoplot(seqinfo(dn))
+@ %def   
+
+
+Then we take one step further, the power of \ggplot{} or \ggbio{} is the
+flexible multivariate data mapping ability in graphics, make data exploration
+much more convenient. In the following example, we are trying to map a
+categorical variable 'exReg' to color, this variable is included in the data,
+and have three levels, '3' indicate 3' utr, '5' means 5' utr and 'C' means
+coding region. We have some missing values indicated as \Rcode{NA}, in default,
+it's going to be shown in gray color, and keep in mind, since the basic
+geom(geometric object) is rectangle, and genome space is very large, so change
+both color/fill color of the rectangle to specify both border and filled color
+is necessary to get the data shown as different color, otherwise if the region
+is too small, border color is going to override the fill color.
+<<load-RNAediting-color, fig = TRUE>>=
+## since default is geom rectangle, even though it's looks like segment
+## we still use both fill/color to map colors
+autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg))
+@ %def   
+
+Or you can set the missing value to particular color you want.
+<<load-RNAediting-color-NA, fig = TRUE>>=
+## since default is geom rectangle, even though it's looks like segment
+## we still use both fill/color to map colors
+autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg)) +
+  scale_color_discrete(na.value = "brown")
+@ %def   
+
+% A test could be performed to demonstrate why 'seqlengths' of object
+% \Robject{GRanges} is important. Let's assume we set wrong chromosome lengths by
+% accident, lengths are all equal to chromosome 1. We arbitrarily set it to the
+% same number so that every chromosome are of equal length. From Figure
+% \ref{fig:exReg-NA-fake}, it's clear that this will affect what we see. So please
+% make sure 
+% \begin{itemize}
+% \item You get data space cover exactly the same chromosome space for each
+%   chromosome. or
+% \item You set the seqlengths to the right number.
+% \end{itemize}
+% Otherwise you will see weird pattern from your results, so actually it's a good
+% way to test your raw data too, if you raw data have something beyond chromosome
+% space, you need to dig into it to see what happened.
+
+
+%<<load-RNAediting-color-fake, fig = TRUE>>=
+%dn2 <- dn
+%seqlengths(dn2) <- rep(max(seqlengths(dn2)), length(seqlengths(dn2)))
+%autoplot(dn2, layout = "karyogram", aes(color = exReg, fill = exReg)) 
+%@ %def   
+
+\subsection{\Rfunction{plotKaryogram}}
+\Rfunction{plotKaryogram} (or \Rfunction{plotStackedOverview}) are specialized
+function to draw karyogram graphics. It's actually what function \autoplot{}
+calls inside. API is a littler simpler because layout 'karyogram' is default in
+these two functions. So equivalent usage is like
+ 
+<<plotKaryogram, eval = FALSE>>=
+plotKaryogram(dn)
+plotKaryogram(dn, aes(color = exReg, fill = exReg))
+@ %def 
+
+\subsection{\Rfunction{layout\_karyogram}}
+In this section, a lower level function \Rfunction{layout\_karyogram} is going
+to be introduced. This is convenient API for constructing karyogram plot and
+adding more data layer by layer. Function \Rfunction{ggplot} is just to create
+blank object to add layer on.
+
+You need to pay attention to 
+\begin{itemize}
+\item when you add plots layer by layer, seqnames of different data must be the
+  same to make sure the data are mapped to the same chromosome. For example, if
+  you name chromosome following schema like \textit{chr1} and use just number
+  \textit{1} to name other data, they will be treated as different chromosomes.
+\item cannot use the same aesthetics mapping multiple time for different
+  data. For example, if you have used aes(color = ), for one data, you cannot
+  use aes(color = ) anymore for mapping variables from other add-on data, this
+  is currently not allowed in \ggplot{}, even though you expect multiple color
+  legend shows up, this is going to confuse people which is which. HOWEVER,
+  \Rfunarg{color} or \Rfunarg{fill} without \Rcode{aes()} wrap around, is
+  allowed for any track, it's set single arbitrary color. This is shown in
+  Figure \ref{fig:low-default-addon}
+\item Default rectangle y range is [0, 10], so when you add on more data layer
+  by layer on existing graphics, you can use \Rfunarg{ylim} to control how to
+  normalize your data and plot it relative to chromosome space. For example,
+  with default, chromosome space is plotted between y [0, 10], if you use
+  \Rcode{ylim = c(10 , 20)}, you will stack data right above each chromosomes
+  and with equal width. For geom like 'point', which you need to specify 'y'
+  value in \Rcode{aes()}, we will add 5\% margin on top and at bottom of that
+  track.
+\end{itemize}
+
+<<low-default, fig = TRUE>>=
+## plot ideogram
+p <- ggplot(hg19) + layout_karyogram(cytoband = TRUE)
+p
+## eqevelant autoplot(hg19, layout = "karyogram", cytoband = TRUE)
+@ %def   
+
+<<low-default-addon, fig = TRUE>>=
+p <- p + layout_karyogram(dn, geom = "rect", ylim = c(11, 21), color = "red")
+## commented line below won't work
+## the cytoband fill color has been used already.
+## p <- p + layout_karyogram(dn, aes(fill = exReg, color = exReg), geom = "rect")
+p
+@ %def   
+
+
+Then we construct another multiple layer graphics for multiple data using
+different geom, suppose we want to show RNA-editing sites on chromosome space as
+rectangle(looks like segment in graphic) and stack a line for another track
+above. 
+
+
+<<edit-space, fig = TRUE>>=
+## plot chromosome space
+p <- autoplot(seqinfo(dn))
+## make sure you pass rect as geom
+## otherwise you just get background
+p <- p + layout_karyogram(dn, aes(fill = exReg, color = exReg), geom = "rect")
+values(dn)$pvalue <- rnorm(length(dn))
+p + layout_karyogram(dn, aes(x = start, y = pvalue), 
+                     ylim = c(10, 30), geom = "line", color = "red")
+p
+@ %def 
 
 \end{document}

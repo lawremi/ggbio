@@ -1,7 +1,8 @@
-plotSingleChrom <- function(obj, subchr, zoom.region,
+plotIdeogram <- function(obj, subchr, zoom.region,
                             xlab, ylab, main, xlabel = FALSE,
                             color = "red", fill = "red", alpha = 0.7,
-                            cytoband = TRUE, aspect.ratio = NULL, genome){
+                            zoom.offset = 0.1, size = 1, 
+                            cytoband = TRUE, aspect.ratio = 1/20, genome){
   if(missing(obj)){
     obj <- getIdeogram(genome = genome, subchr = subchr, cytoband = cytoband)
   }
@@ -28,8 +29,12 @@ plotSingleChrom <- function(obj, subchr, zoom.region,
     zoom.df <- data.frame(x1 = zoom.region[1],
                           x2 = zoom.region[2],
                           seqnames = unique(as.character(seqnames(obj))))
-    p <- p + ggplot2::geom_rect(data = zoom.df, aes(xmin = x1,
-                         xmax = x2, ymin = -0.1, ymax = 10.1), color = color, fill = fill,
+    p <- p + ggplot2::geom_rect(data = zoom.df,
+                                do.call(aes, list(xmin = substitute(x1),
+                                                  xmax = substitute(x2),
+                                                  ymin = substitute(0 - zoom.offset),
+                                                  ymax = substitute(10 + zoom.offset))),
+                                color = color, fill = fill, size = size,
                                 alpha = alpha)
   }
   p <- p + theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
@@ -74,6 +79,7 @@ plotSingleChrom <- function(obj, subchr, zoom.region,
   p
 }
 
+plotSingleChrom <- plotIdeogram
 setMethod("+", c("ideogram"), function(e1, e2){
   ## p <- attr(e1, "ideogram")
   obj <- attr(e1, "ideogram.data")
@@ -138,7 +144,7 @@ setMethod("+", c("ideogram"), function(e1, e2){
 ##   p
 ## })
 
-plotIdeogram <- plotSingleChrom
+
 
 ## ## ======================================================================
 ## ##        For "Overview"

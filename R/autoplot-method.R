@@ -1349,20 +1349,18 @@ setMethod("autoplot", "Views", function(object, ...,
 })
 
 
-setMethod("autoplot", "Seqinfo", function(object, chr, single.ideo = TRUE, ... ){
-  if(!missing(chr))
-    object <- subsetByChrs(object, chr)
+setMethod("autoplot", "Seqinfo", function(object, subchr, ... ){
+  if(!missing(subchr))
+    object <- subsetByChrs(object, subchr)
   obj <- .transformSeqinfo(object)
   if(length(obj) > 1)
     p <- ggplot() + layout_karyogram(obj)
   if(length(obj) == 1){
-    if(single.ideo){
       p <- plotSingleChrom(obj, as.character(seqnames(obj)), ...)
-      class(p) <- c("gg",  "ggplot")
+      suppressWarnings(class(p) <- c("gg",  "ggplot"))
     }else{
       p <- ggplot() + layout_karyogram(obj)
     }
-  }
   p
 })
 

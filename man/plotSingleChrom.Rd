@@ -1,17 +1,19 @@
 \name{plotSingleChrom}
-\alias{plotSingleChrom}
 \alias{plotIdeogram}
+\alias{plotSingleChrom}
 \alias{ideogram-class}
 \alias{+,ideogram,ANY-method}
 \title{Plot single chromosome with cytoband}
 \usage{
 plotSingleChrom(obj, subchr, zoom.region, xlab, ylab, main, xlabel =
                  FALSE, color = "red", fill = "red", alpha = 0.7,
-                 cytoband = TRUE, aspect.ratio = NULL, genome)
+                 zoom.offset = 0.1, size = 1, 
+                 cytoband = TRUE, aspect.ratio = 1/20, genome)
 
 plotIdeogram(obj, subchr, zoom.region, xlab, ylab, main, xlabel =
                  FALSE, color = "red", fill = "red", alpha = 0.7,
-                 cytoband = TRUE, aspect.ratio = NULL, genome)       
+                 zoom.offset = 0.1, size = 1, 
+                 cytoband = TRUE, aspect.ratio = 1/20, genome)       
 }
 \description{
   Plot single chromosome with cytoband. \code{plotIdeogram} is synonyms
@@ -56,7 +58,13 @@ plotIdeogram(obj, subchr, zoom.region, xlab, ylab, main, xlabel =
   }
   \item{alpha}{
     alpha for highlight regio.
-  }  
+  }
+  \item{zoom.offset}{
+    zoomed highlights region offset around chromosome plotting region.
+  }
+  \item{size}{
+    size for zoomed region rectangle boundary.
+  }
   \item{cytoband}{
     If FALSE, plot just blank chromosome without cytoband. default is TRUE.
 es  }

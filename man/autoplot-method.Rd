@@ -48,7 +48,7 @@
 
 \S4method{autoplot}{IRanges}(object, ..., xlab, ylab, main)
 
-\S4method{autoplot}{Seqinfo}(object, chr, single.ideo = TRUE, ... )
+\S4method{autoplot}{Seqinfo}(object, chr, ... )
 
 \S4method{autoplot}{GappedAlignments}(object, ..., xlab, ylab, main, which,
       geom = NULL, stat = NULL)

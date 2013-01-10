@@ -182,7 +182,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
                  label.text.cex = label.text.cex,
                  label.width = label.width)
   
-  new("Tracks", grobs = gbl, backup = backup, labeled = labeled, 
+  obj <- new("Tracks", grobs = gbl, backup = backup, labeled = labeled, 
       heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab, main = main,
       main.height = main.height,
       scale.height = scale.height,
@@ -195,6 +195,8 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
       track.bg.color = track.bg.color,                       
       label.text.cex = label.text.cex,
       label.width = label.width)
+  ggplot2:::set_last_plot(obj)
+  obj
 }
 
 
@@ -211,7 +213,6 @@ setMethod("summary", "Tracks", function(object){
 
 
 setMethod("print", "Tracks", function(x){
-  
     grobs <- x@grobs
     N <- length(grobs)
     if(any(x@labeled))
@@ -267,11 +268,13 @@ setMethod("print", "Tracks", function(x){
                                              main.height = x@main.height,
                                              scale.height = x@scale.height,
                                              xlab.height = x@xlab.height
-)))
+                                             )))
+    ggplot2:::set_last_plot(x)
 })
 
 setMethod("show", "Tracks", function(object){
   print(object)
+  ggplot2:::set_last_plot(object)
 })
 
 

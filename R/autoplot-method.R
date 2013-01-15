@@ -23,6 +23,7 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
                                           legend = TRUE,
                                           geom = NULL,
                                           stat = NULL,
+                                          chr.weight = NULL,
                                           coord = c("default", "genome", "truncate_gaps"),
                                           layout = c("linear", "karyogram", "circle")
                                           ){
@@ -35,7 +36,7 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
   args <- list(...)
   
   if(coord == "genome"){
-    object <- transformToGenome(object, space.skip = space.skip)
+    object <- transformToGenome(object, space.skip = space.skip, chr.weight = chr.weight)
     object <- biovizBase:::rescaleGr(object)
   }
   formals.cur <- c("object", "stat", "geom", "legend",
@@ -149,7 +150,7 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
   }
   if(length(stat) && stat != "aggregate")
     p <- p + facet
-  if((!is.null(geom) && !geom %in% .ggbio.geom) & is.null(stat))
+  if(((!is.null(geom) && !geom %in% .ggbio.geom) & is.null(stat)) | coord == "genome")
     p <- p + facet
   p$.data <- object
   p <- ggbio(p)

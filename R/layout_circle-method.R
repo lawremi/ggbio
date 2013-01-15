@@ -10,7 +10,8 @@ setMethod("layout_circle",  "GRanges",
                    rect.inter.n = 60, rank,  ylim = NULL, 
                    scale.n = 60, scale.unit = NULL, scale.type = c("M", "B", "sci"),
                    grid.n = 5, grid.background = "gray70", grid.line = "white",
-                   grid = FALSE){
+                   grid = FALSE,
+                   chr.weight = NULL){
 
   args <- dots <- list(...)
   args.aes <- parseArgsForAes(args)
@@ -26,7 +27,7 @@ setMethod("layout_circle",  "GRanges",
     data <- getIdeoGR(data)
     res <- transformToRectInCircle(data, y = character(),
                      space.skip = space.skip, trackWidth = trackWidth, radius = radius,
-                     direction = direction, n = rect.inter.n, mul = 0)
+                     direction = direction, n = rect.inter.n, mul = 0, chr.weight = chr.weight)
     names(res) <- NULL
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
@@ -44,7 +45,7 @@ setMethod("layout_circle",  "GRanges",
     res <- transformToSegInCircle(data, y = ".grid.level",
                     space.skip = space.skip, trackWidth = trackWidth,
                                   n = rect.inter.n,
-                    radius = radius, direction = direction)
+                    radius = radius, direction = direction, chr.weight = chr.weight)
     names(res) <- NULL    
     df <- as.data.frame(res)
     args.aes <-   args.non <- list()    
@@ -64,7 +65,7 @@ setMethod("layout_circle",  "GRanges",
     data <- getIdeoGR(data)
     res <- transformToRectInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
-                    direction = direction, n = rect.inter.n)
+                    direction = direction, n = rect.inter.n, chr.weight = chr.weight)
     names(res) <- NULL
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
@@ -92,7 +93,7 @@ setMethod("layout_circle",  "GRanges",
   }
 
   if(geom == "text"){
-    obj <- transformToGenome(data, space.skip)        
+    obj <- transformToGenome(data, space.skip, chr.weight = chr.weight)        
     if("label" %in% names(args.aes)){
       lbs <- as.character(args.aes$label)
       if(!lbs %in% c(colnames(mold(obj[1,])),"start", "end", "seqnames","width"))
@@ -132,7 +133,7 @@ setMethod("layout_circle",  "GRanges",
   }
 
   if(geom == "point"){
-    obj <- transformToGenome(data, space.skip)
+    obj <- transformToGenome(data, space.skip, chr.weight = chr.weight)
     if(!"y" %in% names(args.aes)){
       .y <- 1
       warning("y is missing in aes(), use equal y")
@@ -154,7 +155,7 @@ setMethod("layout_circle",  "GRanges",
   if(geom == "line"){
     if(!"y" %in% names(args.aes))
       stop("y is missing in aes()")
-    obj <- transformToGenome(data, space.skip)    
+    obj <- transformToGenome(data, space.skip, chr.weight = chr.weight)    
     obj <- transformToCircle(obj, y = as.character(args.aes$y), ylim = ylim, 
                              radius= radius, trackWidth = trackWidth,
                      direction = direction)
@@ -172,7 +173,7 @@ setMethod("layout_circle",  "GRanges",
   if(geom == "segment"){
     res <- transformToSegInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth,
-                    radius = radius, direction = direction)
+                    radius = radius, direction = direction, chr.weight = chr.weight)
     names(res) <- NULL    
     df <- as.data.frame(res)
     args.aes$y <- as.name(".circle.y")
@@ -187,7 +188,7 @@ setMethod("layout_circle",  "GRanges",
   if(geom == "heatmap"){
     res <- biovizBase:::transformToSegInCircle2(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth,
-                    radius = radius, direction = direction)
+                    radius = radius, direction = direction, chr.weight = chr.weight)
     names(res) <- NULL    
     df <- as.data.frame(res)
     args.aes$y <- as.name(".circle.y")
@@ -208,7 +209,7 @@ setMethod("layout_circle",  "GRanges",
     values(res0)$scale.y <- 0
     values(res0)$.biovizBase.group <- seq_len(length(res0))
     res <- c(res, res0)
-    res <- transformToGenome(res, space.skip)    
+    res <- transformToGenome(res, space.skip, chr.weight = chr.weight)    
     res <- transformToCircle(res, y = "scale.y", radius= radius, trackWidth = trackWidth,
                              ylim = ylim, 
                      direction = direction)
@@ -253,7 +254,7 @@ setMethod("layout_circle",  "GRanges",
   if(geom == "rect"){
     res <- transformToRectInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
-                    direction = direction, n = rect.inter.n)
+                    direction = direction, n = rect.inter.n, chr.weight = chr.weight)
     names(res) <- NULL
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
@@ -277,7 +278,7 @@ setMethod("layout_circle",  "GRanges",
   if(geom == "bar"){
     res <- transformToBarInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
-                    direction = direction, n = rect.inter.n)
+                    direction = direction, n = rect.inter.n, chr.weight = chr.weight)
     names(res) <- NULL    
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
@@ -301,7 +302,7 @@ setMethod("layout_circle",  "GRanges",
   if(geom == "link"){
     res <- transformToLinkInCircle(data, space.skip = space.skip, linked.to = linked.to,
                      link.fun = link.fun, trackWidth = trackWidth, radius = radius,
-                     direction = direction)
+                     direction = direction, chr.weight = chr.weight)
     args.aes$y <- as.name("y")
     args.aes$x <- as.name("x")
     args.aes$group <- as.name(".biovizBase.group")

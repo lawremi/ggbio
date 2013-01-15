@@ -37,6 +37,7 @@ setMethod("layout_karyogram", "GRanges",
             
             ## check facets
             if(cytoband){
+              geom <- NULL
               cytobandColor <- getOption("biovizBase")$cytobandColor
               ## cytobandColor <- getCytoColor(unique(values(data)$gieStain))
               ## TODO: change to
@@ -160,4 +161,54 @@ setMethod("layout_karyogram", "GRanges",
                       strip.text.y=element_text(angle=0))
             p <- list(p, list(o), list(scale_x_sequnit()))
           })
+
+
+
+## ## ======================================================================
+## ##        For "Overview"
+## ## ======================================================================
+plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
+                         cytoband = FALSE, rescale = TRUE, rescale.range = c(0, 10)){
+  args <- list(...)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  facets <- seqnames ~ .
+  if(missing(obj)){
+    obj <- getIdeogram(cytoband = cytoband)
+    cat("-------get following seqnames------\n")
+    message(paste(seqnames(seqinfo(obj)), collapse = "\n"))
+    ## obj <- keepSeqlevels(obj, unique(seqnames()))
+    idx <- order(seqlengths(obj), decreasing = TRUE)
+    nms <- names(seqlengths(obj))[idx]
+    obj <- keepSeqlevels(obj, nms)
+    p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, facets = facets, geom =  NULL)
+  }else{
+  if(!is(obj, "GRanges"))
+    stop("only GRanges supported now")
+  ## tweak with y
+  if(rescale){
+  if("y" %in% names(args.aes)){
+    values(obj)[, as.character(args.aes$y)] <-
+      rescale(values(obj)[, as.character(args.aes$y)],rescale.range)
+
+  }}
+  p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, facets = facets, geom = NULL)
+  args.non$geom <- geom
+  args.non$facets <- facets
+  if(!cytoband){
+    args.res <- c(list(data = obj), list(do.call(aes, args.aes)),args.non)
+    p <- p + do.call(layout_karyogram,args.res)
+  }
+}
+  if(!missing(xlab))
+    p <- p + xlab(xlab)
+  if(!missing(ylab))
+    p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + labs(title = main)
+  
+  p
+}
+
+plotKaryogram <- plotStackedOverview
 

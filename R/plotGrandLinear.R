@@ -2,18 +2,22 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
                             cutoff = NULL, cutoff.color = "red",
                             cutoff.size = 1, legend = FALSE, xlim, ylim, 
                             xlab, ylab, main,
+                            highlight.gr = NULL,
                             highlight.name = NULL,
                             highlight.col = "red",
-                            highlight.label = TRUE){
+                            highlight.label = TRUE,
+                            highlight.label.size = 5,
+                            highlight.label.offset = 0.05){
 
   if(is.null(geom))
     geom <- "point"
 
-
+  
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   two.color <- c("#0080FF", "#4CC4FF")
+  ## two.color <- c("gray20", "gray50")  
   .is.seq <- FALSE
   if(!"colour" %in% names(args.aes)){
     if(!any(c("color", "colour") %in% names(args.non))){
@@ -70,6 +74,43 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
     p <- p + facet
   }
   p <- p +  theme(panel.grid.minor=element_blank())
+  ## highlights
+  if(!is.null(highlight.gr)){
+    idx <- findOverlaps(obj, highlight.gr)
+    .h.pos <- lapply(split(queryHits(idx), subjectHits(idx)), function(id){
+      gr <- GRanges(as.character(seqnames(p$.data))[id][1],
+                    IRanges(start = min(start(p$.data[id])),
+                              end = max(end(p$.data[id]))))
+      val <- max(as.numeric(values(p$.data[id])[,as.character(args.aes$y)])) 
+      val <- val * (1 + highlight.label.offset)
+      values(gr)$val <- val
+      gr
+    })
+    .h.pos <- do.call("c", unname(.h.pos))
+    if(is.null(highlight.name)){
+      highlight.name <- names(highlight.gr)
+    }else{
+      highlight.name <- values(highlight.gr)[,highlight.name]
+    }
+    p <- p +  geom_point(data = mold(p$.data[queryHits(idx)]),
+                 do.call(aes, list(x = substitute(midpoint),
+                                   y = as.name(args.aes$y))),
+                 color = highlight.col)
+    
+    if(!is.null(highlight.name)){
+      seqinfo(.h.pos) <- seqinfo(obj)
+      .trans <- transformToGenome(.h.pos, space.skip = space.skip)
+      values(.trans)$mean <- (start(.trans) + end(.trans))/2
+      values(.trans)$names <- highlight.name
+      p <- p + geom_text(data = mold(.trans), size = highlight.label.size,
+                         vjust = 0,
+                         do.call(aes, list(x = substitute(mean),
+                                           y = as.name("val"),
+                                           label = as.name("names"))))
+    }
+
+  }
+  
   if(!missing(main))
     p <- p + labs(title = main)
   if(!missing(xlim))

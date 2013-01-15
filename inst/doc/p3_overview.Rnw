@@ -29,6 +29,7 @@
 
 \newcommand{\software}[1]{\textsf{#1}}
 \newcommand{\R}{\software{R}}
+\newcommand{\gr}{\Rclass{GRanges}}
 \newcommand{\Bioc}{\software{Bioconductor}}
 \newcommand{\IRanges}{\Rpackage{IRanges}}
 \newcommand{\biovizBase}{\Rpackage{biovizBase}}
@@ -71,8 +72,9 @@
 library(knitr)
 opts_chunk$set(fig.path='./figures/ggbio-', 
                fig.align='center', fig.show='asis', 
-               eval = TRUE, fig.width = 5,
-               fig.height = 5)
+               eval = TRUE, fig.width = 4,
+               dev = 'png',
+               fig.height = 4, dpi = 400)
 options(replace.assign=TRUE,width=90)
 @
 
@@ -205,7 +207,6 @@ First to add a "ideo" track
 library(ggbio)
 p <- ggplot() + layout_circle(hg19Ideo, geom = "ideo", fill = "gray70",
                               radius = 30, trackWidth = 4)
-p
 @ %def   
   \caption{Adding 'ideogram' track.}
   \label{fig:ideo}
@@ -534,7 +535,7 @@ values(gr.snp)$highlight <- FALSE
 idx <- sample(1:length(gr.snp), size = 15)
 values(gr.snp)$highlight[idx] <- TRUE
 values(gr.snp)$id <- 1:length(gr.snp)
-p = autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
+p <- autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
 
 
 @ %def 
@@ -589,7 +590,18 @@ value, e.g.  p-value. Figure \ref{fig:plotGl} shows a defalut graphic.
 \begin{figure}[!htpb]
   \centering
 <<plotGrandLinear, fig = TRUE, fig.height = 4>>=
-plotGrandLinear(gr.snp, aes(y = pvalue))
+gro <- GRanges(c("1", "2"), IRanges(c(100, 200), width = 5e7))
+plotGrandLinear(gr.snp, aes(y = pvalue), highlight.gr = gro)
+names(gro) <- c("id1", "id2")
+plotGrandLinear(gr.snp, aes(y = pvalue), highlight.gr = gro) + theme_clear() + 
+  theme(legend.position  = "none")
+plotGrandLinear(gr.snp, aes(y = pvalue), highlight.gr = gro) + theme_clear() + 
+  theme(legend.position  = "none")
+.trans <- 0.5
+names(.trans) <- "1"
+plotGrandLinear(gr.snp, aes(y = pvalue), highlight.gr = gro, chr.weight = .trans) + theme_clear() + 
+  theme(legend.position  = "none")
+
 @ %def   
   \caption{Default Manhattan plot by calling plotGrandLinear function}
   \label{fig:plotGl}
@@ -693,8 +705,8 @@ plotGrandLinear(gr.snp, aes(y = pvalue)) + theme(axis.text.x=theme_text(angle=-9
 As you can tell from above examples, all utilities works for \ggplot{} will work
 for \ggbio{} too.
 
-\section{Karyogram overview}
-\subsection{Introduction}
+\chapter{Karyogram overview}
+\section{Introduction}
 A karyotype is the number and appearance of chromosomes in the nucleus of a
 eukaryotic cell\footnote{http://en.wikipedia.org/wiki/Karyotype}. It's one kind
 of overview when we want to show distribution of certain events on the genome,
@@ -709,49 +721,50 @@ generating ideogram templates.
   plotting karyogram. If a \Robject{GRanges} object contains
   \Robject{seqlengths}, we know exactly how long each chromosome is, and will
   use this information to plot genome space, particularly we plot all levels
-  included in it, not just DATA space.
+  included in it, \textbf{NOT JUST} data space.
 \item If a \Robject{GRanges} has no \Robject{seqlengths}, we will issue a
   warning and try to estimate the chromosome lengths from data included. This is
-  NOT accurate most time, so please pay attention to what you are going to
-  visualize and make sure set \Robject{seqlengths} before hand.
+  \textbf{NOT} accurate most time, so please pay attention to what you are going
+  to visualize and make sure set \Robject{seqlengths} before hand.
 \end{itemize}
 
-\subsection{\Rfunction{autoplot}}
+\section{\Rfunction{autoplot}}
 Let's first introduce how to use \autoplot{} to generate karyogram graphic.
 
-The most easy one is just plot Seqinfo by using \autoplot{}, if your \gr{}
+The most easy one is to just plot Seqinfo by using \autoplot{}, if your \gr{}
 object has seqinfo with seqlengths information.
 
 <<fig = TRUE>>=
+data(hg19Ideogram, package = "biovizBase")
 chrs <- paste0("chr", 1:20)
 p <- autoplot(seqinfo(hg19Ideogram)[chrs])
 p
 @
 
-Then you could add additional more data(\Rclass{GRanges} object) on this
-overview, for examle, if you have a set of cytoband information, and
-\Rfunction{scale\_fill\_giemsa} did the trick to correct the color.
+% Then you could add additional more data(\Rclass{GRanges} object) on this
+% overview, for examle, if you have a set of cytoband information, and
+% \Rfunction{scale\_fill\_giemsa} did the trick to correct the color.
 
-<<fig = TRUE>>=
-hg19c <- hg19IdeogramCyto
-hg19c
-hg19c <- ggbio:::subsetByChrs(hg19c, chrs)
-seqlevels(hg19c) <- seqlevels(hg19Ideogram)
-seqlengths(hg19c) <- seqlengths(hg19Ideogram)
-seqinfo(hg19c) <- seqinfo(hg19Ideogram)
-p + layout_karyogram(hg19c, aes(fill = gieStain))
-p + layout_karyogram(hg19c, aes(fill = gieStain)) +  scale_fill_giemsa()
-@ %def 
+%<<fig = TRUE>>=
+%hg19c <- hg19IdeogramCyto
+%hg19c <- ggbio:::subsetByChrs(hg19c, chrs)
+%seqlevels(hg19c) <- seqlevels(hg19Ideogram)
+%seqlengths(hg19c) <- seqlengths(hg19Ideogram)
+%p + layout_karyogram(hg19c, aes(fill = gieStain))
+%p + layout_karyogram(hg19c, aes(fill = gieStain)) +  scale_fill_giemsa()
+%@ %def 
 
 
 Even more typical karyogram overview with cytoband, this will even show the
 arms, two required columns are required 'name' and 'gieStain'.
 
-<<default, fig = TRUE>>=
+<<default, fig = TRUE, fig.width = 5, fig.height = 4>>=
 data(hg19IdeogramCyto, package = "biovizBase")
 head(hg19IdeogramCyto)
-autoplot(hg19IdeogramCyto, layout = "karyogram", cytoband = TRUE) 
+p <- autoplot(hg19IdeogramCyto, layout = "karyogram", cytoband = TRUE) 
 @ %def   
+
+\sfbox{Your turn: change the order of chromosomes.}
 
 % To understand why we call it kayogram, let's first visualize some cytoband. We
 % use \Rfunarg{layout} argument to specify this special layout "karyogram". And
@@ -822,6 +835,7 @@ We use a default data in package \Rpackage{biovizBase}, which is a subset of RNA
 editing set in human. The data involved in this \Robject{GRanges} is sparse, so
 we cannot simply use it to make karyogram, otherwise, the estimated chromosome
 lengths will be very rough and inaccurate. So what we need to do is:
+
 \begin{enumerate}
 \item Adding seqlegnths to this \Robject{GRanges} object. If you adding
   seqlengths to object, we have two ways to show chromosome space as karyogram. 
@@ -868,6 +882,9 @@ autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg))
 @ %def   
 
 Or you can set the missing value to particular color you want.
+
+Note: NA values is not shown on the legend.
+
 <<load-RNAediting-color-NA, fig = TRUE>>=
 ## since default is geom rectangle, even though it's looks like segment
 ## we still use both fill/color to map colors
@@ -897,18 +914,18 @@ autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg)) +
 %autoplot(dn2, layout = "karyogram", aes(color = exReg, fill = exReg)) 
 %@ %def   
 
-\subsection{\Rfunction{plotKaryogram}}
+\section{\Rfunction{plotKaryogram}}
 \Rfunction{plotKaryogram} (or \Rfunction{plotStackedOverview}) are specialized
 function to draw karyogram graphics. It's actually what function \autoplot{}
 calls inside. API is a littler simpler because layout 'karyogram' is default in
 these two functions. So equivalent usage is like
- 
 <<plotKaryogram, eval = FALSE>>=
 plotKaryogram(dn)
 plotKaryogram(dn, aes(color = exReg, fill = exReg))
 @ %def 
 
-\subsection{\Rfunction{layout\_karyogram}}
+
+\section{\Rfunction{layout\_karyogram}}
 In this section, a lower level function \Rfunction{layout\_karyogram} is going
 to be introduced. This is convenient API for constructing karyogram plot and
 adding more data layer by layer. Function \Rfunction{ggplot} is just to create

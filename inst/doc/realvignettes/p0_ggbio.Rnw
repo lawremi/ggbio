@@ -1,0 +1,434 @@
+% \VignetteIndexEntry{Part 0: Introduction and quick start} 
+% \VignetteDepends{} 
+% \VignetteKeywords{visualization utilities} 
+% \VignettePackage{ggbio}
+\documentclass[11pt,a4paper]{article}
+% \usepackage{times}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{color}
+
+<<include=FALSE>>=
+opts_chunk$set(eval=FALSE)
+@
+
+% \setkeys{Gin}{width=0.95\textwidth}
+
+\textwidth=6.5in
+\textheight=8.5in
+\parskip=.3cm
+\parindent = 0cm
+\oddsidemargin=-.1in
+\evensidemargin=-.1in
+\headheight=-.3in
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rcode}[1]{{\texttt{#1}}}
+
+\newcommand{\software}[1]{\textsf{#1}}
+\newcommand{\R}{\software{R}}
+\newcommand{\Bioc}{\software{Bioconductor}}
+\newcommand{\IRanges}{\Rpackage{IRanges}}
+\newcommand{\biovizBase}{\Rpackage{biovizBase}}
+\newcommand{\ggbio}{\Rpackage{ggbio}}
+\newcommand{\visnab}{\Rpackage{visnab}}
+\newcommand{\ggplot}{\Rpackage{ggplot2}}
+\newcommand{\grid}{\Rpackage{grid}}
+\newcommand{\gridExtra}{\Rpackage{gridExtra}}
+\newcommand{\qplot}{\Rfunction{qplot}}
+\newcommand{\autoplot}{\Rfunction{autoplot}}
+\newcommand{\knitr}{\Rpackage{knitr}}
+\newcommand{\tracks}{\Rfunction{tracks}}
+\newcommand{\chipseq}{\Rpackage{chipseq}}
+
+
+% my own frambox
+\newcommand{\sfbox}[2][Tips]{
+\begin{center}
+\shadowbox{
+  \parbox{0.8\linewidth}{
+    \textcolor{blue}{#1:}
+    #2
+  }
+  }
+\end{center}
+}
+
+\title{\ggbio{}: visualization toolkits for genomic data}
+\author{Tengfei Yin}
+\date{\today}
+
+\begin{document}
+% \setkeys{Gin}{width=0.6\textwidth}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+<<setup, include=FALSE, cache=FALSE, eval = TRUE>>=
+library(knitr)
+opts_chunk$set(fig.path='./figures/ggbio-', 
+               fig.align='center', fig.show='asis', 
+               eval = TRUE, fig.width = 5,
+               fig.height = 5)
+options(replace.assign=TRUE,width=90)
+@
+
+
+<<options,echo=FALSE>>=
+options(width=72)
+@
+
+
+\section{Introduction}
+The \ggbio{} package extends and specializes the grammar of graphics for
+biological data. The graphics are designed to answer common scientific
+questions, in particular those often asked of high throughput genomics
+data. Almost all core \Bioc{} data structures are supported, where
+appropriate. The package supports detailed views of particular genomic regions,
+as well as genome-wide overviews. Supported overviews include ideograms and
+grand linear views. High-level plots include sequence fragment length,
+edge-linked interval to data view, mismatch pileup, and several splicing
+summaries.
+
+\section{Documentation}
+After Bioconductor 2.11, two kind of documentation are provided.
+
+\begin{itemize}
+\item Vignettes knited from sweave files. Vignettes are splited up into small
+  individual documentations, each has different focus. For example, the vignette
+  you are reading now is trying to make a general tutorial for a quick
+  start. Other vignettes includes:
+  \begin{itemize}
+  \item \textbf{Overview}: Introduce circular layout, karyogram layout,
+    Manhattan plot(grand linear layout).
+  \item \textbf{Ideogram}: How to generate ideogram, which could be bind in
+    tracks.
+  \item \textbf{tracks}: How to make tracks for existing graphics and how to
+    reset/backup/modify tracks.
+  \item \textbf{Genomic Features}: How to visualization genomic features based
+    on \Robject{TranscriptDb} object.
+  \item \textbf{Case study}: Case studies for particular usage, e.g mismatch
+    summary and chip-seq data analysis.
+  \end{itemize}
+\item Another source is \ggbio{} official websites,
+  \url{http://tengfei.github.com/ggbio}, under \textit{documentation} tab, Rd
+  help manual is knited to html webpages under manual
+  section(\url{http://tengfei.github.com/ggbio/docs/man}), so all the help
+  manual with examples code hybrided with graphics is shown there.
+\end{itemize}
+
+These two documentations are reproducible. For more information about how those
+documentation generated, please visit \knitr{}'s
+websites\footnote{\url{http://yihui.name/knitr/}}.
+
+\section{Support}
+As described on-line (\url{http://tengfei.github.com/ggbio/support.html}).
+
+For issue/bug report and questions about usage, you could 
+\begin{itemize}
+\item File a issue/bug report at \url{https://github.com/tengfei/ggbio/issues}, 
+\item Send maintainter an email directly, so that you can attach graphics.
+\item or ask question about \ggbio{} on biocondcutor mailing list.
+\end{itemize}
+
+\section{Installation}
+As described on-line (\url{http://tengfei.github.com/ggbio/download.html}).
+
+\sfbox{
+  \textbf{github} is only used for issue/bugs report and homepage build purpose,
+  developemnt has been stopped and removed from there already. I only use
+  bioconductor to maintain and develop my package.
+}
+
+After R 2.15, R release cycle falls into annual release instead of semi-annual
+release cycle, at the same time, Bioconductor project still follows semi-annual
+release cycle. So now you can install both released and developmental version
+for the same version of R.
+
+In your R session, please run following code to install released version of
+ggbio, but if you are using developmental version of R, you will get
+developmental version of ggbio automatically. Because what you get depends on
+the bioconductor installer, which is implemented in package BiocInstaller and
+its version decides which version of Bioconductor you got.
+
+
+<<install-release, eval = FALSE>>=
+source("http://bioconductor.org/biocLite.R")
+biocLite("ggbio")
+@ %def 
+
+After you run the code above, next time if you wish to install something new
+from Bioconductor, you can simply run
+
+
+<<install-release2, eval = FALSE>>=
+library("BiocInstaller")
+biocLite("ggbio")
+@ %def 
+
+
+Or you can check all released bioc packages here.
+
+To install developmental version, run
+
+<<install-devel, eval = FALSE>>=
+library("BiocInstaller")
+useDevel(TRUE)
+biocLite("ggbio")
+@ %def 
+
+For developers, you can find latest source code in bioc svn, username and
+password are all "readonly"(without quotes).
+
+\section{Citation}
+<<citation>>=
+citation("ggbio")
+@ %def 
+
+\section{Quick start}
+This chapter gives your a very rough overview about the usage of \ggbio{}, but
+not a complete coverage for all contents.
+
+\autoplot{} is the generic function which support most core \Bioc{} objects, try
+to make different types of graphics for specific object. Please check Chapter
+manual and vignette for \autoplot{} for more information or on-line
+here\url{http://tengfei.github.com/ggbio/docs/man/autoplot-method.html}.
+
+<<warning = FALSE>>=
+library(ggbio)
+library(GenomicRanges)
+set.seed(1)
+N <- 100
+
+gr <- GRanges(seqnames = 
+              sample(c("chr1", "chr2", "chr3"),
+                     size = N, replace = TRUE),
+              IRanges(
+                      start = sample(1:300, size = N, replace = TRUE),
+                      width = sample(70:75, size = N,replace = TRUE)),
+              strand = sample(c("+", "-", "*"), size = N, 
+                replace = TRUE),
+              value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
+              sample = sample(c("Normal", "Tumor"), 
+                size = N, replace = TRUE),
+              pair = sample(letters, size = N, 
+                replace = TRUE))
+
+autoplot(gr)
+autoplot(gr, stat = "coverage", geom = "area")
+autoplot(gr, aes(y = value),  geom = "point")
+autoplot(gr)
+autoplot(gr, aes(y = value),  geom = "point") + geom_line()
+autoplot(gr, aes(y = value),  geom = "point") + geom_line() + stat_smooth()
+autoplot(gr, aes(y = value),  geom = "point") + stat_smooth()
+autoplot(gr, layout = "circle")
+seqlengths(gr)
+seqlengths(gr) <- c(400, 500, 1000)
+autoplot(gr, layout = "circle", aes(fill = seqnames))
+autoplot(gr, coord = "genome")
+@ %def 
+
+% \Rfunction{ggplot} generic method provides flexible API for constructing
+% graphics layer by layer following the grammar of graphics. Actually
+% \autoplot{} method use \Rfunction{ggplot} and other low level utilities to
+% construct customized graphics. Please check Chapter \ref{chapter:ggplot} for
+% more information.
+\begin{table}[htpb]
+  \centering
+  \begin{tabular}{|c|c|}
+    \hline
+    Object& meanings \\\hline
+    GRanges&Genomic interval\\\hline
+    IRanges&numeric interval\\\hline
+    GRangesList&List of genomic interval\\\hline
+    GappedAlignments&NGS data\\\hline
+    BamFiles&Bam files container\\\hline
+    character&Bam files path\\\hline
+    BSgenome&Nucleotide sequence\\\hline
+    Rle&Numeric vector\\\hline
+    RleList&List of numeric vector\\\hline    
+    ExpressionSet&Container for microarray data\\\hline        
+    VCF&Containter for VCF format data\\\hline        
+    matrix& matrix\\\hline            
+    Views& Containter for a set of Views\\\hline            
+    Seqinfo& Information about genomic sequence\\\hline            
+    SummarizedExperiment&eSet-like container\\\hline                
+  \end{tabular}
+  \caption{Objects that \autoplot{} supported.}
+  \label{tab:auto}
+\end{table}
+
+\autoplot{} is the most conventient way to plot something in \ggbio{}, but to
+create more customized graphics or to understand what happened inside
+\autoplot{} function, you may want to create your own graphics layer by layer.
+
+In \ggbio{}, function \Rfunction{ggplot} used to create plots by layers, it
+supports many core data objects defined in \Bioc{}, it takes in the original
+data, and save it in \Rcode{.data} element of the object, you can use
+\Rcode{obj\$.data} to get the original data, and a \Rclass{data.frame}
+transformed and stored in the object too. Running \Rfunction{ggplot} function is
+just creating the \textbf{data} layer, no plot will be generated. You have to
+specify statistics and geometry by adding components using \Rcode{+}.
+
+<<>>=
+ggplot(gr) + geom_rect()
+ggplot(gr) + geom_rect(aes(fill = value))
+## for primitive geom from ggplot2, add facet manually for now
+ggplot(gr, aes(x = midpoint, y = value)) + geom_point() + facet_grid(. ~ seqnames)
+ggplot(gr, aes(x = midpoint, y = value)) + facet_grid(. ~ seqnames) +  geom_point() +
+  stat_smooth()
+ggplot(gr) + layout_circle(aes(fill = seqnames), geom = "rect")
+## slightly different with autoplot api
+ggplot(gr) + geom_rect() + coord_genome()
+ggplot(gr) + stat_aggregate(aes(y = value))
+ggplot(gr) + stat_aggregate(aes(y = value), geom = "boxplot")
+@ %def 
+
+
+\Rfunction{plotSingleChrom} and \Rfunction{plotIdeogram} provides functionality
+to construct ideogram, \Rfunction{tracks} function provides convenient control
+to bind your individual graphics as tracks, reset/backup/modification is
+allowed. Please check vignette about \textbf{tracks} and \textbf{ideogram} for
+more details.
+
+<<fig.width = 5.5, fig.height = 6>>=
+library(ggbio)
+## require internet connection
+p.ideo <- plotIdeogram(genome = "hg19")
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+wh <- GRanges("chr16", IRanges(30064491, 30081734))
+p1 <- autoplot(txdb, which = wh, names.expr = "gene_id")
+p2 <- autoplot(txdb, which = wh, stat = "reduce", color = "brown", 
+               fill = "brown")
+tracks(p.ideo, full = p1, reduce = p2, heights = c(1.5, 5, 1)) + 
+  ylab("") + theme_tracks_sunset()
+@ %def 
+
+
+Overview is useful to show general trends cross all the chomosomes, for example,
+Manhattan plots are used to show SNP, circular view could be used to show
+chromosome rearrangement, kayrogram plot could be used to show clusterred events
+or observe distribution of haplotypes.  In \ggbio{}, \Rfunction{plotGrandLinear}
+is used to plot the whole genome Manhattan plot.  Function
+\Rfunction{layout\_karyogram} and layout 'karyogram' in \autoplot{} to plot the
+karyogram overview. \Rfunction{layout\_circle} and layout 'circle' in
+\autoplot{} to plot the \Rclass{GRanges} in circular layout.  Please check
+vignette about overview and manual for more information.
+
+
+<<>>=
+data(hg19IdeogramCyto, package = "biovizBase")
+data(hg19Ideogram, package = "biovizBase")
+chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
+seqlths <- seqlengths(hg19Ideogram)[chrs]
+set.seed(1)
+nchr <- length(chrs)
+nsnps <- 100
+gr.snp <- GRanges(rep(chrs,each=nsnps),
+                  IRanges(start =
+                          do.call(c, lapply(chrs, function(chr){
+                            N <- seqlths[chr]
+                            runif(nsnps,1,N)
+                          })), width = 1),
+                  SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
+                  pvalue =  -log10(runif(nchr*nsnps)),
+                  group = sample(c("Normal", "Tumor"), size = nchr*nsnps,
+                    replace = TRUE)
+                  )
+genome(gr.snp) <- "hg19"
+nms <- seqnames(seqinfo(gr.snp))
+nms.new <- gsub("chr", "", nms)
+names(nms.new) <- nms
+gr.snp <- renameSeqlevels(gr.snp, nms.new)
+gr.snp <- keepSeqlevels(gr.snp, c(1:22, "X", "Y"))
+gr.snp
+plotGrandLinear(gr.snp, aes(y = pvalue))
+hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X", "Y")))
+autoplot(hg19, layout = "karyogram", cytoband = TRUE)
+@ %def 
+
+
+Let's take a look at a table about stat/geom/layout/coord/scale supported in
+\ggbio{}, Please notice the difference between \ggplot{} and \ggbio{}, in
+\ggbio{}, those components are also generic method. So many of them works for
+not only \Rclass{GRanges} object, but some other objects too.
+
+
+\begin{table}[h!t!b!p]
+\begin{center}
+\small{
+\begin{tabular}{|p{1.4cm}|p{3cm}|p{8cm}|p{0.6cm}|}
+\hline
+Comp & name  & usage & icon\\\hline
+\textbf{geom} &geom\_rect & rectangle& \includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_rect.pdf}\\
+              &geom\_segment & segment& \includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_segment.pdf}\\
+              &geom\_chevron & chevron&\includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_chevron.pdf}\\
+              &geom\_arrow & arrow&\includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_arrow.pdf}\\
+              &geom\_arch & arches &\includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_arch.pdf}\\
+              &geom\_bar & bar &\includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_bar.pdf}\\
+              &geom\_alignment & alignment (gene) & 
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/geom_alignment.pdf}\\\hline
+\textbf{stat} 
+              &stat\_coverage & coverage (of reads) &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/stat_coverage_icon.pdf}\\
+              &stat\_mismatch & mismatch pileup for alignments &
+              \includegraphics[height = 0.25cm,width = 0.6cm]{figures/stat_mismatch.pdf}\\
+              &stat\_aggregate & aggregate in sliding window &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/stat_aggregate.pdf}\\
+              &stat\_stepping & avoid overplotting &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/stat_stepping.pdf}\\
+              &stat\_gene & consider gene structure &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/stat_gene.pdf}\\
+              &stat\_table & tabulate ranges &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/stat_table.pdf}\\
+              &stat\_identity & no change &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/stat_identity.pdf}\\\hline
+\textbf{coord} &linear& ggplot2 linear but facet by chromosome &
+               \includegraphics[height = 0.25cm, width = 0.6cm]{figures/coord_linear.pdf}\\
+               &genome& put everything on genomic coordinates&
+               \includegraphics[height = 0.25cm, width = 0.6cm]{figures/coord_genome.pdf}\\
+               &truncate gaps & compact view by shrinking gaps&
+               \includegraphics[height = 0.25cm, width = 0.6cm]{figures/coord_truncate_gaps.pdf}\\\hline
+\textbf{layout}& track & stacked tracks &\includegraphics[height = 0.25cm, width = 0.6cm]{figures/coord_linear.pdf}\\
+              &karyogram & karyogram display &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/layout_karyogram.pdf}\\
+              &circle & circular &
+              \includegraphics[height = 0.25cm, width = 0.6cm]{figures/layout_circle.pdf}\\\hline
+\textbf{faceting}&formula & facet by formula &
+               \includegraphics[height = 0.25cm, width = 0.6cm]{figures/facet.pdf}\\
+                 &ranges & facet by ranges &
+                 \includegraphics[height = 0.25cm, width = 0.6cm]{figures/facet_gr.pdf}\\\hline
+\textbf{scale} &scale\_x\_sequnit&change x unit:Mb, kb, bp& \\
+               &scale\_fill\_giemsa&ideogram color&\\
+               &scale\_fill\_fold\_change&around 0 scaling, for heatmap.&\\\hline
+\end{tabular}
+}
+\end{center}
+\caption{Components of the basic grammar of graphics, with the extensions available in 
+\ggbio{}.}
+\label{tab:components}
+\end{table}
+
+If you want't to get some instance about using those components, please check
+the on-line manual(\url{http://tengfei.github.com/ggbio/docs/man/index.html}),
+it is provided with graphics help you to understand.
+
+
+\section{Session Information}
+ 
+<<session-info>>=
+sessionInfo()
+@ %def 
+
+
+\end{document}
+

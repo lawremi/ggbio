@@ -1,0 +1,595 @@
+% \VignetteIndexEntry{Part 5:Case study} 
+% \VignetteDepends{} 
+% \VignetteKeywords{visualization utilities} 
+% \VignettePackage{ggbio}
+\documentclass[11pt]{report}
+% \usepackage{times}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{color}
+
+<<include=FALSE>>=
+opts_chunk$set(eval=FALSE)
+@
+
+% \setkeys{Gin}{width=0.95\textwidth}
+\textwidth=6.5in
+\textheight=8.5in
+\parskip=.3cm
+\parindent = 0cm
+\oddsidemargin=-.1in
+\evensidemargin=-.1in
+\headheight=-.3in
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rcode}[1]{{\texttt{#1}}}
+
+\newcommand{\software}[1]{\textsf{#1}}
+\newcommand{\R}{\software{R}}
+\newcommand{\Bioc}{\software{Bioconductor}}
+\newcommand{\IRanges}{\Rpackage{IRanges}}
+\newcommand{\biovizBase}{\Rpackage{biovizBase}}
+\newcommand{\ggbio}{\Rpackage{ggbio}}
+\newcommand{\visnab}{\Rpackage{visnab}}
+\newcommand{\ggplot}{\Rpackage{ggplot2}}
+\newcommand{\grid}{\Rpackage{grid}}
+\newcommand{\gridExtra}{\Rpackage{gridExtra}}
+\newcommand{\qplot}{\Rfunction{qplot}}
+\newcommand{\autoplot}{\Rfunction{autoplot}}
+\newcommand{\knitr}{\Rpackage{knitr}}
+\newcommand{\tracks}{\Rfunction{tracks}}
+\newcommand{\chipseq}{\Rpackage{chipseq}}
+
+
+% my own frambox
+\newcommand{\sfbox}[2][Tips]{
+\begin{center}
+\shadowbox{
+  \parbox{0.8\linewidth}{
+    \textcolor{blue}{#1:}
+    #2
+  }
+  }
+\end{center}
+}
+
+\title{Case study}
+\author{Tengfei Yin}
+\date{\today}
+
+\begin{document}
+% \setkeys{Gin}{width=0.6\textwidth}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+<<setup, include=FALSE, cache=FALSE, eval = TRUE>>=
+library(knitr)
+opts_chunk$set(fig.path='./figures/ggbio-', 
+               fig.align='center', fig.show='asis', 
+               eval = TRUE, fig.width = 5,
+               fig.height = 5)
+options(replace.assign=TRUE,width=90)
+@
+
+
+<<options,echo=FALSE>>=
+options(width=72)
+@
+
+\chapter{Case studies}
+\section{Chip-seq}
+\subsection{Introduction}
+In this tutorial, we are going to use \chipseq{} package to analyze some example
+ChIP-seq data and explore them by visualization of \ggbio{}
+
+Example data we used in this tutorial, is called \textit{cstest}, which is a
+data set in package \chipseq{}. This is a small subset of data downloaded fro
+SRA data base includes two lanes representing CTCF and GFP pull-down in
+mouse. More information about this data could be found in the manual of package
+\chipseq{}.
+
+\subsection{Usage}
+\subsubsection{Processing and fragment estimation}
+Firstly, we mainly follow workflow described in vignette of package \chipseq{},
+except we remove unused seqnames(chromosome names) in the data, from the data we
+could see that only chromosome 10, 11, 12 involved, the reason we removed too
+many unused seq levels from the data is that, in \ggbio{}, most time, it will
+plot every chromosomes in the data even there is no data at all, this will take
+too much space for visualization.
+
+<<>>=
+library(chipseq)
+library(GenomicFeatures)
+data(cstest)
+unique(seqnames(cstest))
+## subset
+chrs <- c("chr10", "chr11", "chr12")
+cstest <- keepSeqlevels(cstest, chrs)
+## estimate fragment length
+fraglen <- estimate.mean.fraglen(cstest$ctcf)
+fraglen[!is.na(fraglen)]
+## that's around 200
+## cstest.gr <- stack(cstest)
+## head(cstest.gr)
+## cstest.ext <- resize(cstest.gr, width = 200)
+## extending them
+ctcf.ext <- resize(cstest$ctcf, width = 200)
+cov.ctcf <- coverage(ctcf.ext)
+gfp.ext <- resize(cstest$gfp, width = 200)
+cov.gfp <- coverage(gfp.ext)
+## estimate peak cutoff
+peakCutoff(cov.ctcf, fdr = 0.0001)
+## we can use 8
+@ %def 
+
+To understand why we are extending reads to estimated fragment lengths, we first
+find two peaks that from negative/positive strands separately which close to
+each other. Then we simply visualize that region and compare it to what it is
+after extending.
+
+
+<<find-close>>=
+c.p <- cstest$ctcf[seqnames(cstest$ctcf) == "chr10" & 
+                   strand(cstest$ctcf) == "+",]
+
+c.n <- cstest$ctcf[seqnames(cstest$ctcf) == "chr10" & 
+                   strand(cstest$ctcf) == "-",]
+
+
+cov.p <- coverage(c.p)
+cov.n <- coverage(c.n)
+v1 <- viewWhichMaxs(slice(cov.p, lower = 8))$chr10
+v2 <- viewWhichMaxs(slice(cov.n, lower = 8))$chr10
+res <- expand.grid(v1, v2)
+wh <- as.numeric(res[order(abs(res[,1] - res[, 2]))[1], ])
+gr.wh <- GRanges("chr10", IRanges(wh[1], wh[2]))
+gr.wh <- resize(gr.wh, width(gr.wh) + 200, fix = "center")
+@ %def 
+
+Then we use \ggbio{} to visualize those short reads first, notice they are
+shorter(width:24) than esitmated fragment lengths(200). That may make one single
+peak looks like two peaks. Here we use \autoplot{} for object
+\Robject{GRanges}. To tell different reads from different strand, we facet and
+filled the rectangles by strands. Figure \ref{fig:reads-close} shows the effect
+of resizing.
+
+Keep in mind, you don't want to viualize all the short reads at once, that's
+going to be crazily slow for NGS data, and it's not useful for exploration. In
+this example, we subset the reads by small region, that will give you quick
+response. For genome-wide visualization, you should try from \autoplot{} for
+\Robject{Rle} or \Robject{RleList} method, which is lots faster and meaningful,
+we will introduce this method soon in this tutorial.
+
+\begin{figure}[!htpb]
+  \centering
+<<reads-close>>=
+library(ggbio)
+ctcf.sub <- subsetByOverlaps(cstest$ctcf, gr.wh)
+p1 <- autoplot(ctcf.sub, aes(fill = strand), facets = strand ~ .)
+ctcf.ext.sub <- subsetByOverlaps(ctcf.ext, gr.wh)
+p2 <- autoplot(ctcf.ext.sub, aes(fill = strand), facets = strand ~ .)
+tracks("original" = p1, "extending" = p2, heights = c(3, 5))
+@ %def   
+\caption{A small region on chromosome 10, each track are faceted by strand. Top
+  track shows short reads of around width 24, and bottom track shows the same
+  data with extending width to 200. The order of short reads are randomly
+  assigned at different levels, so hard to match each reads at exactly the same
+  position. }
+  \label{fig:reads-close}
+\end{figure}
+\clearpage
+
+Maybe reads are not quite easy to perceive the effect of resizing, we use
+statistical transformation ``coverage'' to make better illustration. In Figure
+\ref{fig:coverage-close}, you can clearly see why we need to extending reads to
+get a better estimation of peaks. In this plot, two peaks are about to merge
+together to one single peak. That means most possible, there are only one
+binding site.
+
+\begin{figure}[!htpb]
+  \centering
+<<coverage-close>>=
+ctcf.sub <- subsetByOverlaps(cstest$ctcf, gr.wh)
+p1 <- autoplot(ctcf.sub, aes(fill = strand), facets = strand ~ ., stat = "coverage", 
+               geom = "area")
+ctcf.ext.sub <- subsetByOverlaps(ctcf.ext, gr.wh)
+p2 <- autoplot(ctcf.ext.sub, aes(fill = strand), facets = strand ~ ., 
+               stat = "coverage", geom = "area")
+tracks("original" = p1, "extending" = p2)
+@ %def 
+\caption{A small region on chromosome 10, each track are faceted by strand. Top
+  track shows coverage of short reads of around width 24, and bottom track shows
+  the same data with extending width to 200. Clearly two peaks are tend to merge
+  to one single peak after resizing.}
+  \label{fig:coverage-close}
+\end{figure}
+\clearpage
+
+\subsubsection{Finding islands and genome-wide visualization}
+As mentioned before, to visualize genonme-wide information, short-reads
+visualization is absolutely not recommended, a summary is way much better. We
+can compuate coveage as \Robject{Rle} (Run Length Encode), so we can perform
+efficient summary transformation like finding islands over certain cutoff, or
+bin them and show summary value as heatmap or bar chart.
+
+In the following examples, we tried different visualization method. 
+
+There are three statistical transformation for object \Robject{Rle} and
+\Robject{Rle}:
+\begin{itemize}
+\item \textbf{bin}:(default). Bin the object and compute summary based on
+  summary types mentioned below. \Rfunarg{nbin} controls how many bins you
+  want. geom \textit{heatmap} and \textit{bar}(default) supported.
+\item \textbf{slice}: slice the object based on certain cutoffs to generate
+  islands, use specified summary method to generate values. geom \textit{rect,
+    bar, heatmap} to many other geoms such as \textit{point, line, area} are
+  supported.
+\item \textbf{identity}: raw sequence. Be careful if this object is too long to
+  be visualized!
+\end{itemize}
+
+There are four types of summary method for statistical transformation
+\textbf{bin} and \textbf{slice}
+\begin{itemize}
+\item \textbf{ViewSums:} Sums for each sliced island or bins.
+\item \textbf{ViewMaxs:} Maxs for each sliced island or bins.
+\item \textbf{ViewMeans:} Means for each sliced island or bins.
+\item \textbf{ViewMins:} Mins for each sliced island or bins.
+\end{itemize}
+
+Figure \ref{fig:genome-bin-no-ylim} shows a default track.
+\begin{figure}[!htpb]
+  \centering
+
+<<genome-bin-no-ylim>>=
+library(ggbio)
+p1 <- autoplot(cov.ctcf)
+p2 <- autoplot(cov.gfp)
+tracks(ctcf = p1, gfp = p2)
+@ %def   
+  \caption{Use default statistical transformation "bin" and geom "bar" to
+    represent default smumary ViewSums.}
+  \label{fig:genome-bin-no-ylim}
+\end{figure}
+\clearpage
+
+We may notice it's hard to compare the summary if limits on y are different, we
+have two ways to make them on the same scale. Because tracks by default keep
+original plots' y scale while change and align their x-scale.
+\begin{itemize}
+\item Aggregate all data into one single data and facet by samples.
+\item use ``+'' method to change overall y limits as shown in Figure
+  \ref{fig:genome-bin-ylim}.
+\end{itemize}
+
+\begin{figure}[!htpb]
+  \centering
+<<genome-bin-ylim>>=
+library(ggbio)
+p1 <- autoplot(cov.ctcf)
+p2 <- autoplot(cov.gfp)
+## doesn't work?
+tracks(ctcf = p1, gfp = p2) + coord_cartesian(ylim = c(0, 2e6))
+## work with ylim
+tracks(ctcf = p1, gfp = p2) + ylim(0, 2e6)
+@ %def   
+  \caption{Use default statistical transformation "bin" and geom "bar" to
+    represent default smumary ViewSums, and keep y limits on the same scale.}
+  \label{fig:genome-bin-ylim}
+\end{figure}
+\clearpage
+
+Let's view maxs instead of sums as shown in Figure \ref{fig:genome-bin-maxs}.
+
+\begin{figure}[!htpb]
+  \centering
+<<genome-bin-maxs>>=
+p1 <- autoplot(cov.ctcf, type = "viewMaxs")
+p2 <- autoplot(cov.gfp,type = "viewMaxs")
+tracks(ctcf = p1, gfp = p2) + ylim(c(0, 2e6))
+@ %def   
+  \caption{Use default statistical transformation "bin" and geom "bar" to
+    represent summary ViewMaxs, and keep y limits on the same scale.}
+  \label{fig:genome-bin-maxs}
+\end{figure}
+\clearpage
+
+We can change bin numbers as shown in Figure \ref{fig:genome-bin-100}
+\begin{figure}[!htpb]
+  \centering
+<<genome-bin-100>>=
+p1 <- autoplot(cov.ctcf, type = "viewMaxs", nbin = 100)
+p2 <- autoplot(cov.gfp,type = "viewMaxs", nbin = 100)
+tracks("ctcf" = p1, "gfp" = p2)  + ylim(0, 1e6)
+@ %def   
+\caption{Use default statistical transformation "bin" and geom "bar" to
+  represent summary ViewMaxs, with bin number changed to 100, and keep y limits
+  on the same scale.}
+  \label{fig:genome-bin-100}
+\end{figure}
+\clearpage
+
+Try heatmap as shown in Figure \ref{fig:genome-bin-heat}, When you use tracks
+function to bind plots, please pay attention that, the color scale might be
+different which is critical for your judge. So in the following code, I add some
+add-on control to make sure it's on the same scale.
+
+\begin{figure}[!htpb]
+  \centering
+<<genome-bin-heat>>=
+p1 <- autoplot(cov.ctcf, type = "viewMeans", nbin = 100, geom = "heatmap")
+p2 <- autoplot(cov.gfp,type = "viewMeans", nbin = 100, geom = "heatmap")
+tracks(ctcf = p1, gfp = p2)  + scale_fill_continuous(limits = c(0, 8e05)) + 
+                                 scale_color_continuous(limits = c(0, 8e05))
+@ %def   
+\caption{Use default statistical transformation "bin" and geom "heatmap" to
+  represent summary ViewMaxs, with bin number changed to 100}
+  \label{fig:genome-bin-heat}
+\end{figure}
+\clearpage
+
+Try statistical transformation ``slice'' as shown in Figure
+\ref{fig:genome-slice}, we use an estimated cutoff 8 to define islands.
+
+\begin{figure}[!htpb]
+  \centering
+<<genome-slice>>=
+p1 <- autoplot(cov.ctcf, type = "viewMaxs", stat = "slice", lower = 8)
+p2 <- autoplot(cov.gfp,type = "viewMaxs", stat = "slice", lower = 8)
+tracks(ctcf = p1, gfp = p2) + ylim(0, 15000)
+@ %def   
+\caption{Use default statistical transformation "slice" and geom vertical
+  "segment" to represent summary ViewMaxs, with lower cutoff 8}
+  \label{fig:genome-slice}
+\end{figure}
+\clearpage
+
+Notice in Figure \ref{fig:genome-slice}, chromosome with no data are dropped
+automatically, if you want to keep the chromosomes based on chromosome levels
+you passed, you can use argument \Rfunarg{drop} to control this as shown in
+Figure \ref{fig:genome-slice-drop}
+
+\begin{figure}[!htpb]
+  \centering
+<<genome-slice-drop>>=
+p1 <- autoplot(cov.ctcf, type = "viewMaxs", stat = "slice", lower = 8)
+p2 <- autoplot(cov.gfp,type = "viewMaxs", stat = "slice", lower = 8, drop = FALSE)
+tracks(ctcf = p1, gfp = p2) + ylim(0, 15000)
+@ %def   
+\caption{Use default statistical transformation "slice" and geom vertical
+  "segment" to represent summary ViewMaxs, with lower cutoff 8}
+  \label{fig:genome-slice-drop}
+\end{figure}
+\clearpage
+
+We can use geom ``rect'' to just see the region of island as shown in Figure
+\ref{fig:genome-slice-rect}
+\begin{figure}[!htpb]
+  \centering
+<<genome-slice-rect>>=
+p1 <- autoplot(cov.ctcf, stat = "slice", lower = 5, geom = "rect")
+p2 <- autoplot(cov.gfp, stat = "slice", lower = 5, geom = "rect")
+tracks(ctcf = p1, gfp = p2)
+@ %def   
+\caption{Use default statistical transformation "slice" and geom vertical "rect"
+  to represent island region. Wider rectangle means wider island.}
+  \label{fig:genome-slice-rect}
+\end{figure}
+\clearpage
+
+Finally, let's try geom ``heatmap''.
+
+\ref{fig:genome-slice-rect}
+\begin{figure}[!htpb]
+  \centering
+<<genome-slice-heatmap>>=
+p1 <- autoplot(cov.ctcf, type = "viewMaxs", stat = "slice", lower = 8, geom = "heatmap")
+p2 <- autoplot(cov.gfp,type = "viewMaxs", stat = "slice", lower = 8, geom = "heatmap", 
+               drop = FALSE)
+tracks("ctcf" = p1, "gfp" = p2) + scale_fill_continuous(limits = c(1000, 6000)) + 
+                                 scale_color_continuous(limits = c(1000, 6000))
+@ %def   
+\caption{Use default statistical transformation "slice" and geom vertical "rect"
+  to represent island region. Wider rectangle means wider island.}
+  \label{fig:genome-slice-heatmap}
+\end{figure}
+
+
+
+\subsubsection{Constructing tracks with ideogram and genomic features}
+Most time, we only want to visualize a small region on the genome with
+annotation data to help us understand the biological significance or form
+hypothesis.
+
+In this section, we try to find a region that ..., 
+<<region>>=
+peaks.ctcf <- slice(cov.ctcf, lower = 8)
+peaks.gfp <- slice(cov.gfp, lower = 8)
+## this function is from vignette of chipseq
+peakSummary <- diffPeakSummary(peaks.gfp, peaks.ctcf)
+ peakSummary <-within(peakSummary,
+{
+diffs <- asinh(sums2) - asinh(sums1)
+resids <- (diffs - median(diffs)) / mad(diffs)
+up <- resids > 2
+down <- resids < -2
+change <- ifelse(up, "up", ifelse(down, "down", "flat"))
+})
+ps.down <- peakSummary[peakSummary$change == "down" & peakSummary$space == "chr11", ]
+pk.down <- ps.down[order(ps.down$diffs),]
+pk.down
+## 
+library(TxDb.Mmusculus.UCSC.mm9.knownGene)
+txdb <- TxDb.Mmusculus.UCSC.mm9.knownGene
+tx <- transcripts(txdb)
+gn <- transcriptsBy(txdb, by = "gene")
+fu <- fiveUTRsByTranscript(txdb)
+
+idx <- which(countOverlaps(as(pk.down, "GRanges"), flank(fu, width = 100)) == 1)
+wh.p <- as(pk.down[idx[2], ], "GRanges")
+wh.pw <- resize(wh.p, width = 30000, fix = "center")
+
+@ %def 
+
+
+Since mouse ideogram is not default data in \ggbio{}, you need to get that
+information from UCSC, there is another vignette talking about how to create
+ideogram.
+
+We create this ideogram with zoomed region.
+\begin{figure}[!htpb]
+  \centering
+<<ideogram, fig.height=1.2>>=
+library(biovizBase)
+mm9 <- getIdeogram("mm9")
+cyto.def <- getOption("biovizBase")$cytobandColor
+cyto.new <- c(cyto.def, c(gpos33 = "grey80", gpos66 = "grey60"))
+p.ideo <- plotIdeogram(mm9, "chr10", zoom = c(start(wh.pw),end(wh.pw)))  + 
+  scale_fill_manual(values = cyto.new) 
+print(p.ideo)
+@ %def   
+  \caption{Ideogram for mouse chromosome 10}
+  \label{fig:ideogram}
+\end{figure}
+\clearpage
+
+% 
+<<>>=
+p.gene <- autoplot(txdb, which = wh.pw)
+@ %def 
+
+\begin{figure}[!htpb]
+  \centering
+<<ideo-features>>=
+## coverage
+cstest.s <- stack(cstest)
+cstest.s <- resize(cstest.s, width = 200)
+cstest.sub <- subsetByOverlaps(cstest.s, wh.pw)
+p.cov <- autoplot(cstest.sub, stat = "coverage", facets = sample ~ ., 
+                  geom = "area")
+## ideogram
+tracks(p.ideo, "coverage" = p.cov, "gene" = p.gene, xlim = as(wh.pw, "GRanges"), 
+       heights = c(1, 5, 5))
+@ %def   
+  \caption{Tracks showing one strong peak in cfcf.}
+  \label{fig:tracks}
+\end{figure}
+
+\section{Mismatch summary}
+\subsection{Introduction}
+\Rfunction{stat\_mismatch} is lower level API to read in a bam file and show
+mismatch summary for certain region, counts at each position are summarized,
+those reads which are identical as reference will be either shown as gray
+background or removed, it's controled by argument `show.coverage`, mismatched
+part will be shown as color-coded bar or segment.
+
+Objects supported:
+\begin{itemize}
+\item \Robject{Bamfile}
+\item \Robject{GRanges}. this will pass interval checking which make sure the
+  GRanges has required columns.
+\end{itemize}
+
+\subsection{Usage}
+\subsubsection{Low level API: \Rfunction{stat\_mismatch}}
+Load packages
+<<>>=
+library(ggbio)
+library(BSgenome.Hsapiens.UCSC.hg19)
+data("genesymbol", package = "biovizBase")
+@ %def 
+
+Load example bam file
+
+<<load_bam>>=
+bamfile <- system.file("extdata", "SRR027894subRBM17.bam", package="biovizBase")
+library(Rsamtools)
+bf <- BamFile(bamfile)
+@ %def 
+
+If the object is \Robject{BamFile}, a \Robject{BSgenome} object is required to
+compute the mismatch summary. in the following code,
+\Rfunction{coord\_cartesian} function is a \ggplot{} function which zoom in/out,
+function \Rfunction{theme\_bw} is a customized theme in \ggplot{} which will give
+you a grid and white background.
+\begin{figure}[!htpb]
+  \centering
+
+<<BamFile>>=
+ggplot(bf) + stat_mismatch(which = genesymbol["RBM17"],
+                         bsgenome = Hsapiens,show.coverage = TRUE) +
+  coord_cartesian(xlim = c(6134000, 6135000)) + theme_bw()
+@ %def   
+  \caption{Mismatch summary for gene RBM17. Background is coverage shown as gray
+  color, and only mismatched reads are shown with different color.}
+  \label{fig:bamfile}
+\end{figure}
+
+Sometimes bam file and \Robject{BSgenome} object might have a different naming
+schema for chromosomes, currently, \Rfunction{stat\_mismatch} is not smart enough
+to deal with complicated cases, in this way, you may want to get mismatch
+summary as \Robject{GRanges} yourself and correct the names, with
+\Rfunction{keepSeqlevels} or \Rfunction{renamesSeqleves} functions in package
+\Rpackage{GenomicRanges}. Following examples doesn't show you how to manipulate
+seqnames, but just show you how to compute mismatch summary.  
+
+
+<<pag>>=
+library(biovizBase)
+pgr <- pileupAsGRanges(bamfile, region = genesymbol["RBM17"])
+pgr.match <- pileupGRangesAsVariantTable(pgr, genome = Hsapiens)
+@ %def 
+
+And directly plot the mismatch \Robject{GRanges} object, at the same time hide
+coverage background.
+\begin{figure}[!htpb]
+  \centering
+<<pag_v>>=
+ggplot() + stat_mismatch(pgr.match)
+@ %def   
+  \caption{Mismatch summary without coverage}
+  \label{fig:pag_v1}
+\end{figure}
+
+
+Then we compare geom 'bar' and 'segment', 'bar' is useful when zoomed in to a
+small region.
+\begin{figure}[!htpb]
+  \centering
+<<pag_v2>>=
+p1 <- ggplot() + stat_mismatch(pgr.match, show.coverage = FALSE, geom = "bar") +
+  xlim(6132060,6132120) + ylim(0, 10)
+p2<- ggplot() + stat_mismatch(pgr.match, geom = "segment") +
+  xlim(6132060,6132120) + ylim(0, 10)
+tracks(segment = p2, bar = p1) +scale_x_sequnit('Mb')
+@ %def    
+  \caption{Mismatch summary without coverage}
+  \label{fig:pag_v2}
+\end{figure}
+
+
+\subsubsection{autoplot}
+\autoplot{} for object \Robject{Bamfile} have a statistical transformation
+called \textit{mismatch}, this is a wrapper over lower level function
+\Rfunction{stat\_mismatch}.
+\begin{figure}[!htpb]
+  \centering
+
+<<autoplot>>=
+autoplot(bf, which = genesymbol["RBM17"], 
+         bsgenome = Hsapiens,show.coverage = TRUE, 
+         stat = "mismatch", geom = "bar") +   xlim(6132060,6132120) + ylim(0, 10)
+@ %def   
+  \caption{autoplot API to show the same plot}
+  \label{fig:autoplot}
+\end{figure}
+\end{document}

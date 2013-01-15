@@ -40,6 +40,7 @@ Collate: utils.R
 	 stat_bin-method.R
 	 stat_slice-method.R
 	 stat_reduce-method.R
+	 coord_genome-method.R
 	 autoplot-method.R
 	 hack.R
 	 ideogram.R

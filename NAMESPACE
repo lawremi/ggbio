@@ -125,7 +125,7 @@ exportMethods(layout_karyogram,
 
 
 ## coord
-export(coord_genome)
+exportMethods(coord_genome)
 export(tracks,
        align.plots,
        alignPlots,
@@ -139,7 +139,7 @@ export(tracks,
        plotRangesLinkedToData)
 
 export(theme_null, theme_alignment, theme_clear, theme_tracks_sunset,
-       theme_pack_panels, theme_noexpand)
+       theme_pack_panels, theme_noexpand, theme_genome)
 
 export(ggsave)
  

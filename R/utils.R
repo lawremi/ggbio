@@ -461,12 +461,8 @@ scale_fill_giemsa <- function(fill = getOption("biovizBase")$cytobandColor){
   list(scale_fill_manual(values = fill))
 }
 
-## simply wrapper
-coord_genome <- function(){
-  list(facet_grid(.~seqnames),
-       theme_pack_panels(),
-       scale_x_continuous(breaks = NULL))       
-}
+
+
 
 
 

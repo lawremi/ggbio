@@ -1,8 +1,10 @@
 plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
                             cutoff = NULL, cutoff.color = "red",
                             cutoff.size = 1, legend = FALSE, xlim, ylim, 
-                            xlab,
-                            ylab, main){
+                            xlab, ylab, main,
+                            highlight.name = NULL,
+                            highlight.col = "red",
+                            highlight.label = TRUE){
 
   if(is.null(geom))
     geom <- "point"

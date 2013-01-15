@@ -28,6 +28,7 @@
    have an autoplot method for it. I am not sure if it would always be
    possible/desirable to unify the legends.
    :END:
+** Manhattan plot, with highlighted gene.
 * Statistics
 ** TODO stat_views
 *** TODO generate grouping variable by view intersection
@@ -67,6 +68,7 @@
 ** DONE remove stepping label
    DEADLINE: <2012-07-08 Sun>
 ** TODO resolution to figure out the stepping "buffer"
+** TODO unequal transformation in circular view!
 * Autoplotting
 ** autoplot,Matrix
 *** TODO label by row names and align by column names of matrix
@@ -190,3 +192,4 @@ Position" when method = "raw".
 it is using old scales and labels. And it would be nice to get rid of the "seqs"
 label over the legend. And I'm not sure if we even need the legend when using
 the text geom. It's kind of weird looking.
+

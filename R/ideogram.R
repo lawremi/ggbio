@@ -19,21 +19,23 @@ plotIdeogram <- function(obj, subchr, zoom.region,
   }
   if(length(unique(as.character(seqnames(obj))))>1)
     stop("Mulptiple chromosome information found")
-  if(!isIdeogram(obj))
+  if(!biovizBase:::isIdeogram(obj))
     cytoband <- FALSE
-  p <- ggplot() + layout_karyogram(obj, cytoband = cytoband)
+  p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, geom = NULL)
   p.ideo <- p
   if(!missing(zoom.region)){
     if(length(zoom.region) != 2)
       stop("zoom.region must be a numeric vector of length 2")
     zoom.df <- data.frame(x1 = zoom.region[1],
                           x2 = zoom.region[2],
+                          y1 = 0 - zoom.offset,
+                          y2 = 10 + zoom.offset,
                           seqnames = unique(as.character(seqnames(obj))))
     p <- p + ggplot2::geom_rect(data = zoom.df,
                                 do.call(aes, list(xmin = substitute(x1),
                                                   xmax = substitute(x2),
-                                                  ymin = substitute(0 - zoom.offset),
-                                                  ymax = substitute(10 + zoom.offset))),
+                                                  ymin = substitute(y1),
+                                                  ymax = substitute(y2))),
                                 color = color, fill = fill, size = size,
                                 alpha = alpha)
   }
@@ -75,6 +77,8 @@ plotIdeogram <- function(obj, subchr, zoom.region,
   attr(p, "color") <- color
   attr(p, "fill") <- fill
   attr(p, "alpha") <- alpha
+  attr(p, "size") <- size
+  attr(p, "zoom.offset") <- zoom.offset
   p <- ideogram(p)
   p
 }
@@ -96,15 +100,19 @@ setMethod("+", c("ideogram"), function(e1, e2){
   color <- attr(e1, "color") 
   fill <- attr(e1, "fill")
   alpha <- attr(e1, "alpha")
-  
+  size <- attr(e1, "size")
+  zoom.offset <- attr(e1, "zoom.offset")
   zoom.region <- e2$limits$x
   if(length(zoom.region)){
-    zoom.df <- data.frame(x1 = zoom.region[1],
-                          x2 = zoom.region[2],
-                          seqnames = base::unique(as.character(GenomicRanges::seqnames(obj))))
+    ## zoom.df <- data.frame(x1 = zoom.region[1],
+    ##                       x2 = zoom.region[2],
+    ##                       seqnames = base::unique(as.character(GenomicRanges::seqnames(obj))))
+    ## do.call(plotSingleChrom, list(obj,
+    ##                               ))
     p <- plotSingleChrom(obj, subchr, zoom.region,
                          xlab = xlab, ylab = ylab, main = main, xlabel = xlabel,
                          color = color, fill = fill, alpha = alpha,
+                         size = size, zoom.offset = zoom.offset,
                          cytoband = TRUE, aspect.ratio = aspect.ratio)  
   }else{
     p <- e1

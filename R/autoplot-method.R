@@ -1349,17 +1349,11 @@ setMethod("autoplot", "Views", function(object, ...,
 })
 
 
-setMethod("autoplot", "Seqinfo", function(object, subchr, ... ){
-  if(!missing(subchr))
-    object <- subsetByChrs(object, subchr)
+setMethod("autoplot", "Seqinfo", function(object, ideogram = FALSE, ... ){
   obj <- .transformSeqinfo(object)
-  if(length(obj) > 1)
-    p <- ggplot() + layout_karyogram(obj)
-  if(length(obj) == 1){
-      p <- plotSingleChrom(obj, as.character(seqnames(obj)), ...)
-      suppressWarnings(class(p) <- c("gg",  "ggplot"))
-    }else{
-      p <- ggplot() + layout_karyogram(obj)
+  p <- ggplot() + layout_karyogram(obj, geom = NULL)
+  if(length(obj) == 1 && ideogram){
+      p <- plotIdeogram(obj, as.character(seqnames(obj)), ...)
     }
   p
 })

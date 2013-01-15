@@ -4,7 +4,7 @@ setMethod("layout_karyogram", "GRanges",
           function(data,..., xlab, ylab, main,
                    facets = seqnames ~ .,
                    cytoband = FALSE,
-                   geom = NULL, stat = NULL, ylim = NULL,
+                   geom = "rect", stat = NULL, ylim = NULL,
                    rect.height = 10
                    ) {
               

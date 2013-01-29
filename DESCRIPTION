@@ -1,5 +1,5 @@
 Package: ggbio
-Version: 1.7.12
+Version: 1.7.13
 Title: Visualization tools for genomic data.
 Description: The ggbio package extends and specializes the grammar of graphics for biological data. The graphics are designed to answer common scientific questions, in particular those often asked of high throughput genomics data. All core Bioconductor data structures are supported, where appropriate. The package supports detailed views of particular genomic regions, as well as genome-wide overviews. Supported overviews include ideograms and grand linear views. High-level plots include sequence fragment length, edge-linked interval to data view, mismatch pileup, and several splicing summaries.
 Author: Tengfei Yin, Dianne Cook, Michael Lawrence

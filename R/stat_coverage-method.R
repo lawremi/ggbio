@@ -1,11 +1,6 @@
 ## FIXME: add ..coverage.., and a new way
 setGeneric("stat_coverage", function(data, ...) standardGeneric("stat_coverage"))
 
-## setMethod("stat_coverage", "IRanges", function(data, ...){
-##   fake_gr <- GRanges("null", data)
-##   stat_coverage(fake_gr, ...)
-## })
-
 setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
                                                xlab, ylab, main,
                                                facets = NULL, 
@@ -45,9 +40,12 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
       vals <- vals[[1]][seqs]
       vals <- as.numeric(vals)                           
     }
-    if(geom == "area"){
-      seqs <- c(seqs[1], seqs, seqs[length(seqs)])
-      vals <- c(0, vals, 0)
+    if(geom == "area" | geom == "polygon"){
+      seqs <- c(seqs, rev(seqs))
+      vals <- c(vals, rep(0, length(vals)))
+      ## .df <- data.frame(x = seqs, y = vals)
+      ## qplot(data = .df, x = x, y = y, geom = "polygon")
+
     }
     if(length(unique(values(dt)$.id.name))){                
       res <- data.frame(coverage = vals, seqs = seqs,
@@ -78,10 +76,11 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
     args.aes$x <- as.name("seqs")
 
   aes <- do.call(aes, args.aes)
+  if(geom  == "area" | geom == "polygon")
+    args.non$geom <- "polygon"
   args.res <- c(list(data = res),
                 list(aes),
                 args.non)
-
   p <- do.call(stat_identity, args.res)
 }else{
   p <- NULL

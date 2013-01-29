@@ -77,8 +77,8 @@ opts_chunk$set(eval=FALSE)
 library(knitr)
 opts_chunk$set(fig.path='./figures/ggbio-', 
                fig.align='center', fig.show='asis', 
-               eval = TRUE, fig.width = 5,
-               fig.height = 5)
+               eval = TRUE, fig.width = 4.5,
+               fig.height = 4.5)
 options(replace.assign=TRUE,width=90)
 @
 
@@ -206,11 +206,15 @@ autoplot(gr)
 autoplot(gr, aes(y = value),  geom = "point") + geom_line()
 autoplot(gr, aes(y = value),  geom = "point") + geom_line() + stat_smooth()
 autoplot(gr, aes(y = value),  geom = "point") + stat_smooth()
+## fix me
+## autoplot(gr, aes(y = value)) + stat_aggregate()
+## autoplot(gr, aes(y = value), stat = "aggregate")
 autoplot(gr, layout = "circle")
 seqlengths(gr)
 seqlengths(gr) <- c(400, 500, 1000)
 autoplot(gr, layout = "circle", aes(fill = seqnames))
 autoplot(gr, coord = "genome")
+
 @ %def 
 
 % \Rfunction{ggplot} generic method provides flexible API for constructing
@@ -255,7 +259,7 @@ transformed and stored in the object too. Running \Rfunction{ggplot} function is
 just creating the \textbf{data} layer, no plot will be generated. You have to
 specify statistics and geometry by adding components using \Rcode{+}.
 
-<<>>=
+<<eval = FALSE>>=
 ggplot(gr) + geom_rect()
 ggplot(gr) + geom_rect(aes(fill = value))
 ## for primitive geom from ggplot2, add facet manually for now
@@ -301,7 +305,7 @@ karyogram overview. \Rfunction{layout\_circle} and layout 'circle' in
 vignette about overview and manual for more information.
 
 
-<<>>=
+<<fig.width = 7, fig.height = 4.5>>=
 data(hg19IdeogramCyto, package = "biovizBase")
 data(hg19Ideogram, package = "biovizBase")
 chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
@@ -326,7 +330,6 @@ nms.new <- gsub("chr", "", nms)
 names(nms.new) <- nms
 gr.snp <- renameSeqlevels(gr.snp, nms.new)
 gr.snp <- keepSeqlevels(gr.snp, c(1:22, "X", "Y"))
-gr.snp
 plotGrandLinear(gr.snp, aes(y = pvalue))
 hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X", "Y")))
 autoplot(hg19, layout = "karyogram", cytoband = TRUE)

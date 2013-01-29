@@ -563,3 +563,84 @@ ggsave <- function (filename = default_name(plot), plot = last_plot(),
     print(plot)
     invisible()
 }
+
+## interaction plot
+plotInter <- function(data, fig.h, save = FALSE){
+  data <- data[order(data[, "FDR"]), ]
+  id.inter <- c("Emptyvector.insufficient", "RPA.insufficient", 
+  "Emptyvector.sufficient", "RPA.sufficient", "id" )
+  res.d <- melt(data[, id.inter])
+  id.all <- c("id",  "Emptyvector.sufficient.MAG22", "RPA.sufficient.MAG23",
+              "Emptyvector.sufficient.MAG24", "RPA.sufficient.MAG25",
+              "Emptyvector.sufficient.MAG26", "RPA.sufficient.MAG27",          
+              "Emptyvector.insufficient.MAG28", "RPA.insufficient.MAG29",        
+              "RPA.insufficient.MAG31", "Emptyvector.insufficient.MAG32",
+              "RPA.insufficient.MAG33")
+  res.d2 <- melt(data[, id.all])
+  res.d$fe <- gsub("[a-zA-Z]+\\.","",res.d$variable)
+  res.d$geno <- gsub("\\.[a-zA-Z]+","",res.d$variable)
+  res.d2$fe <- gsub("\\.[a-zA-Z0-9]+", "", gsub("^[a-zA-Z]+\\.","",res.d2$variable))
+  res.d2$geno <- gsub("\\.[a-zA-Z0-9]+","",res.d2$variable)
+  ylim <- c(0, max(res.d2$value) * 1.05)
+  i = 0
+  for(id in data$id){
+    i = i + 1
+    p <- ggplot(data = res.d2[res.d2$id == id, ], 
+                aes(x = fe, shape = geno, color = geno, y= value)) + 
+                  geom_point(size = 3) + 
+                    geom_line(data = res.d[res.d$id == id,], 
+                              aes(x = fe, group = geno, color = geno, y= value)) +
+                      labs(title = id) + xlab("Fe") + ylim(ylim) + 
+                        ylab("log2(normalized counts + 1)")
+    if(save){
+    pval <- signif(data[data$id == id,  "FDR"], 3)
+    fig.path <- paste0(fig.h, "Rank_",i, "_",id,"_p",pval, ".png")    
+    png(fig.path, 450, 450)
+    print(p)
+    dev.off()
+  }else{
+    print(p)
+  }
+  }
+}
+
+plotInter2 <- function(data, fig.h, save = FALSE){
+  id.inter <- c("Emptyvector.insufficient", "RPA.insufficient", 
+  "Emptyvector.sufficient", "RPA.sufficient", "id" )
+  res.d <- melt(data[, id.inter])
+  id.all <- c("id",  "Emptyvector.sufficient.MAG22", "RPA.sufficient.MAG23",
+              "Emptyvector.sufficient.MAG24", "RPA.sufficient.MAG25",
+              "Emptyvector.sufficient.MAG26", "RPA.sufficient.MAG27",          
+              "Emptyvector.insufficient.MAG28", "RPA.insufficient.MAG29",        
+              "RPA.insufficient.MAG31", "Emptyvector.insufficient.MAG32",
+              "RPA.insufficient.MAG33")
+  res.d2 <- melt(data[, id.all])
+  res.d$fe <- gsub("[a-zA-Z]+\\.","",res.d$variable)
+  res.d$geno <- gsub("\\.[a-zA-Z]+","",res.d$variable)
+  res.d2$fe <- gsub("\\.[a-zA-Z0-9]+", "", gsub("^[a-zA-Z]+\\.","",res.d2$variable))
+  res.d2$geno <- gsub("\\.[a-zA-Z0-9]+","",res.d2$variable)
+  ylim <- c(0, max(res.d2$value) * 1.05)
+  i = 0
+  for(id in data$id){
+    i = i + 1
+    p <- ggplot(data = res.d2[res.d2$id == id, ], 
+                aes(x = fe, shape = geno, color = geno, y= value)) + 
+                  geom_point(size = 3) + 
+                    geom_line(data = res.d[res.d$id == id,], 
+                              aes(x = fe, group = geno, color = geno, y= value)) +
+                      labs(title = id) + xlab("Fe") + ylim(ylim) + 
+                        ylab("log2(normalized counts + 1)")
+    if(save){
+    pval <- signif(data[data$id == id,  "FDR"], 3)
+    fig.path <- paste0(fig.h, "Rank_",i, "_",id,"_p",pval, ".png")    
+    png(fig.path, 450, 450)
+    print(p)
+    dev.off()
+  }else{
+    print(p)
+  }
+  }
+}
+
+
+

@@ -71,15 +71,14 @@
   A 'Layer'.
 }
 \examples{
-
 library(ggbio)
-
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
 set.seed(1)
 N <- 1000
 library(GenomicRanges)
+
 gr <- GRanges(seqnames = 
               sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),

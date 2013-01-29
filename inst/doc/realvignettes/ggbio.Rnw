@@ -1,8 +1,8 @@
-% \VignetteIndexEntry{Part 0: Introduction and quick start} 
+% \VignetteIndexEntry{ggbio: visualize genomic data with grammar of graphics.} 
 % \VignetteDepends{} 
 % \VignetteKeywords{visualization utilities} 
 % \VignettePackage{ggbio}
-\documentclass[11pt,a4paper]{article}
+\documentclass[11pt,a4paper]{report}
 % \usepackage{times}
 \usepackage{hyperref}
 \usepackage{verbatim}
@@ -47,6 +47,7 @@ opts_chunk$set(eval=FALSE)
 \newcommand{\knitr}{\Rpackage{knitr}}
 \newcommand{\tracks}{\Rfunction{tracks}}
 \newcommand{\chipseq}{\Rpackage{chipseq}}
+\newcommand{\gr}{\Rclass{GRanges}}
 
 
 % my own frambox
@@ -86,7 +87,11 @@ options(replace.assign=TRUE,width=90)
 options(width=72)
 @
 
-
+\chapter{Quick start}
+\section{Citation}
+<<citation>>=
+citation("ggbio")
+@ %def 
 \section{Introduction}
 The \ggbio{} package extends and specializes the grammar of graphics for
 biological data. The graphics are designed to answer common scientific
@@ -102,22 +107,7 @@ summaries.
 After Bioconductor 2.11, two kind of documentation are provided.
 
 \begin{itemize}
-\item Vignettes knited from sweave files. Vignettes are splited up into small
-  individual documentations, each has different focus. For example, the vignette
-  you are reading now is trying to make a general tutorial for a quick
-  start. Other vignettes includes:
-  \begin{itemize}
-  \item \textbf{Overview}: Introduce circular layout, karyogram layout,
-    Manhattan plot(grand linear layout).
-  \item \textbf{Ideogram}: How to generate ideogram, which could be bind in
-    tracks.
-  \item \textbf{tracks}: How to make tracks for existing graphics and how to
-    reset/backup/modify tracks.
-  \item \textbf{Genomic Features}: How to visualization genomic features based
-    on \Robject{TranscriptDb} object.
-  \item \textbf{Case study}: Case studies for particular usage, e.g mismatch
-    summary and chip-seq data analysis.
-  \end{itemize}
+\item Vignettes knited from sweave files.
 \item Another source is \ggbio{} official websites,
   \url{http://tengfei.github.com/ggbio}, under \textit{documentation} tab, Rd
   help manual is knited to html webpages under manual
@@ -132,7 +122,7 @@ websites\footnote{\url{http://yihui.name/knitr/}}.
 \section{Support}
 As described on-line (\url{http://tengfei.github.com/ggbio/support.html}).
 
-For issue/bug report and questions about usage, you could 
+For issue/bug report and questions about usage, you could
 \begin{itemize}
 \item File a issue/bug report at \url{https://github.com/tengfei/ggbio/issues}, 
 \item Send maintainter an email directly, so that you can attach graphics.
@@ -142,11 +132,9 @@ For issue/bug report and questions about usage, you could
 \section{Installation}
 As described on-line (\url{http://tengfei.github.com/ggbio/download.html}).
 
-\sfbox{
-  \textbf{github} is only used for issue/bugs report and homepage build purpose,
-  developemnt has been stopped and removed from there already. I only use
-  bioconductor to maintain and develop my package.
-}
+\sfbox{ \textbf{github} is only used for issue/bugs report and homepage build
+  purpose, developemnt has been stopped and removed from there already. I only
+  use bioconductor to maintain and develop my package.  }
 
 After R 2.15, R release cycle falls into annual release instead of semi-annual
 release cycle, at the same time, Bioconductor project still follows semi-annual
@@ -165,17 +153,6 @@ source("http://bioconductor.org/biocLite.R")
 biocLite("ggbio")
 @ %def 
 
-After you run the code above, next time if you wish to install something new
-from Bioconductor, you can simply run
-
-
-<<install-release2, eval = FALSE>>=
-library("BiocInstaller")
-biocLite("ggbio")
-@ %def 
-
-
-Or you can check all released bioc packages here.
 
 To install developmental version, run
 
@@ -188,19 +165,17 @@ biocLite("ggbio")
 For developers, you can find latest source code in bioc svn, username and
 password are all "readonly"(without quotes).
 
-\section{Citation}
-<<citation>>=
-citation("ggbio")
-@ %def 
+
 
 \section{Quick start}
-This chapter gives your a very rough overview about the usage of \ggbio{}, but
-not a complete coverage for all contents.
+This chapter will give your a general overview about \ggbio{} and will guide you
+to approperiate chapter as possible as it could be.
+
 
 \autoplot{} is the generic function which support most core \Bioc{} objects, try
-to make different types of graphics for specific object. Please check Chapter
-manual and vignette for \autoplot{} for more information or on-line
-here\url{http://tengfei.github.com/ggbio/docs/man/autoplot-method.html}.
+to make different types of graphics for specific object. Please check
+Chapter\ref{chapter:autoplot} for \autoplot{}.
+
 
 <<warning = FALSE>>=
 library(ggbio)
@@ -224,6 +199,8 @@ gr <- GRanges(seqnames =
 
 autoplot(gr)
 autoplot(gr, stat = "coverage", geom = "area")
+## equal to 
+autoplot(gr, stat = "coverage", geom = "polygon")
 autoplot(gr, aes(y = value),  geom = "point")
 autoplot(gr)
 autoplot(gr, aes(y = value),  geom = "point") + geom_line()
@@ -287,7 +264,6 @@ ggplot(gr, aes(x = midpoint, y = value)) + facet_grid(. ~ seqnames) +  geom_poin
   stat_smooth()
 ggplot(gr) + layout_circle(aes(fill = seqnames), geom = "rect")
 ## slightly different with autoplot api
-ggplot(gr) + geom_rect() + coord_genome()
 ggplot(gr) + stat_aggregate(aes(y = value))
 ggplot(gr) + stat_aggregate(aes(y = value), geom = "boxplot")
 @ %def 
@@ -418,12 +394,1492 @@ Comp & name  & usage & icon\\\hline
 \label{tab:components}
 \end{table}
 
-If you want't to get some instance about using those components, please check
-the on-line manual(\url{http://tengfei.github.com/ggbio/docs/man/index.html}),
-it is provided with graphics help you to understand.
+\chapter{\autoplot{} introduction}\label{chapter:autoplot}
+\chapter{How to make tracks}\label{chapter:tracks}
+\section{Motivation}
+\tracks{} function could be used with \textbf{any other ggplot2 graphics}, not
+just for graphics produced by \ggbio{}.  \ggbio{} depends on \ggplot{} and
+extends it to genomic world, \textbf{so most graphics produced by \ggbio{} is
+  essentially a \ggplot{} object, so you can use any tricks works for \ggplot{}
+  on \ggbio{} graphics.}.
 
 
-\section{Session Information}
+\sfbox{If you want to manipulate graphics from \ggbio{} more freely,
+  documentation on \ggplot{} is a good start, \Rpackage{grid, gtable} packages
+  are necessary knowledge for advanced users. Tracks relies on the new
+  \Rpackage{gtable} package heavily, it has several convenient ways to
+  manipulate the graphic objects.}
+
+
+Track-based view are widely used in almost all genome viewers, it usually stacks
+multiple plots row by row and align them on exactly the same coordinate, which
+in most cases, the genomic coordinates. In this way, we could be able to align
+various annotation data against each other to make comparison. UCSC genome
+browser\footnote{\url{http://genome.ucsc.edu/cgi-bin/hgGateway}} is one of the
+most widely used track-based web genome browser, as shown in Figure
+\ref{fig:ucsc}. There are some other packages in \R{}, that support track-based
+view like UCSC genome browser, such as \Rpackage{Gviz}. 
+
+
+\begin{figure}[h!t!p]
+  \centering
+  \includegraphics[width = 0.8\textwidth]{figures/ucsc.png}
+\end{figure}
+
+
+% \begin{itemize}
+% \item Align each plot in exactly the same X coordinate(genomic coordinate), the
+%   common range is the union of the limits.
+% \item Naming ability for each track, this is different from Y-label, which is
+%   used to illustrate variable used as y.
+% \item Shared ``scale'' track.
+% \item Multiple ways to visualize the data, as points, line, bar chart or
+%   density.etc.
+% \end{itemize}
+
+\ggbio{} is trying to be even more general in terms of building tracks, and
+offer more features.
+
+\begin{itemize}
+\item You can bind any graphics produced by \ggplot{}, not necessarily produced
+  by \ggbio{}, users could construct plots independently, and \Rfunction{tracks}
+  will align them for you.
+\item Utilities for zooming, backup, restore a view. This is useful when you
+  tweak around with your best snapshot, so you can always go back.
+\item An extended \Rcode{+} method. If you are familiar with \ggplot{}'s
+  \Rcode{+} method to edit an existing plot, this is the way it works, if tracks
+  object is adding anything behind with \Rcode{+} , that modification will be
+  applied to each track. This make it easy to tweak with theme and update all
+  the plots.
+% \item You could specify whether you want to label a plot or not by using
+%   \Rfunction{labeled, labeled<-}, and to specify whether you what the plot
+%   x-axis synchronized with other tracks or not by using function
+%   \Rfunction{fixed, fixed<-}.
+\item Modify individual plot, with additional attributes, for example, 'fixed',
+  'mutable', etc . These attributes ONLY reflect when those plots are embeded
+  into tracks function. Table \ref{tab:attr} lists most attributes used.
+\item Creating your own customized themes for not only single plot but also
+  tracks. We will show an example how to create a theme called
+  \Rfunction{theme\_tracks\_subset} in the following sections.
+\end{itemize}
+
+\begin{table}[!htpb]
+  \centering
+  \begin{tabular}{|c|c|}
+    \hline
+    attributes & description \\\hline
+    bgColor & background color \\\hline
+    fixed & fixed x scale or not \\hline
+    labeled & track is labeled on left or not \\\hline
+    mutable & track is mutable to \Rcode{} modification or not \\\hline
+    hasAxis & track has x axis or not \\\hline
+    height & height for track \\\hline
+  \end{tabular}
+  \caption{List of attributes, they all have corresponding replacer function
+    such as Rcode{bgColor() <-}}
+  \label{tab:attr}
+\end{table}
+
+\sfbox{\Rfunction{tracks} function only support graphic objects produced by
+  either \ggplot{} or \ggbio{}. If you want to align plots, produced by other
+  grid based system, like lattice, users need to tweak in grid level, to insert
+  a lattice grob to a layout.}
+
+
+\section{Minimal examples for \tracks{}}
+
+Function \Rfunction{tracks} is a constructor for an object with class
+\Rclass{Tracks}. This object is a container for each plot you are going to
+align, and all the graphic attributes controlling the appearance of tracks.
+
+<<ts>>=
+## load ggbio automatically load ggplot2
+library(ggbio)
+## make a simulated time series data set
+df1 <- data.frame(time = 1:100, score = sin((1:100)/20)*10)
+p1 <- qplot(data = df1, x = time, y = score, geom = "line")
+df2 <- data.frame(time = 30:120, score = sin((30:120)/20)*10, value = rnorm(120-30 + 1))
+p2 <- ggplot(data = df2, aes(x = time, y = score)) + 
+  geom_line() + geom_point(size = 2, aes(color = value))
+@ %def 
+
+\sfbox{When you see \Rfunction{qplot} function, you have to know it's
+  \ggplot{}'s function(means 'quick plot'), since \Bioc{} 2.10, \ggbio{} stop
+  using a confusing generic \Rfunction{qplot} function, instead, we are using a
+  new generic method introduced in \ggplot{}, called \autoplot{}.}
+
+
+% \sfbox{If you don't know how many existing components you could use in pure
+%   \ggplot{} package, please check Hadley's online documentation. Websites is
+%   here \url{http://had.co.nz/ggplot2/}, For \ggbio{} based components, please
+%   read relevant part in this vignettes and visit
+%   \url{http://tengfei.github.com/ggbio/docs} to check documentation. There are
+%   plenty of examples with graphics there.}
+
+
+<<ts-plot, fig.width = 3, fig.height = 3>>=
+p1
+@ %def 
+
+<<ts-plot2, fig.width = 4, fig.height = 3>>=
+p2
+@ %def 
+
+These two plots have different scale on x-axis, but we want to compare those two
+plots and hope to align them on exactly the same x-axis scale, then we could
+make vertical comaprison easily. By default, if you don't pass a name, the
+\tracks{} simply align two plots without two labels. Notice even one plot has a
+legend, that won't affact the alignment.
+
+<<>>=
+tracks(p1, p2)
+@ %def 
+
+
+% We provide some attributes associated with plot, they won't affect the single
+% plot, those attributes will take effect when they are embeded into tracks. Those
+% attributes include
+% \begin{itemize}
+% \item \Rcode{height}: defeault height for this plot.
+% \item \Rcode{bgColor}: background color for this plot.
+% \item \Rcode{labeled}: if you want to show label(and backgrond) for the plot or
+%   not, even through the plot is named.
+% \item \Rcode{fixed}: control if scale of plot is fixed or not.
+% \item \Rcode{mutable}:control if plot is affected by \Rcode{+} method on tracks
+%   or not. 
+% \end{itemize}
+
+% Simply plus \Rcode{xlim, ylim} will apply the change to every track, only if the
+% \Rcode{fixed} attribute is set to \Rcode{TRUE}.
+
+<<ts-xlim, warning = FALSE, fig.height = 4, fig.width = 5>>=
+tracks(time1 = p1, time2 = p2) + xlim(1, 40) + theme_tracks_sunset() 
+@ %def 
+
+Other availalbe zoom in/out methods:
+
+<<eval = FALSE>>=
+library(GenomicRanges)
+gr <- GRanges("chr", IRanges(1, 40))
+# GRanges
+tracks(time1 = p1, time2 = p2) + xlim(gr)
+# IRanges
+tracks(time1 = p1, time2 = p2) + xlim(ranges(gr))
+tks <- tracks(time1 = p1, time2 = p2)
+xlim(tks)
+xlim(tks) <- c(1, 35)
+xlim(tks) <- gr
+xlim(tks) <- ranges(gr)
+@ %def 
+
+Check manual of \tracks{} for other utilities like reset/backup.
+
+\chapter{Visualize single chromosome}
+\section{Introduction}
+\textbf{Single Chromosome Ideogram:} it is widely used in most track-based
+genome browsers, usually on top of all tracks, and use an indicator such as a
+highlighted window to indicate current zoomed region being viewed for different
+data tracks below, in this case, users won't lose too much context when zoomed
+into certain region. 
+
+
+We are going to introduce two types of single chromosome visualization in this
+vignette.
+
+\begin{itemize}
+\item The first one is used to be embedded into tracks as an overview, it's not
+  a simple \Rclass{ggplot} object. Only one highlighted rectangle are allowed to
+  be plotted on top of it. We will focus mostly on this type of visualization in
+  this vignette. In \ggbio{}, this object belongs to a special class called
+  'ideogram', which has several effect which will be introduced later. 
+\item If you want to render more data on single chromosome visualization, you
+  have to use a special case for karyogram overview, which contains only one
+  chromosome, more information about karyogram overview could be found in
+  another vignettes about overview visualization.
+\end{itemize}
+
+% \item \textbf{Karyogram Overview:} could be used to plot one or more than one
+%   chromosomes as an overview for your data, support multiple chromosome or
+%   single chromosome cross multiple samples comparison, please check the examples
+%   in this vignette. This should be used as an individual plot, not to be
+%   embedded into tracks. More important, the returned object is a normal 'ggplot'
+%   object, could be revised easily in anyway.
+% \end{itemize}
+
+
+\section{Single chromosome visualization}
+\subsection{Single chromosome use to be embedded in tracks.}
+\Rfunction{plotIdeogram} is a wrapper function around some functionality in
+package \Rpackage{rtracklayer} to help download cytoband table from UCSC
+automatically and return a graphic object with class 'ideogram'.
+
+\begin{itemize}
+\item If you don't pass genome name, it is going to ask your option from
+  available genomes. NOTE: not all genome has cytoband information, if
+  nocytoband information is available, only seqlengths information will be
+  returned and a message will be printed. When \textit{cytoband} information is
+  available, the arm of chromosomes could be inferred, and plotted as you
+  expected. You could always use \Rfunarg{cytoband} argument to control it.
+\item If argument \Rfunarg{subchr} is not specified, the first chromosomes is
+  going to be used.
+\end{itemize}
+
+<<no-data, eval = FALSE>>=
+p <- plotIdeogram()
+@ %def 
+\begin{verbatim}
+Please specify genome 
+
+  1: hg19       2: hg18       3: hg17       4: hg16       5: felCat4
+  6: felCat3    7: galGal4    8: galGal3    9: galGal2   10: panTro3
+ 11: panTro2   12: panTro1   13: bosTau7   14: bosTau6   15: bosTau4
+ 16: bosTau3   17: bosTau2   18: canFam3   19: canFam2   20: canFam1
+ 21: loxAfr3   22: fr3       23: fr2       24: fr1       25: nomLeu1
+ 26: gorGor3   27: cavPor3   28: equCab2   29: equCab1   30: petMar1
+ 31: anoCar2   32: anoCar1   33: calJac3   34: calJac1   35: oryLat2
+ 36: myoLuc2   37: mm10      38: mm9       39: mm8       40: mm7    
+ 41: hetGla1   42: monDom5   43: monDom4   44: monDom1   45: ponAbe2
+ 46: chrPic1   47: ailMel1   48: susScr2   49: ornAna1   50: oryCun2
+ 51: rn5       52: rn4       53: rn3       54: rheMac2   55: oviAri1
+ 56: gasAcu1   57: echTel1   58: tetNig2   59: tetNig1   60: melGal1
+ 61: macEug2   62: xenTro3   63: xenTro2   64: xenTro1   65: taeGut1
+ 66: danRer7   67: danRer6   68: danRer5   69: danRer4   70: danRer3
+ 71: ci2       72: ci1       73: braFlo1   74: strPur2   75: strPur1
+ 76: apiMel2   77: apiMel1   78: anoGam1   79: droAna2   80: droAna1
+ 81: droEre1   82: droGri1   83: dm3       84: dm2       85: dm1    
+ 86: droMoj2   87: droMoj1   88: droPer1   89: dp3       90: dp2    
+ 91: droSec1   92: droSim1   93: droVir2   94: droVir1   95: droYak2
+ 96: droYak1   97: caePb2    98: caePb1    99: cb3      100: cb1    
+101: ce10     102: ce6      103: ce4      104: ce2      105: caeJap1
+106: caeRem3  107: caeRem2  108: priPac1  109: aplCal1  110: sacCer3
+111: sacCer2  112: sacCer1  
+
+Selection: 
+\end{verbatim}
+
+
+After first plotting, the data is automatically hooked with the graphic object,
+when you do edit and zooming, it will NOT download it anymore, and you can even
+change the view to another chromosomes. That's the special part about object
+with class 'ideogram'.
+
+
+<<ideo-hg19, warning = FALSE, fig.width = 5, fig.height = 2, message = FALSE>>=
+library(ggbio)
+## requrie connection
+p <- plotIdeogram(genome = "hg19")
+p
+p <- plotIdeogram(genome = "hg19", cytoband = FALSE)
+p
+## the data stored with p, won't download again for zooming
+head(attr(p, "ideogram.data"))
+@ %def 
+
+
+\sfbox{ \Rfunarg{aspect.ratio} by default is 1/20, if you set it to
+  \Rcode{NULL}, you have to resize the graphic device manually. You can always
+  set the aspect.ration in theme() function of \ggplot{} by
+  \Rcode{+theme(aspect.ratio = )}}
+
+You can always download the data manualy and save it and use it later, the
+function used called \Rfunction{getIdoegram} in package \Rpackage{biovizBase}.
+Or more flexible relevant function in package \Rpackage{rtracklayer}. The data
+\textit{hg19IdeogramCyto} is a default data of human in \ggbio{}. What if you
+cannot get cytoband information from UCSC, but have the data available in hand?
+You can construct the \Robject{GRanges} object manually, but have to satisfy
+following restriction:
+
+Object have to has elementMeta columns:
+\begin{itemize}
+\item name: start with p or q. to tell the different arms of chromosomes. such
+  as \textbf{p36.22} and \textbf{q12}.
+\item gieStain: dye color of cytoband. such as \textbf{gneg}.
+\end{itemize}
+
+% We say it's a ideogram \Rclass{GRanges} object. It's not a special class, just
+% it could be recongnized by function
+% \Rfunction{plotIdeogram}. \Rfunction{isIdeogram} in package
+% \Rpackage{biovizBase} could be used to check on your data, to see if it contain
+% sufficient information about cytoband and arms or not.
+
+<<load, fig.width = 5, fig.height = 2>>=
+data(hg19IdeogramCyto, package = "biovizBase")
+## data structure
+head(hg19IdeogramCyto)
+plotIdeogram(hg19IdeogramCyto)
+@ %def 
+
+Here comes more special features about the single chromosome 'ideogram' object,
+it all aims to be conventient when it's embeded in tracks. For a normal \ggbio{}
+plot or \ggplot{} plot object, when you set limmits, it zooms in certain
+ranges. But, for an 'ideogram' object, set limits will \textbf{only} add
+highlights rectangle!
+
+You could specify argument \Rfunarg{zoom.region} in \Rfunction{plotIdeogram}
+function, or plus a function \Rfunction{xlim}, it accpets
+\begin{itemize}
+\item nuemric range
+\item IRanges
+\item GRanges object, when it's GRanges object, it will change the chromosome if
+  seqnames is not what it is before.
+\end{itemize}
+
+The highlighted style will be remembered when you zoom use xlim.
+
+<<fig.width = 5, fig.height = 2>>=
+plotIdeogram(hg19IdeogramCyto, "chr1", zoom.region = c(1e7, 5e7))
+## change style of highlighted rectangle
+## p <- plotIdeogram(hg19IdeogramCyto, "chr1") 
+p <- plotIdeogram(hg19IdeogramCyto, "chr1", 
+             zoom.region = c(1e7, 5e7), fill = NA, color = "blue", size = 2, 
+             zoom.offset = 4)
+p
+class(p)
+p + xlim(1e7, 5e7)
+library(GenomicRanges)
+p + xlim(IRanges(5e7, 7e7))
+## change visualized chromosomes
+p + xlim(GRanges("chr2", IRanges(1e7, 5e7)))
+@ %def 
+
+Default ideogram has no X-scale label, to add axis text, you have to specify
+argument \Rfunarg{xlabel} to \Rcode{TRUE}.
+<<ideo-ori-xlabel, fig.width = 5, fig.height = 2>>=
+plotIdeogram(hg19IdeogramCyto, "chr1", xlabel = TRUE)
+@ %def  
+
+Some time, you don't want to visualize a chromosome with cytobands, or you
+cannot find any information about cytobands, in this case, you can simply
+visualize a blank chromosome as overview template. \ggbio{} has several ways to
+do it.
+
+\begin{itemize}
+\item Use argument \Rfunarg{cytoband}. Set it to \Rcode{FALSE}.
+\item Pass a GRanges with no extra column such as \textbf{name, gieStain}. it
+  will automatically parse and estimate the chromosome lengths. It is
+  \textbf{IMPORTANT} that to create an accurate lengths for chromosomes, you
+  need to either make sure the ranges you passed covers all chromosomes or you
+  need to specify the \Rcode{seqlengths} for our \Robject{GRanges} object.
+\item Use autoplot,Seqinfo, when you only pass one chromosomes, it automatically
+  convert it to an 'ideogram'.
+\end{itemize}
+
+When there is no seqlengths, the length is estiamted from the data(cytoband).
+<<ideo-ori-nocyto, fig.width = 5, fig.height = 2>>=
+## there are no seqlengths
+data(hg19IdeogramCyto, package = "biovizBase")
+seqlengths(hg19IdeogramCyto)
+## so directly plot will try to aggregate and estimate lengths of chromosomes, 
+## this is not accurate
+p1 <- plotIdeogram(hg19IdeogramCyto, "chr1", cytoband = FALSE, xlabel = TRUE) 
+p1
+@ %def  
+
+Another default data 'hg19Ideogram' contains seqlengths, more suitable for
+plotting blank overview. Use 'Seqinfo' is convenient way to construct single
+chromosome overview or karyogram overview.
+
+<<>>=
+data(hg19Ideogram, package= "biovizBase")
+autoplot(seqinfo(hg19Ideogram)[paste0("chr", 1:13)])
+@ %def 
+
+Single chromosome visualization by seqinfo, if argument \Rfunarg{ideogram} is
+set to TRUE, the returned object is an 'ideogram' object. By default, it's a
+normal ggplot object, their lookings are different too.
+
+<<hg19-nocyto, fig.width = 5, fig.height = 2>>=
+head(hg19Ideogram)
+library(GenomicRanges)
+## single ideogram
+p <- autoplot(seqinfo(hg19Ideogram)["chr1"])
+p + theme(aspect.ratio = 1/20)
+class(p)
+p <- autoplot(seqinfo(hg19Ideogram)["chr1"], ideogram = TRUE)
+p
+class(p)
+@ %def 
+
+To add more data freely on your single chromosome overview, I can see cases that
+users are familiar with \ggbio{} and \ggplot{} and they hope to
+\begin{itemize}
+\item Tweak with graphics more before embedded in tracks.
+\item Just visualize data on a single chromosome. 
+\end{itemize}
+
+You can 
+\begin{itemize}
+\item Set \Rfunarg{ideogram} to \Rcode{TRUE}, and change class back to ggplot
+  default, then tweak with low level function. 
+\item Default then use \Rfunction{layout\_karyogram}.
+\end{itemize}
+use argument \Rfunarg{ideogram} to set it to \Rcode{FALSE}, then it's
+just a formal ggplot object, and you could manipulate it as usual.
+<<fig.width = 5, fig.height = 2>>=
+## not ideogram, just ggplot object
+p <- autoplot(seqinfo(hg19Ideogram)["chr1"], ideogram = TRUE)
+class(p)
+class(p) <- c("gg", "ggplot")
+gr <- GRanges("chr1", IRanges(start = sample(1:1e8, size = 20), width = 5),
+  seqlengths = seqlengths(hg19Ideogram)["chr1"])
+library(biovizBase)
+p + geom_rect(data = mold(gr), aes(xmin = start, xmax = start, ymin = 0, ymax = 10), 
+              fill = "black", color = "black")
+
+## or default + layout_karyogram
+p <- autoplot(seqinfo(hg19Ideogram)["chr1"]) + layout_karyogram(gr) + theme(aspect.ratio = 1/20)
+p
+@ %def 
+
+
+
+\subsection{Get ideogram or customize the colors}
+We only provide default cytoband ideogram information and trying to cover all
+the cases might be encountered in real world, but what if you want to create
+your ideogram color yourself? To update the cytoband color with complete
+definition, simply replace the pre-defined color set. This will affect all the
+\R{} session.
+
+<<cyto-color, fig.width = 5, fig.height = 2>>=
+optlist <- getOption("biovizBase")
+cyto.new <- rep(c("red", "blue"), length = length(optlist$cytobandColor))
+names(cyto.new) <- names(optlist$cytobandColor)
+head(cyto.new)
+## suppose cyto.new is your new defined color
+optlist$cytobandColor <- cyto.new
+options(biovizBase = optlist)
+## see what happenned...
+plotIdeogram(hg19IdeogramCyto)
+@ %def 
+
+\chapter{Circular view}\label{chapter:circle}
+\section{Introduction}
+Circular view is a special layout in \ggbio{} , this idea has been implemented
+in many different software, for example, the \software{Circos} project.
+
+In this tutorial, we will start from the raw data, if you are already familiar
+with how to process your data into the right format, which here I mean
+\Robject{GRanges},you can jump to \ref{sec:step3} directly.
+
+\section{Tutorial}
+\subsection{Step 1: understand the layout circle}
+We have discussed about the new coordinate "genome" in vignette about Manhattan
+plot before, now this time, it's one step further compared to genome coordinate
+transformation. We specify ring radius \Rfunarg{radius} and track width
+\Rfunarg{trackWidth} to help transform a linear genome coordinate system to a
+circular coordinate system. By using \Rfunction{layout\_circle} function which we
+will introduce later.
+
+Before we visualize our data, we need to have something in mind
+\begin{itemize}
+\item How many tracks we want?
+\item Can they be combined into the same data?
+\item Do I have chromosomes lengths information?
+\item Do I have interesting variables attached as one column?
+\end{itemize}
+
+
+\subsection{Step 2: get your data ready to plot}
+Ok, let's start to process some raw data to the format we want. The data used in
+this study is from this a
+paper\footnote{http://www.nature.com/ng/journal/v43/n10/full/ng.936.html}. In
+this example, We are going to
+\begin{enumerate}
+\item Visualize somatic mutation as segment.
+\item Visualize inter,intro-chromosome rearrangement as links.
+\item Visualize mutation score as point tracks with grid-background.
+\item Add scale and ticks and labels.  
+\item To arrange multiple plots and legend. create multiple sample comparison.
+\end{enumerate}
+
+Notes: don't put too much tracks on it.  
+
+
+I simply put script here to get mutation data as `GRanges` object.
+
+
+<<processing>>=
+crc1 <- system.file("extdata", "crc1-missense.csv", package = "biovizBase")
+crc1 <- read.csv(crc1)
+library(GenomicRanges)
+mut.gr <- with(crc1,GRanges(Chromosome, IRanges(Start_position, End_position),
+                            strand = Strand))
+values(mut.gr) <- subset(crc1, select = -c(Start_position, End_position, Chromosome))
+data("hg19Ideogram", package = "biovizBase")
+seqs <- seqlengths(hg19Ideogram)
+## subset_chr
+chr.sub <- paste("chr", 1:22, sep = "")
+## levels tweak
+seqlevels(mut.gr) <- c(chr.sub, "chrX")
+mut.gr <- keepSeqlevels(mut.gr, chr.sub)
+seqs.sub <- seqs[chr.sub]
+## remove wrong position
+bidx <- end(mut.gr) <= seqs.sub[match(as.character(seqnames(mut.gr)),
+              names(seqs.sub))]
+mut.gr <- mut.gr[which(bidx)]
+## assign_seqlengths
+seqlengths(mut.gr) <- seqs.sub
+## reanme to shorter names
+new.names <- as.character(1:22)
+names(new.names) <- paste("chr", new.names, sep = "")
+new.names
+mut.gr.new <- renameSeqlevels(mut.gr, new.names)
+head(mut.gr.new)
+@ %def 
+
+To get ideogram track, we need to load human hg19 ideogram data, for details
+please check another vignette about getting ideogram.
+
+
+<<ideo>>=
+hg19Ideo <- hg19Ideogram
+hg19Ideo <- keepSeqlevels(hg19Ideogram, chr.sub)
+hg19Ideo <- renameSeqlevels(hg19Ideo, new.names)
+head(hg19Ideo)
+@ %def 
+
+\subsection{Step 3: low level API: \Rfunction{layout\_circle}}\label{sec:step3}
+\Rfunction{layout\_circle} is a lower level API for creating circular plot, it
+accepts \Robject{Granges} object, and users need to specify radius, track width,
+and other aesthetics, it's very flexible. But keep in mind, you \textbf{have to}
+pay attention rules when you make circular plots.
+
+\begin{itemize}
+\item For now, \Rfunction{seqlengths}, \Rfunction{seqlevels} and chromosomes
+  names should be exactly the same, so you have to make sure data on all tracks
+  have this uniform information to make a comparison.
+\item Set arguments \Rfunarg{space.skip} to the same value for all tracks, that
+  matters for transformation, default is the same, so you don't have to change
+  it, unless you want to add/remove space in between.
+\item \Rfunarg{direction} argument should be exactly the same, either
+  "clockwise" or "counterclockwise".
+\item Tweak with your radius and tracks width to get best results.
+\end{itemize}
+
+
+Since low level API leave you as much flexibility as possible, this may looks
+hard to adjust, but it can produce various types of graphics which higher levels
+API like \autoplot{} hardly can, for instance, if you want to overlap multiple
+tracks or fine-tune your layout.
+
+Ok, let's start to add tracks one by one.
+
+First to add a "ideo" track
+<<lower-ideo-track>>=
+library(ggbio)
+p <- ggplot() + layout_circle(hg19Ideo, geom = "ideo", fill = "gray70",
+                              radius = 30, trackWidth = 4)
+@ %def   
+
+Then a "scale" track with ticks
+
+<<lower-scale-track>>=
+p <- p + layout_circle(hg19Ideo, geom = "scale", size = 2, radius = 35, trackWidth = 2)
+p
+@ %def   
+
+Then a "text" track to label chromosomes. *NOTICE*, after genome coordinate
+transformation, original data will be stored in column ".ori", and for mapping,
+just use ".ori" prefix to it. Here we use `.ori.seqnames`, if you use
+`seqnames`, that is going to be just "genome" character.
+
+<<lower-text-track>>=
+p <- p + layout_circle(hg19Ideo, geom = "text", aes(label = seqnames), vjust = 0,
+                       radius = 38, trackWidth = 7)
+p
+@ %def 
+% \clearpage
+
+Then a "rectangle" track to show somatic mutation, this will looks like vertical
+segments. 
+
+<<lower-mut-track>>=
+p <- p + layout_circle(mut.gr, geom = "rect", color = "steelblue",
+                       radius = 23 ,trackWidth = 6)
+p
+@ %def   
+
+Next, we need to add some "links" to show the rearrangement, of course, links
+can be used to map any kind of association between two or more different
+locations to indicate relationships like copies or fusions.
+
+
+<<links>>=
+rearr  <- read.csv(system.file("extdata", "crc-rearrangment.csv", package = "biovizBase"))
+## start position
+gr1 <- with(rearr, GRanges(chr1, IRanges(pos1, width = 1)))
+## end position
+gr2 <- with(rearr, GRanges(chr2, IRanges(pos2, width = 1)))
+## add extra column
+nms <- colnames(rearr)
+.extra.nms <- setdiff(nms, c("chr1", "chr2", "pos1", "pos2"))
+values(gr1) <- rearr[,.extra.nms]
+## remove out-of-limits data
+seqs <- as.character(seqnames(gr1))
+.mx <- seqlengths(hg19Ideo)[seqs]
+idx1 <- start(gr1) > .mx
+seqs <- as.character(seqnames(gr2))
+.mx <- seqlengths(hg19Ideo)[seqs]
+idx2 <- start(gr2) > .mx
+idx <- !idx1 & !idx2
+gr1 <- gr1[idx]
+seqlengths(gr1) <- seqlengths(hg19Ideo)
+gr2 <- gr2[idx]
+seqlengths(gr2) <- seqlengths(hg19Ideo)
+@ %def 
+
+To create a suitable structure to plot, please use another `GRanges` to
+represent the end of the links, and stored as elementMetadata for the "start
+point" `GRanges`. Here we named it as "to.gr" and will be used later.
+ 
+<<link-data>>=
+values(gr1)$to.gr <- gr2
+## rename to gr
+gr <- gr1
+@ %def 
+
+Here we show the flexibility of *ggbio*, for example, if you want to use color
+to indicate your links, make sure you add extra information in the data, used
+for mapping later. Here in this example, we use "intrachromosomal" to label
+rearrangement within the same chromosomes and use "interchromosomal" to label
+rearrangement in different chromosomes.
+ 
+<<rearr>>=
+values(gr)$rearrangements <- ifelse(as.character(seqnames(gr))
+                                    == as.character(seqnames((values(gr)$to.gr))),
+                                    "intrachromosomal", "interchromosomal")
+@ %def 
+
+Get subset of links data for only one sample "CRC1"
+ 
+<<subset-crc-1>>=
+gr.crc1 <- gr[values(gr)$individual == "CRC-1"]
+@ %def 
+
+Ok, add a "point" track with grid background for rearrangement data and map `y`
+to variable "score", map `size` to variable "tumreads", rescale the size to a
+proper size range.
+ 
+<<lower-point-track>>=
+p <- p + layout_circle(gr.crc1, geom = "point", aes(y = score, size = tumreads), color = "red",
+                       radius = 12 ,trackWidth = 10, grid = TRUE) +
+  scale_size(range = c(1, 2.5))
+p
+@ %def 
+
+% \clearpage
+Finally, let's add links and map color to rearrangement types. Remember you need
+to specify `linked.to` to the column that contain end point of the data.
+<<lower-link-track>>=
+p <- p + layout_circle(gr.crc1, geom = "link", linked.to = "to.gr", aes(color = rearrangements),
+                       radius = 10 ,trackWidth = 1)
+p
+@ %def   
+
+\subsection{Step 4: Complex arragnment of plots}
+In this step, we are going to make multiple sample comparison, this may require
+some knowledge about package \Rpackage{grid} and \Rpackage{gridExtra}. We will
+introduce a more easy way to combine your graphics later after this.
+
+We just want 9 single circular plots put together in one page, since we cannot
+keep too many tracks, we only keep ideogram and links. Here is one sample.
+ 
+<<single-arr>>=
+cols <- RColorBrewer::brewer.pal(3, "Set2")[2:1]
+names(cols) <- c("interchromosomal", "intrachromosomal")
+p0 <- ggplot() + layout_circle(gr.crc1, geom = "link", linked.to = "to.gr",
+                              aes(color = rearrangements), radius = 7.1) +
+  layout_circle(hg19Ideo, geom = "ideo", trackWidth = 1.5,
+                color = "gray70", fill = "gray70") +
+  scale_color_manual(values = cols)  
+p0
+@ %def   
+
+
+<<arrangement>>=
+grl <- split(gr, values(gr)$individual)
+## need "unit", load grid
+library(grid)
+lst <- lapply(grl, function(gr.cur){
+  print(unique(as.character(values(gr.cur)$individual)))
+  cols <- RColorBrewer::brewer.pal(3, "Set2")[2:1]
+  names(cols) <- c("interchromosomal", "intrachromosomal")
+  p <- ggplot() + layout_circle(gr.cur, geom = "link", linked.to = "to.gr",
+                         aes(color = rearrangements), radius = 7.1) +
+                           layout_circle(hg19Ideo, geom = "ideo", trackWidth = 1.5,
+                         color = "gray70", fill = "gray70") +
+                           scale_color_manual(values = cols)  + 
+     labs(title = (unique(values(gr.cur)$individual))) +
+       theme(plot.margin = unit(rep(0, 4), "lines"))
+})
+@ %def
+
+We wrap the function in grid level to a more user-friendly high level function,
+called \Rfunction{arrangeGrobByParsingLegend}. You can pass your ggplot2
+graphics to this function , specify the legend you want to keep on the right,
+you can also specify the column/row numbers. Here we assume all plots we have
+passed follows the same color scale and have the same legend, so we only have to
+keep one legend on the right.
+
+ 
+<<simple-wrapper>>=
+arrangeGrobByParsingLegend(lst, widths = c(4, 1), legend.idx = 1, ncol = 2)
+@ %def   
+
+\section{Transform space}
+This is an experimental feature that added after 1.7.12, which transform the
+genome space based on some specified proportions. In \Rfunction{layout\_circle}
+there is a new parameter called \Rfunarg{chr.weight}, which is a vector of
+numeric value and sum of those value should not exceed 1, these value indicates
+proportion of chrommosome space to take in overall space. Names of this vectors
+are chromosomes names, and you can only specify a few of them, other chromosomes
+will take up left space according to their space.
+
+<<fig.height  = 10 >>=
+p1 <- ggplot() + layout_circle(gr.crc1, geom = "link", linked.to = "to.gr",
+                               aes(color = rearrangements), radius = 7.1) +
+  layout_circle(hg19Ideo, geom = "ideo", trackWidth = 1.5,
+                color = "gray70", fill = "gray70") +
+  layout_circle(hg19Ideo, geom = "text", trackWidth = 1.5, radius = 12, aes(label = seqnames))+
+  scale_color_manual(values = cols)  
+.trans <- 0.5
+names(.trans) <- "1"
+p2 <- ggplot() + layout_circle(gr.crc1, geom = "link", linked.to = "to.gr",
+                              aes(color = rearrangements), radius = 7.1, chr.weight = .trans) +
+          layout_circle(hg19Ideo, geom = "ideo", trackWidth = 1.5,
+                color = "gray70", fill = "gray70", chr.weight = .trans) +
+          layout_circle(hg19Ideo, geom = "text", trackWidth = 1.5, 
+                        radius = 12, aes(label = seqnames),
+                chr.weight = .trans)+
+  scale_color_manual(values = cols)  
+library(gridExtra)
+grid.arrange(p1, p2)
+@  
+
+
+\chapter{Manhattan plot}\label{chapter:man}
+\section{Introduction}
+In this tutorial, we introduce a new coordinate system called "genome" for
+genomic data. This transformation is to put all chromosomes on the same genome
+coordinates following specified orders and adding buffers in between.  One may
+think about facet ability based on \textit{seqnames}, it can produce something
+similar to \textit{Manhattan
+  plot}\footnote{http://en.wikipedia.org/wiki/Manhattan}, but the view will not
+be compact. What's more, genome transformation is previous step to form a
+circular view. In this tutorial, we will simulate some SNP data and use this
+special coordinate and a specialized function \Rfunction{plotGrandLinear} to
+make a Manhattan plot.
+
+\textit{Manhattan plot} is just a special use design with this coordinate system.
+
+\section{Understand the new coordinate}
+Let's load some packages and data first
+ 
+<<>>=
+library(ggbio)
+data(hg19IdeogramCyto, package = "biovizBase")
+data(hg19Ideogram, package = "biovizBase")
+library(GenomicRanges)
+@ %def 
+
+
+Make a minimal example `GRanges`, and see what the default coordiante looks
+like, pay attention that, by default, the graphics are faceted by `seqnames` as
+shown in Figure \ref{fig:simul_gr}
+
+<<simul_gr, fig.height = 4, fig.width = 6>>=
+library(biovizBase)
+gr <- GRanges(rep(c("chr1", "chr2"), each = 5),
+              IRanges(start = rep(seq(1, 100, length = 5), times = 2),
+                      width = 50))
+autoplot(gr, aes(fill = seqnames))
+@ %def 
+
+What if we specify the coordinate system to be "genome" in \autoplot{} function,
+there is no faceting anymore, the two plots are merged into one single genome
+space, and properly labeled.
+% There is a limitation on integer in \R{}, so the
+% genome space cannot be too long, to overcome this limitation, a default argument
+% called `maxSize` is defined with this function, if the genome space is over
+% limits, it will rescale everything automatically, function `tranformToGenome`
+% with return a transformed `GRanges` object, with only one single `seqnames`
+% called "genome" and the `seqlengths` of it, is just genome space(with buffering
+% region). arguments called `space.ratio` control the skipped region between
+% chromosomes.
+
+
+<<coord-genome, fig.height = 4, fig.width = 6>>=
+autoplot(gr, coord = "genome", aes(fill = seqnames))
+@ %def   
+
+
+
+The internal transformation are implemented into the function
+\Rfunction{transformToGenome}. And there is some simple way to test if a
+\Robject{GRanges} object is transformed to coordinate "genome" or not
+
+ 
+<<is>>=
+gr.t <- transformToGenome(gr)
+head(gr.t)
+is_coord_genome(gr.t)
+metadata(gr.t)$coord
+@ %def 
+
+
+\section{Step 2: Simulate a SNP data set}
+Let's use the real human genome space to simulate a SNP data set.
+ 
+<<simul_snp>>=
+chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
+seqlths <- seqlengths(hg19Ideogram)[chrs]
+set.seed(1)
+nchr <- length(chrs)
+nsnps <- 100
+gr.snp <- GRanges(rep(chrs,each=nsnps),
+                  IRanges(start =
+                          do.call(c, lapply(chrs, function(chr){
+                            N <- seqlths[chr]
+                            runif(nsnps,1,N)
+                          })), width = 1),
+                  SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
+                  pvalue =  -log10(runif(nchr*nsnps)),
+                  group = sample(c("Normal", "Tumor"), size = nchr*nsnps,
+                    replace = TRUE)
+                  )
+genome(gr.snp) <- "hg19"
+gr.snp
+@ %def 
+
+
+We use the some trick to make a shorter names.
+ 
+<<shorter>>=
+seqlengths(gr.snp)
+nms <- seqnames(seqinfo(gr.snp))
+nms.new <- gsub("chr", "", nms)
+names(nms.new) <- nms
+gr.snp <- renameSeqlevels(gr.snp, nms.new)
+seqlengths(gr.snp)
+@ %def 
+
+
+\section{Step 3: Start to make Manhattan plot by using \autoplot{}}
+wrapped basic functions into \autoplot{}, you can specify the coordinate. Figure
+\ref{fig:unorder} shows what the unordered object looks like.
+
+<<unorder, fig.height = '0.5\\textwidth', fig.height = 4, fig.width = 6>>=
+autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
+@ %def   
+
+
+
+That's probably not what you want, if you want to change to specific order, just
+sort them by hand and use `keepSeqlevels`. Figure \ref{fig:sort} shows a sorted
+plot.
+
+<<sort,fig.height = 4, fig.width = 6>>=
+gr.snp <- keepSeqlevels(gr.snp, c(1:22, "X", "Y"))
+values(gr.snp)$highlight <- FALSE
+idx <- sample(1:length(gr.snp), size = 15)
+values(gr.snp)$highlight[idx] <- TRUE
+values(gr.snp)$id <- 1:length(gr.snp)
+p <- autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
+@ %def 
+
+
+\textbf{NOTICE}: the data now doesn't have information about lengths of each
+chromosomes, this is allowed to be plotted, but it's misleading sometimes,
+without chromosomes lengths information, \ggbio{} use data space to make
+estimated lengths for you, this is not accurate! So let's just assign
+\Rfunction{seqlengths} to the object. Then you will find the data space now is
+distributed proportional to real space as shown in Figure \ref{fig:with-seql}.
+
+<<with_seql, fig.height = 4, fig.width = 6>>=
+names(seqlths) <- gsub("chr", "", names(seqlths))
+seqlengths(gr.snp) <- seqlths[names(seqlengths(gr.snp))]
+## backup
+gr.back <- gr.snp
+autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
+@ %def 
+
+In \autoplot{}, argument \Rfunarg{coord} is just used to transform the data,
+after that, you can use it as common \Robject{GRanges}, all other geom/stat
+works for it. Here just show a simple example for another geom "line" as shown
+in Figure \ref{fig:line}
+
+<<line, fig.height = 4, fig.width = 6>>=
+autoplot(gr.snp, coord = "genome", geom = "line", aes(y = pvalue, group = seqnames,
+                                     color = seqnames))
+@  %def   
+
+
+
+
+\section{Convenient \Rfunction{plotGrandLinear} function}
+In \ggbio{}, sometimes we develop specialized function for certain types of
+plots, it's basically a wrapper over lower level API and \autoplot{}, but more
+convenient to use. Here for \textit{Manhattan plot}, we have a function called
+\Rfunction{plotGrandLinear} used for it. aes(y = ) is required to indicate the y
+value, e.g.  p-value. Figure \ref{fig:plotGl} shows a defalut graphic.
+
+
+
+Color mapping is automatically figured out by *ggbio* following the rules
+\begin{itemize}
+\item if \Rfunarg{color} present in \Rcode{aes()}, like \Rcode{aes(color =
+    seqnames)}, it will assume it's mapping to data column called 'seqnames'.
+\item if \Rfunarg{color} is not wrapped in \Rcode{aes()}, then this function
+  will \textbf{recylcle} them to all chromosomes.
+\item if \Rfunarg{color} is single character representing color, then just use
+  one arbitrary color.
+\end{itemize}
+ 
+Let's test some examples for controling colors.
+<<morecolor1, fig.height = 4, fig.width = 6>>=
+plotGrandLinear(gr.snp, aes(y = pvalue, color = seqnames))
+@ %def   
+
+
+<<morecolor2, fig.height = 4, fig.width = 6>>=
+plotGrandLinear(gr.snp, aes(y = pvalue), color = c("gray0", "gray40"))
+@ %def   
+
+Even more than two colors.
+<<morecolor3, fig.height = 4, fig.width = 6>>=
+plotGrandLinear(gr.snp, aes(y = pvalue), color = c("gray0", "gray40", "gray60")) + 
+  theme_classic() + theme(legend.position = "none")
+@ %def   
+
+For fixed color, and smaller point
+<<morecolor4, fig.height = 4, fig.width = 6>>=
+plotGrandLinear(gr.snp, aes(y = pvalue), color = "darkblue", size = 1.5)
+@ %def   
+
+
+You can also add cutoff line as shown in Figure \ref{fig:cutoff}.
+<<cutoff, fig.height = 4, fig.width = 6>>=
+plotGrandLinear(gr.snp, aes(y = pvalue), cutoff = 3, cutoff.color = "blue", cutoff.size = 1)
+@ %def   
+
+
+This is equivalent to \ggplot{} 's API.
+ 
+<<cutoff-low, eval = FALSE>>=
+plotGrandLinear(gr.snp, aes(y = pvalue)) + geom_hline(yintercept = 3, color = "blue", size = 4)
+@ %def 
+
+Sometimes the names of chromosomes maybe very long, you may want to rotate them, 
+let's make a longer name first
+ 
+<<longer>>=
+## let's make a long name
+nms <- seqnames(seqinfo(gr.snp))
+nms.new <- paste("chr00000", nms, sep = "")
+names(nms.new) <- nms
+gr.snp <- renameSeqlevels(gr.snp, nms.new)
+seqlengths(gr.snp)
+@ %def 
+
+Then rotate it!
+<<rotate, fig.height = 4,fig.width = 6>>=
+plotGrandLinear(gr.snp, aes(y = pvalue)) + theme(axis.text.x=theme_text(angle=-90, hjust=0))
+@ %def   
+
+% \clearpage
+As you can tell from above examples, all utilities works for \ggplot{} will work
+for \ggbio{} too.
+
+
+
+
+\section{Annotating manhattan plot easily}
+You can provide a highlight \gr{}, and each row highlights a set of overlaped
+snps, and labeled by rownames or certain columns, there is more control in the
+function as parameters, with prefix highlight.*, so you could control color,
+label size and color, etc.
+
+<<fig.height = 4, fig.width = 6>>=
+gr.snp <- gr.back
+gro <- GRanges(c("1", "11"), IRanges(c(100, 2e6), width = 5e7))
+names(gro) <- c("id1", "id2")
+plotGrandLinear(gr.snp, aes(y = pvalue), highlight.gr = gro) 
+plotGrandLinear(gr.snp, aes(y = pvalue), highlight.gr = gro) + theme_classic() + 
+  theme(legend.position  = "none")
+@ %def   
+
+\section{Unequal space}
+This is an experimental feature that added after 1.7.12, which transform the
+genome space to some specified proportions. 
+
+In \Rfunction{plotGrandLinear}, there is a new parameter called
+\Rfunarg{chr.weight}, which is a vector of numeric value and sum of those value
+should not exceed 1, these value indicates proportion of chrommosome space to
+take in overall space. Names of this vectors are chromosomes names, and you can
+only specify a few of them, other chromosomes will take up left space according
+to their space.
+
+<<fig.height = 4, fig.width = 6>>=
+.trans <- 0.5
+names(.trans) <- "1"
+plotGrandLinear(gr.snp, aes(y = pvalue), highlight.gr = gro, chr.weight = .trans) + 
+  theme_clear() +  theme(legend.position  = "none")
+@ %def 
+
+\chapter{Karyogram overview}
+\section{Introduction}
+A karyotype is the number and appearance of chromosomes in the nucleus of a
+eukaryotic cell\footnote{http://en.wikipedia.org/wiki/Karyotype}. It's one kind
+of overview when we want to show distribution of certain events on the genome,
+for example, binding sites for certain protein, even compare them acroos samples
+as example shows in this section.
+
+\Robject{GRanges} and \Robject{Seqinfo} object are also an ideal container for
+storing data needed for karyogram plot. Here is the strategy we used for
+generating ideogram templates.
+\begin{itemize}
+\item Althouth \Robject{seqlengths} is not required, it's highly recommended for
+  plotting karyogram. If a \Robject{GRanges} object contains
+  \Robject{seqlengths}, we know exactly how long each chromosome is, and will
+  use this information to plot genome space, particularly we plot all levels
+  included in it, \textbf{NOT JUST} data space.
+\item If a \Robject{GRanges} has no \Robject{seqlengths}, we will issue a
+  warning and try to estimate the chromosome lengths from data included. This is
+  \textbf{NOT} accurate most time, so please pay attention to what you are going
+  to visualize and make sure set \Robject{seqlengths} before hand.
+\end{itemize}
+
+\section{\Rfunction{autoplot}}
+Let's first introduce how to use \autoplot{} to generate karyogram graphic.
+
+The most easy one is to just plot Seqinfo by using \autoplot{}, if your \gr{}
+object has seqinfo with seqlengths information.
+
+<<>>=
+data(hg19Ideogram, package = "biovizBase")
+chrs <- paste0("chr", 1:20)
+p <- autoplot(seqinfo(hg19Ideogram)[chrs])
+p
+@
+
+% Then you could add additional more data(\Rclass{GRanges} object) on this
+% overview, for examle, if you have a set of cytoband information, and
+% \Rfunction{scale\_fill\_giemsa} did the trick to correct the color.
+
+%<<fig = TRUE>>=
+%hg19c <- hg19IdeogramCyto
+%hg19c <- ggbio:::subsetByChrs(hg19c, chrs)
+%seqlevels(hg19c) <- seqlevels(hg19Ideogram)
+%seqlengths(hg19c) <- seqlengths(hg19Ideogram)
+%p + layout_karyogram(hg19c, aes(fill = gieStain))
+%p + layout_karyogram(hg19c, aes(fill = gieStain)) +  scale_fill_giemsa()
+%@ %def 
+
+
+Even more typical karyogram overview with cytoband, this will even show the
+arms, two required columns are required 'name' and 'gieStain'.
+
+<<default, fig.width = 5, fig.height = 4>>=
+data(hg19IdeogramCyto, package = "biovizBase")
+head(hg19IdeogramCyto)
+p <- autoplot(hg19IdeogramCyto, layout = "karyogram", cytoband = TRUE) 
+@ %def   
+
+\sfbox{Your turn: change the order of chromosomes.}
+
+% To understand why we call it kayogram, let's first visualize some cytoband. We
+% use \Rfunarg{layout} argument to specify this special layout "karyogram". And
+% under this layout, \Rfunarg{cytoband} argument is acceptable, default is
+% \Rcode{FALSE}, if set to \Rcode{TRUE}, we assume your have additional
+% information associated with the data, stored in column \Rcode{gieStain}, it will
+% try to fill colors based on this variable according to a pre-set staining
+% colors. You may notice, this data set doesn't contain seqlengths information,
+% but the data space actually cover the real space, so it's not going to be a
+% problem.
+
+% <<default, fig = TRUE>>=
+% data(hg19IdeogramCyto, package = "biovizBase")
+% autoplot(hg19IdeogramCyto, layout = "karyogram", cytoband = TRUE) 
+% @ %def   
+
+% You may want to change the order of chromosomes, \Rfunction{keepSeqlevels} are
+% convenient for this purpose, it's defined in package \Rpackage{GenomicRanges}.
+
+% <<change-order, fig = TRUE>>=
+% hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X", "Y")))
+% head(hg19)
+% autoplot(hg19, layout = "karyogram", cytoband = TRUE)
+% @ %def   
+
+% This \Robject{GRanges} object is special, contains two required colomns, 'name'
+% and 'giestain', in this case, \Rfunarg{cytoband} argument could set to
+% \Rcode{TRUE}, and we draw special ideogram not just rectangles but show
+% \textbf{centromere} as possible.
+
+% If we set it to \Rcode{FALSE}, we treat it as a normal \Robject{GRanges},
+% nothing special with cytoband and arm information. So to show the cytoband, we
+% need to specify which color column variable to fill as cytoband, function
+% \Rfunction{aes} use an unevaluated expression like \Rcode{fill = gieStain},
+% \textit{gieStain} is column name which store cytoband color, notice that we
+% don't use quotes around it, this means it's not something defined globally, but
+% some column name defined in the data. The system will usually automatically
+% assign categorical colors to represent this variable. But instead, cytoband
+% already have some pre-defined colors which mimic the color you observed under
+% microscope. Function \Rfunction{scale\_fill\_giemsa} did this trick to correct
+% the color. If it's first time you observe usage by \Rcode{+}, it's a very
+% popular API in package \ggplot{}\footnote{http://had.co.nz/ggplot2/}, which
+% could add graphics layer by layer or revise a existing graphic.
+% \begin{figure}[!htpb]
+%   \centering
+% <<cyto-normal, fig = TRUE>>=
+% library(GenomicRanges)
+% ## it's a 'ideogram'
+% biovizBase::isIdeogram(hg19)
+% ## set to FALSE
+% autoplot(hg19, layout = "karyogram", cytoband = FALSE, aes(fill = gieStain)) +
+%   scale_fill_giemsa()
+% @ %def   
+% \caption{Cytoband on karyogram layout. We treat it as normal \Robject{GRanges}
+%   data set, so we fill with gieStain color, and use
+%   \Rfunction{scale\_fill\_giemsa} to use customized color. Notice the difference
+%   if it's not a 'ideogram' object. we don't draw centromere particularly.}
+% \label{fig:cytoband-custom}
+% \end{figure}
+% % \clearpage
+
+% Let's try a different data set which is not an 'ideogram', but a normal
+% \Robject{GRanges} object that most people will have, extra data such as
+% statistical values or categorical levels are stored in element data columns used
+% for aesthetics mapping.
+
+We use a default data in package \Rpackage{biovizBase}, which is a subset of RNA
+editing set in human. The data involved in this \Robject{GRanges} is sparse, so
+we cannot simply use it to make karyogram, otherwise, the estimated chromosome
+lengths will be very rough and inaccurate. So what we need to do is:
+
+\begin{enumerate}
+\item Adding seqlegnths to this \Robject{GRanges} object. If you adding
+  seqlengths to object, we have two ways to show chromosome space as karyogram. 
+  \\\Rcode{autoplot(object, layout = 'karyogram')} or 
+  \\\Rcode{autoplot(seqinfo(object))}.
+\item Changing the order of chromosomes.  
+\item Visualize it and map variable to different aesthetics.  
+\end{enumerate}
+
+<<load-RNAediting>>=
+data(darned_hg19_subset500, package = "biovizBase")
+dn <- darned_hg19_subset500
+head(dn)
+## add seqlengths
+## we have seqlegnths information in another data set
+data(hg19Ideogram, package = "biovizBase")
+seqlengths(dn) <- seqlengths(hg19Ideogram)[names(seqlengths(dn))]
+## now we have seqlengths
+head(dn)
+## then we change order
+dn <- keepSeqlevels(dn, paste0("chr", c(1:22, "X")))
+autoplot(dn, layout = "karyogram")
+## this equivalent to 
+## autoplot(seqinfo(dn))
+@ %def   
+
+
+Then we take one step further, the power of \ggplot{} or \ggbio{} is the
+flexible multivariate data mapping ability in graphics, make data exploration
+much more convenient. In the following example, we are trying to map a
+categorical variable 'exReg' to color, this variable is included in the data,
+and have three levels, '3' indicate 3' utr, '5' means 5' utr and 'C' means
+coding region. We have some missing values indicated as \Rcode{NA}, in default,
+it's going to be shown in gray color, and keep in mind, since the basic
+geom(geometric object) is rectangle, and genome space is very large, so change
+both color/fill color of the rectangle to specify both border and filled color
+is necessary to get the data shown as different color, otherwise if the region
+is too small, border color is going to override the fill color.
+
+<<load-RNAediting-color>>=
+## since default is geom rectangle, even though it's looks like segment
+## we still use both fill/color to map colors
+autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg))
+@ %def   
+
+Or you can set the missing value to particular color you want.
+
+Note: NA values is not shown on the legend.
+
+<<load-RNAediting-color-NA>>=
+## since default is geom rectangle, even though it's looks like segment
+## we still use both fill/color to map colors
+autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg)) +
+  scale_color_discrete(na.value = "brown")
+@ %def   
+
+% A test could be performed to demonstrate why 'seqlengths' of object
+% \Robject{GRanges} is important. Let's assume we set wrong chromosome lengths by
+% accident, lengths are all equal to chromosome 1. We arbitrarily set it to the
+% same number so that every chromosome are of equal length. From Figure
+% \ref{fig:exReg-NA-fake}, it's clear that this will affect what we see. So please
+% make sure 
+% \begin{itemize}
+% \item You get data space cover exactly the same chromosome space for each
+%   chromosome. or
+% \item You set the seqlengths to the right number.
+% \end{itemize}
+% Otherwise you will see weird pattern from your results, so actually it's a good
+% way to test your raw data too, if you raw data have something beyond chromosome
+% space, you need to dig into it to see what happened.
+
+
+%<<load-RNAediting-color-fake, fig = TRUE>>=
+%dn2 <- dn
+%seqlengths(dn2) <- rep(max(seqlengths(dn2)), length(seqlengths(dn2)))
+%autoplot(dn2, layout = "karyogram", aes(color = exReg, fill = exReg)) 
+%@ %def   
+
+\section{\Rfunction{plotKaryogram}}
+\Rfunction{plotKaryogram} (or \Rfunction{plotStackedOverview}) are specialized
+function to draw karyogram graphics. It's actually what function \autoplot{}
+calls inside. API is a littler simpler because layout 'karyogram' is default in
+these two functions. So equivalent usage is like
+<<plotKaryogram, eval = FALSE>>=
+plotKaryogram(dn)
+plotKaryogram(dn, aes(color = exReg, fill = exReg))
+@ %def 
+
+
+\section{\Rfunction{layout\_karyogram}}
+In this section, a lower level function \Rfunction{layout\_karyogram} is going
+to be introduced. This is convenient API for constructing karyogram plot and
+adding more data layer by layer. Function \Rfunction{ggplot} is just to create
+blank object to add layer on.
+
+You need to pay attention to 
+\begin{itemize}
+\item when you add plots layer by layer, seqnames of different data must be the
+  same to make sure the data are mapped to the same chromosome. For example, if
+  you name chromosome following schema like \textit{chr1} and use just number
+  \textit{1} to name other data, they will be treated as different chromosomes.
+\item cannot use the same aesthetics mapping multiple time for different
+  data. For example, if you have used aes(color = ), for one data, you cannot
+  use aes(color = ) anymore for mapping variables from other add-on data, this
+  is currently not allowed in \ggplot{}, even though you expect multiple color
+  legend shows up, this is going to confuse people which is which. HOWEVER,
+  \Rfunarg{color} or \Rfunarg{fill} without \Rcode{aes()} wrap around, is
+  allowed for any track, it's set single arbitrary color. This is shown in
+  Figure \ref{fig:low-default-addon}.
+\item Default rectangle y range is [0, 10], so when you add on more data layer
+  by layer on existing graphics, you can use \Rfunarg{ylim} to control how to
+  normalize your data and plot it relative to chromosome space. For example,
+  with default, chromosome space is plotted between y [0, 10], if you use
+  \Rcode{ylim = c(10 , 20)}, you will stack data right above each chromosomes
+  and with equal width. For geom like 'point', which you need to specify 'y'
+  value in \Rcode{aes()}, we will add 5\% margin on top and at bottom of that
+  track.
+\end{itemize}
+
+<<low-default>>=
+## plot ideogram
+p <- ggplot(hg19) + layout_karyogram(cytoband = TRUE)
+p
+## eqevelant autoplot(hg19, layout = "karyogram", cytoband = TRUE)
+@ %def   
+
+<<low-default-addon>>=
+p <- p + layout_karyogram(dn, geom = "rect", ylim = c(11, 21), color = "red")
+## commented line below won't work
+## the cytoband fill color has been used already.
+## p <- p + layout_karyogram(dn, aes(fill = exReg, color = exReg), geom = "rect")
+p
+@ %def   
+
+Then we construct another multiple layer graphics for multiple data using
+different geom, suppose we want to show RNA-editing sites on chromosome space as
+rectangle(looks like segment in graphic) and stack a line for another track
+above.
+
+<<edit-space>>=
+## plot chromosome space
+p <- autoplot(seqinfo(dn))
+## make sure you pass rect as geom
+## otherwise you just get background
+p <- p + layout_karyogram(dn, aes(fill = exReg, color = exReg), geom = "rect")
+values(dn)$pvalue <- rnorm(length(dn))
+p + layout_karyogram(dn, aes(x = start, y = pvalue), 
+                     ylim = c(10, 30), geom = "line", color = "red")
+p
+@ %def 
+\chapter{Visualize genomic features}
+\section{Introduction}
+Transcript-centric annotation is one of the most useful tracks that frequently
+aligned with other data in many genome browsers. In \Bioc{}, you can either
+request data on the fly from UCSC or BioMart, which require internet connection,
+or you can save frequently used annotation data of particular organism, for
+example human genome, as a local data base. Package \Rpackage{GenomicFeatures}
+provides very convenient API for making and manipulating such database. \Bioc{}
+also pre-built some frequently used genome annotation as packages for easy
+installation, for instance, for human genome(hg19), there is a meta data package
+called \Rpackage{TxDb.Hsapiens.UCSC.hg19.knownGene}, after you load this
+package, a \Robject{TranscriptDb} object called
+\Rcode{TxDb.Hsapiens.UCSC.hg19.knownGene} will be visible from your
+workspace. This object contains information like coding regions, exons, introns,
+utrs, transcripts for this genome. If you cannot find the organism you want in
+\Bioc{} meta packages, please refer to the vignette of package
+\Rpackage{GenomicFeatures} to check how to build your own data base manually.
+
+
+\ggbio{} providing visualization utilities based on this specific object, in the
+following tutorial we cover some usage:
+\begin{itemize}
+\item How to plot genomic features for certain region, including coding region, introns,
+  utrs.
+\item How to change geom of introns, how to revise arrow size and density.
+\item How to change aesthetics such as colors.
+\item How to plot single genomic features by make statistical transformation of ``reduce''.
+\item How to revise y label using expression and pattern.
+\item How to change x-scale unit to arbitrary \textit{kb,bp}.
+\item How to use lower level API.
+\end{itemize}
+
+
+\section{Usage}
+\subsection{autoplot}
+\autoplot{} API is higher level API in \ggbio{} which tries to make smart
+decision for object-oriented graphics. Another vignette have more detailed
+introduction to this function.
+
+In this tutorial, we solely focus on visualization of \Robject{TranscriptDb}
+object.
+
+<<>>=
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+## suppose you already know the region you want to visualize
+## or for human genome, you can try following commented code
+## data(genesymbol, package = "biovizBase")
+## genesymbol["ALDOA"]
+aldoa.gr <- GRanges("chr16", IRanges(30064491, 30081734))
+aldoa.gr
+@ %def 
+
+
+<<txdb-full, fig.height = 4.5>>=
+library(ggbio)
+p1 <- autoplot(txdb, which = aldoa.gr)
+p1
+@ %  
+
+You can changing some aesthetics like colors in \autoplot{}, since rectangle is
+defined by 'color' which is border color and 'fill' for filled color.
+
+<<txdb-full-aes, fig.height = 4.5>>=
+library(ggbio)
+p1 <- autoplot(txdb, which = aldoa.gr, fill = "brown", color = "brown")
+p1
+@ %  
+
+\autoplot{} function for object \Robject{TranscriptDb} has two supported
+statistical transformation.
+
+\begin{itemize}
+\item \textbf{identity}: full model, show each transcript, parsing coding region, introns
+  and utrs automatically from the database. intorns are shown as small arrows to
+  indicate the direction, exons are represented as wider rectangles and utrs are
+  represented as narrow rectangles. This transformation is shown in Figure \ref{fig:default}
+\item \textbf{reduce}: reduced model, show single reduced model, which take union of CDS,
+  utrs and re-compute introns, as shown in Figure \ref{fig:reduce}.
+\end{itemize}
+
+
+<<txdb-reduce, fig.height = 1.5>>=
+p2 <- autoplot(txdb, which = aldoa.gr, stat = "reduce")
+print(p2)
+@ %def   
+
+To better understand the behavior of ``reduce'' transformation, we layout these
+two graphics by tracks as shown in Figure \ref{fig:track}. Function
+\Rfunction{Tracks} has been introduced in detail in another vignette.
+
+<<tracks, fig.height = 4.5>>=
+tracks(full = p1, reduced = p2, heights = c(4,1)) + 
+  theme_alignment(grid=FALSE, border = FALSE) 
+@ %def   
+
+
+We allow users to change the way to visualization introns here, it's controlled
+by parameter ``gap.geom'', supported three geoms:
+\begin{itemize}
+\item \textbf{arrow}: with small arrow to indicate the strand direction, extra
+  parameter existing to control the appearance of the arrow, as shown in Figure
+  \ref{fig:gap.geom-up}.
+\textbf{arrow.rate} control how dense the arrows shows
+  in between.
+\item \textbf{chevron}:chevron to show as introns, no strand indication. please
+  check \Rfunction{geom\_chevron}.
+\item \textbf{segment}:segments to show as introns, no strand indication. 
+\end{itemize}
+
+
+The geometric object for ranges, introns and uts are controled by parameters
+\Rfunarg{range.geom, gap.geom, utr.geom}. For example if you want to change the
+geom for gap, just change the \Rfunarg{gap.geom}.
+
+<<change-intron-geom, fig.height = 4.5>>=
+autoplot(txdb, which = aldoa.gr, gap.geom = "chevron")
+@ %def   
+
+<<change-intron-geom-arrow, fig.height = 4.5>>=
+library(grid)
+autoplot(txdb, which = aldoa.gr, arrow.rate = 0.001, length = unit(0.35, "cm"))
+@ %def   
+
+We also allow users to parse y labels from existing column in
+\Robject{TranscriptDb} object.
+
+<<parsing-expression, fig.height = 4.5>>=
+p <- autoplot(txdb, which = aldoa.gr, names.expr = "gene_id:::tx_name")
+p
+@ %def 
+  
+
+
+
+\clearpage
+\Rfunction{scale\_x\_sequnit} is a add-on utility to revise the x-scale, it
+provides three unit
+\begin{itemize}
+\item \textbf{mb}: 1e6bp unit. default for autoplot,TranscriptDb.
+\item \textbf{kb}: 1e3bp unit.
+\item \textbf{bp}: 1bp unit
+\end{itemize}
+it's just post-graphic modification, won't re-load the parsing process. Figure 
+
+
+\begin{figure}[!htpb]
+  \centering
+<<change-unit, fig.height=4.5>>=
+p + scale_x_sequnit("kb")
+@ %de  
+  \caption{change the unit to kb.}
+  \label{fig:change-unit}
+\end{figure}
+
+\subsection{geom\_alignment}
+\Rfunction{stat\_gene} is deprecated, and \Rfunction{geom\_alignment} is the
+lower level API which facilitate construction layer by layer.
+<<stat_gene, eval = FALSE>>=
+p1 <- ggplot() + geom_alignment(txdb, which = aldoa.gr)
+@ %def 
+\chapter{Visualize gtf/gff files}
+\chapter{Visualize bam files}
+\chapter{Visualize matrix-related objects}
+\chapter{Visualize VCF files}
+\chapter{Visualize splicing events}
+\chapter{Miscellaneous}
+\section{Themes}
+\subsection{Plot theme}
+\subsection{Track theme}
+\section{Scales}
+\chapter{Session Information}
+
  
 <<session-info>>=
 sessionInfo()

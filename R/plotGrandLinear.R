@@ -7,7 +7,8 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
                             highlight.col = "red",
                             highlight.label = TRUE,
                             highlight.label.size = 5,
-                            highlight.label.offset = 0.05){
+                            highlight.label.offset = 0.05,
+                            highlight.label.col = "black"){
 
   if(is.null(geom))
     geom <- "point"
@@ -86,7 +87,7 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
       values(gr)$val <- val
       gr
     })
-    .h.pos <- do.call("c", unname(.h.pos))
+    .h.pos <- suppressWarnings(do.call("c", unname(.h.pos)))
     if(is.null(highlight.name)){
       highlight.name <- names(highlight.gr)
     }else{
@@ -95,15 +96,16 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
     p <- p +  geom_point(data = mold(p$.data[queryHits(idx)]),
                  do.call(aes, list(x = substitute(midpoint),
                                    y = as.name(args.aes$y))),
-                 color = highlight.col)
-    
+                         color = highlight.col)
+
     if(!is.null(highlight.name)){
-      seqinfo(.h.pos) <- seqinfo(obj)
+      seqlevels(.h.pos) <- seqlevels(obj)
+      suppressWarnings(seqinfo(.h.pos) <- seqinfo(obj))
       .trans <- transformToGenome(.h.pos, space.skip = space.skip)
       values(.trans)$mean <- (start(.trans) + end(.trans))/2
       values(.trans)$names <- highlight.name
       p <- p + geom_text(data = mold(.trans), size = highlight.label.size,
-                         vjust = 0,
+                         vjust = 0, color = highlight.label.col,
                          do.call(aes, list(x = substitute(mean),
                                            y = as.name("val"),
                                            label = as.name("names"))))

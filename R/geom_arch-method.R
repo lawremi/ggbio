@@ -5,10 +5,12 @@ setMethod("geom_arch", "data.frame", function(data, ...,
 
 
   args <- list(...)
-
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-
+  if("y" %in% names(args.aes))
+    y.name <- as.character(args.aes$y)
+  else
+    y.name <- NULL
   
   ## check required argument
   if(!all(c("x", "xend") %in% names(args.aes)))
@@ -65,6 +67,14 @@ setMethod("geom_arch", "data.frame", function(data, ...,
   if(nrow(apoint)){
     reslst <- c(list(data = apoint), list(aesres),args.non)
     p <- do.call(geom_line, reslst)
+    if("ylab" %in% names(args.non)){
+      ylab <- as.character(args.non$ylab)
+    }else if(length(y.name)){
+      ylab <- y.name
+    }else{
+      ylab <- ""
+    }
+    p <- list(p, ggplot2::ylab(ylab))
   }else{
     p <- NULL
   }

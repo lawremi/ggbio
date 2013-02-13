@@ -78,7 +78,9 @@ library(knitr)
 opts_chunk$set(fig.path='./figures/ggbio-', 
                fig.align='center', fig.show='asis', 
                eval = TRUE, fig.width = 4.5,
-               fig.height = 4.5)
+               fig.height = 4.5,
+               tidy = FALSE,
+               message = FALSE)
 options(replace.assign=TRUE,width=90)
 @
 
@@ -87,7 +89,7 @@ options(replace.assign=TRUE,width=90)
 options(width=72)
 @
 
-\chapter{Quick start}
+\chapter{Getting started}
 \section{Citation}
 <<citation>>=
 citation("ggbio")
@@ -115,18 +117,11 @@ After Bioconductor 2.11, two kind of documentation are provided.
   manual with examples code hybrided with graphics is shown there.
 \end{itemize}
 
-These two documentations are reproducible. For more information about how those
-documentation generated, please visit \knitr{}'s
-websites\footnote{\url{http://yihui.name/knitr/}}.
-
 \section{Support}
-As described on-line (\url{http://tengfei.github.com/ggbio/support.html}).
-
 For issue/bug report and questions about usage, you could
 \begin{itemize}
 \item File a issue/bug report at \url{https://github.com/tengfei/ggbio/issues}, 
-\item Send maintainter an email directly, so that you can attach graphics.
-\item or ask question about \ggbio{} on biocondcutor mailing list.
+\item Ask question about \ggbio{} on biocondcutor mailing list.
 \end{itemize}
 
 \section{Installation}
@@ -162,185 +157,205 @@ useDevel(TRUE)
 biocLite("ggbio")
 @ %def 
 
-For developers, you can find latest source code in bioc svn, username and
-password are all "readonly"(without quotes).
+For developers, you can find latest source code in bioc svn.
+\section{Getting started}
+\subsection{Genesis: everything started from \gr{}}\label{chapter:gr}
+In our model, \gr{} is the core data structure that support most direct
+geom/stat/layout transformation and visualization support, every other data
+structure always converted to \gr{} first inside, and arrange components
+properly to bring some nice default graphics.
 
+\subsection{About \gr{}}
+\gr{} object is a container holding genomic interval data associated with meta
+data information. The power about \ggbio{} is about flexible mapping for all
+those information. 
 
+Here is an example of \gr{} and how to construct it by using constructor
+\Rfunction{GRanges}. We construct a \gr{} object with three chromosomes named
+\textit{chr1, chr2, chr3} and with seqlengths 400, 500, 1000. Pay attention to
+the seqlengths, if you didn't assign any value, these fields will be
+\Rcode{NA}. And these are important information if you want to generate overview
+in genome space context later.
 
-\section{Quick start}
-This chapter will give your a general overview about \ggbio{} and will guide you
-to approperiate chapter as possible as it could be.
-
-
-\autoplot{} is the generic function which support most core \Bioc{} objects, try
-to make different types of graphics for specific object. Please check
-Chapter\ref{chapter:autoplot} for \autoplot{}.
-
-
-<<warning = FALSE>>=
-library(ggbio)
+<<tidy = FALSE>>=
 library(GenomicRanges)
 set.seed(1)
 N <- 100
-
-gr <- GRanges(seqnames = 
-              sample(c("chr1", "chr2", "chr3"),
+gr <- GRanges(seqnames = sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),
-              IRanges(
-                      start = sample(1:300, size = N, replace = TRUE),
+              IRanges(start = sample(1:300, size = N, replace = TRUE),
                       width = sample(70:75, size = N,replace = TRUE)),
-              strand = sample(c("+", "-", "*"), size = N, 
-                replace = TRUE),
+              strand = sample(c("+", "-"), size = N, replace = TRUE),
               value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
               sample = sample(c("Normal", "Tumor"), 
                 size = N, replace = TRUE),
               pair = sample(letters, size = N, 
                 replace = TRUE))
-
-autoplot(gr)
-autoplot(gr, stat = "coverage", geom = "area")
-## equal to 
-autoplot(gr, stat = "coverage", geom = "polygon")
-autoplot(gr, aes(y = value),  geom = "point")
-autoplot(gr)
-autoplot(gr, aes(y = value),  geom = "point") + geom_line()
-autoplot(gr, aes(y = value),  geom = "point") + geom_line() + stat_smooth()
-autoplot(gr, aes(y = value),  geom = "point") + stat_smooth()
-## fix me
-## autoplot(gr, aes(y = value)) + stat_aggregate()
-## autoplot(gr, aes(y = value), stat = "aggregate")
-autoplot(gr, layout = "circle")
-seqlengths(gr)
-seqlengths(gr) <- c(400, 500, 1000)
-autoplot(gr, layout = "circle", aes(fill = seqnames))
-autoplot(gr, coord = "genome")
-
+seqlengths(gr) <- c(400, 1000, 500)
+head(gr)
 @ %def 
 
-% \Rfunction{ggplot} generic method provides flexible API for constructing
-% graphics layer by layer following the grammar of graphics. Actually
-% \autoplot{} method use \Rfunction{ggplot} and other low level utilities to
-% construct customized graphics. Please check Chapter \ref{chapter:ggplot} for
-% more information.
+The first three columns are required information about intervals, including
+seqnames(chromosome names), ranges(interval start and end), strand(direction:*,
++, -).
+
+\sfbox{For more information, please visit vignettes for package
+  \Rpackage{IRanges, GenomicRanges}. Those packages provide awesome
+  computational methods working on interval data, and have lots of convenient
+  accessors, so we won't spend time introducing those tips here.}
+
+\subsection{Visualize \gr{} object}
+\autoplot{} is the generic function which support most core \Bioc{} objects, try
+to make different types of graphics for specific object.
+
+<<warning = FALSE, fig.width = 6>>=
+library(ggbio)
+autoplot(gr)
+@ %def 
+
+To set arbitrary aesthetics, such as color, size, etc.
+<<fig.width = 6>>=
+autoplot(gr, color = "gray40", fill = "skyblue")
+@ %def 
+
+To map variables to certain aesthetics, \textbf{DON'T} forget to use
+\Rcode{aes()} to wrap around the mapping, that's different with \ggplot{}'s
+\qplot{} strategy. For example, if you want to map 'strand' variable to color,
+you have to put the mapping inside \Rcode{aes()} and remember don't use quotes
+around the variable name.
+
+
+<<fig.width = 6>>=
+autoplot(gr, aes(color = strand, fill = strand))
+@ %def 
+
+You could also pass 'facets' argument in \autoplot{}, to split the data based on
+some column factors, use the form 'a ~ b', 'a' indicates the row and 'b'
+indicates the column. 
+
+\sfbox{For implementation reason, if you pass facets inside \autoplot{} that
+  will usually work as expected, if you plus \Rfunction{facet\_grid} and
+  \Rfunction{facet\_wrap} in the end of \autoplot{}, for specific stat that won't
+  work as expected. Because data are calculated split based facet formula and
+  for now won't work in \ggplot{}  evaluation fashion.}
+
+
+<<fig.width = 6>>=
+autoplot(gr, aes(color = strand, fill = strand), facets = strand ~ seqnames) 
+@ %def 
+
+\textit{stat} represents the statistical transformation from original data,
+allow you to plot or map new computed variable in the graphics. Default stat is
+'stepping' which, as you have seen, print all the interval stacked upon each
+other without overlapping, we could try use other different \textit{stat}, to
+specify it in the \autoplot{} function. For example \Rfunction{stat\_coverage}.
+
+<<fig.width = 6>>=
+autoplot(gr, aes(color = strand, fill = strand), facets = strand ~ seqnames, 
+         stat = "coverage")
+@ %def 
+
+Some stats are very useful for summary statistics, for example,
+\Rfunction{stat\_aggregate}.
+
+<<fig.width = 6>>=
+autoplot(gr, stat = "aggregate", aes(y = score))
+autoplot(gr, stat = "aggregate", aes(y = score), geom = "boxplot", window = 50)
+@ %def 
+
+
+\textit{coordinate} is not a new idea, we all familiar with x-y Cartesian
+coordinates. We introduced new 'genome' coordinate in \ggbio{}, that put all
+chromosomes together in a grand linear manner and relabel them only by
+chromosome names.
+
+\textit{layout} is a fairly new idea in \ggbio{} which not exists in \ggplot{},
+it's about how we layout the genome, in a circular fashion or in a karyogram
+fashion.
+
+<<>>=
+autoplot(gr, layout = "circle", aes(fill = seqnames))
+@ %def 
+
+
+<<fig.width = 6>>=
+autoplot(gr, coord = "genome")
+@ %def 
+
+
+
+The power about \autoplot{} is not only for \gr{}, but also for some other core
+\Bioc{} data structures for example, \Rclass{IRanges} object visualization
+strategy is almost identical to \gr{}, except that those plots are not faceted
+by seqnames by default. 
+
+<<>>=
+## For IRanges
+autoplot(ranges(gr))
+## For seqinfo
+@ %def 
+
+
+<<fig.show = "hold", fig.width = 3, fig.height = 3>>=
+autoplot(seqinfo(gr))
+autoplot(gr, layout = "karyogram", aes(fill = score))
+@ %def 
+
+
+\newpage
+Table \ref{tab:auto} shows objects we currently supported and following chapters
+will cover most of those topics.
+
 \begin{table}[htpb]
   \centering
-  \begin{tabular}{|c|c|}
+  \begin{tabular}{|c|c|c|}
     \hline
-    Object& meanings \\\hline
-    GRanges&Genomic interval\\\hline
-    IRanges&numeric interval\\\hline
-    GRangesList&List of genomic interval\\\hline
-    GappedAlignments&NGS data\\\hline
-    BamFiles&Bam files container\\\hline
-    character&Bam files path\\\hline
-    BSgenome&Nucleotide sequence\\\hline
-    Rle&Numeric vector\\\hline
-    RleList&List of numeric vector\\\hline    
-    ExpressionSet&Container for microarray data\\\hline        
-    VCF&Containter for VCF format data\\\hline        
-    matrix& matrix\\\hline            
-    Views& Containter for a set of Views\\\hline            
-    Seqinfo& Information about genomic sequence\\\hline            
-    SummarizedExperiment&eSet-like container\\\hline                
+    Object& meanings& chapter \\\hline
+    GRanges&Genomic interva & \ref{chapter:gr} \\\hline
+    IRanges&numeric interval& \ref{chapter:gr}\\\hline
+    GRangesList&List of genomic interval& \ref{chapter:gr}\\\hline
+    Seqinfo& Information about genomic sequence&\ref{chapter:karyogram}\\\hline
+    GappedAlignments&NGS data&\ref{chapter:bam}\\\hline
+    BamFiles&Bam files container&\ref{chapter:bam}\\\hline
+    character&Bam files path&\ref{chapter:bam} \ref{chapter:gff}\\\hline
+    BSgenome&Nucleotide sequence&\ref{chapter:bsgenome}\\\hline
+    matrix& matrix&\ref{chapter:matrix}\\\hline                
+    Rle&Numeric vector&\ref{chapter:matrix}\\\hline
+    RleList&List of numeric vector&\ref{chapter:matrix}\\\hline    
+    Views& Containter for a set of Views&\ref{chapter:matrix}\\\hline                
+    ExpressionSet&Container for microarray data&\ref{chapter:matrix}\\\hline        
+    SummarizedExperiment&eSet-like container&\ref{chapter:matrix}\\\hline
+    VCF&Containter for VCF format data&\ref{chapter:vcf}\\\hline        
   \end{tabular}
   \caption{Objects that \autoplot{} supported.}
   \label{tab:auto}
 \end{table}
 
-\autoplot{} is the most conventient way to plot something in \ggbio{}, but to
-create more customized graphics or to understand what happened inside
-\autoplot{} function, you may want to create your own graphics layer by layer.
+Thouth \autoplot{} is a very conventient way to plot in \ggbio{}, to create more
+customized graphics or to understand what happened inside \autoplot{} function,
+you may want to create your own graphics layer by layer. In \ggbio{}, generic
+function \Rfunction{ggplot} used to create plots by layers, it supports many
+core data objects defined in \Bioc{}, it takes in the original data, and save it
+in \Rcode{.data} element of the object, you can use \Rcode{obj\$.data} to get
+the original data, and a \Rclass{data.frame} transformed and stored in the
+object too. Running \Rfunction{ggplot} function is just creating the
+\textbf{data} layer, no plot will be generated. You have to specify statistics
+and geometry by adding components using \Rcode{+}.
 
-In \ggbio{}, function \Rfunction{ggplot} used to create plots by layers, it
-supports many core data objects defined in \Bioc{}, it takes in the original
-data, and save it in \Rcode{.data} element of the object, you can use
-\Rcode{obj\$.data} to get the original data, and a \Rclass{data.frame}
-transformed and stored in the object too. Running \Rfunction{ggplot} function is
-just creating the \textbf{data} layer, no plot will be generated. You have to
-specify statistics and geometry by adding components using \Rcode{+}.
-
-<<eval = FALSE>>=
-ggplot(gr) + geom_rect()
-ggplot(gr) + geom_rect(aes(fill = value))
-## for primitive geom from ggplot2, add facet manually for now
-ggplot(gr, aes(x = midpoint, y = value)) + geom_point() + facet_grid(. ~ seqnames)
-ggplot(gr, aes(x = midpoint, y = value)) + facet_grid(. ~ seqnames) +  geom_point() +
-  stat_smooth()
-ggplot(gr) + layout_circle(aes(fill = seqnames), geom = "rect")
-## slightly different with autoplot api
-ggplot(gr) + stat_aggregate(aes(y = value))
-ggplot(gr) + stat_aggregate(aes(y = value), geom = "boxplot")
+For example, we can make some arches.
+<<>>=
+ggplot(gr) + geom_arch(aes(height = value))
 @ %def 
+% 
 
+Besides all components defined in \ggplot{}, we have several newly defined
+components inside \ggbio{}.  Let's take a look at a table about
+stat/geom/layout/coord/scale supported in \ggbio{},
 
-\Rfunction{plotSingleChrom} and \Rfunction{plotIdeogram} provides functionality
-to construct ideogram, \Rfunction{tracks} function provides convenient control
-to bind your individual graphics as tracks, reset/backup/modification is
-allowed. Please check vignette about \textbf{tracks} and \textbf{ideogram} for
-more details.
-
-<<fig.width = 5.5, fig.height = 6>>=
-library(ggbio)
-## require internet connection
-p.ideo <- plotIdeogram(genome = "hg19")
-library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
-wh <- GRanges("chr16", IRanges(30064491, 30081734))
-p1 <- autoplot(txdb, which = wh, names.expr = "gene_id")
-p2 <- autoplot(txdb, which = wh, stat = "reduce", color = "brown", 
-               fill = "brown")
-tracks(p.ideo, full = p1, reduce = p2, heights = c(1.5, 5, 1)) + 
-  ylab("") + theme_tracks_sunset()
-@ %def 
-
-
-Overview is useful to show general trends cross all the chomosomes, for example,
-Manhattan plots are used to show SNP, circular view could be used to show
-chromosome rearrangement, kayrogram plot could be used to show clusterred events
-or observe distribution of haplotypes.  In \ggbio{}, \Rfunction{plotGrandLinear}
-is used to plot the whole genome Manhattan plot.  Function
-\Rfunction{layout\_karyogram} and layout 'karyogram' in \autoplot{} to plot the
-karyogram overview. \Rfunction{layout\_circle} and layout 'circle' in
-\autoplot{} to plot the \Rclass{GRanges} in circular layout.  Please check
-vignette about overview and manual for more information.
-
-
-<<fig.width = 7, fig.height = 4.5>>=
-data(hg19IdeogramCyto, package = "biovizBase")
-data(hg19Ideogram, package = "biovizBase")
-chrs <- as.character(levels(seqnames(hg19IdeogramCyto)))
-seqlths <- seqlengths(hg19Ideogram)[chrs]
-set.seed(1)
-nchr <- length(chrs)
-nsnps <- 100
-gr.snp <- GRanges(rep(chrs,each=nsnps),
-                  IRanges(start =
-                          do.call(c, lapply(chrs, function(chr){
-                            N <- seqlths[chr]
-                            runif(nsnps,1,N)
-                          })), width = 1),
-                  SNP=sapply(1:(nchr*nsnps), function(x) paste("rs",x,sep='')),
-                  pvalue =  -log10(runif(nchr*nsnps)),
-                  group = sample(c("Normal", "Tumor"), size = nchr*nsnps,
-                    replace = TRUE)
-                  )
-genome(gr.snp) <- "hg19"
-nms <- seqnames(seqinfo(gr.snp))
-nms.new <- gsub("chr", "", nms)
-names(nms.new) <- nms
-gr.snp <- renameSeqlevels(gr.snp, nms.new)
-gr.snp <- keepSeqlevels(gr.snp, c(1:22, "X", "Y"))
-plotGrandLinear(gr.snp, aes(y = pvalue))
-hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X", "Y")))
-autoplot(hg19, layout = "karyogram", cytoband = TRUE)
-@ %def 
-
-
-Let's take a look at a table about stat/geom/layout/coord/scale supported in
-\ggbio{}, Please notice the difference between \ggplot{} and \ggbio{}, in
-\ggbio{}, those components are also generic method. So many of them works for
-not only \Rclass{GRanges} object, but some other objects too.
-
+\sfbox{A good source for understanding the low level components is to read the
+  on-line manual, they all parsed from example section from the Rd file. For
+  \ggplot{}, it on \url{http://docs.ggplot2.org/current/}, for \ggbio{} it's on
+  \url{http://www.tengfei.name/ggbio/docs/man/}.}
 
 \begin{table}[h!t!b!p]
 \begin{center}
@@ -397,7 +412,112 @@ Comp & name  & usage & icon\\\hline
 \label{tab:components}
 \end{table}
 
-\chapter{\autoplot{} introduction}\label{chapter:autoplot}
+
+\Rfunction{plotIdeogram}(or \Rfunction{plotSingleChrom}) provides functionality
+to construct ideogram. \Rfunction{tracks} function provides convenient control
+to bind your individual graphics as tracks, reset/backup/modification is
+allowed.
+
+<<fig.width = 5.5, fig.height = 6>>=
+library(ggbio)
+## require internet connection
+p.ideo <- plotIdeogram(genome = "hg19")
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+wh <- GRanges("chr16", IRanges(30064491, 30081734))
+p1 <- autoplot(txdb, which = wh, names.expr = "gene_id")
+p2 <- autoplot(txdb, which = wh, stat = "reduce", color = "brown", 
+               fill = "brown")
+tracks(p.ideo, full = p1, reduce = p2, heights = c(1.5, 5, 1)) + 
+  ylab("") + theme_tracks_sunset()
+@ %def 
+
+
+Manhattan plots are used to show SNP, circular view could be used to show
+chromosome rearrangement, kayrogram plot could be used to show clusterred events
+or observe distribution of haplotypes.  In \ggbio{}, \Rfunction{plotGrandLinear}
+is used to plot the whole genome Manhattan plot.  Function
+\Rfunction{layout\_karyogram} and layout 'karyogram' in \autoplot{} to plot the
+karyogram overview. \Rfunction{layout\_circle} and layout 'circle' in
+\autoplot{} to plot the \Rclass{GRanges} in circular layout.
+
+If you are interested in how to visualize your data in circular layout like
+something shown in Figure \ref{fig:cir}, please go to chapter \ref{chapter:circle}
+\begin{figure}[h!t!p!b]
+  \centering
+\includegraphics[width = 0.45\textwidth]{figures/cir-single.pdf}
+\includegraphics[width = 0.45\textwidth]{figures/circular-9-circle.pdf}
+\label{fig:cir}
+\end{figure}
+
+If you are interested in how to make manhattan plot like something shown in
+Figure \ref{fig:man}, please go to chapter \ref{chapter:man}
+\begin{figure}[h!t!p!b]
+  \centering
+\includegraphics[width = 0.8\textwidth, height = 0.4\textwidth]{figures/Manhattan-plotGrandLinear.pdf}
+\label{fig:man}
+\end{figure}
+
+If you are interested in how to visualize your data in karyogram layout like
+something shown in Figure \ref{fig:kary}, please go to chapter
+\ref{chapter:karyogram}
+\begin{figure}[h!t!p!b]
+  \centering
+\includegraphics[width = 0.45\textwidth]{figures/karyogram.pdf}
+\label{fig:kary}
+\end{figure}
+
+% If you are interested in how to make ranges linked view like something shown in
+% Figure \ref{fig:link}, please go to chapter \ref{chapter:link}
+% \begin{figure}[h!t!p!b]
+%   \centering
+% \includegraphics[width = 0.45\textwidth]{figures/karyogram.pdf}
+% \label{fig:link}
+% \end{figure}
+
+
+For someother things like how to change theme and scales, please check chapter \ref{chapter:misc}.
+%% \chapter{\autoplot{} introduction}\label{chapter:autoplot}
+
+\chapter{Visaulize gff-like files}\label{chapter:gff}
+For some historical reason, there are lots of different but very similar format
+out there to store interval data and meta data, for example, bed, gff, gtf,
+etc. Bioconductor provide very nice abstract for all kinds of widely used
+biological files. \gr{} is one of them. With the help of pacakge
+\Rpackage{rtracklayer}, we can easily import files like \textit{gff, bed} into
+\R{} sesseion. For example
+
+<<eval = FALSE>>=
+## fix annotation automatically
+library(rtracklayer)
+fl <- "~/Softwares/genome_browser/data/wgEncodeCshlLongRnaSeqHmecCellPamGeneDeNovoV2.gff"
+gr <- import(, asRangedData = FALSE)
+library(ggbio)
+## fix me
+autoplot(gr[seqnames(gr) == "chr1"], geom = "bar")
+autoplot(gr[seqnames(gr) == "chr1"], geom = "bar", color = "black", aes(y = log(score)))
+autoplot()
+@ %def 
+
+\chapter{Visualize bam files}\label{chapter:bam}
+<<eval = FALSE>>=
+fl <- "~/Datas/seqs/ENCODE/cshl/wgEncodeCshlLongRnaSeqGm12878CellPapAlnRep1.bam"
+autoplot(fl)
+p <- autoplot(fl, which = c(paste0("chr", 1:12)))
+p + facet_wrap(~seqnames)
+data(genesymbol, package = "biovizBase")
+
+autoplot(fl, which = genesymbol["BRCA1"], method = "raw")
+autoplot(fl, which = genesymbol["BRCA1"], method = "raw", geom = "area")
+
+## fix me
+autoplot(fl, which = genesymbol["BRCA1"], method = "raw", geom = "rect")
+## fix me
+autoplot(fl, which = genesymbol["BRCA1"], method = "raw", stat = "stepping")
+autoplot(fl, which = genesymbol["BRCA1"], method = "raw", geom = "gapped.pair")
+@ %def 
+
+
 \chapter{How to make tracks}\label{chapter:tracks}
 \section{Motivation}
 \tracks{} function could be used with \textbf{any other ggplot2 graphics}, not
@@ -577,7 +697,7 @@ xlim(tks) <- ranges(gr)
 
 Check manual of \tracks{} for other utilities like reset/backup.
 
-\chapter{Visualize single chromosome}
+\chapter{Visualize single chromosome}\label{chapter:single}
 \section{Introduction}
 \textbf{Single Chromosome Ideogram:} it is widely used in most track-based
 genome browsers, usually on top of all tracks, and use an indicator such as a
@@ -1429,7 +1549,7 @@ plotGrandLinear(gr.snp, aes(y = pvalue), highlight.gr = gro, chr.weight = .trans
   theme_clear() +  theme(legend.position  = "none")
 @ %def 
 
-\chapter{Karyogram overview}
+\chapter{Karyogram overview}\label{chapter:karyogram}
 \section{Introduction}
 A karyotype is the number and appearance of chromosomes in the nucleus of a
 eukaryotic cell\footnote{http://en.wikipedia.org/wiki/Karyotype}. It's one kind
@@ -1710,7 +1830,8 @@ p + layout_karyogram(dn, aes(x = start, y = pvalue),
                      ylim = c(10, 30), geom = "line", color = "red")
 p
 @ %def 
-\chapter{Visualize genomic features}
+
+\chapter{Visualize genomic features}\label{chapter:txdb}
 \section{Introduction}
 Transcript-centric annotation is one of the most useful tracks that frequently
 aligned with other data in many genome browsers. In \Bioc{}, you can either
@@ -1871,12 +1992,13 @@ lower level API which facilitate construction layer by layer.
 <<stat_gene, eval = FALSE>>=
 p1 <- ggplot() + geom_alignment(txdb, which = aldoa.gr)
 @ %def 
-\chapter{Visualize gtf/gff files}
-\chapter{Visualize bam files}
-\chapter{Visualize matrix-related objects}
-\chapter{Visualize VCF files}
-\chapter{Visualize splicing events}
-\chapter{Miscellaneous}
+
+\chapter{Visualize sequence}\label{chapter:bsgenome}
+\chapter{Visualize matrix-related objects}\label{chapter:matrix}
+\chapter{Visualize VCF files}\label{chapter:vcf}
+% \chapter{Ranges-linked-to-data files}\label{chapter:link}
+\chapter{Visualize splicing events}\label{chapter:splice}
+\chapter{Miscellaneous}\label{chapter:misc}
 \section{Themes}
 \subsection{Plot theme}
 \subsection{Track theme}

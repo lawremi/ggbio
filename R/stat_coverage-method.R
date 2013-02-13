@@ -8,7 +8,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
 
 
   if(is.null(geom))
-    geom <- "line"
+    geom <- "area"
   data <- keepSeqlevels(data, unique(as.character(seqnames(data))))
   args <- list(...)
   args$facets <- facets

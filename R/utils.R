@@ -69,8 +69,10 @@ getLimits <- function(obj){
 getLimitsFromScales <- function(obj){
   scal <- obj$scales$scales
   lst <- lapply(scal, function(x){
+    x <- scal[[1]]
     if(!is.null(x$limits)){
       limits <- x$limits
+      res <- NULL
     if(any(x$aesthetics %in% c("x", "xmin", "xmax", "xend", "xintercept",
                                "xmin_final", "xmax_final"))){
       res <- data.frame(xmin = limits[1],
@@ -78,6 +80,7 @@ getLimitsFromScales <- function(obj){
                         ymin = NA,
                         ymax = NA)
     }
+
       if(any(x$aesthetics %in% c("y", "ymin", "ymax", "yend",
                                  "yintercept", "ymin_final", "ymax_final"))){
       res <- data.frame(ymin = limits[1],
@@ -85,6 +88,7 @@ getLimitsFromScales <- function(obj){
                         xmin = NA,
                         xmax = NA)
       }
+
   }else{
     res <- NULL
   }

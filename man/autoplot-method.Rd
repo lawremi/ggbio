@@ -35,9 +35,10 @@
 \usage{
 \S4method{autoplot}{GRanges}(object, ..., chr, xlab, ylab, main, truncate.gaps = FALSE,
                  truncate.fun = NULL, ratio = 0.0025, space.skip = 0.1,
-                 legend = TRUE, geom = NULL, stat = NULL, coord =
-                 c("default", "genome", "truncate_gaps"), layout =
-                 c("linear", "karyogram", "circle"))
+                 legend = TRUE, geom = NULL, stat = NULL,
+                 chr.weight = NULL,
+                 coord = c("default", "genome", "truncate_gaps"),
+                 layout = c("linear", "karyogram", "circle"))
 
 
 \S4method{autoplot}{GRangesList}(object, ..., xlab, ylab, main, indName = "grl_name",
@@ -48,7 +49,7 @@
 
 \S4method{autoplot}{IRanges}(object, ..., xlab, ylab, main)
 
-\S4method{autoplot}{Seqinfo}(object, chr, ... )
+\S4method{autoplot}{Seqinfo}(object, ideogram = FALSE, ... )
 
 \S4method{autoplot}{GappedAlignments}(object, ..., xlab, ylab, main, which,
       geom = NULL, stat = NULL)
@@ -113,10 +114,9 @@
   \item{object}{
     object to be plot.
   }
-  \item{chr}{
-    characters indicate chromosome names, used to subset the object by
-  chromosomes, this will reduce both the data  and the levels of
-  seqnames. 
+  \item{ideogram}{
+    Weather to call \code{plotIdeogram} or not, default is \code{FALSE},
+  if \code{TRUE}, \code{layout_karyogram} will be called.
   }
   \item{transpose}{
     logical value, defaut TRUE, always make features from VCF as x, so
@@ -179,6 +179,14 @@
   \item{coord}{
     Coodinate system.
   }
+  \item{chr.weight}{
+    numeric vectors which sum to <1, the names of vectors has to be
+  matched with seqnames in seqinfo, and you can only specify part of the
+  seqnames, other lengths of chromosomes will be assined proportionally
+  to their seqlengths, for example, you could specify chr1 to be 0.5, so
+  the chr1 will take half of the space and other chromosomes squeezed to
+  take left of the space. 
+  }  
   \item{legend}{
     A logical value indicates whether to show legend or not. Default is
     \code{TRUE}
@@ -287,9 +295,8 @@
   \item{ref.show}{
     logical value. If TRUE, show REF in VCF at bottom track.
   }
-  \item{single.ideo}{
-    for object 'Seqinfo', if length of object is 1, then this control
-    whether to use \code{plotSingleChrom} or \code{layout_karyogram}.
+  \item{chr}{
+    characters indicates the seqnames to be subseted.
   }
 }
 \value{

@@ -125,7 +125,7 @@ exportMethods(layout_karyogram,
 
 
 ## coord
-exportMethods(coord_genome)
+## exportMethods(coord_genome)
 export(tracks,
        align.plots,
        alignPlots,

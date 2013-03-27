@@ -17,7 +17,7 @@
                  ylim = NULL, 
                  scale.n = 60, scale.unit = NULL, scale.type = c("M",
                  "B", "sci"), grid.n = 5, grid.background = "gray70",
-                 grid.line = "white", grid = FALSE)
+                 grid.line = "white", grid = FALSE, chr.weight = NULL)
 
 \S4method{layout_circle}{missing}(data, ...)
 }
@@ -84,6 +84,15 @@
   \item{grid.line}{
     grid line color.
   }
+  \item{chr.weight}{
+    numeric vectors which sum to <1, the names of vectors has to be
+  matched with seqnames in seqinfo, and you can only specify part of the
+  seqnames, other lengths of chromosomes will be assined proportionally
+  to their seqlengths, for example, you could specify chr1 to be 0.5, so
+  the chr1 will take half of the space and other chromosomes squeezed to
+  take left of the space. 
+  }  
+  
 }
 \value{
   A 'Layer'.

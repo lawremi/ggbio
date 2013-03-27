@@ -13,7 +13,12 @@ association they are.
 \usage{
 plotGrandLinear(obj, ..., facets, space.skip = 0.01, geom = NULL,
                  cutoff = NULL, cutoff.color = "red", cutoff.size = 1,
-                 legend = FALSE, xlim, ylim, xlab, ylab, main)
+                 legend = FALSE, xlim, ylim, xlab, ylab, main,
+                 highlight.gr = NULL, highlight.name = NULL,
+                 highlight.col = "red", highlight.label = TRUE,
+                 highlight.label.size = 5, highlight.label.offset =
+                 0.05, highlight.label.col = "black")
+
 }
 \arguments{
   \item{obj}{
@@ -60,6 +65,30 @@ plotGrandLinear(obj, ..., facets, space.skip = 0.01, geom = NULL,
   }
   \item{main}{
     title.
+  }
+  \item{highlight.gr}{
+    a \code{GRanges} object, this wil highlight overlapped region with
+    provided intervals.
+  }
+  \item{highlight.name}{
+    if \code{NULL}, using rownames of \code{GRanges} object provided by
+    argument \code{highlight.gr}, otherwise use
+    character to indicate column used as labeled names.
+  }
+  \item{highlight.col}{
+    highlight colors.
+  }
+  \item{highlight.label}{
+    logical value, label the highlighted region of not.
+  }
+  \item{highlight.label.size}{
+    highlight label size.
+  }
+  \item{highlight.label.offset}{
+    highlight label offset.
+  }
+  \item{highlight.label.col}{
+    highlight label color. 
   }
 }
 \value{

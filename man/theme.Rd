@@ -5,6 +5,7 @@
 \alias{theme_alignment}
 \alias{theme_clear}
 \alias{theme_tracks_sunset}
+\alias{theme_genome}
 \title{theme in ggbio}
 \description{
   Theme defined in ggbio for plot or tracks. 
@@ -22,6 +23,7 @@ schema theme_tracks_*}
               axis.ticks.x = FALSE, axis.ticks.y = TRUE, grid.color = "gray95",
               axis.line.color = "gray80")
   theme_tracks_sunset(bg = "#fffedb", alpha = 1, ...)
+  theme_genome()
 }
 \arguments{
   

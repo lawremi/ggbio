@@ -7,7 +7,7 @@
 }
 \usage{
 \S4method{layout_karyogram}{GRanges}(data, ..., xlab, ylab, main,
-          facets = seqnames ~ ., cytoband = FALSE, geom = NULL,
+          facets = seqnames ~ ., cytoband = FALSE, geom = "rect",
           stat = NULL, ylim = NULL, rect.height = 10)
 
 }

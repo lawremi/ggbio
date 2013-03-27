@@ -181,3 +181,141 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
   p
 })
 
+
+
+.aggregate <- function(data, ..., xlab, ylab, main, by, FUN, maxgap=0L,
+                            minoverlap=1L, type=c("any", "start", "end", "within",
+                                                "equal"),
+                       select=c("all", "first", "last", "arbitrary"),
+                       y = NULL, window = NULL, facets = NULL,
+                       method = c("count", "median","max", "min", "sum",
+                                                "mean", "identity"),
+                       geom = NULL, nbin = 20){
+
+
+  type <- match.arg(type)
+  select <- match.arg(select)
+  
+  if(is.null(geom))
+    geom <- "histogram"
+
+  if(is.null(window))
+    window <- as.integer(width(range(ranges(data)))/nbin)
+
+  method <- match.arg(method)
+
+  grl <- split(data, seqnames(data))
+
+  if(geom %in% c("boxplot"))
+    method <- "identity"
+
+  if(missing(FUN)){
+    if(!(method %in% c("count", "identity")) & is.null(y))
+      stop("need to provide y value for method ", method)
+    .FUN <- switch(method,
+                   identity = {
+                     function(x){
+                       x
+                   }
+                   },
+                   mean = {
+                     function(x){
+                         mean(values(x)[, y])
+                     }
+                   },
+                   median = {
+                     function(x){
+                       median(values(x)[, y])
+                     }
+                   },
+                   max = {
+                     function(x){
+                       max(values(x)[, y])
+                     }
+                   },
+                   min = {
+                     function(x){
+                       min(values(x)[, y])
+                     }
+                   },
+                   sum = {
+                     function(x){
+                       sum(values(x)[, y])
+                     }
+                   },
+                   count = {
+                     function(x){
+                       length(x)
+                     }
+                   })
+  }else{
+    .FUN <- FUN
+  }
+
+
+  lst <- lapply(grl, function(dt){
+        snm <- unique(seqnames(dt))
+        seqs <- seq(from = min(start(dt)), to = max(end(dt)), by = window)
+        .by <- IRanges(start = seqs,
+                       width = window)
+        if(select != "all"){
+          hits <- findOverlaps(ranges(dt), .by, 
+                               maxgap = maxgap, minoverlap = minoverlap,
+                               type = type, select = select)
+          res <- rep(NA, length(.by))
+          names(res) <- c(1:length(.by))
+          res2 <- unlist(lapply(split(dt, hits), .FUN))
+          res[names(res2)] <- res2
+        }else{
+          hits <- findOverlaps(ranges(dt), .by, maxgap = maxgap, minoverlap = minoverlap,
+                               type = type, select = select)
+          res <- rep(NA, length(.by))
+          names(res) <- c(1:length(.by))
+          res2 <- unlist(lapply(base::by(as.data.frame(hits), subjectHits(hits), function(x){
+            x[,1]
+          }), function(id){
+            x <- dt[id]
+            .FUN(x)
+          }))
+          res[names(res2)] <- res2
+        }
+      if(!geom %in% c("boxplot")){
+        df <- as.data.frame(.by)
+        df$.value <- res
+        df$.mid <- start(.by) + width(.by)/2
+        df$seqnames <-snm
+      }else{
+        if(select != "all"){
+        grq <- GRanges(snm, .by)
+        idx <- findOverlaps(dt, grq, maxgap = maxgap, minoverlap = minoverlap,
+                               type = type, select = select)
+        values(dt)$.mid <- start(grq[idx]) + width(grq[idx])
+        df <- as.data.frame(dt)
+      }else{
+        grq <- GRanges(snm, .by)
+        idx <- findOverlaps(dt, grq, maxgap = maxgap, minoverlap = minoverlap,
+                               type = type, select = select)
+        dt <- dt[queryHits(idx)]
+        values(dt)$.mid <- start(grq[subjectHits(idx)]) +
+          width(grq[subjectHits(idx)])
+        df <- as.data.frame(dt)
+      }
+      }
+        ## GRanges(df$seqnames, IRanges(df$start, df$end), df$.value)
+        df
+       ## biovizBase::transformDfToGr(df, seqnames = "seqnames",
+       ##                             start = "start", end = "end")
+   })
+   res <- do.call(rbind, lst)
+  rownames(res) <- NULL
+  x <- res
+  gra <- GRanges(x$seqnames, IRanges(x$start, x$end), value = x$.value)
+  ## biovizBase::transformDfToGr(res, seqnames = "seqnames",
+  ##                                   start = "start", end = "end")
+  seqlengths(gra) <- seqlengths(data)
+  gra
+}
+
+
+
+

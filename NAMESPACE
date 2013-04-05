@@ -44,7 +44,7 @@ importFrom(GenomicRanges, "seqnames<-",
            GRanges, GRangesList, Seqinfo, seqlengths, "seqlengths<-")
 importMethodsFrom(GenomicRanges, ranges, "ranges<-",
                   start, end, width, "start<-", "end<-", "width<-",
-                  seqnames, seqinfo, show, summary,
+                  seqnames, seqinfo, show, 
                    "elementMetadata<-", elementMetadata,
                   as.data.frame, keepSeqlevels, renameSeqlevels,
                   sort)

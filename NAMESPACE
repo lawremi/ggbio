@@ -57,7 +57,7 @@ importClassesFrom(GenomicRanges, GRanges, GRangesList, GenomicRangesList)
 importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,
            scanBamFlag,BamFile,
            PileupFiles, PileupParam ,
-           readBamGappedAlignments)
+           readGAlignmentsFromBam)
 importMethodsFrom(Rsamtools, applyPileups, path)
 importClassesFrom(Rsamtools, BamFile)
 

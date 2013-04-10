@@ -315,7 +315,7 @@ will cover most of those topics.
     IRanges&numeric interval& \ref{chapter:gr}\\\hline
     GRangesList&List of genomic interval& \ref{chapter:gr}\\\hline
     Seqinfo& Information about genomic sequence&\ref{chapter:karyogram}\\\hline
-    GappedAlignments&NGS data&\ref{chapter:bam}\\\hline
+    GAlignments&NGS data&\ref{chapter:bam}\\\hline
     BamFiles&Bam files container&\ref{chapter:bam}\\\hline
     character&Bam files path&\ref{chapter:bam} \ref{chapter:gff}\\\hline
     BSgenome&Nucleotide sequence&\ref{chapter:bsgenome}\\\hline

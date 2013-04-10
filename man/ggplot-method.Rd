@@ -9,7 +9,7 @@
 \alias{ggplot,ExpressionSet-method}
 \alias{ggplot,SummarizedExperiment-method}
 \alias{ggplot,VCF-method}
-\alias{ggplot,GappedAlignments-method}
+\alias{ggplot,GAlignments-method}
 \alias{ggplot,BamFile-method}
 \alias{ggplot,character-method}
 \alias{ggplot,TranscriptDb-method}
@@ -38,7 +38,7 @@
 \S4method{ggplot}{ExpressionSet}(data, ...)
 \S4method{ggplot}{SummarizedExperiment}(data, assay.id = 1, ...)
 \S4method{ggplot}{VCF}(data, ...)
-\S4method{ggplot}{GappedAlignments}(data, ...)
+\S4method{ggplot}{GAlignments}(data, ...)
 \S4method{ggplot}{BamFile}(data, ...)
 \S4method{ggplot}{character}(data, ...)
 \S4method{ggplot}{TranscriptDb}(data, ...)

@@ -125,7 +125,7 @@ setMethod("mold", c("Views"), function(data){
 
 ## })
 
-## setMethod("mold", c("GappedAlignments"), function(data){
+## setMethod("mold", c("GAlignments"), function(data){
 
 ## })
 

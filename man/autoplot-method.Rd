@@ -6,7 +6,7 @@
 \alias{autoplot,IRanges-method}
 \alias{autoplot,Seqinfo-method}
 \alias{autoplot,BSgenome-method}
-\alias{autoplot,GappedAlignments-method}
+\alias{autoplot,GAlignments-method}
 \alias{autoplot,BamFile-method}
 \alias{autoplot,TranscriptDb-method}
 \alias{autoplot,character-method}
@@ -51,7 +51,7 @@
 
 \S4method{autoplot}{Seqinfo}(object, ideogram = FALSE, ... )
 
-\S4method{autoplot}{GappedAlignments}(object, ..., xlab, ylab, main, which,
+\S4method{autoplot}{GAlignments}(object, ..., xlab, ylab, main, which,
       geom = NULL, stat = NULL)
 
 \S4method{autoplot}{BamFile}(object, ..., which, xlab, ylab, main,
@@ -698,9 +698,9 @@ library(Rsamtools)
 data("genesymbol", package = "biovizBase")
 bamfile <- system.file("extdata", "SRR027894subRBM17.bam", package="biovizBase")
 ## need to set use.names = TRUE
-ga <- readBamGappedAlignments(bamfile,
-                              param = ScanBamParam(which = genesymbol["RBM17"]),
-                              use.names = TRUE)
+ga <- readGAlignmentsFromBam(bamfile,
+                             param = ScanBamParam(which = genesymbol["RBM17"]),
+                             use.names = TRUE)
 
 
 ###################################################

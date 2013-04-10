@@ -91,7 +91,7 @@ setMethod("ggplot", "RleList", function(data, ...){
 })
 
 
-setMethod("ggplot", "GappedAlignments", function(data, ...){
+setMethod("ggplot", "GAlignments", function(data, ...){
   g <- ggplot(...)
   g$.data <- data
   g <- ggbio(g)

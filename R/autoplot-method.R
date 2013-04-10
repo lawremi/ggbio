@@ -240,9 +240,9 @@ setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
 
 
 ## ======================================================================
-##        For "GappedAlignments"
+##        For "GAlignments"
 ## ======================================================================
-setMethod("autoplot", "GappedAlignments", function(object, ...,
+setMethod("autoplot", "GAlignments", function(object, ...,
                                                    xlab, ylab, main,
                                                    which,
                                                    geom = NULL, stat = NULL){
@@ -323,10 +323,10 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
   method <- match.arg(method)
   bf <- open(object)
   if(geom == "gapped.pair"){
-    message("Read GappedAlignments from BamFile...")
-    ga <- readBamGappedAlignments(bf,
-                                  param = ScanBamParam(which = which),
-                                  use.name = TRUE)
+    message("Read GAlignments from BamFile...")
+    ga <- readGAlignmentsFromBam(bf,
+                                 param = ScanBamParam(which = which),
+                                 use.name = TRUE)
     message("plotting...")
     args.ga <- args[names(args) %in% "show.junction"]
     args <- c(args.ga, list(object = ga))
@@ -363,9 +363,9 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
         p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which)
       }
     }else{
-      ga <- readBamGappedAlignments(bf,
-                                    param = ScanBamParam(which = which),
-                                    use.name = TRUE)
+      ga <- readGAlignmentsFromBam(bf,
+                                   param = ScanBamParam(which = which),
+                                   use.name = TRUE)
       gr <- biovizBase:::fetch(ga, type = "raw")
       p <- autoplot(gr, ..., geom = geom, stat = stat)
     }

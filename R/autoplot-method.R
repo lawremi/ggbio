@@ -437,7 +437,8 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                ratio = 0.0025, 
                                                geom = c("alignment"),
                                                stat = c("identity", "reduce"),
-                                               names.expr = "tx_name(gene_id)"){
+                                               names.expr = "tx_name(gene_id)",
+                                               label = TRUE){
 
   stat <- match.arg(stat)
   args <- list(...)
@@ -450,6 +451,7 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
   args.non$geom <- geom
   args.non$stat <- stat
   args.non$names.expr <- names.expr
+  args.non$label <- label 
   if(!missing(which))
     args.non$which <- which
   aes.res <- do.call(aes, args.aes)

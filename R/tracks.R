@@ -1,12 +1,3 @@
-setOldClass("options")
-setOldClass("unit")
-setOldClass("gtable")
-setOldClass("theme")
-setOldClass("gTree")
-setOldClass("grob")
-setClassUnion("themeORNULL", c("theme", "NULL"))
-setClassUnion("optionsORNULL", c("options", "NULL"))
-setClassUnion("numericORunit", c("numeric", "unit"))
 setClass("ideogram", contains = c("gg", "ggplot"))
 ideogram <- function(x){
   new("ideogram", x)  

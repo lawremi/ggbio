@@ -7,9 +7,11 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                                                 facets = NULL,
                                                 stat = c("stepping", "identity"),
                                                 range.geom = c("rect", "arrowrect"),
-                                                gap.geom = c("chevron", "arrow", "segment"),
+                                                gap.geom = c("chevron", "arrow",
+                                                  "segment"),
                                                 rect.height = NULL,
-                                                group.selfish = TRUE){
+                                                group.selfish = TRUE,
+                                                label = TRUE){
    
 
   stat <- match.arg(stat)
@@ -155,7 +157,8 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                                                 range.geom = "rect",
                                                 gap.geom = "arrow",
                                                 utr.geom = "rect",
-                                                names.expr = "tx_name(gene_id)"){
+                                                names.expr = "tx_name(gene_id)",
+                                                     label = TRUE){
 
   
   stat <- match.arg(stat)
@@ -192,9 +195,48 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                end(range(gr, ignore.strand = TRUE)))    
     if(length(gr)){
       message("Constructing graphics...")
-      
-      values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
-      df <- as.data.frame(gr)      
+      ## values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
+      ## FIXME: add flexible estimation
+      if(label){
+        es <- .transformTextToSpace("aaaaaaaaaaaaaaaaaa", limits = .xlim)
+        gr <- addStepping(gr, group.name = "tx_id", group.selfish = FALSE, fix = "start",
+                          extend.size = es)
+      }else{
+        gr <- addStepping(gr, group.name = "tx_id", group.selfish = FALSE)
+      }
+      ## rownames(gr) <- NULL
+      ## gr
+      ## rownames(gr)
+      ## rownames
+      ## class(gr)
+      ## values(gr)$stepping <- 
+      ## df <- as.data.frame(gr)
+      df <- data.frame(seqnames = as.character(seqnames(gr)),
+                          start = start(gr),
+                          end = end(gr))
+      df <- cbind(df, as.data.frame(values(gr)))
+      if(label){
+      ## get lalel
+      .df.sub <- df[, c("stepping", "tx_id", "tx_name", "gene_id")]
+      .df.sub <- .df.sub[!duplicated(.df.sub),]
+      sts <- do.call(c, as.list(by(df, df$tx_id, function(x) min(x$start))))
+      .df.sub$start <- sts - es * 0.1
+      .labels <- NA      
+      if(is.expression(names.expr)){
+        .labels <- eval(names.expr, .df.sub)
+      }else if(is.character(names.expr)){
+        if(length(names.expr) == nrow(.df.sub)){
+          .labels <- names.expr
+        }else{
+          .labels <- sub_names(.df.sub, names.expr)
+        }
+      }else{
+        .labels <- sub_names(.df.sub, names.expr)
+      }
+      .df.lvs <- unique(df$stepping)
+      .df.sub$.labels <- .labels
+    }
+
       gr.cds <- gr[values(gr)$type == "cds"]
       args.cds.non <- args.non
       if(!"rect.height" %in% names(args.cds.non)){
@@ -225,6 +267,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
       }else{
         args.utr.non$rect.height <- args.non$rect.height/3
       }
+      
       if(range.geom == "arrowrect" && utr.geom == range.geom){
         if(!"arrow.head" %in% names(args.utr.non)){
           args.utr.non$arrow.head <- 0.06
@@ -233,6 +276,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
         args.utr.non <- args.non[names(args.non) != "arrow.rate"]
         args.utr.non$arrow.head.fix <- arrow.head.fix
       }
+      
       args.utr.res <- c(list(data = gr.utr),
                         list(aes.res),
                         args.utr.non,
@@ -260,25 +304,20 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                          list(stat = "identity"))
       
       p <- c(p , list(do.call(gap.fun, args.gaps.res)))
+      if(label){
+      aes.label <- do.call(aes, list(label = substitute(.labels),
+                                     x = substitute(start),
+                                     y = substitute(stepping)))
+      args.label.res <- c(list(data = .df.sub),
+                          list(aes.label),
+                          list(hjust = 1),
+                          args.non)
 
-      .df.lvs <- unique(df$stepping)
-      .df.sub <- df[, c("stepping", "tx_id", "tx_name", "gene_id")]
-      .df.sub <- .df.sub[!duplicated(.df.sub),]
-      .labels <- NA
-
-      if(is.expression(names.expr)){
-        .labels <- eval(names.expr, .df.sub)
-      }else if(is.character(names.expr)){
-        if(length(names.expr) == nrow(.df.sub)){
-          .labels <- names.expr
-        }else{
-          .labels <- sub_names(.df.sub, names.expr)
-        }
-      }else{
-        .labels <- sub_names(.df.sub, names.expr)
+        p <- c(p , list(do.call(geom_text, args.label.res)))
       }
-      p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
-                                         labels = .labels)))
+      p <- c(p , list(scale_y_continuous(breaks = NULL)))      
+      ## args.
+      ## p <- c(p, list(do.call(geom_text, )))
     }else{
       p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
              list(ggplot2::xlim(c(0, 1))))
@@ -412,3 +451,10 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
   p  
 })
 
+
+.transformTextToSpace <- function(x = character(), limits = NULL,
+                                  fixed = 200, size = 1 ){
+  if(!length(limits))
+    stop("pleast provide your limits of current viewed coordinate")
+  nchar(x) * size / fixed * diff(limits)
+}

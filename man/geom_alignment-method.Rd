@@ -13,14 +13,16 @@
 \S4method{geom_alignment}{GRanges}(data, ..., xlab, ylab, main, facets = NULL, stat =
                  c("stepping", "identity"), range.geom = c("rect",
                  "arrowrect"), gap.geom = c("chevron", "arrow",
-                 "segment"), rect.height = NULL, group.selfish = TRUE)
+                 "segment"), rect.height = NULL, group.selfish = TRUE,
+                  label = TRUE)
 
 \S4method{geom_alignment}{TranscriptDb}(data, ..., which, xlim, truncate.gaps = FALSE,
                  truncate.fun = NULL, ratio = 0.0025, xlab, ylab, main,
                  facets = NULL, geom = "alignment",
                  stat = c("identity", "reduce"),
                  range.geom = "rect", gap.geom = "arrow",
-                 utr.geom = "rect", names.expr = "tx_name(gene_id)")
+                 utr.geom = "rect", names.expr = "tx_name(gene_id)",
+                 label = TRUE)
 
 }
 \arguments{
@@ -88,7 +90,11 @@
     geom for utr region.
   }
   \item{names.expr}{
-    Expression for showing y label.
+    expression for showing y label.
+  }
+  \item{label}{
+    logical value. Whether to label the intervals with names specified
+    by argument \code{names.expr}. 
   }
 }
 \value{

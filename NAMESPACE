@@ -92,7 +92,7 @@ exportMethods(autoplot, rescale, mold, fixed, "fixed<-",
               hasAxis, "hasAxis<-", ggplot)
 
 
-export(arrangeGrobByParsingLegend, ggbio)
+export(arrangeGrobByParsingLegend, ggbio, GGbio)
 
 ## scale
 export(scale_x_sequnit, scale_fill_giemsa, scale_fill_fold_change)

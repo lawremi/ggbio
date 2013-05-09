@@ -18,7 +18,7 @@ GGbio.gen$methods(initialize = function(ggplot = NULL, data = NULL,
   callSuper(...)
 })
 
-GGBio <- function(ggplot = NULL, ...){
+GGbio <- function(ggplot = NULL, ...){
   GGbio.gen$new(ggplot = ggplot, ...)
 }
 ## alias

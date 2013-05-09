@@ -13,6 +13,7 @@ BugReports: https://github.com/tengfei/ggbio/issues
 License: Artistic-2.0 
 LazyLoad: Yes
 Collate: utils.R
+	 AllClasses.R
 	 AllGenerics.R
 	 GGbio-class.R
 	 ggplot-method.R

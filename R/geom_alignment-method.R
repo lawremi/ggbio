@@ -146,6 +146,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
 
 
 
+
 setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                                                 truncate.gaps = FALSE,
                                                 truncate.fun = NULL,
@@ -157,7 +158,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                                                 range.geom = "rect",
                                                 gap.geom = "arrow",
                                                 utr.geom = "rect",
-                                                names.expr = "tx_name(gene_id)",
+                                                names.expr = "tx_name",
                                                      label = TRUE){
 
   
@@ -197,6 +198,8 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
       message("Constructing graphics...")
       ## values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
       ## FIXME: add flexible estimation
+      .gr <- gr
+      gr <- .gr
       if(label){
         es <- .transformTextToSpace("aaaaaaaaaaaaaaaaaa", limits = .xlim)
         gr <- addStepping(gr, group.name = "tx_id", group.selfish = FALSE, fix = "start",
@@ -204,24 +207,17 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
       }else{
         gr <- addStepping(gr, group.name = "tx_id", group.selfish = FALSE)
       }
-      ## rownames(gr) <- NULL
-      ## gr
-      ## rownames(gr)
-      ## rownames
-      ## class(gr)
-      ## values(gr)$stepping <- 
-      ## df <- as.data.frame(gr)
-      df <- data.frame(seqnames = as.character(seqnames(gr)),
-                          start = start(gr),
-                          end = end(gr))
-      df <- cbind(df, as.data.frame(values(gr)))
+
+      df <- mold(gr)
+      
       if(label){
       ## get lalel
       .df.sub <- df[, c("stepping", "tx_id", "tx_name", "gene_id")]
       .df.sub <- .df.sub[!duplicated(.df.sub),]
-      sts <- do.call(c, as.list(by(df, df$tx_id, function(x) min(x$start))))
+       sts <- do.call(c, as.list(by(df, df$tx_id, function(x) min(x$start))))
       .df.sub$start <- sts - es * 0.1
-      .labels <- NA      
+      .labels <- NA
+      .df.sub
       if(is.expression(names.expr)){
         .labels <- eval(names.expr, .df.sub)
       }else if(is.character(names.expr)){

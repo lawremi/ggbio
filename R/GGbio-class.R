@@ -39,7 +39,7 @@ ggbio <- GGbio
     .geom <- grep("geom_", .nms, value = TRUE)
     idx.geom <- grep("geom_", .nms)
     if(length(.geom)){
-    .geom <- str_match(.geom, "geom_([a-z]+)")[, 2]
+    .geom <- stringr::str_match(.geom, "geom_([a-z]+)")[, 2]
     if(length(.geom) > 1){
       warning("multiple geoms detected, last one used")
       .geom <- tail(.geom, 1)
@@ -53,7 +53,6 @@ ggbio <- GGbio
     }}else{
       .geom <- NULL
     }
-
     .stat <- grep("stat_", .nms, value = TRUE)
     idx.stat  <- grep("stat_", .nms)    
     if(length(.stat)){
@@ -101,21 +100,25 @@ setMethod("+", c("GGbio"), function(e1, e2){
   .args <-   as.list(as.list(mc)$e2)
   .args <- list(.args[-1])
   names(.args) <- .nm
+  if(!is.null(e1$data) & is.null(.args$data))
+    .args[[1]]$data <- e1$data
   e1$cmd <- c(e1$cmd, .tmp)
   e1$args <- c(e1$args, .args)
   ## old ggbio class file
-  e2name <- deparse(substitute(e2))  
-  if(is.call(e2)){
-    args <- as.list(e2)
-    if(!is.null(e1$data))
-      args$data <- e1$data
-    object <- do.call(as.character(args[[1]]), args[-1])
-    e1 <- mapToGG(e1$ggplot, object)
-  }else{
-    object <- e2
-  }
-  res <- ggplot2:::add_ggplot(e1$ggplot, object, e2name)
-  e1$ggplot <- res
+  ## insert data from original one 
+  ## e2name <- deparse(substitute(e2))  
+  ## if(is.call(e2)){
+  ##    args <- as.list(e2)
+  ## ##   if(!is.null(e1$data))
+  ## ##     args$data <- e1$data
+  ## object <- do.call(as.character(args[[1]]), args[-1])
+  ## FIXME:
+  ## e1$ggplot <- mapToGG(e1$ggplot, object)
+  ## }else{
+  ##   object <- e2
+  ## }
+  ## res <- ggplot2:::add_ggplot(e1$ggplot, object, e2name)
+  ## e1$ggplot <- res
   e1 
 })
 

@@ -152,8 +152,8 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
     p <- p + facet
   if(((!is.null(geom) && !geom %in% .ggbio.geom) & is.null(stat)) | coord == "genome")
     p <- p + facet
-  p$.data <- object
-  p <- ggbio(p)
+  ## p$data <- object
+  p <- ggbio(p, data = object)
   p
 })
 

@@ -1,10 +1,10 @@
+library(ggbio)
 p <- ggplot(data = mtcars)
 ## obj.new <- obj.new + layout_circle()
+p  <- p + geom_point(aes(x = mpg, y = wt), color = "red")
+p
 
-obj <- obj + geom_point(aes(x = mpg, y = wt), color = "red")
-obj
-
-
+class(p)
 
 N <- 100
 library(GenomicRanges)
@@ -25,7 +25,6 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
-
 seqlengths(gr) <- c(400, 500, 700)
 values(gr)$to.gr <- gr[sample(1:length(gr), size = length(gr))]
 
@@ -37,4 +36,6 @@ ggplot() + layout_circle(gr, geom = "ideo", fill = "gray70", radius = 7, trackWi
   layout_circle(gr, geom = "link", linked.to = "to.gr", radius = 6,
                 trackWidth = 1)
 
+p <- ggplot(gr) + layout_circle() + geom_bar(aes(fill = score, y = score))
+p
 

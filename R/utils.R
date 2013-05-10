@@ -412,7 +412,6 @@ scale_by_xlim <- function(xlim, by.unit = TRUE){
 }
 
 sub_names <- function(data, name.expr){
-  ## name.expr <- deparse(substitute(name.expr))
   .res <- c()  
   for(i in seq_len(nrow(data))){
     res <- data[i,]
@@ -432,7 +431,7 @@ sub_names <- function(data, name.expr){
       else
         return(name.expr)
     }
-    .res <- c(subfun(res, name.expr), .res)
+    .res <- c(.res, subfun(res, name.expr))
   }
   .res
 }

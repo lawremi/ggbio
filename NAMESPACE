@@ -7,13 +7,14 @@ import(BiocGenerics)
 import(biovizBase)
 import(grid)
 import(ggplot2)
+import(lattice)
 ## importFrom(gtable, gtable_add_padding, gtable_add_grob, gtable_add_cols,
 ##            gtable_add_rows, cbind)
 import(gtable)
 import(reshape2)
 import(scales)
 import(plyr)
-importFrom(gridExtra, grid.arrange, arrangeGrob)
+importFrom(gridExtra, grid.arrange, arrangeGrob, latticeGrob)
 importFrom(Hmisc, bezier)
 ## GenomicRanges
 ## IRanges
@@ -35,7 +36,7 @@ importMethodsFrom(IRanges,  split,
                   "[","[<-","[[", "[[<-","$",
                   show)
 
-importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL, Views, ViewsList)
+importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL, Views, ViewsList, List)
 
 ## ## GenomicRanges
 
@@ -142,5 +143,6 @@ export(theme_null, theme_alignment, theme_clear, theme_tracks_sunset,
        theme_pack_panels, theme_noexpand, theme_genome)
 
 export(ggsave)
- 
 
+## Tracked
+exportMethods(Grob)

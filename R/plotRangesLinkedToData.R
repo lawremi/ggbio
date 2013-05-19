@@ -50,7 +50,8 @@ setMethod("plotRangesLinkedToData", "GenomicRangesORGRangesList",
                 stop("if 'stat.y' is character, it must match column names ",
                      "in mcols(data)")
               }
-            } if (!is.numeric(stat.y))  {
+            }
+            if (!is.numeric(stat.y))  {
               stop("'stat.y' must be a numeric or character index into the ",
                    "columns of mcols(data)")
             }

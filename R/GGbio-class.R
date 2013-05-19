@@ -3,24 +3,15 @@ GGbio.gen <- setRefClass("GGbio",
                          fields = list(
                            data = "ANY", #raw data
                            ggplot = "ggORNULL", #ggplot object
-                           ## layout = "LayoutORNULL", #work around
                            cmd = "list",
-                           args = "list"
-                           ))
-
-GGbio.gen$methods(initialize = function(ggplot = NULL, data = NULL, 
-                    cmd = list(), args = list(), ...){
-  data <<- data
-  ggplot <<- ggplot
-  ## layout <<- layout
-  cmd <<- cmd
-  args <<- args
-  callSuper(...)
-})
+                           args = "list"),
+                         contains = "Cache")
 
 GGbio <- function(ggplot = NULL, ...){
   GGbio.gen$new(ggplot = ggplot, ...)
 }
+
+
 ## alias
 ggbio <- GGbio
 

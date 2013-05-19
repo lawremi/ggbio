@@ -1,31 +1,13 @@
+## Goal: need to be able to bind tracks!, tracks(tracks(), tracks())
 setClass("ideogram", contains = c("gg", "ggplot"))
 ideogram <- function(x){
   new("ideogram", x)  
 }
 
-## suppose to store original graphics
-setClass("ggplotGrobList", prototype = prototype(elementType = "ggplot"),
-         contains = "list")
-
-reduceListOfGrobs <- function(x) {
-  firstElementIsListOfGrobs <-
-    length(x) == 1 && is.list(x[[1L]]) && !is(x[[1L]], "ggplot")
-  if (firstElementIsListOfGrobs)
-    x <- x[[1]]
-  x
-}
-
-ggplotGrobList <- function(...){
-  items <- list(...)
-  items <- reduceListOfGrobs(items)
-  if (!all(sapply(items, is, "ggplot")))
-    stop("all elements in '...' must be Item objects")
-  new("ggplotGrobList", items)
-}
-
 tracks.gen <- setClass("Tracks",
-                       representation(grobs = "ggplotGrobList",
-                                      backup = "list",
+                       representation(grobs = "PlotList", # working plots
+                                      plot.ori = "PlotList", # original plots passed into tracks
+                                      backup = "list", # backup of the whole tracks object
                                       heights = "numericORunit",
                                       xlim = "numeric",
                                       ylim = "list",
@@ -108,6 +90,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
       xlim <- range(xlim)
     }
   }
+  
 
   mts <- sapply(dots, mutable)
   dots <- lapply(1:length(dots), function(i){
@@ -156,9 +139,11 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
   ## else
   labeled <- sapply(dots, labeled)
 
-  gbl <- do.call(ggplotGrobList, dots)
+  ## gbl <- do.call(GrobList, dots)
+  ppl <- do.call(PlotList, dots)
   
-  backup <- list(grobs = gbl,
+  backup <- list(grobs = ppl,
+                 plot.ori = ppl,
                  heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab,
                  main = main,
                  main.height = main.height,
@@ -173,7 +158,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
                  label.text.cex = label.text.cex,
                  label.width = label.width)
   
-  obj <- new("Tracks", grobs = gbl, backup = backup, labeled = labeled, 
+  obj <- new("Tracks", grobs = gbl, plot.ori = ppl, backup = backup, labeled = labeled, 
       heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab, main = main,
       main.height = main.height,
       scale.height = scale.height,
@@ -505,7 +490,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
 
   ## parse grobs
   grobs <- lapply(ggl, function(x){
-    gg <- ggplotGrobAttr(x)
+    gg <- Grob(x)
     gg
   })
 
@@ -718,14 +703,14 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
 
 getPanelIndex <- function(g){
   if(inherits(g, "ggplot"))
-    g <- ggplotGrobAttr(g)
+    g <- Grob(g)
   idx <- which("panel" == g$layout$name)
   idx
 }
 
 spaceAroundPanel <- function(g, type = c("t", "l", "b", "r")){
   if(inherits(g, "ggplot"))
-    g <- ggplotGrobAttr(g)
+    g <- Grob(g)
   idx <- getPanelIndex(g)
   rsl <- list()
   for(tp in type){
@@ -779,7 +764,7 @@ uniformAroundPanel <- function(..., direction = c("row", "col")){
   lst <- list(...)
   grobs <- lapply(lst, function(p){
     if(inherits(p, "ggplot"))
-      g <- ggplotGrobAttr(p)
+      g <- Grob(p)
     else
       g <- p
     g
@@ -869,7 +854,7 @@ titleGrob <- function(g){
 
 ## xlabGrob <- function(p){
 ##   p <- ScalePlot(x)  
-##   g <- ggplotGrobAttr(p)
+##   g <- Grob(p)
 ##   idx <- g$layout$name %in% c("xlab")
 ##   idx <- unique(c(g$layout[idx, "t"], g$layout[idx, "b"]))
 ##   g[idx,]
@@ -935,302 +920,6 @@ ScalePlot2 <- function(xlim, format = scientific_format(),
   p
 }
 
-setGeneric("bgColor",  function(x, ...) standardGeneric("bgColor"))
-setGeneric("bgColor<-",  function(x, value,  ...) standardGeneric("bgColor<-"))
-setMethod("bgColor", "gg", function(x){
-  bg <- attr(x, "bgcolor")
-  if(is.null(bg))
-    return("white")
-  else
-    return(bg)
-})
-setReplaceMethod("bgColor", c("gg", "character"), function(x, value){
-  attr(x, "bgcolor") <- value
-  x
-})
-
-setMethod("bgColor", "gtable", function(x){
-  bg <- attr(x, "bgcolor")
-  if(is.null(bg))
-    return("white")
-  else
-    return(bg)
-})
-
-setReplaceMethod("bgColor", c("gtable", "character"), function(x, value){
-  attr(x, "bgcolor") <- value
-  x
-})
-
-setMethod("bgColor", "ideogram", function(x){
-  bg <- attr(x, "bgcolor")
-  if(is.null(bg))
-    return("white")
-  else
-    return(bg)
-})
-
-setReplaceMethod("bgColor", c("ideogram", "character"), function(x, value){
-  attr(x, "bgcolor") <- value
-  x
-})
-
-
-setMethod("fixed", "gg", function(x){
-  res <- attr(x, "fixed")
-  if(is.null(res))
-    return(FALSE)
-  else
-    return(res)
-})
-
-
-setReplaceMethod("fixed", c("gg", "logical"), function(x, value){
-  attr(x, "fixed") <- value
-  x
-})
-
-setMethod("fixed", "ideogram", function(x){
-  res <- attr(x, "fixed")
-  if(is.null(res))
-    return(FALSE)
-  else
-    return(res)
-})
-
-
-setReplaceMethod("fixed", c("ideogram", "logical"), function(x, value){
-  attr(x, "fixed") <- value
-  x
-})
-
-setMethod("fixed", "gtable", function(x){
-  res <- attr(x, "fixed")
-  if(is.null(res))
-    return(FALSE)
-  else
-    return(res)
-})
-
-setReplaceMethod("fixed", c("gtable", "logical"), function(x, value){
-  attr(x, "fixed") <- value
-  x
-})
-
-
-setGeneric("labeled",  function(x, ...) standardGeneric("labeled"))
-setGeneric("labeled<-",  function(x, value,  ...) standardGeneric("labeled<-"))
-setMethod("labeled", "gg", function(x){
-  bg <- attr(x, "labeled")
-  if(is.null(bg))
-    return(TRUE)
-  else
-    return(bg)
-})
-
-setReplaceMethod("labeled", c("gg", "logical"), function(x, value){
-  attr(x, "labeled") <- value
-  x
-})
-
-setMethod("labeled", "ideogram", function(x){
-  bg <- attr(x, "labeled")
-  if(is.null(bg))
-    return(TRUE)
-  else
-    return(bg)
-})
-
-setReplaceMethod("labeled", c("ideogram", "logical"), function(x, value){
-  attr(x, "labeled") <- value
-  x
-})
-
-
-setMethod("labeled", "gtable", function(x){
-  bg <- attr(x, "labeled")
-  if(is.null(bg))
-    return(TRUE)
-  else
-    return(bg)
-})
-
-setReplaceMethod("labeled", c("gtable", "logical"), function(x, value){
-  attr(x, "labeled") <- value
-  x
-}
-)
-
-setOldClass("text")
-setMethod("labeled", "text", function(x){
-  bg <- attr(x, "labeled")
-  if(is.null(bg))
-    return(TRUE)
-  else
-    return(bg)
-})
-
-setMethod("labeled", "gTree", function(x){
-  bg <- attr(x, "labeled")
-  if(is.null(bg))
-    return(TRUE)
-  else
-    return(bg)
-})
-
-setGeneric("mutable",  function(x, ...) standardGeneric("mutable"))
-setGeneric("mutable<-",  function(x, value,  ...) standardGeneric("mutable<-"))
-setMethod("mutable", "gg", function(x){
-  mt <- attr(x, "mutable")
-  if(is.null(mt))
-    return(TRUE)
-  else
-    return(mt)
-})
-
-setReplaceMethod("mutable", c("gg", "logical"), function(x, value){
-  attr(x, "mutable") <- value
-  x
-})
-
-setMethod("mutable", "ideogram", function(x){
-  mt <- attr(x, "mutable")
-  if(is.null(mt))
-    return(TRUE)
-  else
-    return(mt)
-})
-
-setReplaceMethod("mutable", c("ideogram", "logical"), function(x, value){
-  attr(x, "mutable") <- value
-  x
-})
-
-
-setMethod("mutable", "gtable", function(x){
-  mt <- attr(x, "mutable")
-  if(is.null(mt))
-    return(TRUE)
-  else
-    return(mt)
-})
-
-setReplaceMethod("mutable", c("gtable", "logical"), function(x, value){
-  attr(x, "mutable") <- value
-  x
-})
-
-
-setGeneric("hasAxis",  function(x, ...) standardGeneric("hasAxis"))
-setGeneric("hasAxis<-",  function(x, value,  ...) standardGeneric("hasAxis<-"))
-setMethod("hasAxis", "gg", function(x){
-  mt <- attr(x, "hasAxis")
-  if(is.null(mt))
-    return(FALSE)
-  else
-    return(mt)
-})
-
-setReplaceMethod("hasAxis", c("gg", "logical"), function(x, value){
-  attr(x, "hasAxis") <- value
-  x
-})
-
-setMethod("hasAxis", "ideogram", function(x){
-  mt <- attr(x, "hasAxis")
-  if(is.null(mt))
-    return(FALSE)
-  else
-    return(mt)
-})
-
-setReplaceMethod("hasAxis", c("ideogram", "logical"), function(x, value){
-  attr(x, "hasAxis") <- value
-  x
-})
-
-
-setMethod("hasAxis", "gtable", function(x){
-  mt <- attr(x, "hasAxis")
-  if(is.null(mt))
-    return(FALSE)
-  else
-    return(mt)
-})
-
-setReplaceMethod("hasAxis", c("gtable", "logical"), function(x, value){
-  attr(x, "hasAxis") <- value
-  x
-}
-)
-
-setGeneric("height",  function(x, ...) standardGeneric("height"))
-setGeneric("height<-",  function(x, value,  ...) standardGeneric("height<-"))
-setMethod("height", "gg", function(x){
-  ht <- attr(x, "height")
-  if(is.null(ht))
-    return(unit(1, "null"))
-  else if(is.numeric(ht)  && !is.unit(ht)){
-    return(unit(mt, "null"))
-  }else if(is.unit(ht)){
-    return(ht)
-  }else{
-    stop("height attribute must be numeric or ")
-  }
-})
-
-setReplaceMethod("height", c("gg", "numericORunit"), function(x, value){
-  if(length(value) != 1)
-    stop("height value can only be of length 1.")
-  if(is.numeric(value) && !is.unit(value))
-    value <- unit(value, "null")
-  attr(x, "height") <- value
-  x
-})
-
-setMethod("height", "ideogram", function(x){
-  ht <- attr(x, "height")
-  if(is.null(ht))
-    return(unit(1, "null"))
-  else if(is.numeric(ht)  && !is.unit(ht)){
-    return(unit(mt, "null"))
-  }else if(is.unit(ht)){
-    return(ht)
-  }else{
-    stop("height attribute must be numeric or ")
-  }
-})
-
-setReplaceMethod("height", c("ideogram", "numericORunit"), function(x, value){
-  if(length(value) != 1)
-    stop("height value can only be of length 1.")
-  if(is.numeric(value) && !is.unit(value))
-    value <- unit(value, "null")
-  attr(x, "height") <- value
-  x
-})
-
-setMethod("height", "gtable", function(x){
-  ht <- attr(x, "height")
-  if(is.null(ht))
-    return(unit(1, "null"))
-  else if(is.numeric(ht)  && !is.unit(ht)){
-    return(unit(mt, "null"))
-  }else if(is.unit(ht)){
-    return(ht)
-  }else{
-    stop("height attribute must be numeric or ")
-  }
-})
-
-setReplaceMethod("height", c("gtable", "numericORunit"), function(x, value){
-  if(length(value) != 1)
-    stop("height value can only be of length 1.")
-  if(is.numeric(value) && !is.unit(value))
-    value <- unit(value, "null")
-  attr(x, "height") <- value
-  x
-})
 
 textPlot <- function(lb="", ut = unit(4, "lines")){
   df <- data.frame(x =1:10, y = 1)
@@ -1278,26 +967,17 @@ removeYAxis <- function(g){
 getAxisHeight <- function(p, base){
   .base <- as.numeric(base)
   p2 <- p + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) 
-  h1 <- sum(ggplotGrobAttr(p)$height)
-  h2 <- sum(ggplotGrobAttr(p2)$height)
+  h1 <- sum(Grob(p)$height)
+  h2 <- sum(Grob(p2)$height)
   .h <- convertUnit(h1, "cm", value = TRUE)/convertUnit(h2, "cm", value = TRUE) * .base
   unit(.h, "null")
 }
 
-ggplotGrobAttr <- function(x){
-  attrs <- attributes(x)
-  attrs <- attrs[setdiff(names(attrs), c("class", "names"))]
-  res <- ggplotGrob(x)
-  attrs <- c(attrs, attributes(res))
-  attributes(res) <- attrs
-  res
-}
-
-## from x1 object to x2 object
-copyAttr <- function(x1, x2){
-  attrs <- attributes(x1)
-  attrs <- attrs[setdiff(names(attrs), c("class", "names"))]
-  attrs <- c(attrs, attributes(x2))
-  attributes(x2) <- attrs
-  x2
-}
+## ggplotGrobAttr <- function(x){
+##   ## attrs <- attributes(x)
+##   ## attrs <- attrs[setdiff(names(attrs), c("class", "names"))]
+##   res <- ggplotGrob(x)
+##   ## attrs <- c(attrs, attributes(res))
+##   ## attributes(res) <- attrs
+##   copyAttr(x, res)
+## }

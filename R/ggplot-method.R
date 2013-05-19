@@ -114,9 +114,9 @@ setMethod("ggplot", "BSgenome", function(data, ...){
   
 })
 
-setMethod("ggplot", "ANY", function(data, ...){
-  g <- ggplot2::ggplot(data = data, ...)
-  g <- GGbio(g, data = data)
-  g
-})
+## setMethod("ggplot", "ANY", function(data, ...){
+##   g <- ggplot2::ggplot(data = data, ...)
+##   g <- GGbio(g, data = data)
+##   g
+## })
 

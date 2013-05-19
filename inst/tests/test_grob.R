@@ -7,7 +7,7 @@ x = 1:3
 p1 <- qplot(x = mpg, y = wt, data = mtcars)
 p2 <- xyplot(1:10 ~ 1:10)
 require(ggbio)
-p3 <- new("GGbio", p1)
+p3 <- GGbio(p1)
 p <- plot(1:10, 1:10)
 test_that("test grob", {
   expect_that(p1, is_a("gg"))
@@ -57,10 +57,22 @@ test_that("Test Cache Class", {
 
 context("Test Plot Class")
 test_that("test Plot", {
-  expect_that(plotList(p1, p2), is_a("plotList"))
-  expect_that(plotList(p1, p2, x), gives_warning())
-  expect_that(length(plotList(p1, p2, x)), equals(2))
-  
+  expect_that(Plot(p1), is_a("Plot"))
+  expect_that(Plot(p2), is_a("Plot"))  
+  expect_that(PlotList(p1, p2), is_a("PlotList"))
+  expect_that(PlotList(p1, p2, x), gives_warning())
+  expect_that(length(PlotList(p1, p2, x)), equals(2))
+})
+
+
+context("Test GGbio Class")
+test_that("test Plot", {
+  expect_that(Plot(p1), is_a("Plot"))
+  expect_that(Plot(p2), is_a("Plot"))
+  expect_that(Plot(p3), is_a("Plot"))    
+  expect_that(PlotList(p1, p2, p3), is_a("PlotList"))
+  expect_that(PlotList(p1, p2, p3, x), gives_warning())
+  expect_that(length(PlotList(p1, p2, p3, x)), equals(3))
 })
 
 

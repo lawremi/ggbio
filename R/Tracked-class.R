@@ -23,11 +23,12 @@ setReplaceMethod("bgColor", c("Tracked", "character"), function(x, value){
   x
 })
 
+
 ## fixed
 setMethod("fixed", "Tracked", function(x){
   x@fixed
 })
-setReplaceMethod("fixed", c("Tracked", "character"), function(x, value){
+setReplaceMethod("fixed", c("Tracked", "logical"), function(x, value){
   x@fixed <- value
   x
 })
@@ -39,10 +40,32 @@ setGeneric("labeled<-",  function(x, value,  ...) standardGeneric("labeled<-"))
 setMethod("labeled", "Tracked", function(x){
   x@labeled
 })
-setReplaceMethod("labeled", c("Tracked", "character"), function(x, value){
+setReplaceMethod("labeled", c("Tracked", "logical"), function(x, value){
   x@labeled <- value
   x
 })
+
+setMethod("labeled", "Ideogram", function(x){
+  x@labeled
+})
+setReplaceMethod("labeled", c("Ideogram", "logical"), function(x, value){
+  attr(x, "labeled") <- value
+  x
+})
+
+setMethod("labeled", "gtable", function(x){
+  bg <- attr(x, "labeled")
+  if(is.null(bg))
+    return(TRUE)
+  else
+    return(bg)
+})
+
+setReplaceMethod("labeled", c("gtable", "logical"), function(x, value){
+  attr(x, "labeled") <- value
+  x
+}
+)
 
 setOldClass("text")
 setMethod("labeled", "text", function(x){
@@ -67,7 +90,7 @@ setGeneric("mutable<-",  function(x, value,  ...) standardGeneric("mutable<-"))
 setMethod("mutable", "Tracked", function(x){
   x@mutable
 })
-setReplaceMethod("mutable", c("Tracked", "character"), function(x, value){
+setReplaceMethod("mutable", c("Tracked", "logical"), function(x, value){
   x@mutable <- value
   x
 })
@@ -78,7 +101,7 @@ setGeneric("hasAxis<-",  function(x, value,  ...) standardGeneric("hasAxis<-"))
 setMethod("hasAxis", "Tracked", function(x){
   x@hasAxis
 })
-setReplaceMethod("hasAxis", c("Tracked", "character"), function(x, value){
+setReplaceMethod("hasAxis", c("Tracked", "logical"), function(x, value){
   x@hasAxis <- value
   x
 })
@@ -99,4 +122,6 @@ setReplaceMethod("height", c("Tracked", "numericORunit"), function(x, value){
   x@height <- value
   x
 })
+
+
 

@@ -5,7 +5,7 @@ setClass("Plot", contains = "Tracked")
 setClass("ggplotPlot", contains = c("gg", "ggplot", "Plot"))
 setClass("latticePlot", contains = c("trellis","Plot"))
 setRefClass("ggbioPlot", contains = c("GGbio", "Plot"))
-
+setClass("test", contains = c("gg", "ggplot", "Plot"))
 
 ## Generic function to get subclas instance of 'Plot' class
 setGeneric("Plot", function(x, ...) standardGeneric("Plot"))
@@ -36,4 +36,13 @@ PlotList <- function(...){
   items <- lapply(items, Plot)
   new("PlotList", items)
 }
+
+## original list of plots
+plotList <- function(...){
+  items <- list(...)
+  items <- reduceListOfPlots(items)
+}
+
+
+
 

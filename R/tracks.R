@@ -1,12 +1,6 @@
-## Goal: need to be able to bind tracks!, tracks(tracks(), tracks())
-setClass("ideogram", contains = c("gg", "ggplot"))
-ideogram <- function(x){
-  new("ideogram", x)  
-}
-
 tracks.gen <- setClass("Tracks",
-                       representation(grobs = "PlotList", # working plots
-                                      plot.ori = "PlotList", # original plots passed into tracks
+                       representation(grobs = "PlotList", # working plots, not reall 'Grob'
+                                      plot = "list", # original plots passed into tracks
                                       backup = "list", # backup of the whole tracks object
                                       heights = "numericORunit",
                                       xlim = "numeric",
@@ -35,7 +29,6 @@ tracks.gen <- setClass("Tracks",
 tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
                    title = NULL,
                    theme = NULL, 
-                   fixed = NULL,
                    track.plot.color = NULL,
                    track.bg.color = NULL,
                    main.height = unit(2, "lines"),
@@ -48,6 +41,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
                    label.text.cex = 1,                   
                    label.width = unit(2.5, "lines")){
 
+  
   if(is.numeric(padding) && !is.unit(padding))
     padding <- unit(padding, "lines")
   
@@ -55,23 +49,44 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     main <- title
   
   dots <- list(...)
-  dots <- reduceListOfGrobs(dots)
+  dots <- reduceListOfPlots(dots)
 
-  nms <- names(dots)
-  if(is.null(fixed)){
-    fixed <- sapply(dots, fixed)
+  ## original plots
+  ppl.ori <- do.call(plotList, dots)
+
+  ## convert to Plot object with extra slots
+  dots <- do.call(PlotList, dots)
+  
+  ## fixed
+  fixed <- sapply(dots, fixed)
+
+  ## mutable
+  mts <- sapply(dots, mutable)
+
+  ## hasAxis
+  axs <- sapply(dots, hasAxis)
+  
+  ## get height
+  if(missing(heights)){
+    heights <- getHeight(dots)
   }else{
-    stopifnot(length(fixed) == length(dots))
-    dots <- lapply(1:length(dots), function(i){
-      fixed(dots[[i]]) <- fixed[i]
-      dots[[i]]
-    })
+    heights <- parseHeight(heights, length(dots))
   }
 
-  ideo <- !sapply(dots, is, "ideogram")
-  
+  ## labeld
+  labeled <- sapply(dots, labeled)
+
+  ## Ideo
+  isIdeo <- sapply(dots, is, "Ideogram")
+
+  ## ylim
+  ylim <- lapply(dots[!fixed & !isIdeo], function(grob){
+     scales::expand_range(getLimits(grob)$ylim, mul = 0.05)
+  })
+
+  ## xlim
   if(missing(xlim)){
-    lst <- lapply(dots[!fixed & ideo], function(obj){
+    lst <- lapply(dots[!fixed & !isIdeo], function(obj){
       res <- getLimits(obj)
       data.frame(xmin = res$xlim[1], xmax = res$xlim[2])
     })
@@ -91,66 +106,16 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     }
   }
   
-
-  mts <- sapply(dots, mutable)
-  dots <- lapply(1:length(dots), function(i){
-    mutable(dots[[i]]) <- mts[i]
-    dots[[i]]
-  })  
-  axs <- sapply(dots, hasAxis)
-  dots <- lapply(1:length(dots), function(i){
-    hasAxis(dots[[i]]) <- axs[i]
-    dots[[i]]
-  })
-  names(dots) <- nms
-  ## get height
-  getHeight <- function(dts){
-    hts <- do.call(unit.c, lapply(dts, height))
-    hts
-  }
-
-  parseHeight <- function(hts, n){
-    if(length(hts) != n && length(hts) != 1)
-      stop("Heights must be of length 1 or numbers of graphics")
-    if(is.numeric(hts) && !is.unit(hts)){
-      if(length(hts) == 1)
-        res <- rep(unit(1, "null"), n)
-      if(length(hts) == n)
-        res <- unit(hts, "null")
-    }else if(is.unit(hts)){
-      res <- hts
-    }
-      res
-  }
-
-  if(missing(heights))
-    heights <- getHeight(dots)
-  else
-    heights <- parseHeight(heights, length(dots))
-  
-  fixs <- sapply(dots, fixed)
-
-  ylim <- lapply(dots[!fixs & ideo], function(grob){
-     scales::expand_range(getLimits(grob)$ylim, mul = 0.05)
-  })
-
-  ## if(is.null(names(dots)))
-  ##   labeled <- rep(FALSE
-  ## else
-  labeled <- sapply(dots, labeled)
-
-  ## gbl <- do.call(GrobList, dots)
-  ppl <- do.call(PlotList, dots)
-  
-  backup <- list(grobs = ppl,
-                 plot.ori = ppl,
+  ## backup: record a state
+  backup <- list(grobs = dots,
+                 plot = ppl.ori,
                  heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab,
                  main = main,
                  main.height = main.height,
                  scale.height = scale.height,
                  xlab.height = xlab.height,
                  theme = theme, mutable = mts, hasAxis = axs,
-                 fixed = fixs, padding = padding,
+                 fixed = fixed, padding = padding,
                  labeled = labeled, label.bg.color = label.bg.color, label.bg.fill = label.bg.fill,
                  label.text.color = label.text.color,
                  track.plot.color = track.plot.color,
@@ -158,13 +123,13 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
                  label.text.cex = label.text.cex,
                  label.width = label.width)
   
-  obj <- new("Tracks", grobs = gbl, plot.ori = ppl, backup = backup, labeled = labeled, 
+  obj <- new("Tracks", grobs = dots, plot = ppl.ori, backup = backup, labeled = labeled, 
       heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab, main = main,
       main.height = main.height,
       scale.height = scale.height,
       xlab.height = xlab.height,
       theme = theme,  mutable = mts, hasAxis = axs,
-      fixed = fixs, padding = padding,
+      fixed = fixed, padding = padding,
       label.bg.color = label.bg.color, label.bg.fill = label.bg.fill,
       label.text.color = label.text.color,      
       track.plot.color = track.plot.color,
@@ -314,7 +279,7 @@ setMethod("Arith", signature = c("Tracks", "cartesian"), function(e1, e2) {
     e1@xlim <- e2$limits$x
   if(!is.null(e2$limits$y)){  
     for(i in seq_len(length(e1@ylim))){
-      if(!fixed(e1@grobs[[i]]) && !is(e1@grobs[[i]], "ideogram"))
+      if(!fixed(e1@grobs[[i]]) && !is(e1@grobs[[i]], "Ideogram"))
         e1@ylim[[i]] <- e2$limits$y
     }
   }
@@ -482,18 +447,15 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
 
   ## add a plot with axis and remove later
   if(add.scale){
-    idx.fix <- which(!sapply(ggl, fixed) & !sapply(ggl, is, "ideogram"))[1]
+    idx.fix <- which(!sapply(ggl, fixed) & !sapply(ggl, is, "Ideogram"))[1]
     if(is.na(idx.fix))
       idx.fix <- 1
     ggl <- c(ggl, list(ggl[[idx.fix]] + theme_gray()))
   }
 
   ## parse grobs
-  grobs <- lapply(ggl, function(x){
-    gg <- Grob(x)
-    gg
-  })
-
+  grobs <- do.call(GrobList, ggl)
+  
   addLabel <- function(grobs, nms, lbs,
                        label.bg.color =  "white",
                        label.bg.fill = "gray80",
@@ -506,8 +468,10 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     label.text.color <- rep(label.text.color, len = length(grobs))
     label.text.cex <- rep(label.text.cex, len = length(grobs))
     label.bg.color <- rep(label.bg.color, len = length(grobs))            
-    label.bg.fill <- rep(label.bg.fill, len = length(grobs))        
+    label.bg.fill <- rep(label.bg.fill, len = length(grobs))
+    
     direction <- match.arg(direction)
+    
     if(direction == "row"){
       res <- lapply(1:length(grobs), function(i){
         grob <- grobs[[i]]
@@ -521,7 +485,8 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
         }else{
           left.grob <- ggplot2:::zeroGrob()
         }
-        gt <- gtable(width = unit.c(label.width,unit(1, "null")), height = unit(1, "null"))
+        gt <- gtable(width = unit.c(label.width,unit(1, "null")),
+                     height = unit(1, "null"))
         gt <- gtable_add_grob(gt, left.grob,l = 1, t = 1)      
         gt <- gtable_add_grob(gt, grob, l = 2, t =1 )
       })
@@ -538,7 +503,8 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
         }else{
           top.grob <- ggplot2:::zeroGrob()
         }
-        gt <- gtable(width = unit(1, "null"), height = unit.c(label.width,unit(1, "null")))
+        gt <- gtable(width = unit(1, "null"),
+                     height = unit.c(label.width,unit(1, "null")))
         gt <- gtable_add_grob(gt, top.grob,l = 1, t = 1)      
         gt <- gtable_add_grob(gt, grob, l = 1, t =2 )
       })
@@ -570,15 +536,19 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     grobs[[i]]$grobs[[1]]$children[[1]]$children$layout <- gt.temp
     grobs[[i]]$grobs[[1]] <- editGrob(grobs[[i]]$grobs[[1]], "bgColor", grep = TRUE, global = TRUE,
                        gp  = gpar(fill = .col, col = .col))
-    grobs[[i]] <- copyAttr(.grob, grobs[[i]])
+    ## grobs[[i]] <- copyAttr(.grob, grobs[[i]])
+    grobs[[i]]
   })
+
   names(grobs) <- .nms
   if(add.scale){
     g.last <- grobs[[length(grobs)]]
     grobs <- grobs[-length(grobs)]
   }
+  
   if(add.scale){
     g <- g.last$grobs[[1]]$children[[1]]$children$layout
+    ## g <- g.last$children[[1]]$children$layout
     g.s <- scaleGrob(g)
     if(length(track.bg.color)){
         rect.grob <- rectGrob(gp=gpar(col = track.bg.color,
@@ -589,8 +559,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     if(length(main)){
       text.grob <- textGrob(main)
       if(length(track.bg.color)){
-        rect.grob <- rectGrob(gp=gpar(col = track.bg.color,
-                                fill = track.bg.color))
+        rect.grob <- rectGrob(gp=gpar(col = track.bg.color, fill = track.bg.color))
         text.grob <- grobTree(gTree(children = gList(rect.grob, text.grob)))
       }
     grobs <- c(list(text.grob), grobs)      
@@ -598,13 +567,14 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     if(length(xlab)){
       text.grob <- textGrob(xlab)      
       if(length(track.bg.color)){
-        rect.grob <- rectGrob(gp=gpar(col = track.bg.color,
-                                fill = track.bg.color))
+        rect.grob <- rectGrob(gp=gpar(col = track.bg.color, fill = track.bg.color))
         text.grob <- grobTree(gTree(children = gList(rect.grob, text.grob)))
       }
       grobs <- c(grobs, list(text.grob))
     }
   }
+
+  
   lbs <- sapply(grobs, labeled)
   nms <- names(grobs)
 
@@ -637,7 +607,17 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                         direction = "col")
   }
 
+  ## reduce to normal grob
+  temp <- grobs[[3]]
   
+  grobs <- lapply(grobs, function(g){
+    if(is(g, "Grob")){
+      suppressWarnings(class(g) <- g@.S3Class)    
+      return(g)
+    }else{
+      return(g)
+    }
+  })
 
   if(vertical){
     if(!length(widths)){
@@ -759,16 +739,21 @@ spaceAroundPanel <- function(g, type = c("t", "l", "b", "r")){
 
 
 ## return uniformed grobs
+
 uniformAroundPanel <- function(..., direction = c("row", "col")){
   dir <- match.arg(direction)
   lst <- list(...)
-  grobs <- lapply(lst, function(p){
-    if(inherits(p, "ggplot"))
-      g <- Grob(p)
-    else
-      g <- p
-    g
-  })
+  if(length(lst) == 1 && is(lst[[1]], "GrobList")){
+    grobs <- lst[[1]]
+  }else{
+    grobs <- lapply(lst, function(p){
+      if(inherits(p, "ggplot"))
+        g <- Grob(p)
+      else
+        g <- p
+      g
+    })
+  }
   if(dir == "row"){
     slst <- lapply(grobs, spaceAroundPanel, c("l", "r"))
     lmx <- do.call(max, lapply(slst, function(lst) lst$l))
@@ -784,7 +769,7 @@ uniformAroundPanel <- function(..., direction = c("row", "col")){
       ## rect.grob <- rectGrob(gp = gpar(fill = NA, col = NA))
       all.grob <- grobTree(gTree(children = gList(rect.grob, grobs[[i]])))      
       grobs[[i]] <- gtable_add_grob(gt, all.grob, 1, 1)
-      grobs[[i]] <- copyAttr(.grob, grobs[[i]])
+      ## grobs[[i]] <- copyAttr(.grob, grobs[[i]])
     }
   }
   if(dir == "col"){
@@ -800,7 +785,7 @@ uniformAroundPanel <- function(..., direction = c("row", "col")){
       rect.grob <- rectGrob(gp = gpar(fill = NA, color = NA), name = "bgColor")
       all.grob <- grobTree(gTree(children = gList(rect.grob, grobs[[i]])))      
       grobs[[i]] <- gtable_add_grob(gt, all.grob, 1, 1)
-      grobs[[i]] <- copyAttr(.grob, grobs[[i]])      
+      ## grobs[[i]] <- copyAttr(.grob, grobs[[i]])      
     }
   }
   grobs
@@ -828,6 +813,7 @@ ScalePlot <- function(x, color = "black", fill = NA){
   p <- qplot(data = df, x = x, y = y, geom = "blank") +
     theme_onlyXaxis() + theme(aspect.ratio = 1/1000) +
       theme(panel.border = element_rect(color = color, fill = fill))
+  p <- new("ggplotPlot", p)
   mutable(p) <- FALSE
   hasAxis(p) <- TRUE
   ## height(p) <- unit(4, "lines")
@@ -835,6 +821,7 @@ ScalePlot <- function(x, color = "black", fill = NA){
 }
 
 ## always comes last
+
 scaleGrob <- function(g){
   idx <- g$layout$name %in% c("axis-b", "xlab")
   idx <- unique(c(g$layout[idx, "t"], g$layout[idx, "b"]))
@@ -926,6 +913,7 @@ textPlot <- function(lb="", ut = unit(4, "lines")){
   p <- qplot(x = 1, y = 1, geom = "text", label = lb) + theme_null()+
     theme(plot.margin = unit(c(0, 0, 0, 0), "lines"),
           panel.margin = unit(c(0, 0, 0, 0), "lines"))
+  p <- new("ggplotPlot", p)
   mutable(p) <- FALSE
   fixed(p) <- TRUE
   height(p) <- ut
@@ -973,11 +961,21 @@ getAxisHeight <- function(p, base){
   unit(.h, "null")
 }
 
-## ggplotGrobAttr <- function(x){
-##   ## attrs <- attributes(x)
-##   ## attrs <- attrs[setdiff(names(attrs), c("class", "names"))]
-##   res <- ggplotGrob(x)
-##   ## attrs <- c(attrs, attributes(res))
-##   ## attributes(res) <- attrs
-##   copyAttr(x, res)
-## }
+getHeight <- function(dts){
+  hts <- do.call(unit.c, lapply(dts, height))
+  hts
+}
+
+parseHeight <- function(hts, n){
+  if(length(hts) != n && length(hts) != 1)
+    stop("Heights must be of length 1 or numbers of graphics")
+  if(is.numeric(hts) && !is.unit(hts)){
+    if(length(hts) == 1)
+      res <- rep(unit(1, "null"), n)
+    if(length(hts) == n)
+      res <- unit(hts, "null")
+  }else if(is.unit(hts)){
+    res <- hts
+  }
+  res
+}

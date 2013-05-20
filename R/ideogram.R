@@ -1,3 +1,9 @@
+## Ideogram has a special response to +xlim() method
+setClass("Ideogram", contains = c("gg", "ggplot"))
+Ideogram <- function(x){
+  new("Ideogram", x)  
+}
+
 plotIdeogram <- function(obj, subchr, zoom.region,
                             xlab, ylab, main, xlabel = FALSE,
                             color = "red", fill = "red", alpha = 0.7,
@@ -79,7 +85,7 @@ plotIdeogram <- function(obj, subchr, zoom.region,
   attr(p, "alpha") <- alpha
   attr(p, "size") <- size
   attr(p, "zoom.offset") <- zoom.offset
-  p <- ideogram(p)
+  p <- Ideogram(p)
   p
 }
 
@@ -104,11 +110,6 @@ setMethod("+", c("ideogram"), function(e1, e2){
   zoom.offset <- attr(e1, "zoom.offset")
   zoom.region <- e2$limits$x
   if(length(zoom.region)){
-    ## zoom.df <- data.frame(x1 = zoom.region[1],
-    ##                       x2 = zoom.region[2],
-    ##                       seqnames = base::unique(as.character(GenomicRanges::seqnames(obj))))
-    ## do.call(plotSingleChrom, list(obj,
-    ##                               ))
     p <- plotSingleChrom(obj, subchr, zoom.region,
                          xlab = xlab, ylab = ylab, main = main, xlabel = xlabel,
                          color = color, fill = fill, alpha = alpha,
@@ -119,38 +120,4 @@ setMethod("+", c("ideogram"), function(e1, e2){
   }
   p
 })
-
-## "+.ideogram" <- function(e1, e2){
-## }
-
-## setMethod("+", c("ideogram"), function(e1, e2){
-##     p <- attr(e1, "ideogram")
-##   obj <- attr(e1, "ideogram.data")
-##   if("chr" %in% names(attributes(e2))){
-##     subchr <- attr(e2, "chr")
-##   }else{
-##     subchr <- attr(e1, "subchr")
-##   }
-##   aspect.ratio <- attr(e1, "aspect.ratio")
-##   xlabel <- attr(e1, "xlabel")
-##   xlab <- attr(p, "xlab") 
-##   ylab <- attr(p, "ylab")
-##   main <- attr(p, "main")
-##   if(is.null(xlab))
-##     xlab <- ""
-##   if(is.null(ylab))
-##     ylab <- ""
-##   if(is.null(main))
-##     main <- ""
-##   zoom.region <- e2$limits$x
-##   zoom.df <- data.frame(x1 = zoom.region[1],
-##                         x2 = zoom.region[2],
-##                         seqnames = base::unique(as.character(GenomicRanges::seqnames(obj))))
-##   p <- plotSingleChrom(obj, subchr, zoom.region,
-##                        xlab = xlab, ylab = ylab, main = main, xlabel = xlabel,
-##                        cytoband = TRUE, aspect.ratio = aspect.ratio)  
-##   p
-## })
-
-
 

@@ -416,7 +416,6 @@ tracks(time1 = p1, time2 = p2, track.plot.color = c("yellow", "brown"))
 
 ## alignPlots simply align the panel, without adjusting the xlims
 alignPlots(p1, p2)
-
 alignPlots(p1, p2 + theme(legend.position = "none"), vertical = FALSE)
 }
 \author{Tengfei Yin}

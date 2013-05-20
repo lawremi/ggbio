@@ -144,5 +144,6 @@ export(theme_null, theme_alignment, theme_clear, theme_tracks_sunset,
 
 export(ggsave)
 
-## Tracked
-exportMethods(Grob)
+
+exportMethods(Grob, Plot)
+export(PlotList)

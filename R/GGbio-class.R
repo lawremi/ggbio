@@ -83,7 +83,6 @@ setMethod("show", "GGbio", function(object){
 })
 
 setMethod("+", c("GGbio"), function(e1, e2){
-  ## hold all command and parsed args
   mc <- match.call()
   .nm <- as.character(mc)[3]
   .tmp <- list(e2)
@@ -95,21 +94,6 @@ setMethod("+", c("GGbio"), function(e1, e2){
     .args[[1]]$data <- e1$data
   e1$cmd <- c(e1$cmd, .tmp)
   e1$args <- c(e1$args, .args)
-  ## old ggbio class file
-  ## insert data from original one 
-  ## e2name <- deparse(substitute(e2))  
-  ## if(is.call(e2)){
-  ##    args <- as.list(e2)
-  ## ##   if(!is.null(e1$data))
-  ## ##     args$data <- e1$data
-  ## object <- do.call(as.character(args[[1]]), args[-1])
-  ## FIXME:
-  ## e1$ggplot <- mapToGG(e1$ggplot, object)
-  ## }else{
-  ##   object <- e2
-  ## }
-  ## res <- ggplot2:::add_ggplot(e1$ggplot, object, e2name)
-  ## e1$ggplot <- res
   e1 
 })
 

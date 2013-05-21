@@ -574,7 +574,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     }
   }
 
-  
+  ## FIXME:
   lbs <- sapply(grobs, labeled)
   nms <- names(grobs)
 
@@ -608,8 +608,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   }
 
   ## reduce to normal grob
-  temp <- grobs[[3]]
-  
+grobs_back <- grobs
   grobs <- lapply(grobs, function(g){
     if(is(g, "Grob")){
       suppressWarnings(class(g) <- g@.S3Class)    
@@ -619,6 +618,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     }
   })
 
+  
   if(vertical){
     if(!length(widths)){
       widths <- unit(1, "null")
@@ -673,6 +673,9 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
       tab <- gtable_add_grob(tab, grobs[[i]], l = i, t = 1, b = 1)
     }
   }
+  
+
+  
   if(plot){
     ##grid.newpage()
     grid.draw(tab)

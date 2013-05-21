@@ -8,33 +8,37 @@ isSupportedPlots <- function(x){
 }
 
 setClass("Grob", contains = "VIRTUAL")
-setClass("ggplotGrob", contains = c("gtable", "grob", "Grob"))
-setClass("latticeGrob", contains = c("lattice", "grob", "Grob"))
+## setClass("ggplotGrob", contains = c("gtable", "grob", "Grob"))
+## setClass("latticeGrob", contains = c("lattice", "grob", "Grob"))
 
 ## Grob creat instance of sub-class
 setGeneric("Grob", function(x, ...) standardGeneric("Grob"))
 setMethod("Grob", "gg", function(x){
-  new("ggplotGrob", ggplotGrob(x))
+  ## new("ggplotGrob", ggplotGrob(x))
+  ggplotGrob(x)
 })
 setMethod("Grob", "gtable", function(x){
-  new("ggplotGrob", x)  
-
+  ## new("ggplotGrob", x)
+  x
 })
 setMethod("Grob", "trellis", function(x){
-  new("latticeGrob", latticeGrob(x))
+  ## new("latticeGrob", latticeGrob(x))
+  latticeGrob(x)
 })
 
 setMethod("Grob", "lattice", function(x){
-   new("latticeGrob", x)
+  ## new("latticeGrob", x)  
+  x
 })
 
 setMethod("Grob", "GGbio", function(x){
-   new("ggplotGrob", ggplotGrob(x$ggplot))
+   ## new("ggplotGrob", ggplotGrob(x$ggplot))
+   ggplotGrob(x$ggplot)
 })
 
 
-setClass("GrobList", prototype = prototype(elementType = "Grob"),
-         contains = "list")
+## setClass("GrobList", prototype = prototype(elementType = "Grob"),
+##          contains = "list")
 
 .validList <- function(x){
   if(all(sapply(x, is, x@elementType)))
@@ -42,13 +46,14 @@ setClass("GrobList", prototype = prototype(elementType = "Grob"),
   else
     paste("Class must be", x@elementType)
 }
-setValidity("GrobList", .validList)
+## setValidity("GrobList", .validList)
 
-## constructor for class 'grobList'
+## ## constructor for class 'grobList'
 GrobList <- function(...){
   items <- list(...)
   items <- listOfGrobs(items)
-  new("GrobList", items)
+  ## new("GrobList", items)
+  items
 }
 
 reduceListOfPlots <- function(x){

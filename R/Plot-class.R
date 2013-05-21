@@ -10,17 +10,41 @@ setClass("test", contains = c("gg", "ggplot", "Plot"))
 ## Generic function to get subclas instance of 'Plot' class
 setGeneric("Plot", function(x, ...) standardGeneric("Plot"))
 setMethod("Plot", "gg", function(x){
-  new("ggplotPlot", x)
+  idx <- names(attributes(x)) %in% c("fixed", "labeled", "bgColor", "hasAxis", "mutable", "height")
+  if(length(idx)){
+    lst <- attributes(x)[idx]
+    obj <- do.call("new", c("ggplotPlot", list(x), lst))
+  }else{
+    obj <- new("ggplotPlot", x)    
+  }
+  obj
 })
 
 ## lattice doesn't now how to update itself yet, so mutalbe = FALSE
 setMethod("Plot", "trellis", function(x, mutable = FALSE){
-  new("latticePlot", x, mutable = mutable)
+  idx <- names(attributes(x)) %in% c("fixed", "labeled", "bgColor", "hasAxis", "mutable", "height")
+  if(length(idx)){
+    lst <- attributes(x)[idx]
+    lst$mutable <- mutable
+    obj <- do.call("new", c("latticePlot", list(x), lst))
+  }else{
+    obj <- new("latticePlot", x, mutable = mutable)    
+  }
+  obj
 })
 
 setMethod("Plot", "GGbio", function(x){
-  new("ggbioPlot", x)
+  idx <- names(attributes(x)) %in% c("fixed", "labeled", "bgColor", "hasAxis", "mutable", "height")
+  if(length(idx)){
+    lst <- attributes(x)[idx]
+    obj <- do.call("new", c("ggbioPlot", list(x), lst))
+  }else{
+    obj <- new("ggbioPlot", x)    
+  }
+  obj
 })
+
+
 
 ## compare to grobList, plotList return a list of original plot
 ## supported grobs only

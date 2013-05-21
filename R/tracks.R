@@ -164,9 +164,14 @@ setMethod("print", "Tracks", function(x){
                   function(i) {
                     if(i %in% which(x@mutable))
                       grobs[[i]] <- grobs[[i]] + x@theme
-                    grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "") +
-                      theme(plot.margin = unit(c(as.numeric(x@padding), 1,
+                    grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "")
+                    if(i == 1){
+                      grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(1, 1,
                               as.numeric(x@padding),  0.5), "lines"))
+                    }else{
+                      grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(as.numeric(x@padding), 1,
+                              as.numeric(x@padding),  0.5), "lines"))
+                    }
                     if(i %in% which(!x@hasAxis))
                       grobs[[i]] <- grobs[[i]] + theme(axis.text.x = element_blank(),
                                                        axis.ticks.x = element_blank())
@@ -1078,6 +1083,30 @@ setMethod("c", "Tracks",  function(x, ...){
         res <- do.call(tracks, do.call(c, lst))
         res
 })
+
+setMethod("cbind", "Tracks",  function(...){
+  args <- list(...)
+  if(all(sapply(args, is, "Tracks"))){
+    lst <- lapply(args, get_gtable)
+    res <- do.call(cbind, lst)    
+  }else{
+    stop("need to be of class Tracks")
+  }
+   grid.draw(res)
+})
+
+
+setMethod("rbind", "Tracks",  function(...){
+  args <- list(...)
+  if(all(sapply(args, is, "Tracks"))){
+    lst <- lapply(args, get_gtable)
+    res <- do.call(rbind, lst)    
+  }else{
+    stop("need to be of class Tracks")
+  }
+   grid.draw(res)
+})
+
 
 
 

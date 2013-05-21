@@ -70,3 +70,20 @@ plotList <- function(...){
 
 
 
+## add tracks + plot
+setMethod("c", "PlotList",  function(x, ...){
+        if (missing(x)) {
+            args <- unname(list(...))
+            x <- args[[1L]]
+        } else {
+            args <- unname(list(x, ...))
+        }
+        if (length(args) == 1L)
+            return(x)
+        arg_is_null <- sapply(args, is.null)
+        if (any(arg_is_null))
+            args[arg_is_null] <- NULL  # remove NULL elements by setting them to NULL!
+        if (!all(sapply(args, is, class(x))))
+            stop("all arguments in '...' must be ", class(x), " objects (or NULLs)")
+        do.call(PlotList, unlist(args, recursive = FALSE))
+})

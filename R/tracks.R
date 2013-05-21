@@ -210,7 +210,71 @@ setMethod("print", "Tracks", function(x){
                                              scale.height = x@scale.height,
                                              xlab.height = x@xlab.height
                                              )))
-    ggplot2:::set_last_plot(x)
+
+    grid.draw(res)
+    ggplot2:::set_last_plot(x)          
+})
+
+setGeneric("get_gtable", function(x, ...) standardGeneric("get_gtable"))
+
+setMethod("get_gtable", "Tracks", function(x){
+    grobs <- x@grobs
+    N <- length(grobs)
+    if(any(x@labeled))
+      nms <- names(x@grobs)
+    else
+      nms <- NULL
+    lst <- lapply(seq_len(N),
+                  function(i) {
+                    if(i %in% which(x@mutable))
+                      grobs[[i]] <- grobs[[i]] + x@theme
+                    grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "") +
+                      theme(plot.margin = unit(c(as.numeric(x@padding), 1,
+                              as.numeric(x@padding),  0.5), "lines"))
+                    if(i %in% which(!x@hasAxis))
+                      grobs[[i]] <- grobs[[i]] + theme(axis.text.x = element_blank(),
+                                                       axis.ticks.x = element_blank())
+
+                    if(i %in% which(!x@fixed)){
+                      s <- coord_cartesian(xlim = x@xlim)                      
+                      grobs[[i]] <- grobs[[i]] + s
+                    }
+                    grobs[[i]]
+                  })
+
+    if(!is.null(nms))
+      names(lst) <- nms
+    if(any(x@labeled))
+      res <- do.call(alignPlots, c(lst, list(heights = x@heights,
+                                             padding = x@padding,
+                                             label.bg.color =  x@label.bg.color,
+                                             label.bg.fill = x@label.bg.fill,
+                                             label.text.color = x@label.text.color,
+                                             label.text.cex = x@label.text.cex,                   
+                                             label.width = x@label.width,
+                                             track.plot.color = x@track.plot.color,
+                                             track.bg.color = x@track.bg.color,
+                                             add.scale = TRUE,
+                                             main = x@main,
+                                             xlab = x@xlab,
+                                             main.height = x@main.height,
+                                             scale.height = x@scale.height,
+                                             xlab.height = x@xlab.height
+                                             )))
+    else
+      res <- do.call(alignPlots, c(lst, list(heights = x@heights,
+                                             padding = x@padding,
+                                             track.plot.color = x@track.plot.color,
+                                             track.bg.color = x@track.bg.color,
+                                             add.scale = TRUE,
+                                             main = x@main,
+                                             xlab = x@xlab,
+                                             main.height = x@main.height,
+                                             scale.height = x@scale.height,
+                                             xlab.height = x@xlab.height
+                                             )))
+
+    res
 })
 
 setMethod("show", "Tracks", function(object){
@@ -390,7 +454,7 @@ setMethod("backup", "Tracks", function(obj){
 ## TODO: adust due to left/right legend
 alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        heights = NULL, height = NULL, width = NULL,
-                       plot = TRUE,  padding = NULL, 
+                       padding = NULL, 
                        track.plot.color = NULL,
                        track.bg.color = NULL,                                             
                        label.bg.color =  "white",
@@ -673,16 +737,10 @@ grobs_back <- grobs
       tab <- gtable_add_grob(tab, grobs[[i]], l = i, t = 1, b = 1)
     }
   }
-  
-
-  
-  if(plot){
-    ##grid.newpage()
-    grid.draw(tab)
-  }else{
     tab
-  }
 }
+
+
 
 getPanelIndex <- function(g){
   if(inherits(g, "ggplot"))
@@ -982,3 +1040,44 @@ parseHeight <- function(hts, n){
   }
   res
 }
+
+## combining
+## do something fun here, make combination method for Tracks
+## support
+## 1. c(Tracks, Tracks) 
+## 2. Tracks + Tracks
+## 3. Tracks(Tracks, Tracks)
+## 4. Tracks + plot (not yet)
+setMethod("Arith", signature = c("Tracks", "Tracks"), function(e1, e2) {
+     switch(.Generic,
+            "+"= {
+              e1 <- c(e1, e2)
+            },
+            stop("unhandled 'Arith' operator '", .Generic, "'"))
+    e1
+})
+
+setMethod("c", "Tracks",  function(x, ...){
+        if (missing(x)) {
+            args <- unname(list(...))
+            x <- args[[1L]]
+        } else {
+            args <- unname(list(x, ...))
+        }
+        if (length(args) == 1L)
+            return(x)
+        arg_is_null <- sapply(args, is.null)
+        if (any(arg_is_null))
+            args[arg_is_null] <- NULL  # remove NULL elements by setting them to NULL!
+        if (!all(sapply(args, is, class(x))))
+            stop("all arguments in '...' must be ", class(x), " objects (or NULLs)")
+        lst <- lapply(args, function(x){
+          x@grobs
+        })
+        ## FIXME: how to keep other attributes?
+        res <- do.call(tracks, do.call(c, lst))
+        res
+})
+
+
+

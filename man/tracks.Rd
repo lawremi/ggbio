@@ -282,6 +282,14 @@ tracks(p1, p2)
 tks <- tracks(p1, p2)
 tks
 
+## combine
+c(tks, tks)
+tks + tks
+
+x <- get_gtable(tks)
+grid.draw(cbind(x, x))
+
+
 ## labeling: default labeling a named graphic
 ## simply pass a name with it
 tracks(time1 = p1, time2 = p2)

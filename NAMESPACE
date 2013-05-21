@@ -145,5 +145,5 @@ export(theme_null, theme_alignment, theme_clear, theme_tracks_sunset,
 export(ggsave)
 
 
-exportMethods(Grob, Plot)
+exportMethods(Grob, Plot, get_gtable)
 export(PlotList)

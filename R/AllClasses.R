@@ -9,6 +9,8 @@ setClassUnion("optionsORNULL", c("options", "NULL"))
 setClassUnion("numericORunit", c("numeric", "unit"))
 setClassUnion("numericORNULL", c("numeric", "NULL"))
 
+setClassUnion("GRangesORNULL", c("GRanges", "NULL"))
+
 
 
 setOldClass("ggplot")

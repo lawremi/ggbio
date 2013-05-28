@@ -1,9 +1,10 @@
 library(ggbio)
 p <- ggplot(data = mtcars)
 ## obj.new <- obj.new + layout_circle()
-p  <- p + geom_point(aes(x = mpg, y = wt), color = "red")
-p
 
+p  <- p + geom_point(aes(x = mpg, y = wt), color = "red")
+
+p
 class(p)
 
 N <- 100
@@ -25,6 +26,8 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
+
+
 seqlengths(gr) <- c(400, 500, 700)
 values(gr)$to.gr <- gr[sample(1:length(gr), size = length(gr))]
 
@@ -38,4 +41,51 @@ ggplot() + layout_circle(gr, geom = "ideo", fill = "gray70", radius = 7, trackWi
 
 p <- ggplot(gr) + layout_circle() + geom_bar(aes(fill = score, y = score))
 p
+library(grid)
+p <- ggplot() + geom_rect(gr)
+
+autoplot(gr)
+class(p)
+p
+p + xlim(100, 200)
+p <- ggplot(gr) + geom_rect(which = gr)
+p
+class(p)
+
+
+gr1 <- GRanges("chr1", IRanges(1, 3))
+gr2 <- GRanges("chr1", IRanges(c(2, 4, 1), c(3, 5, 2)))
+countOverlaps(gr2, gr1, type = "within")
+
+## test cache ability
+
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+data(genesymbol, package = "biovizBase")
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+library(ggbio)
+p1 <- autoplot(txdb, which = genesymbol["ALDOA"], names.expr = "tx_name")
+
+ggbio:::cached_which(p1)
+ggbio:::cached_item(p1)
+
+gr1 <- genesymbol["ALDOA"]
+gr1
+gr2 <- GRanges("chr16", IRanges(30074491, 30075733))
+gr3 <- GRanges("chr12", IRanges(30074491, 30081733))
+
+print(ggbio:::needCache(p1, gr2))
+p11 = p1
+p11
+p1
+p1 + xlim(gr1)
+p3 <- p1 + xlim(gr3)
+p3
+class( xlim(gr3))
+ggbio:::cached(p1)
+res <- xlim(gr2)
+res <- xlim_car(res)
+
+
+
+
 

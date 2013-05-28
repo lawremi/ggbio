@@ -360,8 +360,11 @@ setMethod("Arith", signature = c("Tracks", "cartesian"), function(e1, e2) {
   e1
 })
 
-setGeneric("xlim",function(obj, ...) standardGeneric("xlim"))
 
+xlim_car <- function(x){
+  class(x) <- c(class(x), "xlim")
+  x
+}
 
 setMethod("xlim", "numeric", function(obj, ...){
   if(length(list(...)))
@@ -369,13 +372,15 @@ setMethod("xlim", "numeric", function(obj, ...){
   if(length(obj) > 2){
     obj <- range(obj)
   }
-  ggplot2::coord_cartesian(xlim = obj)
+  res <- ggplot2::coord_cartesian(xlim = obj)
+  xlim_car(res)
 })
 
 
 setMethod("xlim", "IRanges", function(obj, ...){
     xlim <- c(start(obj), end(obj))
-  ggplot2::coord_cartesian(xlim = xlim)
+    res <- ggplot2::coord_cartesian(xlim = xlim)
+    xlim_car(res)
 })
 
 setMethod("xlim", "GRanges", function(obj, ...){
@@ -384,14 +389,14 @@ setMethod("xlim", "GRanges", function(obj, ...){
   res <- ggplot2::coord_cartesian(xlim = xlim)
   chr <- unique(as.character(seqnames(obj)))
   attr(res, "chr") <- chr
-  res
+  xlim_car(res)
 })
 
 setMethod("xlim", "Tracks", function(obj, ...){
   obj@xlim
 })
 
-setGeneric("xlim<-", function(x, value) standardGeneric("xlim<-"))
+
 
 setReplaceMethod("xlim", c("Tracks", "IRanges"), function(x, value){
     xlim <- c(start(value), end(value))

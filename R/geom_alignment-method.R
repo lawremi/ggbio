@@ -7,8 +7,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                                                 facets = NULL,
                                                 stat = c("stepping", "identity"),
                                                 range.geom = c("rect", "arrowrect"),
-                                                gap.geom = c("chevron", "arrow",
-                                                  "segment"),
+                                                gap.geom = c("chevron", "arrow", "segment"),
                                                 rect.height = NULL,
                                                 group.selfish = TRUE,
                                                 label = TRUE){
@@ -27,8 +26,6 @@ setMethod("geom_alignment", "GRanges", function(data,...,
   else
     es <- 0
   
-
-  ## rect.height <- force(rect.height)
   if(is.null(rect.height))
     rect.height <- 0.4
   args.non$rect.height <- rect.height
@@ -192,14 +189,14 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
     message("Aggregating TranscriptDb...")
     gr <- biovizBase:::fetch(object, which, truncate.gaps = truncate.gaps,
                              truncate.fun = truncate.fun, ratio = ratio)
-    .xlim <- c(start(range(gr, ignore.strand = TRUE)),
-               end(range(gr, ignore.strand = TRUE)))    
+    .xlim <- NULL    
     if(length(gr)){
+      .xlim <- c(start(range(gr, ignore.strand = TRUE)),
+                 end(range(gr, ignore.strand = TRUE)))    
+      
       message("Constructing graphics...")
       ## values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
       ## FIXME: add flexible estimation
-      .gr <- gr
-      gr <- .gr
       if(label){
         es <- .transformTextToSpace("aaaaaaaaaaaaaaaaaa", limits = .xlim)
         gr <- addStepping(gr, group.name = "tx_id", group.selfish = FALSE, fix = "start",
@@ -207,7 +204,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
       }else{
         gr <- addStepping(gr, group.name = "tx_id", group.selfish = FALSE)
       }
-
+      .xlim[1] <- .xlim[1] - es
       df <- mold(gr)
       
       if(label){
@@ -325,10 +322,10 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                              truncate.gaps = truncate.gaps,
                              truncate.fun = truncate.fun, ratio = ratio)
 
-    .xlim <- c(start(range(gr, ignore.strand = TRUE)),
-               end(range(gr, ignore.strand = TRUE)))
-    
+    .xlim <- NULL
     if(length(gr)){
+      .xlim <- c(start(range(gr, ignore.strand = TRUE)),
+                 end(range(gr, ignore.strand = TRUE)))
       ## gr <- fetch(object, which, type = "single")
       message("Constructing graphics...")
       values(gr)$stepping <-  1
@@ -439,7 +436,12 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
     if(!missing(xlim)){
       p <- c(p, list(coord_cartesian(xlim = xlim)))
     } else if (!is.list(which)) {
-      xlim <- c(start(which), end(which))
+
+      if(!is.null(.xlim))
+        xlim <- expand_range(.xlim, mul = 0.05)
+      else
+        xlim <- c(start(which), end(which))
+      
       p <- c(p, list(coord_cartesian(xlim = xlim)))
     }
   }

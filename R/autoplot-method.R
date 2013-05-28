@@ -152,8 +152,8 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
     p <- p + facet
   if(((!is.null(geom) && !geom %in% .ggbio.geom) & is.null(stat)) | coord == "genome")
     p <- p + facet
-  ## p$data <- object
-  p <- ggbio(p, data = object)
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)
   p
 })
 
@@ -211,6 +211,8 @@ setMethod("autoplot", "GRangesList", function(object, ...,
     p <- p + ylab(ylab)
   if(!missing(main))
     p <- p + labs(title = main)
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)
   p
 })          
 
@@ -234,7 +236,9 @@ setMethod("autoplot", "IRanges", function(object, ..., xlab, ylab, main){
   if(!missing(main))
     p <- p + labs(title = main) +
       theme(strip.background = element_rect(colour = 'NA', fill = 'NA'))+ 
-        theme(strip.text.y = element_text(colour = 'white')) 
+        theme(strip.text.y = element_text(colour = 'white'))
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
   p
 })
 
@@ -295,6 +299,8 @@ setMethod("autoplot", "GAlignments", function(object, ...,
   if(!missing(main))
     p <- p + labs(title = main)
   p <- p + facet
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
   p
 })
 
@@ -378,7 +384,12 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + labs(title = main) 
+    p <- p + labs(title = main)
+  
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
+  
+  
   p
 })
 
@@ -422,7 +433,11 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
   if(!missing(ylab))
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
-    p <- p + labs(title = main) 
+    p <- p + labs(title = main)
+
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
+  
   p  
 })
 
@@ -440,6 +455,8 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                names.expr = "tx_name(gene_id)",
                                                label = TRUE){
 
+
+  mc <- match.call(call = sys.call(sys.parent()))
   stat <- match.arg(stat)
   args <- list(...)
   args.aes <- parseArgsForAes(args)
@@ -451,9 +468,12 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
   args.non$geom <- geom
   args.non$stat <- stat
   args.non$names.expr <- names.expr
-  args.non$label <- label 
-  if(!missing(which))
+  args.non$label <- label
+  if(!missing(which)){
+    if(!is(which, "GRanges"))
+      stop("which if provided, must be GRagnes object")
     args.non$which <- which
+  }
   aes.res <- do.call(aes, args.aes)
   args.res <- c(args.non,list(aes.res))
   p <- ggplot() + do.call(geom_alignment, args.res)
@@ -467,6 +487,15 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
     p <- p + ggplot2::ylab("")
   if(!missing(main))
     p <- p + labs(title = main)
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)
+  
+  if(!missing(which)){
+    p <- addItem(p, p)
+    p <- addWhich(p, which)
+  }
+  p$fetchable <- TRUE
+  p$cmd <- list(mc)
   p
 })
 
@@ -609,6 +638,10 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
   p <- p + scale_y_continuous(breaks = NULL)
   if(!missing(main))
     p <- p + labs(title = main)
+
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
+  
   p
 })
 
@@ -664,6 +697,10 @@ setMethod("autoplot", "Rle", function(object, ...,
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
     p <- p + labs(title = main)
+
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
+  
   p
 })
 
@@ -722,6 +759,10 @@ setMethod("autoplot", "RleList", function(object, ...,
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
     p <- p + labs(title = main)
+
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
+  
   p
   ## if(facetByRow)
   ##   facets <- listName ~ .
@@ -860,6 +901,9 @@ setMethod("autoplot", "ExpressionSet", function(object, ...,
     df.l <- mold(object)
     p <- qplot(data = df.l, ...)
   }
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
+  
   p
 })
 
@@ -1173,6 +1217,10 @@ setMethod("autoplot", "VCF", function(object, ...,
   p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
     p <- p + labs(title = main)
+
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
+  
   p
 })
 
@@ -1348,6 +1396,10 @@ setMethod("autoplot", "Views", function(object, ...,
   if(!is.null(na.value)){
     p <-  p + scale_fill_discrete(na.value = na.value)
   }
+
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
+  
   p
 })
 
@@ -1358,6 +1410,10 @@ setMethod("autoplot", "Seqinfo", function(object, ideogram = FALSE, ... ){
   if(length(obj) == 1 && ideogram){
       p <- plotIdeogram(obj, as.character(seqnames(obj)), ...)
     }
+
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
+  
   p
 })
 
@@ -1428,6 +1484,10 @@ setMethod("autoplot", "SummarizedExperiment", function(object, ...,
     df <- as.data.frame(res)
     p <- plotmatrix(df, ...)    
   }
+
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
+  
   p
 })
 

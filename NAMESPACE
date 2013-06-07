@@ -40,15 +40,14 @@ importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL, Views, ViewsL
 
 ## ## GenomicRanges
 
-importFrom(GenomicRanges, "seqnames<-",
+importFrom(GenomicRanges, keepSeqlevels, renameSeqlevels, "seqnames<-",
            seqlevels, "seqlevels<-", genome, "genome<-",
            GRanges, GRangesList, Seqinfo, seqlengths, "seqlengths<-")
 importMethodsFrom(GenomicRanges, ranges, "ranges<-",
                   start, end, width, "start<-", "end<-", "width<-",
                   seqnames, seqinfo, show, 
                    "elementMetadata<-", elementMetadata,
-                  as.data.frame, keepSeqlevels, renameSeqlevels,
-                  sort)
+                  as.data.frame, sort)
 
 
 importClassesFrom(GenomicRanges, GRanges, GRangesList, GenomicRangesList)

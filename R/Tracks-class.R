@@ -42,6 +42,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
                    label.width = unit(2.5, "lines")){
 
   
+  
   if(is.numeric(padding) && !is.unit(padding))
     padding <- unit(padding, "lines")
   
@@ -49,14 +50,24 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     main <- title
   
   dots <- list(...)
+  
   ## reduce plots
   dots <- reduceListOfPlots(dots)
+
+
+  
   ## return plots if not
   dots <- genPlots(dots)
+
 
   ## original plots
   ppl.ori <- do.call(plotList, dots)
 
+  ## ## Make sure Tracks are combined later
+  ## isTracks <- lapply(dots, is, "Tracks")
+  ## dots <- dots[!isTracks]
+  ## tks.addon <- dots[isTracks]
+  
   ## convert to Plot object with extra slots
   dots <- do.call(PlotList, dots)
 
@@ -84,6 +95,17 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
 
   ## is blank
   isBlank <- sapply(dots, function(x) x@blank)
+
+
+  if(length(label.text.color) == 1)
+      label.text.color <- rep(label.text.color, len = length(dots))
+  if(length(label.text.cex) == 1)    
+      label.text.cex <- rep(label.text.cex, len = length(dots))
+  if(length(label.bg.color) == 1)        
+      label.bg.color <- rep(label.bg.color, len = length(dots))
+  if(length(label.bg.fill) == 1)            
+      label.bg.fill <- rep(label.bg.fill, len = length(dots))
+
 
   ## ylim
   ylim <- lapply(dots[!fixed & !isIdeo & !isBlank], function(grob){
@@ -137,6 +159,24 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     })
     dots <- do.call(PlotList, dots)
   }
+
+  ## track bround
+  ##   if(is.null(track.bg.color))
+  ##     track.plot.color <- sapply(dots, bgColor)
+  ##   else
+  ##     track.plot.color <- rep(track.bg.color, length(dots))
+  ## stopifnot(length(track.bg.color) == N | length(track.bg.color) == 1)  
+  
+  ## plot background
+  N <- length(dots)
+  if(is.null(track.plot.color)){
+    if(is.null(track.bg.color))
+      track.plot.color <- sapply(dots, bgColor)
+    else
+      track.plot.color <- rep(track.bg.color, length(dots))
+  }
+  stopifnot(length(track.plot.color) == N | length(track.plot.color) == 1)  
+
   
   ## backup: record a state
   backup <- list(grobs = dots,
@@ -168,6 +208,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
       track.bg.color = track.bg.color,                       
       label.text.cex = label.text.cex,
       label.width = label.width)
+  ## obj <- c(obj, tks.addon)
   ggplot2:::set_last_plot(obj)
   obj
 }
@@ -536,17 +577,8 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     }}else{
       return(ggplot())
     }
-
+  label.name <- names(ggl)
   N <- length(ggl)
-  ## plot background 
-  if(is.null(track.plot.color)){
-    if(is.null(track.bg.color))
-      track.plot.color <- sapply(ggl, bgColor)
-    else
-      track.plot.color <- rep(track.bg.color, length(ggl))
-  }
-  
-  stopifnot(length(track.plot.color) == N | length(track.plot.color) == 1)
   
   if(length(track.plot.color) == 1){
       track.plot.color <- rep(track.plot.color, N)
@@ -572,10 +604,14 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        direction = c("row", "col")
                        ){
 
-    label.text.color <- rep(label.text.color, len = length(grobs))
-    label.text.cex <- rep(label.text.cex, len = length(grobs))
-    label.bg.color <- rep(label.bg.color, len = length(grobs))            
-    label.bg.fill <- rep(label.bg.fill, len = length(grobs))
+    if(length(label.text.color) == 1)
+        label.text.color <- rep(label.text.color, len = length(grobs))
+    if(length(label.text.cex) == 1)    
+        label.text.cex <- rep(label.text.cex, len = length(grobs))
+    if(length(label.bg.color) == 1)        
+        label.bg.color <- rep(label.bg.color, len = length(grobs))
+    if(length(label.bg.fill) == 1)            
+        label.bg.fill <- rep(label.bg.fill, len = length(grobs))
     
     direction <- match.arg(direction)
     
@@ -683,7 +719,8 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
 
   ## FIXME:
   lbs <- sapply(grobs, labeled)
-  nms <- names(grobs)
+ ## nms <- names(grobs)
+  nms <- label.name
 
   if(any(remove.y.axis)){
     for(i in which(remove.y.axis))
@@ -705,7 +742,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        label.width = label.width)
   }else{
     if(any(!is.null(nms)))
-      grobs <- addLabel(grobs, nms, lbs,
+      grobs <- addLabe(lgrobs, nms, lbs,
                         label.bg.color =  label.bg.color,
                        label.bg.fill = label.bg.fill,
                        label.text.color = label.text.color,
@@ -1146,5 +1183,37 @@ setMethod("rbind", "Tracks",  function(...){
 })
 
 
+
+
+
+setMethod("[", c("Tracks", "numeric", "missing", "ANY"),
+          function(x, i, j, ..., drop=TRUE){
+              i <- as.integer(i)
+              initialize(x, 
+                  grobs = x@grobs[i],
+                  plot = x@plot[i],
+                  ## backup = backup,
+                  labeled = x@labeled[i], 
+                  heights = x@heights[i],
+                  xlim = x@xlim,
+                  ylim = x@ylim,
+                  xlab = x@xlab,
+                  main = x@main,
+                  main.height = x@main.height,
+                  scale.height = x@scale.height,
+                  xlab.height = x@xlab.height,
+                  theme = x@theme,
+                  mutable = x@mutable[i],
+                  hasAxis = x@hasAxis[i],
+                  fixed = x@fixed[i],
+                  padding = x@padding,
+                  label.bg.color = x@label.bg.color[i],
+                  label.bg.fill = x@label.bg.fill[i],
+                  label.text.color = x@label.text.color[i],      
+                  track.plot.color = x@track.plot.color[i],
+                  track.bg.color = x@track.bg.color[i],                       
+                  label.text.cex = x@label.text.cex[i],
+                  label.width = x@label.width)    
+          })
 
 

@@ -10,5 +10,6 @@ setGeneric("plotSpliceSum", function(data, model, ...)
 setGeneric("xlim",function(obj, ...) standardGeneric("xlim"))
 setGeneric("xlim<-", function(x, value) standardGeneric("xlim<-"))
 
+getGeneric("[")
 
 

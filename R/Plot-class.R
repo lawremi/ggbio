@@ -106,3 +106,15 @@ genPlots <- function(dots){
 }
 
 
+
+
+setMethod("[", c("PlotList", "numeric", "missing"),
+          function(x, i, j, ...){
+              i <- as.integer(i)
+              nms <- names(x)
+              x <- initialize(x, x@.Data[i])
+              names(x) <- nms[i]
+              x
+          })
+
+

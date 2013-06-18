@@ -123,6 +123,13 @@ setMethod("stat_mismatch", "BamFile", function(data, ...,  bsgenome, which,
                                                xlab, ylab, main,
                                                geom = c("segment", "bar"),  
                                                show.coverage = TRUE){
+  if(missing(which)){
+      ## stop("missing which is not supported yet")
+      p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
+             list(ggplot2::xlim(c(0, 1))))
+      return(p)
+  }
+    
   geom <- match.arg(geom)
     if(missing(bsgenome)){
       stop("For geom mismatch.summary, please provide bsgenome(A BSgenome object)")

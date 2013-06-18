@@ -148,18 +148,26 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                                                coord = c("linear", "genome")){
 
   coord <- match.arg(coord)  
-  ## which could be a granges or seqnames
   if(missing(which)){
-    seq.nm <- names(scanBamHeader(data)[[1]])[1]
+      ## stop("missing which is not supported yet")
+      p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
+             list(ggplot2::xlim(c(0, 1))))
+      return(p)
   }else{
-    if(is(which, "GRanges")){
-      seq.nm <- unique(as.character(seqnames(which)))
-    } else if(is(which, "character")){
-      seq.nm <- which
-    }else{
-      stop("which must be missing, GRanges or character(for seqnames)")
-    }
+
+      if(is(which, "GRanges")){
+          seq.nm <- unique(as.character(seqnames(which)))
+      } else if(is(which, "character")){
+          seq.nm <- which
+      }else{
+          stop("which must be missing, GRanges or character(for seqnames)")
+      }
   }
+
+  ## if(missing(which)){
+  ##   seq.nm <- names(scanBamHeader(data)[[1]])[1]
+  ## }
+
   args <- list(...)
   args$facets <- facets
   args.aes <- parseArgsForAes(args)

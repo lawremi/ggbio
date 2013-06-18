@@ -1,18 +1,21 @@
 ## For a class GGbio, all calls are stacked over each other
-GGbio.gen <- setRefClass("GGbio",
-                         fields = list(
-                           data = "ANY", #raw data
+GGbio.gen <- setClass("GGbio",
+                         slots = list(
+                           data = "ANY",
                            ggplot = "ggORNULL", #ggplot object
                            cmd = "list",
-                           fetchable = "logical"),
+                           fetchable = "logical",
+                           blank = "logical"),
                          contains = "Cache")
 
-GGbio <- function(ggplot = NULL, fetchable = FALSE, ...){
-  GGbio.gen$new(ggplot = ggplot, fetchable = fetchable, ...)
-}
 
+
+GGbio <- function(ggplot = NULL, data = NULL, fetchable = FALSE, blank = FALSE,...){
+  new("GGbio", ggplot = ggplot, data = data, fetchable = fetchable, blank = blank, ...)
+}
 ## alias
 ggbio <- GGbio
+
 
 ## combine command if layout_circle presents
 .layout_circle.geoms <- c("point","line", "link",
@@ -22,15 +25,16 @@ ggbio <- GGbio
 
 ## FIXME, need geom_* for something like ideogram
 .combineNames <- function(obj){
-  cmd <- obj$cmd
+    cmd <- obj@cmd
   .nms <- names(cmd)
-  idx <- grepl("layout_circle", .nms)
-  if(sum(idx)){
+  idx <- "layout_circle" == .nms
+  if(sum(idx) && sum(idx)!=length(cmd)){
     ## did the trick here, which combine the geom/stat/and layout together
     .geom <- grep("geom_", .nms, value = TRUE)
     idx.geom <- grep("geom_", .nms)
     if(length(.geom)){
-    .geom <- stringr::str_match(.geom, "geom_([a-z]+)")[, 2]
+        .geom <- gsub("geom_", "", .geom)        
+    ## .geom <- stringr::str_match(.geom, "geom_([a-z]+)")[, 2]
     if(length(.geom) > 1){
       warning("multiple geoms detected, last one used")
       .geom <- tail(.geom, 1)
@@ -47,7 +51,8 @@ ggbio <- GGbio
     .stat <- grep("stat_", .nms, value = TRUE)
     idx.stat  <- grep("stat_", .nms)    
     if(length(.stat)){
-      .stat <- str_match(.stat, "stat_([a-z]+)")[, 2]
+        .stat <- gsub("stat_", "", .stat)
+      ## .stat <- str_match(.stat, "stat_([a-z]+)")[, 2]
     if(length(.stat) > 1){
       warning("multiple stats detected, last one used")
       .stat <- tail(.stat, 1)
@@ -63,24 +68,25 @@ ggbio <- GGbio
     }
     ## to costruct the new call
     if(length(.geom)){
-      .args <- argList(obj$cmd)
+      .args <- argList(obj@cmd)
       args <- c(.args[[idx.geom]],
                 list(geom = .geom))
-      if(!is.null(obj$data) & is.null(args$data))
-        args$data <- obj$data
-      obj$cmd <- do.call(layout_circle, args)
+      if(!is.null(obj@data) & is.null(args$data))
+        args$data <- obj@data
+      obj@cmd <- do.call(layout_circle, args)
     }
-    obj$ggplot <- ggplot() + obj$cmd
+    p <- ggplot2::ggplot() + obj@cmd
+    obj@ggplot <- p
   }
   obj
 }
 
 
 setMethod("show", "GGbio", function(object){
-  ## this will parse layout first, define our own order here
   object <- .combineNames(object)
-  ## then print
-  print(object$ggplot)
+  if(object@blank)
+    warning("No region(with chromosome name) specified, so no data found")
+  print(object@ggplot)
 })
 
 argList <- function(cmd){
@@ -91,49 +97,49 @@ argList <- function(cmd){
 
 setMethod("+", c("GGbio"), function(e1, e2){
   if(!is(e2, "xlim")){
-    e2name <- deparse(substitute(e2))  
-    ## special if
-    .tmp <- list(e2)
+      ## FIXME: do.call(doesn'twork)
+    args <- as.list(match.call()$e2)
+    e2name <-  deparse(args[[1]])
+    .tmp <- list(args)
     names(.tmp) <- e2name
-    e1$cmd <- c(e1$cmd, .tmp)
+    e1@cmd <- c(e1@cmd, .tmp)
     ## get data from object
     if(is.call(e2)){
-      args <- as.list(e2)
-      if(!is.null(e1$data) & is.null(args$data))
-        args$data <- e1$data
-      object <- do.call(as.character(args[[1]]), args[-1])
-      e1$ggplot <- mapToGG(e1$ggplot, object)
+        ## args <- as.list(e2)
+        if(!is.null(e1@data) & is.null(args$data))
+            args$data <- e1@data
+        object <- do.call(as.character(args[[1]]), args[-1])
+        e1@ggplot <- mapToGG(e1@ggplot, object)
     }else{
       object <- e2
     }
-    res <- ggplot2:::add_ggplot(e1$ggplot, object, e2name)
-    e1$ggplot <- res
+    res <- ggplot2:::add_ggplot(e1@ggplot, object, e2name)
+    e1@ggplot <- res
     return(e1)
   }else{
-    if(!e1$fetchable){
-      e1$ggplot <- e1$ggplot + e2
+    if(!e1@fetchable){
+      e1@ggplot <- e1@ggplot + e2
     }else{
       grl <- cached_which(e1)
-      current.which <- grl[length(grl)]
-      chr.default <- as.character(seqnames(current.which))
       new.which <- getGrFromXlim(e2, chr.default)
-      idx <- needCache(e1, new.which)
-      if(!length(idx)){
-        ## so need to update cache
-        ## point is to re-run the cmd with new which
-        e1 <- replaceArg(e1, list(which = new.which))
-        ## browser()
-        ## FIXME:
-        if(TRUE){
-          e1 <-eval(e1$cmd[[1]])
+      if(length(grl)){
+        current.which <- grl[length(grl)]
+        chr.default <- as.character(seqnames(current.which))
+        idx <- needCache(e1, new.which)
+        if(!length(idx)){
+          ## so need to update cache
+          ## point is to re-run the cmd with new which
+          e1 <- replaceArg(e1, list(which = new.which))
+          e1 <-eval(e1@cmd[[1]])
         }else{
-          e1$ggplot <- e1$ggplot + e1$cmd
+          ## use cached p
+          id <- idx[1]                      #use either one
+          e1@ggplot <- e1@cached_item[[id]]@ggplot + e2
         }
-        ## how to update which at this point?
       }else{
-        ## use cached p
-        id <- idx[1]                      #use either one
-        e1$ggplot <- e1@cached_item[[id]]$ggplot + e2
+        e1 <- replaceArg(e1, list(which = new.which))
+        e1 <-eval(e1@cmd[[1]])
+        ## no cached copy and no current range
       }
     }
     return(e1)
@@ -141,17 +147,14 @@ setMethod("+", c("GGbio"), function(e1, e2){
 })
 
 ## replace *single* arg
-
 replaceArg <- function(p, args){
-  .cmd <- lapply(p$cmd, function(cm){
+  .cmd <- lapply(p@cmd, function(cm){
     .args <- as.list(cm)
-    if(names(args) %in% names(.args)){
-      .args[names(args)] <- args[[1]]
-    }
+    .args[names(args)] <- args[[1]]
     as.call(.args)
     ## do.call(as.character(.fun), .arg)
   })
-  p$cmd <- .cmd
+  p@cmd <- .cmd
   p
 }
 
@@ -162,7 +165,9 @@ needCache <- function(p, new.which){
 
 getGrFromXlim <- function(xlim, chr.default = NULL){
   .xlim <- xlim$limits$x
-  if("chr" %in% names(attributes(xlim))){
+  if("ori" %in% names(attributes(xlim))){
+    return(attr(xlim, "ori"))
+  }else if("chr" %in% names(attributes(xlim))){
     return(GRanges(attr(xlim, "chr"), IRanges(.xlim[1], .xlim[2])))
   }else{
     if(!length(chr.default))

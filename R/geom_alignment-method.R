@@ -168,8 +168,13 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
     geom <- "reduced_gene"
 
 
-  if(missing(which))
-    stop("missing which is not supported yet")
+  if(missing(which)){
+    ## stop("missing which is not supported yet")
+     p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
+             list(ggplot2::xlim(c(0, 1))))
+    return(p)
+  }
+    
 
   object <- data
 

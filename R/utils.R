@@ -1,4 +1,12 @@
-getLimits <- function(obj){
+setGeneric("getLimits", function(obj, ...) standardGeneric("getLimits"))
+setMethod("getLimits", "ggplotPlot", function(obj){
+  .getLimits(obj)
+})
+setMethod("getLimits", "ggbioPlot", function(obj){
+  .getLimits(obj@ggplot)
+})
+
+.getLimits <- function(obj){
 
   x <- y <- xmin <- ymin <- xmax <- ymax <- xend <- yend <- NULL
   ## x
@@ -34,10 +42,10 @@ getLimits <- function(obj){
   ## if(length(obj$layer)>1){
   l.res <- suppressWarnings(getLimitsFromLayer(obj))
 
-  res <- suppressWarnings(list(xlim = c(min(c(l.res$xmin, x, xmin)),
-                                 max(c(l.res$xmax,x, xmax, xend))),
-                               ylim = c(min(c(l.res$ymin, y, ymin)),
-                                 max(c(l.res$ymax, y, ymax, yend)))))
+  res <- suppressWarnings(list(xlim = c(min(c(l.res$xmin, x, xmin), na.rm = TRUE),
+                                 max(c(l.res$xmax,x, xmax, xend), na.rm = TRUE)),
+                               ylim = c(min(c(l.res$ymin, y, ymin), na.rm = TRUE),
+                                 max(c(l.res$ymax, y, ymax, yend), na.rm = TRUE))))
   
   if(any(unlist(res) %in% c(Inf, -Inf)))
     res <- evalLan(obj)
@@ -96,10 +104,10 @@ getLimitsFromScales <- function(obj){
   })
   lst <- lst[!is.null(lst)]
   res <- do.call("rbind", lst)
-  res <- data.frame(xmin = min(res$xmin[!is.na(res$xmin)]),
-                    xmax = max(res$xmax[!is.na(res$xmax)]),
-                    ymin = min(res$ymin[!is.na(res$ymin)]),
-                    ymax = max(res$ymax[!is.na(res$ymax)]))
+  res <- data.frame(xmin = min(res$xmin, na.rm = TRUE),
+                    xmax = max(res$xmax, na.rm = TRUE),
+                    ymin = min(res$ymin, na.rm = TRUE),
+                    ymax = max(res$ymax, na.rm = TRUE))
   res
 }
 
@@ -153,10 +161,10 @@ getLimitsFromLayer <- function(obj){
     else
       yend <- NULL
     
-    res <- data.frame(xmin = min(c(x, xmin)),
-                      xmax = max(c(x, xmax, xend)),
-                      ymin = min(c(y, ymin)),
-                      ymax = max(c(y, ymax, yend)))
+    res <- data.frame(xmin = min(c(x, xmin), na.rm = TRUE),
+                      xmax = max(c(x, xmax, xend), na.rm = TRUE),
+                      ymin = min(c(y, ymin), na.rm = TRUE),
+                      ymax = max(c(y, ymax, yend), na.rm = TRUE))
   }else{
     res <- NULL
   }
@@ -658,3 +666,5 @@ copyAttr <- function(x1, x2){
   x2
 }
 
+
+## mark a plot as a blank plot which doesn't 

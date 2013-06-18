@@ -22,7 +22,7 @@ Collate: utils.R
 	 Plot-class.R
 	 ggplot-method.R
 	 theme.R	
-	 tracks.R
+	 Tracks-class.R
 	 mold-method.R
 	 geom_chevron-method.R
          geom_alignment-method.R 

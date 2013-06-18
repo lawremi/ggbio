@@ -4,14 +4,14 @@ setClass("Plot", contains = "Tracked")
 ## instance
 setClass("ggplotPlot", contains = c("gg", "ggplot", "Plot"))
 setClass("latticePlot", contains = c("trellis","Plot"))
-setRefClass("ggbioPlot", contains = c("GGbio", "Plot"))
-setClass("test", contains = c("gg", "ggplot", "Plot"))
+setClass("ggbioPlot", contains = c("GGbio", "Plot"))
+
 
 ## Generic function to get subclas instance of 'Plot' class
 setGeneric("Plot", function(x, ...) standardGeneric("Plot"))
 setMethod("Plot", "gg", function(x){
   idx <- names(attributes(x)) %in% c("fixed", "labeled", "bgColor", "hasAxis", "mutable", "height")
-  if(length(idx)){
+  if(sum(idx)){
     lst <- attributes(x)[idx]
     obj <- do.call("new", c("ggplotPlot", list(x), lst))
   }else{
@@ -23,7 +23,7 @@ setMethod("Plot", "gg", function(x){
 ## lattice doesn't now how to update itself yet, so mutalbe = FALSE
 setMethod("Plot", "trellis", function(x, mutable = FALSE){
   idx <- names(attributes(x)) %in% c("fixed", "labeled", "bgColor", "hasAxis", "mutable", "height")
-  if(length(idx)){
+  if(sum(idx)){
     lst <- attributes(x)[idx]
     lst$mutable <- mutable
     obj <- do.call("new", c("latticePlot", list(x), lst))
@@ -34,12 +34,14 @@ setMethod("Plot", "trellis", function(x, mutable = FALSE){
 })
 
 setMethod("Plot", "GGbio", function(x){
+  
   idx <- names(attributes(x)) %in% c("fixed", "labeled", "bgColor", "hasAxis", "mutable", "height")
-  if(length(idx)){
+  
+  if(sum(idx)){
     lst <- attributes(x)[idx]
     obj <- do.call("new", c("ggbioPlot", list(x), lst))
   }else{
-    obj <- new("ggbioPlot", x)    
+    obj <- new("ggbioPlot", x)
   }
   obj
 })
@@ -87,3 +89,20 @@ setMethod("c", "PlotList",  function(x, ...){
             stop("all arguments in '...' must be ", class(x), " objects (or NULLs)")
         do.call(PlotList, unlist(args, recursive = FALSE))
 })
+
+
+genPlots <- function(dots){
+  lapply(dots, function(x){
+    isPlot <- any(sapply(.supportedPlots, function(c){
+      extends(class(x), c)
+    }))
+    if(!isPlot){
+      res <- autoplot(x)
+    }else{
+      res <- x
+    }
+    res
+  })
+}
+
+

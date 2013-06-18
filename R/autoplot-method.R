@@ -316,81 +316,131 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
                                           bsgenome,
                                           geom = "line",
                                           stat = "coverage",
-                                          method = c("estimate", "raw"),
+                                          method = c("raw", "estimate"),
                                           coord = c("linear", "genome"),
                                           resize.extra = 10,
                                           space.skip = 0.1,
                                           show.coverage = TRUE){
 
-  coord <- match.arg(coord)
-  if(missing(xlab))
-    xlab <- NULL
-  args <- list(...)
-  method <- match.arg(method)
-  bf <- open(object)
-  if(geom == "gapped.pair"){
-    message("Read GAlignments from BamFile...")
-    ga <- readGAlignmentsFromBam(bf,
-                                 param = ScanBamParam(which = which),
-                                 use.name = TRUE)
-    message("plotting...")
-    args.ga <- args[names(args) %in% "show.junction"]
-    args <- c(args.ga, list(object = ga))
-    p <- do.call(autoplot, args)
-  }else{
-    if(stat == "coverage"){
-      if(method == "estimate"){
-      if(missing(which)){
-        seq.nm <- names(scanBamHeader(object)[[1]])[1]
-      }else{
-        if(is(which, "GRanges")){
-          seq.nm <- unique(as.character(seqnames(which)))
-        } else if(is(which, "character")){
-          seq.nm <- which
-        }else{
-          stop("which must be missing, GRanges or character(for seqnames)")
-        }
-      }
-      xlab <- ""
-    }
-      
-      if(!missing(which))
-        p <- ggplot() + stat_coverage(bf, ..., method = method, coord = coord,
-                                      space.skip = space.skip,
-                                      geom  =  geom, which = which)
-      else
-        p <- ggplot() + stat_coverage(bf, ..., method = method, coord = coord,
-                                      space.skip = space.skip,
-                                      geom  =  geom)
-    }else if(stat == "mismatch"){
-      if(geom %in% c("bar", "segment")){
-        p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which, geom = "bar")
-      }else{
-        p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which)
-      }
+    mc <- as.list(match.call())[-1]
+    mc <- lapply(mc, eval, envir = parent.frame(1))
+    mc <- c(list(as.name("autoplot")), mc)
+    cmd <- list(mc)
+    names(cmd) <- "autoplot"
+
+    coord <- match.arg(coord)
+    if(missing(xlab))
+        xlab <- NULL
+    args <- list(...)
+    method <- match.arg(method)
+    bf <- open(object)
+    if(geom == "gapped.pair"){
+        message("Read GAlignments from BamFile...")
+        ga <- readGAlignmentsFromBam(bf,
+                                     param = ScanBamParam(which = which),
+                                     use.name = TRUE)
+        message("plotting...")
+        args.ga <- args[names(args) %in% "show.junction"]
+        args <- c(args.ga, list(object = ga))
+        p <- do.call(autoplot, args)
     }else{
-      ga <- readGAlignmentsFromBam(bf,
-                                   param = ScanBamParam(which = which),
-                                   use.name = TRUE)
-      gr <- biovizBase:::fetch(ga, type = "raw")
-      p <- autoplot(gr, ..., geom = geom, stat = stat)
+        if(stat == "coverage"){
+            if(method == "estimate"){
+                if(missing(which)){
+                    seq.nm <- names(scanBamHeader(object)[[1]])[1]
+                }else{
+                    if(is(which, "GRanges")){
+                        seq.nm <- unique(as.character(seqnames(which)))
+                    } else if(is(which, "character")){
+                        seq.nm <- which
+                    }else{
+                        stop("which must be missing, GRanges or character(for seqnames)")
+                    }
+                }
+                xlab <- ""
+            }
+            
+            if(!missing(which))
+                p <- ggplot() + stat_coverage(bf, ..., method = method, coord = coord,
+                                              space.skip = space.skip,
+                                              geom  =  geom, which = which)
+            else
+                p <- ggplot() + stat_coverage(bf, ..., method = method, coord = coord,
+                                              space.skip = space.skip,
+                                              geom  =  geom)
+        }else if(stat == "mismatch"){
+            if(geom %in% c("bar", "segment")){
+                p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which, geom = "bar")
+            }else{
+                p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which)
+            }
+        }else{
+            ga <- readGAlignmentsFromBam(bf,
+                                         param = ScanBamParam(which = which),
+                                         use.name = TRUE)
+            gr <- biovizBase:::fetch(ga, type = "raw")
+            p <- autoplot(gr, ..., geom = geom, stat = stat)
+        }
     }
-  }
-  if(length(xlab) >=1){
-    p <- p + ggplot2::xlab(xlab)
-  }else{
-    p <- p + ggplot2::xlab("")
-  }
-  if(!missing(ylab))
-    p <- p + ggplot2::ylab(ylab)
-  if(!missing(main))
-    p <- p + labs(title = main)
-  
-  if(!is(p, "GGbio"))
-    p <- GGbio(p, data = object)  
-  
-  
-  p
+    if(length(xlab) >=1){
+        p <- p + ggplot2::xlab(xlab)
+    }else{
+        p <- p + ggplot2::xlab("")
+    }
+    if(!missing(ylab))
+        p <- p + ggplot2::ylab(ylab)
+    if(!missing(main))
+        p <- p + labs(title = main)
+    
+    if(!is(p, "GGbio"))
+        p <- GGbio(p, data = object)
+    
+    if(!is(p, "GGbio"))
+        p <- GGbio(p, data = object)
+    if(!missing(which)){
+        p <- cacheSet(p, which)
+    }else{
+        p@blank <- TRUE
+    }
+
+    p@fetchable <- TRUE
+    p@cmd <- cmd
+    p
+})
+
+## ======================================================================
+##        For "BamFileList"
+## ======================================================================
+## TODO
+## 1. mismatch
+## 2. simply summary
+setMethod("autoplot", "BamFileList", function(object, ..., which,
+                                              xlab, main, names = NULL){
+
+    plst <- lapply(object, function(x){
+        autoplot(x, ...)
+    })
+
+    if(!length(names)){
+        nms <- names(plst)
+        nms <- basename(nms)
+        names(plst) <- nms
+    }else{
+        names(plst) <- names
+    }
+    if(missing(xlab))
+       xlab <- ""
+
+    if(missing(main))
+       main <- ""
+
+    if(missing(which)){
+        tks <- tracks(plst, xlab = xlab, main = main)
+    }else{
+        tks <- tracks(plst, xlab = xlab, main = main, xlim = which)        
+    }
+
+    tks
 })
 
 ## ======================================================================
@@ -399,46 +449,62 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
 setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
                                             which,
                                             asRangedData = FALSE){
-  args <- list(...)
-  args.aes <- parseArgsForAes(args)
-  args.non <- parseArgsForNonAes(args)
-  if(!missing(which))
-    args.non$which <- which
 
-  .ext <- tools::file_ext(object)
-  if(.ext == "bam"){
-    message("reading in as Bamfile")
-    obj <- BamFile(object)
-  }else{
-    message("reading in")
-    obj <- import(object, asRangedData = asRangedData)
-    if(!missing(which) && is(which, "GRanges"))
-      obj <- subsetByOverlaps(obj, which)
-  }
-  if(is(obj, "GRanges")){
-    if(missing(xlab))
-      xlab <- ""
-    if(!"geom" %in% names(args.non)){
-    if("y" %in% names(args.aes) | "score" %in% colnames(values(obj))){
-      args.non$geom <- "bar"
+    ## FIXME: does it always work?
+    mc <- as.list(match.call())[-1]
+    mc <- lapply(mc, eval, envir = parent.frame(1))
+    mc <- c(list(as.name("autoplot")), mc)
+    cmd <- list(mc)
+    names(cmd) <- "autoplot"
+    
+    args <- list(...)
+    args.aes <- parseArgsForAes(args)
+    args.non <- parseArgsForNonAes(args)
+    if(!missing(which))
+        args.non$which <- which
+
+    .ext <- tools::file_ext(object)
+    if(.ext == "bam"){
+        message("reading in as Bamfile")
+        obj <- BamFile(object)
     }else{
-      args.non$geom <- "rect"
-    }}
-  }
-  args.non$object <- obj
-  aes.res <- do.call(aes, args.aes)
-  p <- do.call(autoplot, c(list(aes.res), args.non))
-  if(!missing(xlab))
-    p <- p + ggplot2::xlab(xlab)
-  if(!missing(ylab))
-    p <- p + ggplot2::ylab(ylab)
-  if(!missing(main))
-    p <- p + labs(title = main)
+        message("reading in")
+        obj <- import(object, asRangedData = asRangedData)
+        if(!missing(which) && is(which, "GRanges"))
+            obj <- subsetByOverlaps(obj, which)
+    }
+    if(is(obj, "GRanges")){
+        if(missing(xlab))
+            xlab <- ""
+        if(!"geom" %in% names(args.non)){
+            if("y" %in% names(args.aes) | "score" %in% colnames(values(obj))){
+                args.non$geom <- "bar"
+            }else{
+                args.non$geom <- "rect"
+            }}
+    }
+    args.non$object <- obj
+    aes.res <- do.call(aes, args.aes)
+    p <- do.call(autoplot, c(list(aes.res), args.non))
+    if(!missing(xlab))
+        p <- p + ggplot2::xlab(xlab)
+    if(!missing(ylab))
+        p <- p + ggplot2::ylab(ylab)
+    if(!missing(main))
+        p <- p + labs(title = main)
 
-  if(!is(p, "GGbio"))
-    p <- GGbio(p, data = object)  
-  
-  p  
+    if(!is(p, "GGbio"))
+        p <- GGbio(p, data = object)
+    if(!missing(which)){
+        p <- cacheSet(p, which)
+    }else{
+        p@blank <- TRUE
+    }
+
+    p@fetchable <- TRUE
+    p@cmd <- cmd
+    
+    p  
 })
 
 ## FIX THIS first:
@@ -456,47 +522,54 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                label = TRUE){
 
 
-  mc <- match.call(call = sys.call(sys.parent()))
-  stat <- match.arg(stat)
-  args <- list(...)
-  args.aes <- parseArgsForAes(args)
-  args.non <- parseArgsForNonAes(args)
-  args.non$data <- object  
-  args.non$truncate.gaps <- truncate.gaps
-  args.non$truncate.fun <- truncate.fun
-  args.non$ratio <- ratio
-  args.non$geom <- geom
-  args.non$stat <- stat
-  args.non$names.expr <- names.expr
-  args.non$label <- label
-  if(!missing(which)){
-    if(!is(which, "GRanges"))
-      stop("which if provided, must be GRagnes object")
-    args.non$which <- which
-  }
-  aes.res <- do.call(aes, args.aes)
-  args.res <- c(args.non,list(aes.res))
-  p <- ggplot() + do.call(geom_alignment, args.res)
-  if(!missing(xlab))
-    p <- p + xlab(xlab)
-  else
-    p <- p + ggplot2::xlab("")
-  if(!missing(ylab))
-    p <- p + ylab(ylab)
-  else
-    p <- p + ggplot2::ylab("")
-  if(!missing(main))
-    p <- p + labs(title = main)
-  if(!is(p, "GGbio"))
-    p <- GGbio(p, data = object)
-  
-  if(!missing(which)){
-    p <- addItem(p, p)
-    p <- addWhich(p, which)
-  }
-  p$fetchable <- TRUE
-  p$cmd <- list(mc)
-  p
+    ## FIXME: does it always work?
+    mc <- as.list(match.call())[-1]
+    mc <- lapply(mc, eval, envir = parent.frame(1))
+    mc <- c(list(as.name("autoplot")), mc)
+    cmd <- list(mc)
+    names(cmd) <- "autoplot"
+
+    stat <- match.arg(stat)
+    args <- list(...)
+    args.aes <- parseArgsForAes(args)
+    args.non <- parseArgsForNonAes(args)
+    args.non$data <- object  
+    args.non$truncate.gaps <- truncate.gaps
+    args.non$truncate.fun <- truncate.fun
+    args.non$ratio <- ratio
+    args.non$geom <- geom
+    args.non$stat <- stat
+    args.non$names.expr <- names.expr
+    args.non$label <- label
+    if(!missing(which)){
+        if(!is(which, "GRanges"))
+            stop("which if provided, must be GRagnes object")
+        args.non$which <- which
+    }
+
+    aes.res <- do.call(aes, args.aes)
+    args.res <- c(args.non,list(aes.res))
+    p <- ggplot() + do.call(geom_alignment, args.res)
+    if(!missing(xlab))
+        p <- p + xlab(xlab)
+    else
+        p <- p + ggplot2::xlab("")
+    if(!missing(ylab))
+        p <- p + ylab(ylab)
+    else
+        p <- p + ggplot2::ylab("")
+    if(!missing(main))
+        p <- p + labs(title = main)
+    if(!is(p, "GGbio"))
+        p <- GGbio(p, data = object)
+    if(!missing(which)){
+        p <- cacheSet(p, which)
+    }else{
+        p@blank <- TRUE
+    }
+    p@fetchable <- TRUE
+    p@cmd <- cmd
+    p
 })
 
 
@@ -616,16 +689,6 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
 
               })
   if(missing(xlab)){
-    ## chrs <- unique(seqnames(which))
-    ## gms <- genome(object)
-    ## gm <- unique(gms[chrs])
-    ## chrs.tx <- paste(chrs, sep = ",")    
-    ## if(is.na(gm)){
-    ##   xlab <- chrs.tx
-    ## }else{
-    ##   gm.tx <- paste(gm)
-    ##   xlab <- paste(gm.tx,"::",chrs.tx, sep = "")      
-    ## }
     xlab <- ""
   }
   p <- p + xlab(xlab)
@@ -634,13 +697,20 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
     ylab = ""
   }
   p <- p + ylab(ylab)
-  ## if(stat == "stepping" | geom == "alignment")
+
   p <- p + scale_y_continuous(breaks = NULL)
   if(!missing(main))
     p <- p + labs(title = main)
 
   if(!is(p, "GGbio"))
-    p <- GGbio(p, data = object)  
+    p <- GGbio(p, data = object)
+
+  if(!missing(which)){
+    p <- addItem(p, p)
+    p <- addWhich(p, which)
+  }
+  p@fetchable <- TRUE
+  p@cmd <- list(mc)
   
   p
 })

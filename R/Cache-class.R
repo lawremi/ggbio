@@ -1,23 +1,21 @@
 setClass("Cache", 
-         slots = c(cached = "logical",
-           cached_xlim = "numericORNULL",
-           cached_ylim = "numericORNULL",
-           cached_which = "GRangesORNULL",
-           cached_item = "list"
-           ),
-         prototype = prototype(
-           cached = TRUE
-           ))
+            slots = list(
+              cached = "logical",
+              cached_xlim = "numericORNULL",
+              cached_ylim = "numericORNULL",
+              cached_which = "GRangesORNULL",
+              cached_item = "list"
+              ))
 
 ## cached always equal TRUE
 ## only for 'fetchable' object, set it to FALSE
-Cache <- function(cached = TRUE, cached_xlim = NULL, cached_ylim = NULL,
+Cache <- function(..., cached = TRUE, cached_xlim = NULL, cached_ylim = NULL,
                   cached_which = NULL, cached_item = list()){
   new("Cache", cached = cached,
       cached_xlim = cached_xlim,
       cached_ylim = cached_ylim,
       cached_which = cached_which,
-      cached_item = cached_item)
+      cached_item = cached_item, ...)
 }
 
 setGeneric("cached", function(x, ...) standardGeneric("cached"))
@@ -98,6 +96,16 @@ setMethod("addWhich", c("Cache", "GRanges"), function(x, value){
   }
   x
 })
+
+## cacheSet cache item and which at the same time, make sure the lengths equals
+setGeneric("cacheSet", function(x, value, ...) standardGeneric("cacheSet"))
+setMethod("cacheSet", c("Cache", "GRanges"), function(x, value){
+  x <- addItem(x, x)
+  x <- addWhich(x, value)
+  x
+})
+
+
 
 
 

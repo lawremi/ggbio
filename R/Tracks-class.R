@@ -49,14 +49,17 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     main <- title
   
   dots <- list(...)
+  ## reduce plots
   dots <- reduceListOfPlots(dots)
+  ## return plots if not
+  dots <- genPlots(dots)
 
   ## original plots
   ppl.ori <- do.call(plotList, dots)
 
   ## convert to Plot object with extra slots
   dots <- do.call(PlotList, dots)
-  
+
   ## fixed
   fixed <- sapply(dots, fixed)
 
@@ -79,31 +82,60 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
   ## Ideo
   isIdeo <- sapply(dots, is, "Ideogram")
 
+  ## is blank
+  isBlank <- sapply(dots, function(x) x@blank)
+
   ## ylim
-  ylim <- lapply(dots[!fixed & !isIdeo], function(grob){
+  ylim <- lapply(dots[!fixed & !isIdeo & !isBlank], function(grob){
      scales::expand_range(getLimits(grob)$ylim, mul = 0.05)
   })
 
+  wh <- NULL
   ## xlim
   if(missing(xlim)){
-    lst <- lapply(dots[!fixed & !isIdeo], function(obj){
-      res <- getLimits(obj)
-      data.frame(xmin = res$xlim[1], xmax = res$xlim[2])
-    })
-    res <- do.call(rbind, lst)
-    xlim <- c(min(res$xmin), max(res$xmax))
-    xlim <- scales::expand_range(xlim, mul = 0.1)
+      idx <- sapply(list(...), function(x){is(x, "GRanges")})
+      if(any(idx)){
+          grs <- list(...)[idx]
+          grs <- do.call(c, grs)
+          chrs <- unique(as.character(seqnames(grs)))
+          if(length(chrs) > 1){
+              stop("seqnames of passed GRanges has to be the same for tracks")
+          }
+          ir <- reduce(ranges(grs))
+          wh <- GRanges(chrs, ir)
+      }
+      xid <- !fixed & !isIdeo & !isBlank
+      if(sum(xid)){
+          lst <- lapply(dots[xid], function(obj){
+              res <- getLimits(obj)
+              data.frame(xmin = res$xlim[1], xmax = res$xlim[2])
+          })
+          res <- do.call(rbind, lst)
+          xlim <- c(min(res$xmin), max(res$xmax))
+          xlim <- scales::expand_range(xlim, mul = 0.1)
+      }else{
+          xlim <- c(0, 1)
+      }
   }else{
     if(is(xlim, "IRanges")){
       xlim <- c(start(xlim), end(xlim))
     }
     if(is(xlim,"GRanges")){
+      wh <- xlim
       xlim <- c(start(ranges(reduce(xlim, ignore.strand = TRUE))),
                 end(ranges(reduce(xlim, ignore.strand = TRUE))))
     }
     if(is.numeric(xlim)){
       xlim <- range(xlim)
     }
+  }
+
+  ## sync xlim when construct them??
+  if(!is.null(wh)){
+    dots <- lapply(dots, function(x){
+        x + xlim(wh)
+    })
+    dots <- do.call(PlotList, dots)
   }
   
   ## backup: record a state
@@ -389,6 +421,7 @@ setMethod("xlim", "GRanges", function(obj, ...){
   res <- ggplot2::coord_cartesian(xlim = xlim)
   chr <- unique(as.character(seqnames(obj)))
   attr(res, "chr") <- chr
+  attr(res, "ori") <- obj
   xlim_car(res)
 })
 

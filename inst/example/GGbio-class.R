@@ -1,12 +1,9 @@
 library(ggbio)
+library(ggplot2)
 p <- ggplot(data = mtcars)
-## obj.new <- obj.new + layout_circle()
-
-p  <- p + geom_point(aes(x = mpg, y = wt), color = "red")
-
-p
 class(p)
-
+p  <- p + geom_point(aes(x = mpg, y = wt), color = "red")
+p
 N <- 100
 library(GenomicRanges)
 ## ======================================================================
@@ -43,41 +40,56 @@ p <- ggplot(gr) + layout_circle() + geom_bar(aes(fill = score, y = score))
 p
 library(grid)
 p <- ggplot() + geom_rect(gr)
-
-autoplot(gr)
-class(p)
 p
+genPlots(list(p, p, gr, txdb))
+tracks(p)
 p + xlim(100, 200)
 p <- ggplot(gr) + geom_rect(which = gr)
-p
-class(p)
 
+
+tracks(p = p, p2 = p) + xlim(1, 3)
 
 gr1 <- GRanges("chr1", IRanges(1, 3))
 gr2 <- GRanges("chr1", IRanges(c(2, 4, 1), c(3, 5, 2)))
 countOverlaps(gr2, gr1, type = "within")
+cached_item(p1)
 
 ## test cache ability
-
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 data(genesymbol, package = "biovizBase")
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
-library(ggbio)
-p1 <- autoplot(txdb, which = genesymbol["ALDOA"], names.expr = "tx_name")
-
-ggbio:::cached_which(p1)
-ggbio:::cached_item(p1)
-
 gr1 <- genesymbol["ALDOA"]
 gr1
 gr2 <- GRanges("chr16", IRanges(30074491, 30075733))
 gr3 <- GRanges("chr12", IRanges(30074491, 30081733))
 
-print(ggbio:::needCache(p1, gr2))
-p11 = p1
-p11
+p1 <- autoplot(txdb, which = genesymbol["ALDOA"])
+p1
+## this should work
+myfunc <- function(x, ...){
+  autoplot(x, ...)
+}
+ylab = "asdfasdf"
+p1 <- myfunc(txdb, xlab = "lalaal", ylab = ylab)
+p.tx <- autoplot(txdb)
+p <- p.tx + xlim(gr1)
+p
+p + xlim(gr2)
+p + xlim(gr3)
+
+## fixme:
+## Need to add a marker called null graphics need to sync xlim wiht
+tracks(gr1, p1)
+tracks(txdb, xlim = gr1)
+library(grid)
+getGrFromXlim(xlim(gr1))
+p1
+
+tracks(p1)
+library(grid)
 p1
 p1 + xlim(gr1)
+p1
 p3 <- p1 + xlim(gr3)
 p3
 class( xlim(gr3))
@@ -85,7 +97,19 @@ ggbio:::cached(p1)
 res <- xlim(gr2)
 res <- xlim_car(res)
 
+## test bamfile
+fl <- "~/Datas/seqs/ENCODE/cshl/wgEncodeCshlLongRnaSeqGm12878CellPapAlnRep1.bam"
+fl1 <- "~/Datas/seqs/ENCODE/cshl/wgEncodeCshlLongRnaSeqK562CellPapAlnRep1.bam"
 
+library(Rsamtools)
+bf <- BamFile(fl)
+p <- autoplot(bf)
+p <- p + xlim(gr1)
+p
+p + xlim(gr2)
 
+tracks(bf, txdb, xlim = gr1)
 
+bfl <- BamFileList(c(fl, fl1))
 
+autoplot(bfl)

@@ -32,8 +32,8 @@ setMethod("Grob", "lattice", function(x){
 })
 
 setMethod("Grob", "GGbio", function(x){
-   ## new("ggplotGrob", ggplotGrob(x$ggplot))
-   ggplotGrob(x$ggplot)
+   ## new("ggplotGrob", ggplotGrob(x@ggplot))
+   ggplotGrob(x@ggplot)
 })
 
 
@@ -61,15 +61,7 @@ reduceListOfPlots <- function(x){
     length(x) == 1 && is.list(x[[1L]]) 
   if (firstElementIsListOfGrobs)
     x <- x[[1]]
-  idx <- isSupportedPlots(x)
-  if(!all(idx)){
-    warning("only class ", paste(.supportedPlots, collapse = "|"), " are suppoted for binding in tracks.")
-    warning("plot ", paste(which(!idx), collpase = " and "), " is dropped")
-  }
-  if(length(idx))
-    return(x[idx])
-  else
-    return(NULL)
+  x
 }
 
 ## this return a list of 'grobs' from list of valided 'plots' which could have grobs returned

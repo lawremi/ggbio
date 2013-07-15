@@ -6,7 +6,7 @@ GGbio.gen <- setClass("GGbio",
                            cmd = "list",
                            fetchable = "logical",
                            blank = "logical"),
-                         contains = "Cache")
+                      contains = "Cache")
 
 
 
@@ -17,8 +17,8 @@ GGbio <- function(ggplot = NULL, data = NULL, fetchable = FALSE, blank = FALSE,.
 ggbio <- GGbio
 
 
-## combine command if layout_circle presents
-.layout_circle.geoms <- c("point","line", "link",
+## combine command if circle presents
+.circle.geoms <- c("point","line", "link",
                           "ribbon","rect", "bar",
                           "segment","hist", "scale",
                           "heatmap", "ideogram", "text")
@@ -73,7 +73,7 @@ ggbio <- GGbio
                 list(geom = .geom))
       if(!is.null(obj@data) & is.null(args$data))
         args$data <- obj@data
-      obj@cmd <- do.call(layout_circle, args)
+      obj@cmd <- do.call(circle, args)
     }
     p <- ggplot2::ggplot() + obj@cmd
     obj@ggplot <- p
@@ -96,8 +96,29 @@ argList <- function(cmd){
 }
 
 setMethod("+", c("GGbio"), function(e1, e2){
+    if(is(e2, "circle")){
+        ## compute radius
+        args <- e2
+        r.addon <- .radius(e2)
+        r <- attr(e1, "radius")
+        if(is.null(r)){
+            attr(e1, "radius") <- 0
+        }
+        t.addon <- .trackWidth(e2)
+        if(is.null(r.addon)){
+            r.cur <-  attr(e1, "radius") +  t.addon
+            attr(e1, "radius") <- r.attr <- r.cur
+        }else{
+            r.cur <- r.addon
+            attr(e1, "radius") <- r.attr <- max(attr(e1, "radius"),  r.cur + t.addon)
+        }
+        args$radius <- r.cur
+        args$trackWidth <- t.addon
+        e1 <- e1 + do.call(layout_circle, args)
+        attr(e1, "radius") <- r.attr
+        return(e1)
+    }
   if(!is(e2, "xlim")){
-      ## FIXME: do.call(doesn'twork)
     args <- as.list(match.call()$e2)
     e2name <-  deparse(args[[1]])
     .tmp <- list(args)

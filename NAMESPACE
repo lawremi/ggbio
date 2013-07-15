@@ -123,7 +123,7 @@ exportMethods(stat_aggregate,
 exportMethods(layout_karyogram,
               layout_circle)
 
-
+export(circle)
 ## coord
 ## exportMethods(coord_genome)
 export(tracks,
@@ -144,5 +144,9 @@ export(theme_null, theme_alignment, theme_clear, theme_tracks_sunset,
 export(ggsave)
 
 
-exportMethods(Grob, Plot, get_gtable)
+exportMethods(Grob, Plot, get_gtable, cached, "cached<-",
+              cached_xlim, "cached_xlim<-",
+              cached_ylim, "cached_ylim<-",
+              cached_item, "cached_item<-", addItem, addWhich,
+              cached_which)
 export(PlotList)

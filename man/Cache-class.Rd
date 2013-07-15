@@ -41,7 +41,6 @@ cached_xlim(obj)
 cached_xlim(obj) <- 1
 cached_ylim(obj) <- c(0, 5)
 
-obj <- Cache()
 
 }
 \author{Tengfei Yin}

@@ -23,10 +23,15 @@ gr <- GRanges(seqnames =
               pair = sample(letters, size = N, 
                 replace = TRUE))
 
-
-
 seqlengths(gr) <- c(400, 500, 700)
 values(gr)$to.gr <- gr[sample(1:length(gr), size = length(gr))]
+
+
+ggplot() + circle(gr, geom = "ideo", fill = "gray70") +
+     circle(gr, geom = "bar", aes(fill = score, y = score)) + 
+     circle(gr, geom = "point", color = "red", grid = TRUE, aes(y = score)) + 
+     circle(gr, geom = "link", linked.to = "to.gr", r = 0, )
+
 
 ## doesn't pass gr to the ggplot
 ggplot() + layout_circle(gr, geom = "ideo", fill = "gray70", radius = 7, trackWidth = 3) +
@@ -108,8 +113,32 @@ p <- p + xlim(gr1)
 p
 p + xlim(gr2)
 
-tracks(bf, txdb, xlim = gr1)
-
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(Rsamtools)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+fl <- "~/Datas/seqs/ENCODE/cshl/wgEncodeCshlLongRnaSeqGm12878CellPapAlnRep1.bam"
+bf <- BamFile(fl)
+tks <- tracks(coverage = bf, model = txdb, xlim = gr1)
+tks
+ggsave("~/Desktop/tks.jpg")
 bfl <- BamFileList(c(fl, fl1))
 
 autoplot(bfl)
+
+
+## subset tracks
+p <- ggplot(data = mtcars)
+p1  <- p + geom_point(aes(x = mpg, y = wt), color = "red")
+p2  <- p + geom_point(aes(x = mpg, y = wt), color = "blue")
+p3  <- p + geom_point(aes(x = mpg, y = wt), color = "green")
+
+tks <- tracks(p1 = p1, p2 = p2, p3 = p3)
+names(tks@grobs[c(1, 3)])
+tk <- tks[c(1, 3)]
+tk
+names(tk@grobs)
+tk <- tks[1:2]
+names(tk@grobs)
+tk@label
+
+

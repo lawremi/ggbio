@@ -140,7 +140,7 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
     ## FIXME: xlab/ylab/main
   }
   if(layout == "circle"){
-    p <- ggplot(object) + layout_circle(object, geom = geom, space.skip = space.skip, ...) 
+    p <- ggplot(object) + circle(object, geom = geom, space.skip = space.skip, ...) 
   }
   ## test scale
   if(is_coord_truncate_gaps(object) | is_coord_genome(object)){
@@ -1088,7 +1088,7 @@ getNR <- function(x, type = c("NUSE", "RLE"),range = 0, ...){
 ##     p <- ggplot()
   
 ##     for(i in 1:length(object)){
-##       p <- p + do.call(layout_circle, c(list(data = object[[i]]), radius = radius[i],
+##       p <- p + do.call(circle, c(list(data = object[[i]]), radius = radius[i],
 ##                                         trackWidth = trackWidth[i], grid = grid[i],
 ##                                         args[[i]]))
 ##     }}

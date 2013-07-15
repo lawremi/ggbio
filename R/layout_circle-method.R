@@ -1,3 +1,16 @@
+## setClass("Circle", contains = c("gg"),slots = list(radius = "numeric",
+##                                         trackWidth = "numeric"))
+## Circle <- function(object, radius = 10, trackWidth = 5){
+##     new("Circle", object, radius = radius, trackWidth = trackWidth)
+## }
+
+## ## accessor
+## setGeneric("radius", function(obj) standardGeneric("radius"))
+## setMethod("radius", "Circle", function(obj) obj@radius)
+## setGeneric("trackWidth", function(obj) standardGeneric("trackWidth"))
+## setMethod("trackWidth", "Circle", function(obj) obj@trackWidth)
+
+
 setGeneric("layout_circle", function(data,...) standardGeneric("layout_circle"))
 
 setMethod("layout_circle",  "GRanges",
@@ -12,7 +25,8 @@ setMethod("layout_circle",  "GRanges",
                    grid.n = 5, grid.background = "gray70", grid.line = "white",
                    grid = FALSE,
                    chr.weight = NULL){
-
+  message("layout_circle() is now a lower level component to transform a
+           linear object, and please check circle() for easier API")
   args <- dots <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
@@ -325,4 +339,37 @@ setMethod("layout_circle",  "GRanges",
 })
 
 
+
+## layout_circle <- function(...){
+##     .Deprecated("circle")
+##     message("layout_circle() is now a lower level component to transform a linear object")
+##     circle(...)
+## }
+
+
+
+circle <- function(...){
+    args <- list(...)
+    class(args) <- "circle"
+    args
+}
+
+.radius <- function(args){
+    idx <- names(args) %in% c("r", "radius")
+    if(sum(idx)){
+        return(args[[which(idx)[1]]])
+    }else{
+        return(NULL)
+    }
+
+}
+
+.trackWidth <- function(args){
+    idx <- names(args) == "trackWidth"
+    if(sum(idx)){
+        return(args[[which(idx)[1]]])
+    }else{
+        return(5)
+    }
+}
 

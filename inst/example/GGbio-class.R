@@ -142,3 +142,8 @@ names(tk@grobs)
 tk@label
 
 
+
+library(ggbio)
+p <- qplot(data = mtcars, x = mpg,  y = wt, facets = cyl ~ .)
+p1 <- qplot(data = mtcars, x = mpg,  y = wt)
+tracks(p1 = p, p2 = p1)

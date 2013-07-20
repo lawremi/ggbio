@@ -25,9 +25,7 @@ setMethod("Grob", "trellis", function(x){
   ## new("latticeGrob", latticeGrob(x))
   latticeGrob(x)
 })
-
 setMethod("Grob", "lattice", function(x){
-  ## new("latticeGrob", x)  
   x
 })
 

@@ -6,6 +6,7 @@ GGbio.gen <- setClass("GGbio",
                            cmd = "list",
                            fetchable = "logical",
                            blank = "logical"),
+                      prototype = list(ggplot = NULL, data = NULL, fechable = FALSE, blank = FALSE),
                       contains = "Cache")
 
 
@@ -85,7 +86,7 @@ ggbio <- GGbio
 setMethod("show", "GGbio", function(object){
   object <- .combineNames(object)
   if(object@blank)
-    warning("No region(with chromosome name) specified, so no data found")
+    message("No region(with chromosome name) specified, so no data found")
   print(object@ggplot)
 })
 

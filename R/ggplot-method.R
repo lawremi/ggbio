@@ -74,7 +74,6 @@ setMethod("ggplot", "Rle", function(data, ...){
 setMethod("ggplot", "RleList", function(data, ...){
   df <- mold(data)
   g <- ggplot2::ggplot(df, ...)
-  g <- ggbio(g)
   g <- GGbio(g, data = data)                
   g
 })

@@ -10,13 +10,8 @@ setClass("ggbioPlot", contains = c("GGbio", "Plot"))
 ## Generic function to get subclas instance of 'Plot' class
 setGeneric("Plot", function(x, ...) standardGeneric("Plot"))
 setMethod("Plot", "gg", function(x){
-  idx <- names(attributes(x)) %in% c("fixed", "labeled", "bgColor", "hasAxis", "mutable", "height")
-  if(sum(idx)){
-    lst <- attributes(x)[idx]
-    obj <- do.call("new", c("ggplotPlot", list(x), lst))
-  }else{
-    obj <- new("ggplotPlot", x)    
-  }
+  x <- ggbio(x)
+  obj <- Plot(x)
   obj
 })
 

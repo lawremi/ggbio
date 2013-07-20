@@ -189,7 +189,6 @@ eset <- sample.ExpressionSet[idx,]
 
 ggplot(eset) + geom_tile(aes(x = x, y = y, fill = value))
 ## please check autoplot,matrix method which gives you more control
-head(ggplot(eset)$data)
 ggplot(eset) + geom_tile(aes(x = x, y = y, fill = sex))
 ggplot(eset) + geom_tile(aes(x = x, y = y, fill = type))
 

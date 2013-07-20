@@ -584,6 +584,12 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                                                 "point",
                                                 "rect")){
 
+    mc <- as.list(match.call())[-1]
+    mc <- lapply(mc, eval, envir = parent.frame(1))
+    mc <- c(list(as.name("autoplot")), mc)
+    cmd <- list(mc)
+    names(cmd) <- "autoplot"
+
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
@@ -863,7 +869,7 @@ setMethod("autoplot", "RleList", function(object, ...,
 setMethod("autoplot", "ExpressionSet", function(object, ...,
                                                 type = c("heatmap","none",
                                                   "scatterplot.matrix", "pcp", "MA", "boxplot",
-                                                  "mean-sd", "volcano",
+                                                  "mean-sd", 
                                                   "NUSE", "RLE"),
                                                 test.method = "t",
                                                 rotate = FALSE,
@@ -954,19 +960,19 @@ setMethod("autoplot", "ExpressionSet", function(object, ...,
         xlab(xlabs) + ylab("sd")
     p
   }
-  if(type == "volcano"){
-    require(genefilter)
-    if(!"fac" %in% names(args))
-      stop("argument fac must be provided to make t-test,
-            check genefilter::rowttests for details")
+  ## if(type == "volcano"){
+  ##   require(genefilter)
+  ##   if(!"fac" %in% names(args))
+  ##     stop("argument fac must be provided to make t-test,
+  ##           check genefilter::rowttests for details")
 
-    message("genefilter::rowttests used")
-    tt <- rowttests(object, args$fac)
-    p <- qplot(tt$dm, -log10(tt$p.value), geom = "point") +
-      xlab(expression(mean~log[2]~fold~change)) +
-        ylab(expression(-log[10](p)))
+  ##   message("genefilter::rowttests used")
+  ##   tt <- rowttests(object, args$fac)
+  ##   p <- qplot(tt$dm, -log10(tt$p.value), geom = "point") +
+  ##     xlab(expression(mean~log[2]~fold~change)) +
+  ##       ylab(expression(-log[10](p)))
 
-  }
+  ## }
   if(type == "none"){
     df.l <- mold(object)
     p <- qplot(data = df.l, ...)

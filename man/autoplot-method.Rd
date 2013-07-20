@@ -90,7 +90,7 @@
 
 \S4method{autoplot}{ExpressionSet}(object, ..., type = c("heatmap", "none",
                  "scatterplot.matrix", "pcp", "MA", "boxplot",
-                 "mean-sd", "volcano", "NUSE", "RLE"), test.method =
+                 "mean-sd", "NUSE", "RLE"), test.method =
                  "t", rotate = FALSE, pheno.plot = FALSE, main_to_pheno
                  = 4.5, padding = 0.2)
 
@@ -863,8 +863,6 @@ autoplot(eset[, 1:7], type = "scatterplot.matrix")
 autoplot(eset, type = "mean-sd")
 
 
-## volcano
-autoplot(eset, type = "volcano", fac = pData(sample.ExpressionSet)$type)
 
 
 ###################################################

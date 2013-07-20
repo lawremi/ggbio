@@ -20,8 +20,6 @@
 \alias{print,Tracks-method}
 \alias{Arith}
 \alias{Arith,Tracks,ANY-method}
-\alias{update}
-\alias{update,Tracks-method}
 \alias{reset}
 \alias{reset,Tracks-method}
 \alias{backup}
@@ -204,10 +202,6 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
       \code{obj} is the Tracks object, this clear previous backup and
       use current setting for a new backup.
     }
-    \item{update(obj, xlim)}{
-      \code{obj} is the Tracks object, this allow a quick tweak with
-      xlim when the plot is shown on your screen.     
-    }
   }
 }
 
@@ -288,6 +282,7 @@ tks + tks
 
 cbind(tks, tks)
 rbind(tks, tks) ## different wth c()!
+library(grid)
 x <- get_gtable(tks)
 grid.draw(cbind(x, x))
 
@@ -326,7 +321,7 @@ tracks(time1 = p1, time2 = p2, "time3(fixed)" = p3)
 
 fixed(p3) <- FALSE
 ## otherwise you could run
-tracks(time1 = p1, time2 = p2, "time3(fixed)" = p3, fixed = c(FALSE, FALSE, TRUE))
+%% tracks(time1 = p1, time2 = p2, "time3(fixed)" = p3, fixed = c(FALSE, FALSE, TRUE))
 
 
 ## control axis
@@ -410,12 +405,6 @@ tks <- backup(tks)
 tks <- tks + theme_bw()
 tks
 reset(tks)
-
-## update
-## show it on the fly, save your time to re-print
-tks <- tracks(time1 = p1, time2 = p2)
-tks
-update(tks, xlim = c(1, 40))
 
 ## padding(need to be fixed for more delicate control)
 tracks(time1 = p1, time2 = p2, padding = 2)

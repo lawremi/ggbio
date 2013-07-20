@@ -461,3 +461,22 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
     stop("pleast provide your limits of current viewed coordinate")
   nchar(x) * size / fixed * diff(limits)
 }
+
+
+## For bam file show individual aligments
+
+setMethod("geom_alignment", "BamFile", function(data,..., which,
+                                                what = c("rname", "strand", "pos", "qwidth", "seq"),
+                                                xlab, ylab, main,
+                                                facets = NULL){
+    bi <- biovizBase:::scanBamGRanges(fl, which = which, what = what)
+    bt <- bi[1:100]
+    bt <- biovizBase::addStepping(bt)
+    names(bt) <- NULL
+    
+    d <- as.data.frame(bt)
+
+    library(ggplot2)
+    qplot(x = start, y = stepping, label = df, geom = "text", data = d)
+
+})

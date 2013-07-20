@@ -509,11 +509,11 @@ setReplaceMethod("xlim", c("Tracks", "numeric"), function(x, value){
   x
 })
 
-setMethod("update", "Tracks", function(object, xlim){
-  xlim(object) <- xlim
-  object@xlim <- xlim
-  print(object)
-})
+## setMethod("update", "Tracks", function(object, xlim){
+##   xlim(object) <- xlim
+##   object@xlim <- xlim
+##   print(object)
+## })
 
 setGeneric("reset", function(obj, ...) standardGeneric("reset"))
 setMethod("reset", "Tracks", function(obj){

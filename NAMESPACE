@@ -86,7 +86,7 @@ importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref, "ref<-",
 ## ============================================================
 ## utils
 exportMethods(autoplot, rescale, mold, fixed, "fixed<-", 
-              xlim, "xlim<-", update, reset, backup,
+              xlim, "xlim<-", reset, backup,
               bgColor, "bgColor<-", labeled, "labeled<-",
               mutable, "mutable<-", height, "height<-",
               hasAxis, "hasAxis<-", ggplot)
@@ -148,5 +148,5 @@ exportMethods(Grob, Plot, get_gtable, cached, "cached<-",
               cached_xlim, "cached_xlim<-",
               cached_ylim, "cached_ylim<-",
               cached_item, "cached_item<-", addItem, addWhich,
-              cached_which)
-export(PlotList)
+              cached_which, cbind, rbind)
+export(PlotList, Tracked)

@@ -593,8 +593,9 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   }
 
   ## parse grobs
+  ## a little slow
   grobs <- do.call(GrobList, ggl)
-  
+
   addLabel <- function(grobs, nms, lbs,
                        label.bg.color =  "white",
                        label.bg.fill = "gray80",
@@ -679,7 +680,6 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     grobs[[i]]$grobs[[1]]$children[[1]]$children$layout <- gt.temp
     grobs[[i]]$grobs[[1]] <- editGrob(grobs[[i]]$grobs[[1]], "bgColor", grep = TRUE, global = TRUE,
                        gp  = gpar(fill = .col, col = .col))
-    ## grobs[[i]] <- copyAttr(.grob, grobs[[i]])
     grobs[[i]]
   })
 
@@ -691,7 +691,6 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   
   if(add.scale){
     g <- g.last$grobs[[1]]$children[[1]]$children$layout
-    ## g <- g.last$children[[1]]$children$layout
     g.s <- scaleGrob(g)
     if(length(track.bg.color)){
         rect.grob <- rectGrob(gp=gpar(col = track.bg.color,
@@ -742,7 +741,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        label.width = label.width)
   }else{
     if(any(!is.null(nms)))
-      grobs <- addLabe(lgrobs, nms, lbs,
+      grobs <- addLabel(lgrobs, nms, lbs,
                         label.bg.color =  label.bg.color,
                        label.bg.fill = label.bg.fill,
                        label.text.color = label.text.color,
@@ -752,7 +751,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   }
 
   ## reduce to normal grob
-grobs_back <- grobs
+  grobs_back <- grobs
   grobs <- lapply(grobs, function(g){
     if(is(g, "Grob")){
       suppressWarnings(class(g) <- g@.S3Class)    
@@ -866,7 +865,7 @@ spaceAroundPanel <- function(g, type = c("t", "l", "b", "r")){
                 },
                 r = {
                   id <- which(g$layout$r > max(g$layout[idx, ]$r))
-                  id <- id[!duplicated(g$layout$name[id])]                  
+                  ## id <- id[!duplicated(g$layout$name[id])]                  
                   if(length(id))
                     res <- sum(g$width[unique(g$layout$r[id])])
                   else
@@ -902,15 +901,11 @@ uniformAroundPanel <- function(..., direction = c("row", "col")){
     for(i in 1:length(grobs)){
       .grob <- grobs[[i]]
       gt <- gtable(unit(1, "null"), unit(1, "null"), name = "panel.ori")
-      grobs[[i]] <- gtable_add_cols(grobs[[i]], lmx - slst[[i]]$l ,
-                                    pos = 0)
+      grobs[[i]] <- gtable_add_cols(grobs[[i]], lmx - slst[[i]]$l, pos = 0)
       grobs[[i]] <- gtable_add_cols(grobs[[i]], rmx - slst[[i]]$r, pos = -1)
-      rect.grob <- rectGrob(gp = gpar(fill = NA, col = NA),
-                            name = "bgColor")
-      ## rect.grob <- rectGrob(gp = gpar(fill = NA, col = NA))
+      rect.grob <- rectGrob(gp = gpar(fill = NA, col = NA), name = "bgColor")
       all.grob <- grobTree(gTree(children = gList(rect.grob, grobs[[i]])))      
       grobs[[i]] <- gtable_add_grob(gt, all.grob, 1, 1)
-      ## grobs[[i]] <- copyAttr(.grob, grobs[[i]])
     }
   }
   if(dir == "col"){
@@ -926,7 +921,6 @@ uniformAroundPanel <- function(..., direction = c("row", "col")){
       rect.grob <- rectGrob(gp = gpar(fill = NA, color = NA), name = "bgColor")
       all.grob <- grobTree(gTree(children = gList(rect.grob, grobs[[i]])))      
       grobs[[i]] <- gtable_add_grob(gt, all.grob, 1, 1)
-      ## grobs[[i]] <- copyAttr(.grob, grobs[[i]])      
     }
   }
   grobs
@@ -980,13 +974,6 @@ titleGrob <- function(g){
   
 }
 
-## xlabGrob <- function(p){
-##   p <- ScalePlot(x)  
-##   g <- Grob(p)
-##   idx <- g$layout$name %in% c("xlab")
-##   idx <- unique(c(g$layout[idx, "t"], g$layout[idx, "b"]))
-##   g[idx,]
-## }
 
 
 

@@ -1,3 +1,4 @@
+## For transcripts support three mode?
 setGeneric("geom_alignment", function(data, ...) standardGeneric("geom_alignment"))
 
 
@@ -192,7 +193,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
 
   if(geom == "alignment"){
     message("Aggregating TranscriptDb...")
-    gr <- biovizBase:::fetch(object, which, truncate.gaps = truncate.gaps,
+    gr <- crunch(object, which, truncate.gaps = truncate.gaps,
                              truncate.fun = truncate.fun, ratio = ratio)
     .xlim <- NULL    
     if(length(gr)){
@@ -208,8 +209,9 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                           extend.size = es)
       }else{
         gr <- addStepping(gr, group.name = "tx_id", group.selfish = FALSE)
+        es <- 0
       }
-      .xlim[1] <- .xlim[1] - es
+      .xlim[1] <- min(.xlim) - es
       df <- mold(gr)
       
       if(label){
@@ -323,7 +325,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
   }
   if(geom == "reduced_gene"){
     message("Aggregating TranscriptDb...")
-    gr <- biovizBase:::fetch(object, which, type = "single",
+    gr <- crunch(object, which, type = "reduce",
                              truncate.gaps = truncate.gaps,
                              truncate.fun = truncate.fun, ratio = ratio)
 
@@ -331,7 +333,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
     if(length(gr)){
       .xlim <- c(start(range(gr, ignore.strand = TRUE)),
                  end(range(gr, ignore.strand = TRUE)))
-      ## gr <- fetch(object, which, type = "single")
+      ## gr <- fetch(object, which, type = "reduce")
       message("Constructing graphics...")
       values(gr)$stepping <-  1
       ## drawing
@@ -430,7 +432,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
   if(!missing(main))
     p <- c(p, labs(title = main))
   
-  ## test scale
+
   if(is_coord_truncate_gaps(gr)){
     gr <- gr[values(gr)$type %in% c("utr", "cds")]
     ss <- getXScale(gr)
@@ -456,7 +458,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
 
 
 .transformTextToSpace <- function(x = character(), limits = NULL,
-                                  fixed = 200, size = 1 ){
+                                  fixed = 100, size = 1 ){
   if(!length(limits))
     stop("pleast provide your limits of current viewed coordinate")
   nchar(x) * size / fixed * diff(limits)

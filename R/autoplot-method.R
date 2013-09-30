@@ -154,6 +154,7 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
     p <- p + facet
   if(!is(p, "GGbio"))
     p <- GGbio(p, data = object)
+  p <- p + scale_by_xlim(getLimits(p)$xlim)
   p
 })
 
@@ -284,9 +285,9 @@ setMethod("autoplot", "GAlignments", function(object, ...,
     p <- do.call(autoplot, c(list(aes.res), args.non))
   }else{
     if(!missing(which))
-      gr <- biovizBase:::fetch(object, which)
+      gr <- crunch(object, which)
     else
-      gr <- biovizBase:::fetch(object)
+      gr <- crunch(object)
     args.non$object <- gr
     p <- do.call(autoplot, c(list(aes.res), args.non))
   }
@@ -378,7 +379,7 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
             ga <- readGAlignmentsFromBam(bf,
                                          param = ScanBamParam(which = which),
                                          use.name = TRUE)
-            gr <- biovizBase:::fetch(ga, type = "raw")
+            gr <- crunch(ga, type = "raw")
             p <- autoplot(gr, ..., geom = geom, stat = stat)
         }
     }
@@ -515,10 +516,11 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                xlab, ylab, main,
                                                truncate.gaps = FALSE,
                                                truncate.fun = NULL,
-                                               ratio = 0.0025, 
+                                               ratio = 0.0025,
+                                               mode = c("full", "packed", "reduce"), #mode is combination of geom and stat and more 
                                                geom = c("alignment"),
                                                stat = c("identity", "reduce"),
-                                               names.expr = "tx_name(gene_id)",
+                                               names.expr = "tx_name",
                                                label = TRUE){
 
 
@@ -569,6 +571,8 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
     }
     p@fetchable <- TRUE
     p@cmd <- cmd
+    p <- p + theme_bw()
+    ## p <- p + scale_by_xlim(getLimits(p)$xlim)    
     p
 })
 

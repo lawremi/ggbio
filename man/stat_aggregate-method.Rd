@@ -153,8 +153,9 @@ ggplot(gr) + stat_aggregate(aes(y = value), geom = "boxplot", window = 60)
 ## now facets need to take place inside stat_* geom_* for an accurate computation
 ggplot(gr) + stat_aggregate(aes(y = value), geom = "boxplot", window = 30,
               facets = sample ~ seqnames)
-autoplot(gr, stat = "aggregate", aes(y = value))
-autoplot(gr, stat = "aggregate", geom = "boxplot", aes(y = value), window = 36)
+## FIXME:
+## autoplot(gr, stat = "aggregate", aes(y = value), window = 36)
+## autoplot(gr, stat = "aggregate", geom = "boxplot", aes(y = value), window = 36)
 }
 \author{Tengfei Yin}
 

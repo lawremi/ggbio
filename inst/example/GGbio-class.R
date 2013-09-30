@@ -1,3 +1,7 @@
+## TODO:
+## 1. Txdb
+## 2. Solve the seqinfo issues
+## 3. remove keepSeqlevels, renameSeqlevels
 library(ggbio)
 library(ggplot2)
 p <- ggplot(data = mtcars)
@@ -25,7 +29,10 @@ gr <- GRanges(seqnames =
 
 seqlengths(gr) <- c(400, 500, 700)
 values(gr)$to.gr <- gr[sample(1:length(gr), size = length(gr))]
+grr <- GRanges(c("chr1", "chr1", "chr2"), IRanges(1, 50))
 
+autoplot(gr, facets = grr)
+ggbio() + geom_rect(gr)
 
 ggplot() + circle(gr, geom = "ideo", fill = "gray70") +
      circle(gr, geom = "bar", aes(fill = score, y = score)) + 
@@ -142,8 +149,26 @@ names(tk@grobs)
 tk@label
 
 
-
+## TODO: make a better looking txbd
 library(ggbio)
 p <- qplot(data = mtcars, x = mpg,  y = wt, facets = cyl ~ .)
 p1 <- qplot(data = mtcars, x = mpg,  y = wt)
 tracks(p1 = p, p2 = p1)
+
+
+## 
+library(ggbio)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+data(genesymbol, package = "biovizBase")
+p <- autoplot(txdb, which = genesymbol["BRCA1"])
+data(genesymbol, package = "biovizBase")
+p <- autoplot(txdb, which = genesymbol["BRCA1"])
+autoplot(keepSeqlevels(genesymbol[1:100], "chr1"))
+class(p)
+is
+
+
+
+
+

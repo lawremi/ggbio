@@ -4,7 +4,7 @@ setGeneric("geom_arrow", function(data, ...) standardGeneric("geom_arrow"))
 setMethod("geom_arrow", "GRanges", function(data, ...,
                                             xlab, ylab, main, 
                                             angle = 30,
-                                            length = unit(0.15, "cm"),
+                                            length = unit(0.12, "cm"),
                                             type = "open", 
                                             stat = c("stepping", "identity"),
                                             facets = NULL, arrow.rate = 0.03,

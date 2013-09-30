@@ -201,7 +201,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                   if(missing(which))
                     stop("method 'raw' require which argument")
                   message("Parsing raw coverage...")
-                  res <- biovizBase:::fetch(data, which = which)
+                  res <- crunch(data, which = which)
                 })
   res.ori <- res
   

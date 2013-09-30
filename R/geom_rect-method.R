@@ -1,3 +1,8 @@
+## TODO::
+## Let's load a RefSeq data
+## naming the interval
+## two mode? packed, full with name (default)
+## reduce is just a stat transformation at lower level
 setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
 
 setMethod("geom_rect", "data.frame", function(data, ...){

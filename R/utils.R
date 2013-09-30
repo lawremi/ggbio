@@ -1,4 +1,7 @@
 setGeneric("getLimits", function(obj, ...) standardGeneric("getLimits"))
+setMethod("getLimits", "GGbio", function(obj){
+  .getLimits(obj@ggplot)
+})
 setMethod("getLimits", "ggplotPlot", function(obj){
   .getLimits(obj)
 })

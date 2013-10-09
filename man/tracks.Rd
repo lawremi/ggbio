@@ -24,10 +24,11 @@
 \alias{reset,Tracks-method}
 \alias{backup}
 \alias{backup,Tracks-method}
+\alias{}
 \title{Tracks for genomic graphics}
 \usage{
 tracks(..., heights, xlim, xlab = NULL, main = NULL,
-            title = NULL, theme = NULL, fixed = NULL,
+            title = NULL, theme = NULL, 
             track.plot.color = NULL,
             track.bg.color = NULL,
             main.height = unit(2, "lines"),
@@ -50,10 +51,6 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
   \item{title}{title for the tracks, alias like main.}
   \item{theme}{theme object used for building tracks, this will
     set to default, which could be reseted later. }
-  \item{fixed}{vector of logical value, indicates whether the
-    scale of passed graphics are fixed or not, useful for attaching
-    unchanged plots to the tracks, like ideogram. Please check utilities
-    section below.}
   \item{track.plot.color}{
     Vector of characters of length 1 or the same length of passed plots,
     background color for each track, default is white.
@@ -283,7 +280,7 @@ tks + tks
 cbind(tks, tks)
 rbind(tks, tks) ## different wth c()!
 library(grid)
-x <- get_gtable(tks)
+x <- ggbio:::get_gtable(tks)
 grid.draw(cbind(x, x))
 
 

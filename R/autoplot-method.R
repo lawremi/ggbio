@@ -517,7 +517,7 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
                                                truncate.gaps = FALSE,
                                                truncate.fun = NULL,
                                                ratio = 0.0025,
-                                               mode = c("full", "packed", "reduce"), #mode is combination of geom and stat and more 
+                                               mode = c("full", "reduce"), #mode is combination of geom and stat and more 
                                                geom = c("alignment"),
                                                stat = c("identity", "reduce"),
                                                names.expr = "tx_name",

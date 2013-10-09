@@ -142,11 +142,11 @@ export(theme_null, theme_alignment, theme_clear, theme_tracks_sunset,
        theme_pack_panels, theme_noexpand, theme_genome)
 
 export(ggsave)
+exportMethods(cbind, rbind)
 
-
-exportMethods(Grob, Plot, get_gtable, cached, "cached<-",
-              cached_xlim, "cached_xlim<-",
-              cached_ylim, "cached_ylim<-",
-              cached_item, "cached_item<-", addItem, addWhich,
-              cached_which, cbind, rbind)
-export(PlotList, Tracked)
+## exportMethods(Grob, Plot, get_gtable, cached, "cached<-",
+##               cached_xlim, "cached_xlim<-",
+##               cached_ylim, "cached_ylim<-",
+##               cached_item, "cached_item<-", addItem, addWhich,
+##               cached_which, cbind, rbind)
+## export(PlotList, Tracked, Plot, Grob)

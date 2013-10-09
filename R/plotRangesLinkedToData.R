@@ -1,7 +1,7 @@
 ## TODO: exons label
 ## check (done)
 ## significant
-##  log y
+##  log y, stat.col, stat.label, where is it.
 
 setGeneric("plotRangesLinkedToData",
            function(data, ...) standardGeneric("plotRangesLinkedToData"))

@@ -56,16 +56,17 @@
 
 \S4method{autoplot}{BamFile}(object, ..., which, xlab, ylab, main,
               bsgenome, geom = "line", stat = "coverage",
-              method = c("estimate", "raw"),
+              method = c("raw","estimate"),
               coord = c("linear", "genome"), resize.extra = 10,
               space.skip = 0.1, show.coverage = TRUE)
 
 \S4method{autoplot}{character}(object, ..., xlab, ylab, main, which, asRangedData = FALSE)
 
 \S4method{autoplot}{TranscriptDb}(object, which, ..., xlab, ylab, main, truncate.gaps =
-                 FALSE, truncate.fun = NULL, ratio = 0.0025, geom =
+                 FALSE, truncate.fun = NULL, ratio = 0.0025,
+                 mode = c("full", "reduce"),geom =
                  c("alignment"), stat = c("identity", "reduce"),
-                 names.expr = "tx_name(gene_id)")
+                 names.expr = "tx_name", label = TRUE)
 
 
 
@@ -173,6 +174,9 @@
   \item{ratio}{
     used in \code{maxGap}.
   }
+  \item{mode}{
+    Display mode for genomic features. 
+  }
   \item{space.skip}{
     space ratio between chromosome spaces in coordate genome.
   }
@@ -213,6 +217,9 @@
   }
 \item{ylab}{
     y label.
+  }
+  \item{label}{
+    logic value, default TRUE. To show label by the side of features. 
   }
 \item{facetByRow}{
     A logical value, default is TRUE ,facet RleList by row. If FALSE,

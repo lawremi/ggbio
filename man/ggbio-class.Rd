@@ -1,5 +1,6 @@
-\name{ggbio}
+\name{GGbio}
 \alias{ggbio}
+\alias{GGbio}
 \alias{ggbio-class}
 \alias{+,ggbio,ANY-method}
 \title{class ggbio}
@@ -7,11 +8,24 @@
   a sub class of ggplot and gg class defined in ggplot2 package, used for ggbio specific methods.
 }
 \usage{
-  ggbio(x)
+  GGbio(ggplot = NULL, data = NULL, fetchable = FALSE, blank =
+                 FALSE, ...)
 }
 \arguments{
-  \item{x}{
+  \item{ggplot}{
     a ggplot or gg object.
+  }
+  \item{data}{
+    raw data
+  }
+  \item{fetchable}{
+    logical value, default \code{FALSE}, is there any fetch method available. 
+  }
+  \item{blank}{
+    logical value, default \code{FALSE}, is this plot a blank plot.
+  }
+  \item{...}{
+    More properties passed to class like \code{Cache}.
   }
 }
 \value{

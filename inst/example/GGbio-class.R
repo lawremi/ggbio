@@ -2,6 +2,7 @@
 ## 1. Txdb
 ## 2. Solve the seqinfo issues
 ## 3. remove keepSeqlevels, renameSeqlevels
+## 
 library(ggbio)
 library(ggplot2)
 p <- ggplot(data = mtcars)
@@ -168,7 +169,7 @@ autoplot(keepSeqlevels(genesymbol[1:100], "chr1"))
 class(p)
 is
 
-
+## 
 
 
 

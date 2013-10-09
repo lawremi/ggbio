@@ -1,21 +1,27 @@
 \name{plotRangesLinkedToData}
 \alias{plotRangesLinkedToData}
+\alias{plotRangesLinkedToData,SummarizedExperiment-method}
+\alias{plotRangesLinkedToData,GenomicRangesORGRangesList-method}
 \title{Plot Ranges Linked with Data}
 \description{
   Plot GRanges object structure and linked to a even spaced paralell
   coordinates plot which represting the data in elementeMetadata.
 }
 \usage{
-plotRangesLinkedToData(data, ..., stat.col, stat.label,
-                                   stat.ylab,
-                                   sig, sig.col = c("black", "red"),
-                                   stat.coord.trans = coord_trans(),
-                                   annotation = list(),
-                                   width.ratio = 0.8,
-                                   theme.stat = theme_grey(),
-                                   theme.align = theme_gray(),
-                                   linetype = 3, 
-                                   heights)
+\S4method{plotRangesLinkedToData}{SummarizedExperiment}(data, ...,
+          stat.y = seq_len(ncol(data)), stat.ylab = names(assays(data)[stat.assay]),
+          stat.assay = 1L)
+
+\S4method{plotRangesLinkedToData}{GenomicRangesORGRangesList}(data, ...,
+          stat.y = seq_len(ncol(mcols(data))),
+          stat.ylab, sig, sig.col = c("black", "red"),
+          stat.coord.trans = coord_trans(),
+          annotation = list(), width.ratio = 0.8,
+          theme.stat = theme_gray(), theme.align = theme_gray(),
+          linetype = 3, heights)
+
+
+
 
 }
 \arguments{
@@ -25,15 +31,15 @@ plotRangesLinkedToData(data, ..., stat.col, stat.label,
   \item{...}{
     Parameters passed to control lines in top plot.
   }
-  \item{stat.col}{
+  \item{stat.y}{
     integer (variable position starting in DataFrame of data, start from
     1) or strings (variable names) which indicate the column names.
   }
-  \item{stat.label}{
-    Labels of the columns, if missing, use stat.col.
-  }
   \item{stat.ylab}{
     y label for stat track(the top track).
+  }
+  \item{stat.assay}{
+    default 1L, element of assays.
   }
   \item{sig}{
     a character of element meta data column of logical value, indicates
@@ -112,12 +118,12 @@ values(exon.new)$sample2 <- rnorm(length(exon.new), 10, 10)
 values(exon.new)$score <- rnorm(length(exon.new))
 values(exon.new)$significant <- sample(c(TRUE,FALSE), size = length(exon.new),replace = TRUE)
 
-plotRangesLinkedToData(exon.new, stat.col = c("sample1", "sample2"))
-plotRangesLinkedToData(exon.new, stat.col = 1:2)
-plotRangesLinkedToData(exon.new, stat.col = 1:2, size = 3, linetype = 4)
-plotRangesLinkedToData(exon.new, stat.col = 1:2, size = 3, linetype = 4,
+plotRangesLinkedToData(exon.new, stat.y = c("sample1", "sample2"))
+plotRangesLinkedToData(exon.new, stat.y = 1:2)
+plotRangesLinkedToData(exon.new, stat.y = 1:2, size = 3, linetype = 4)
+plotRangesLinkedToData(exon.new, stat.y = 1:2, size = 3, linetype = 4,
                        sig = "significant")
-plotRangesLinkedToData(exon.new, stat.col = 1:2, size = 3, linetype = 4,
+plotRangesLinkedToData(exon.new, stat.y = 1:2, size = 3, linetype = 4,
                         sig = "significant", sig.col = c("gray90","red"))
 }
 \author{Tengfei Yin}

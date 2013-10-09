@@ -21,7 +21,7 @@
                  facets = NULL, geom = "alignment",
                  stat = c("identity", "reduce"),
                  range.geom = "rect", gap.geom = "arrow",
-                 utr.geom = "rect", names.expr = "tx_name(gene_id)",
+                 utr.geom = "rect", names.expr = "tx_name",
                  label = TRUE)
 
 }

@@ -9,7 +9,7 @@
 }
 \usage{
 \S4method{geom_arrow}{GRanges}(data, ..., xlab, ylab, main,
-          angle = 30, length = unit(0.15, "cm"), type = "open",
+          angle = 30, length = unit(0.12, "cm"), type = "open",
           stat = c("stepping", "identity"), facets = NULL,
           arrow.rate = 0.03, group.selfish = TRUE)
 

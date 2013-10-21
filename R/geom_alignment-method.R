@@ -211,39 +211,45 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
         gr <- addStepping(gr, group.name = "tx_id", group.selfish = FALSE)
         es <- 0
       }
-      .xlim[1] <- min(.xlim) - es
+
       df <- mold(gr)
       
       if(label){
-      ## get lalel
-      .df.sub <- df[, c("stepping", "tx_id", "tx_name", "gene_id")]
-      .df.sub <- .df.sub[!duplicated(.df.sub),]
-       sts <- do.call(c, as.list(by(df, df$tx_id, function(x) min(x$start))))
-      .df.sub$start <- sts - es * 0.1
-      .labels <- NA
-      .df.sub
-      if(is.expression(names.expr)){
-        .labels <- eval(names.expr, .df.sub)
-      }else if(is.character(names.expr)){
-        if(length(names.expr) == nrow(.df.sub)){
-          .labels <- names.expr
-        }else{
-          .labels <- sub_names(.df.sub, names.expr)
-        }
-      }else{
-        .labels <- sub_names(.df.sub, names.expr)
-      }
-      .df.lvs <- unique(df$stepping)
-      .df.sub$.labels <- .labels
-    }
+          ## get lalel
+          .df.sub <- df[, c("stepping", "tx_id", "tx_name", "gene_id")]
+          .df.sub <- .df.sub[!duplicated(.df.sub),]
+          sts <- do.call(c, as.list(by(df, df$tx_id, function(x) min(x$start))))
+          .df.sub$start <- sts - es * 0.1
+          .labels <- NA
 
+          if(is.expression(names.expr)){
+              .labels <- eval(names.expr, .df.sub)
+          }else if(is.character(names.expr)){
+              if(length(names.expr) == nrow(.df.sub)){
+                  .labels <- names.expr
+              }else{
+                  .labels <- sub_names(.df.sub, names.expr)
+              }
+          }else{
+              .labels <- sub_names(.df.sub, names.expr)
+          }
+          .df.lvs <- unique(df$stepping)
+          .df.sub$.labels <- .labels
+          if(all(!is.na(.labels))){
+              es <- .transformTextToSpace(.labels[which.max(nchar(.labels))], limits = .xlim)
+          }else{
+              es <- 0
+          }
+      }
+
+      .xlim[1] <- min(.xlim) - es                                
       gr.cds <- gr[values(gr)$type == "cds"]
       args.cds.non <- args.non
       if(!"rect.height" %in% names(args.cds.non)){
         args.cds.non$rect.height <- 0.4
       }
       
-      ## df.cds <- df[df$type == "cds",]
+
       if(length(gr.cds)){
         args.cds <- args.aes[names(args.aes) != "y"]
         args.cds$y <- as.name("stepping")
@@ -282,28 +288,29 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                         args.utr.non,
                         list(stat = "identity"))
       p <- c(p, list(do.call(utr.fun, args.utr.res)))
-      
+      ## gaps
       df.gaps <- getGaps(c(gr[values(gr)$type %in% c("utr", "cds")]),
                          group.name = "tx_id")
-
-      args.aes.gaps <- args.aes[!(names(args.aes) %in% c("x", "y", "fill"))]
-      aes.res <- do.call(aes, args.aes.gaps)
-      
-      if(!"arrow.rate" %in%  names(args.non)){
-        if(!is.list(which)){
-          arrow.rate <- 0.03 * (end(range(ranges(which))) - start(range(ranges(which))))/
-            (end(range(ranges(df.gaps))) - start(range(ranges(df.gaps))))
-          args.non$arrow.rate <- arrow.rate
-        }
+      if(length(df.gaps)){
+          args.aes.gaps <- args.aes[!(names(args.aes) %in% c("x", "y", "fill"))]
+          aes.res <- do.call(aes, args.aes.gaps)
+          
+          if(!"arrow.rate" %in%  names(args.non)){
+              if(!is.list(which)){
+                  arrow.rate <- 0.03 * (end(range(ranges(which))) - start(range(ranges(which))))/
+                      (end(range(ranges(df.gaps))) - start(range(ranges(df.gaps))))
+                  args.non$arrow.rate <- arrow.rate
+              }
+          }
+          
+          aes.res$y <- as.name("stepping")
+          args.gaps.res <- c(list(data = df.gaps),
+                             list(aes.res),
+                             args.non,
+                             list(stat = "identity"))
+          
+          p <- c(p , list(do.call(gap.fun, args.gaps.res)))
       }
-      
-      aes.res$y <- as.name("stepping")
-      args.gaps.res <- c(list(data = df.gaps),
-                         list(aes.res),
-                         args.non,
-                         list(stat = "identity"))
-      
-      p <- c(p , list(do.call(gap.fun, args.gaps.res)))
       if(label){
       aes.label <- do.call(aes, list(label = substitute(.labels),
                                      x = substitute(start),
@@ -316,8 +323,6 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
         p <- c(p , list(do.call(geom_text, args.label.res)))
       }
       p <- c(p , list(scale_y_continuous(breaks = NULL)))      
-      ## args.
-      ## p <- c(p, list(do.call(geom_text, )))
     }else{
       p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
              list(ggplot2::xlim(c(0, 1))))

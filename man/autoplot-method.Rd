@@ -701,7 +701,7 @@ tracks(full = p1, reduce = p2, heights = c(5, 1)) + ylab("")
 ###################################################
 ### code chunk number 28: ga-load
 ###################################################
-library(Rsamtools)
+library(GenomicAlignments)
 data("genesymbol", package = "biovizBase")
 bamfile <- system.file("extdata", "SRR027894subRBM17.bam", package="biovizBase")
 ## need to set use.names = TRUE

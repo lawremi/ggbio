@@ -56,10 +56,12 @@ importClassesFrom(GenomicRanges, GRanges, GRangesList, GenomicRangesList)
 
 importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,
            scanBamFlag,BamFile,
-           PileupFiles, PileupParam ,
-           readGAlignmentsFromBam)
+           PileupFiles, PileupParam)
 importMethodsFrom(Rsamtools, applyPileups, path)
 importClassesFrom(Rsamtools, BamFile)
+
+## ## ## GenomicAlignments
+importFrom(GenomicAlignments, readGAlignmentsFromBam)
 
 ## ## ## BSgenome
 importClassesFrom(BSgenome, BSgenome)

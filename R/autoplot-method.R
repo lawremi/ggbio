@@ -154,7 +154,18 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
     p <- p + facet
   if(!is(p, "GGbio"))
     p <- GGbio(p, data = object)
-  p <- p + scale_by_xlim(getLimits(p)$xlim)
+  if(!is_coord_truncate_gaps(object) && !is_coord_genome(object)){  
+      p <- p + scale_by_xlim(getLimits(p)$xlim)
+  }
+  if(is_coord_genome(object)){
+      sls <- seqlengths(test)
+      sls <- sum(sls)
+      if(is.na(sls))
+          sls <- max(end(object))
+      .xlim <- c(1, sls)
+      .xlim <- expand_range(.xlim, mul = 0.05)
+      p <- p + xlim(.xlim)
+  }
   p
 })
 

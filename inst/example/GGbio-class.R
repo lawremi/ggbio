@@ -1,7 +1,7 @@
 ## TODO:
 ## 1. Txdb
 ## 2. Solve the seqinfo issues
-## 3. remove keepSeqlevels, renameSeqlevels
+
 
 library(ggbio)
 library(ggplot2)

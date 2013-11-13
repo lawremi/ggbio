@@ -1,5 +1,5 @@
 ## Ideogram has a special response to +xlim() method
-setClass("Ideogram", contains = c("gg", "ggplot"))
+setClass("Ideogram", contains = c("GGbio"))
 Ideogram <- function(x){
   new("Ideogram", x)  
 }

@@ -225,7 +225,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
           if(is.expression(names.expr)){
               .labels <- eval(names.expr, .df.sub)
           }else if(is.character(names.expr)){
-              if(length(names.expr) == nrow(.df.sub)){
+              if(length(names.expr) == nrow(.df.sub) &&   !(names.expr %in% colnames(.df.sub))){
                   .labels <- names.expr
               }else{
                   .labels <- sub_names(.df.sub, names.expr)
@@ -242,8 +242,12 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
           }
       }
 
-      .xlim[1] <- min(.xlim) - es                                
+      .xlim[1] <- min(.xlim) - es
+      ## cds
       gr.cds <- gr[values(gr)$type == "cds"]
+      ## exons
+      gr.exons <- gr[values(gr)$type == "exon"]
+      
       args.cds.non <- args.non
       if(!"rect.height" %in% names(args.cds.non)){
         args.cds.non$rect.height <- 0.4
@@ -259,9 +263,20 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                           args.cds.non,
                           list(stat = "identity"))
         p <- do.call(range.fun, args.cds.res)
+    }else if(length(gr.exons)){
+        args.cds <- args.aes[names(args.aes) != "y"]
+        args.cds$y <- as.name("stepping")
+        aes.res <- do.call(aes, args.cds)
+        ## input gr.exons
+        args.cds.res <- c(list(data = gr.exons),
+                          list(aes.res),
+                          args.cds.non,
+                          list(stat = "identity"))
+        p <- do.call(range.fun, args.cds.res)
       }else{
-        p <- NULL
+          p <- NULL
       }
+
       ## utrs
       gr.utr <- gr[values(gr)$type == "utr"]
       args.utr <- args.aes[names(args.aes) != "y"]
@@ -282,12 +297,14 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
         args.utr.non <- args.non[names(args.non) != "arrow.rate"]
         args.utr.non$arrow.head.fix <- arrow.head.fix
       }
+      if(length(gr.utr)){
+          args.utr.res <- c(list(data = gr.utr),
+                            list(aes.res),
+                            args.utr.non,
+                            list(stat = "identity"))
+          p <- c(p, list(do.call(utr.fun, args.utr.res)))
+      }
       
-      args.utr.res <- c(list(data = gr.utr),
-                        list(aes.res),
-                        args.utr.non,
-                        list(stat = "identity"))
-      p <- c(p, list(do.call(utr.fun, args.utr.res)))
       ## gaps
       df.gaps <- getGaps(c(gr[values(gr)$type %in% c("utr", "cds")]),
                          group.name = "tx_id")
@@ -308,8 +325,9 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                              list(aes.res),
                              args.non,
                              list(stat = "identity"))
-          
-          p <- c(p , list(do.call(gap.fun, args.gaps.res)))
+          if(length(df.gaps)){
+              p <- c(p , list(do.call(gap.fun, args.gaps.res)))
+          }          
       }
       if(label){
       aes.label <- do.call(aes, list(label = substitute(.labels),

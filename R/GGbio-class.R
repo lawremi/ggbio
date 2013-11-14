@@ -125,11 +125,17 @@ setMethod("+", c("GGbio"), function(e1, e2){
     .tmp <- list(args)
     names(.tmp) <- e2name
     e1@cmd <- c(e1@cmd, .tmp)
-    ## get data from object
-    if(is.call(e2)){
-        ## args <- as.list(e2)
+    if(!is.null(attr(e2, "call")) && attr(e2, "call")){
+        e2 <- attr(e2, "mc")
         if(!is.null(e1@data) & is.null(args$data))
             args$data <- e1@data
+
+        object <- do.call(as.character(args[[1]]), args[-1])
+        e1@ggplot <- mapToGG(e1@ggplot, object)
+    }else if(is.call(e2)){
+        if(!is.null(e1@data) & is.null(args$data))
+            args$data <- e1@data
+
         object <- do.call(as.character(args[[1]]), args[-1])
         e1@ggplot <- mapToGG(e1@ggplot, object)
     }else{

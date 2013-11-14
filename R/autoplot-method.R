@@ -11,7 +11,7 @@ formals.facets <- union(formals.facet_grid, formals.facet_wrap)
 .ggbio.stat <- c("identity", "coverage", "stepping", "aggregate", "table",
                  "gene", "mismatch", "reduce", "bin", "slice")
 .ggplot.geom <- c("rect", "segment", "bar")
-.ggplot.stat <- c("identity", "aggregate", "bin")
+.ggplot.stat <- c("identity", "bin")
 
 
 ## ======================================================================
@@ -162,7 +162,7 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
       p <- p + scale_by_xlim(getLimits(p)$xlim)
   }
   if(is_coord_genome(object)){
-      sls <- seqlengths(test)
+      sls <- seqlengths(object)
       sls <- sum(sls)
       if(is.na(sls))
           sls <- max(end(object))

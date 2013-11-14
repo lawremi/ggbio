@@ -395,11 +395,20 @@ trans_seq_rev<- function(unit = c("Mb", "kb", "bp")){
   }
 }
 
-scale_x_sequnit <- function(unit = c("Mb", "kb", "bp")){
+.append_unit <- function(unit = ""){
+    function(x) {paste(x, unit)}
+}
+
+scale_x_sequnit <- function(unit = c("Mb", "kb", "bp"), append = NULL){
   unit <- match.arg(unit)
-  scale_x_continuous(breaks = trans_breaks(trans_seq(unit),
-                                           trans_seq_rev(unit)),
-                     labels = trans_format(trans_seq_format(unit), math_format(.x)))
+  if(is.null(append)){
+      scale_x_continuous(breaks = trans_breaks(trans_seq(unit),
+                             trans_seq_rev(unit)),
+                         labels = trans_format(trans_seq_format(unit), math_format(.x)))
+  }else{
+      stopifnot(is.character(append))
+      scale_x_continuous(labels = trans_format(.append_unit(append), math_format(.x)))
+  }
 }
 
 get_digits <- function(x){

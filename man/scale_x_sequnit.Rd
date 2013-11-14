@@ -5,12 +5,17 @@
   scale x by unit 'Mb','kb', 'bp'.
 }
 \usage{
-scale_x_sequnit(unit = c("Mb", "kb", "bp"))
+scale_x_sequnit(unit = c("Mb", "kb", "bp"), append = NULL)
 }
 \arguments{
   \item{unit}{
-    unit to scale x. 
+    unit to scale x. Default is Mb. 
   }
+  \item{append}{
+    default \code{NULL}. If pass a character, it disalbe unit and arbitrarily append a
+    text behind the original x scale numbers. 
+  }
+
 }
 \value{
   'position_c'

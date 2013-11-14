@@ -107,10 +107,14 @@ for(method in .gr.name.ggplot){
 
       setMethod(.method, "missing", function(data, ...){
           method0 <- getFromNamespace(method, "ggplot2")
-          res <- method0(...)
-          mc <- match.call()
-          attr(res, "call") <- TRUE
-          attr(res, "mc") <- mc
+          tm <- try({res <- method0(...)}, silent = TRUE)
+          if(inherits(tm, "try-error")){
+              res <-  match.call()
+          }else{
+              mc <- match.call()
+              attr(res, "call") <- TRUE
+              attr(res, "mc") <- mc
+          }
         return(res)        
       })
   }
@@ -120,15 +124,24 @@ for(method in .gr.name.ggplot){
       .method <- method      
       setMethod(.method, "uneval", function(data, ...){
           method0 <- getFromNamespace(method, "ggplot2")
-          res <- method0(data, ...)
-          lst <- as.list(match.call())
-          idx <- names(lst) != "data"
-          aes.u <- unname(lst[!idx])
-          res <- lst[idx]
-          res <- c(res, aes.u)
-          mc <- as.call(res)
-          attr(res, "call") <- TRUE
-          attr(res, "mc") <- mc
+          tm <- try({res <- method0(data, ...)}, silent = TRUE)
+          if(inherits(tm, "try-error")){
+              lst <- as.list(match.call())
+              idx <- names(lst) != "data"
+              aes.u <- unname(lst[!idx])
+              res <- lst[idx]
+              res <- c(res, aes.u)
+              res <- as.call(res)
+          }else{
+              lst <- as.list(match.call())
+              idx <- names(lst) != "data"
+              aes.u <- unname(lst[!idx])
+              res <- lst[idx]
+              res <- c(res, aes.u)
+              mc <- as.call(res)
+              attr(res, "call") <- TRUE
+              attr(res, "mc") <- mc
+          }
           return(res)
       })
   }

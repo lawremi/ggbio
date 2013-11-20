@@ -888,8 +888,8 @@ setMethod("autoplot", "RleList", function(object, ...,
 setMethod("autoplot", "ExpressionSet", function(object, ...,
                                                 type = c("heatmap","none",
                                                   "scatterplot.matrix", "pcp", "MA", "boxplot",
-                                                  "mean-sd", 
-                                                  "NUSE", "RLE"),
+                                                  "mean-sd"),
+                                                  ## "NUSE", "RLE"),
                                                 test.method = "t",
                                                 rotate = FALSE,
                                                 pheno.plot = FALSE,
@@ -942,28 +942,28 @@ setMethod("autoplot", "ExpressionSet", function(object, ...,
   if(type == "MA"){
     stop("not impleenmted yet")
   }
-  if(type == "NUSE"){
-    require(affyPLM)
-    message("fit PLM model...")
-    dataPLM <- fitPLM(object)
-    message("compute NUSE(Normalized Unscaled Standard Error)...")
-    res <- getNR(dataPLM, type = "NUSE")
-    res.m <- melt(res)
-    colnames(res.m) <- c("probe", "sampleNames", "value")
-    message("plotting...")
-    p <- ggplot(res.m, aes(x = sampleNames, y = value)) + geom_boxplot(...)
-  }
-  if(type == "RLE"){
-    require(affyPLM)
-    message("fit PLM model...")    
-    dataPLM <- fitPLM(object)
-    message("compute RLE(Relative Log Expression)...")    
-    res <- getNR(dataPLM, type = "RLE")
-    res.m <- melt(res)
-    colnames(res.m) <- c("probe", "sampleNames", "value")
-    message("plotting...")    
-    p <- ggplot(res.m, aes(x = sampleNames, y = value)) + geom_boxplot(...)
-  }
+  ## if(type == "NUSE"){
+  ##   require(affyPLM)
+  ##   message("fit PLM model...")
+  ##   dataPLM <- fitPLM(object)
+  ##   message("compute NUSE(Normalized Unscaled Standard Error)...")
+  ##   res <- getNR(dataPLM, type = "NUSE")
+  ##   res.m <- melt(res)
+  ##   colnames(res.m) <- c("probe", "sampleNames", "value")
+  ##   message("plotting...")
+  ##   p <- ggplot(res.m, aes(x = sampleNames, y = value)) + geom_boxplot(...)
+  ## }
+  ## if(type == "RLE"){
+  ##   require(affyPLM)
+  ##   message("fit PLM model...")    
+  ##   dataPLM <- fitPLM(object)
+  ##   message("compute RLE(Relative Log Expression)...")    
+  ##   res <- getNR(dataPLM, type = "RLE")
+  ##   res.m <- melt(res)
+  ##   colnames(res.m) <- c("probe", "sampleNames", "value")
+  ##   message("plotting...")    
+  ##   p <- ggplot(res.m, aes(x = sampleNames, y = value)) + geom_boxplot(...)
+  ## }
   if(type == "mean-sd"){
     require("vsn")
     rk <- TRUE

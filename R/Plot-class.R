@@ -5,6 +5,7 @@ setClass("Plot", contains = "Tracked")
 setClass("ggplotPlot", contains = c("gg", "ggplot", "Plot"))
 setClass("latticePlot", contains = c("trellis","Plot"))
 setClass("ggbioPlot", contains = c("GGbio", "Plot"))
+setClass("ideogramPlot", contains = c("Ideogram", "Plot"))
 
 
 ## Generic function to get subclas instance of 'Plot' class
@@ -29,9 +30,7 @@ setMethod("Plot", "trellis", function(x, mutable = FALSE){
 })
 
 setMethod("Plot", "GGbio", function(x){
-  
   idx <- names(attributes(x)) %in% c("fixed", "labeled", "bgColor", "hasAxis", "mutable", "height")
-  
   if(sum(idx)){
     lst <- attributes(x)[idx]
     obj <- do.call("new", c("ggbioPlot", list(x), lst))
@@ -39,6 +38,11 @@ setMethod("Plot", "GGbio", function(x){
     obj <- new("ggbioPlot", x)
   }
   obj
+})
+
+## be careful with Ideogram object
+setMethod("Plot", "Ideogram", function(x){
+    res <- new("ideogramPlot", x)
 })
 
 
@@ -85,7 +89,7 @@ setMethod("c", "PlotList",  function(x, ...){
         do.call(PlotList, unlist(args, recursive = FALSE))
 })
 
-
+## if raw data, generate plot
 genPlots <- function(dots){
   lapply(dots, function(x){
     isPlot <- any(sapply(.supportedPlots, function(c){

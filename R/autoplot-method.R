@@ -586,7 +586,6 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
     p@fetchable <- TRUE
     p@cmd <- cmd
     p <- p + theme_bw()
-    ## p <- p + scale_by_xlim(getLimits(p)$xlim)    
     p
 })
 

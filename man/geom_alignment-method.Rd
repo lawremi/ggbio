@@ -4,6 +4,7 @@
 \alias{geom_alignment,missing-method}
 \alias{geom_alignment,uneval-method}
 \alias{geom_alignment,TranscriptDb-method}
+\alias{geom_alignment,BamFile-method}
 \title{Alignment geoms for GRanges object}
 \description{
   Show interval data as alignment.

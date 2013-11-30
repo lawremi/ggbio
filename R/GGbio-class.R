@@ -12,10 +12,24 @@ GGbio.gen <- setClass("GGbio",
 
 
 GGbio <- function(ggplot = NULL, data = NULL, fetchable = FALSE, blank = FALSE,...){
-  new("GGbio", ggplot = ggplot, data = data, fetchable = fetchable, blank = blank, ...)
+    if(is(ggplot, "GGbio")){
+        ggplot <- ggplot@ggplot
+    }
+    new("GGbio", ggplot = ggplot, data = data, fetchable = fetchable, blank = blank, ...)
 }
 ## alias
 ggbio <- GGbio
+
+setReplaceMethod("$", "GGbio",
+                 function(x, name, value) {
+                     x@ggplot[[name]] <- value
+                     x
+                 })
+
+setMethod("$", "GGbio",
+                 function(x, name) {
+                     x@ggplot[[name]]
+                 })
 
 
 ## combine command if circle presents
@@ -125,6 +139,7 @@ setMethod("+", c("GGbio"), function(e1, e2){
     .tmp <- list(args)
     names(.tmp) <- e2name
     e1@cmd <- c(e1@cmd, .tmp)
+    ## get data from object
     if(!is.null(attr(e2, "call")) && attr(e2, "call")){
         e2 <- attr(e2, "mc")
         if(!is.null(e1@data) & is.null(args$data))
@@ -149,10 +164,10 @@ setMethod("+", c("GGbio"), function(e1, e2){
       e1@ggplot <- e1@ggplot + e2
     }else{
       grl <- cached_which(e1)
-      new.which <- getGrFromXlim(e2, chr.default)
       if(length(grl)){
         current.which <- grl[length(grl)]
         chr.default <- as.character(seqnames(current.which))
+        new.which <- getGrFromXlim(e2, chr.default)        
         idx <- needCache(e1, new.which)
         if(!length(idx)){
           ## so need to update cache
@@ -165,6 +180,7 @@ setMethod("+", c("GGbio"), function(e1, e2){
           e1@ggplot <- e1@cached_item[[id]]@ggplot + e2
         }
       }else{
+        new.which <- getGrFromXlim(e2)        
         e1 <- replaceArg(e1, list(which = new.which))
         e1 <-eval(e1@cmd[[1]])
         ## no cached copy and no current range
@@ -173,6 +189,7 @@ setMethod("+", c("GGbio"), function(e1, e2){
     return(e1)
   }
 })
+
 
 ## replace *single* arg
 replaceArg <- function(p, args){
@@ -188,7 +205,7 @@ replaceArg <- function(p, args){
 
 needCache <- function(p, new.which){
   current.which <- cached_which(p)
-  idx <- subjectHits(findOverlaps(new.which, current.which, type = "within"))
+  suppressWarnings(idx <- subjectHits(findOverlaps(new.which, current.which, type = "within")))  
 }
 
 getGrFromXlim <- function(xlim, chr.default = NULL){

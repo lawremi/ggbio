@@ -8,6 +8,7 @@
 \alias{autoplot,BSgenome-method}
 \alias{autoplot,GAlignments-method}
 \alias{autoplot,BamFile-method}
+\alias{autoplot,BamFileList-method}
 \alias{autoplot,TranscriptDb-method}
 \alias{autoplot,character-method}
 \alias{autoplot,Rle-method}
@@ -91,7 +92,7 @@
 
 \S4method{autoplot}{ExpressionSet}(object, ..., type = c("heatmap", "none",
                  "scatterplot.matrix", "pcp", "MA", "boxplot",
-                 "mean-sd", "NUSE", "RLE"), test.method =
+                 "mean-sd"), test.method =
                  "t", rotate = FALSE, pheno.plot = FALSE, main_to_pheno
                  = 4.5, padding = 0.2)
 

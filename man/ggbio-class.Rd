@@ -2,7 +2,9 @@
 \alias{ggbio}
 \alias{GGbio}
 \alias{ggbio-class}
-\alias{+,ggbio,ANY-method}
+\alias{+,GGbio,ANY-method}
+\alias{$,GGbio-method}
+\alias{$<-,GGbio-method}
 \title{class ggbio}
 \description{
   a sub class of ggplot and gg class defined in ggplot2 package, used for ggbio specific methods.

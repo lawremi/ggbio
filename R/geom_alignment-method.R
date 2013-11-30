@@ -195,7 +195,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
     message("Aggregating TranscriptDb...")
     gr <- crunch(object, which, truncate.gaps = truncate.gaps,
                              truncate.fun = truncate.fun, ratio = ratio)
-    .xlim <- NULL    
+    .xlim <- NULL
     if(length(gr)){
       .xlim <- c(start(range(gr, ignore.strand = TRUE)),
                  end(range(gr, ignore.strand = TRUE)))    
@@ -211,49 +211,41 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
         gr <- addStepping(gr, group.name = "tx_id", group.selfish = FALSE)
         es <- 0
       }
-
-      df <- mold(gr)
-      
-      if(label){
-          ## get lalel
-          .df.sub <- df[, c("stepping", "tx_id", "tx_name", "gene_id")]
-          .df.sub <- .df.sub[!duplicated(.df.sub),]
-          sts <- do.call(c, as.list(by(df, df$tx_id, function(x) min(x$start))))
-          .df.sub$start <- sts - es * 0.1
-          .labels <- NA
-
-          if(is.expression(names.expr)){
-              .labels <- eval(names.expr, .df.sub)
-          }else if(is.character(names.expr)){
-              if(length(names.expr) == nrow(.df.sub) &&   !(names.expr %in% colnames(.df.sub))){
-                  .labels <- names.expr
-              }else{
-                  .labels <- sub_names(.df.sub, names.expr)
-              }
-          }else{
-              .labels <- sub_names(.df.sub, names.expr)
-          }
-          .df.lvs <- unique(df$stepping)
-          .df.sub$.labels <- .labels
-          if(all(!is.na(.labels))){
-              es <- .transformTextToSpace(.labels[which.max(nchar(.labels))], limits = .xlim)
-          }else{
-              es <- 0
-          }
-      }
-
       .xlim[1] <- min(.xlim) - es
+      df <- mold(gr)
+
+      if(label){
+      ## get lalel
+      .df.sub <- df[, c("stepping", "tx_id", "tx_name", "gene_id")]
+      .df.sub <- .df.sub[!duplicated(.df.sub),]
+       sts <- do.call(c, as.list(by(df, df$tx_id, function(x) min(x$start))))
+      .df.sub$start <- sts - es * 0.1
+      .labels <- NA
+      if(is.expression(names.expr)){
+        .labels <- eval(names.expr, .df.sub)
+      }else if(is.character(names.expr)){
+
+        if(length(names.expr) == nrow(.df.sub) &&   !(names.expr %in% colnames(.df.sub))){
+          .labels <- names.expr
+        }else{
+          .labels <- sub_names(.df.sub, names.expr)
+        }
+      }else{
+        .labels <- sub_names(.df.sub, names.expr)
+      }
+      .df.lvs <- unique(df$stepping)
+      .df.sub$.labels <- .labels
+    }
       ## cds
       gr.cds <- gr[values(gr)$type == "cds"]
       ## exons
       gr.exons <- gr[values(gr)$type == "exon"]
-      
       args.cds.non <- args.non
       if(!"rect.height" %in% names(args.cds.non)){
         args.cds.non$rect.height <- 0.4
       }
       
-
+      ## df.cds <- df[df$type == "cds",]
       if(length(gr.cds)){
         args.cds <- args.aes[names(args.aes) != "y"]
         args.cds$y <- as.name("stepping")
@@ -276,7 +268,6 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
       }else{
           p <- NULL
       }
-
       ## utrs
       gr.utr <- gr[values(gr)$type == "utr"]
       args.utr <- args.aes[names(args.aes) != "y"]
@@ -297,6 +288,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
         args.utr.non <- args.non[names(args.non) != "arrow.rate"]
         args.utr.non$arrow.head.fix <- arrow.head.fix
       }
+
       if(length(gr.utr)){
           args.utr.res <- c(list(data = gr.utr),
                             list(aes.res),
@@ -305,29 +297,27 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
           p <- c(p, list(do.call(utr.fun, args.utr.res)))
       }
       
-      ## gaps
       df.gaps <- getGaps(c(gr[values(gr)$type %in% c("utr", "cds")]),
                          group.name = "tx_id")
+
+      args.aes.gaps <- args.aes[!(names(args.aes) %in% c("x", "y", "fill"))]
+      aes.res <- do.call(aes, args.aes.gaps)
+      
+      if(!"arrow.rate" %in%  names(args.non)){
+        if(!is.list(which)){
+          arrow.rate <- 0.03 * (end(range(ranges(which))) - start(range(ranges(which))))/
+            (end(range(ranges(df.gaps))) - start(range(ranges(df.gaps))))
+          args.non$arrow.rate <- arrow.rate
+        }
+      }
+      
+      aes.res$y <- as.name("stepping")
+      args.gaps.res <- c(list(data = df.gaps),
+                         list(aes.res),
+                         args.non,
+                         list(stat = "identity"))
       if(length(df.gaps)){
-          args.aes.gaps <- args.aes[!(names(args.aes) %in% c("x", "y", "fill"))]
-          aes.res <- do.call(aes, args.aes.gaps)
-          
-          if(!"arrow.rate" %in%  names(args.non)){
-              if(!is.list(which)){
-                  arrow.rate <- 0.03 * (end(range(ranges(which))) - start(range(ranges(which))))/
-                      (end(range(ranges(df.gaps))) - start(range(ranges(df.gaps))))
-                  args.non$arrow.rate <- arrow.rate
-              }
-          }
-          
-          aes.res$y <- as.name("stepping")
-          args.gaps.res <- c(list(data = df.gaps),
-                             list(aes.res),
-                             args.non,
-                             list(stat = "identity"))
-          if(length(df.gaps)){
-              p <- c(p , list(do.call(gap.fun, args.gaps.res)))
-          }          
+          p <- c(p , list(do.call(gap.fun, args.gaps.res)))
       }
       if(label){
       aes.label <- do.call(aes, list(label = substitute(.labels),
@@ -341,6 +331,8 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
         p <- c(p , list(do.call(geom_text, args.label.res)))
       }
       p <- c(p , list(scale_y_continuous(breaks = NULL)))      
+
+
     }else{
       p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
              list(ggplot2::xlim(c(0, 1))))
@@ -439,13 +431,14 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
     p <- c(p, list(scale_y_continuous(breaks = NULL)),
            list(theme(axis.text.y = element_blank())))
   }
-  
+
+
   if(missing(xlab)){
     xlab <- ""
   }else{
     xlab <- ggplot2::xlab(xlab)
   }
-  
+
   p <- c(p, list(xlab(xlab)))
   if(missing(ylab)){
     p <- c(p, list(ggplot2::ylab(getYLab(object))))
@@ -457,23 +450,24 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
   
 
   if(is_coord_truncate_gaps(gr)){
-    gr <- gr[values(gr)$type %in% c("utr", "cds")]
-    ss <- getXScale(gr)
-    p <- c(p, list(scale_x_continuous(breaks = ss$breaks,
-                                      labels = ss$labels)))
+      gr <- gr[values(gr)$type %in% c("utr", "cds")]
+      ss <- getXScale(gr)
+      p <- c(p, list(scale_x_continuous(breaks = ss$breaks,
+                                        labels = ss$labels)))
   }else{
-    p <- c(p, list(scale_by_xlim(.xlim)))
-    if(!missing(xlim)){
+      if(is.null(.xlim)){
+          if(length(which) && is(which, "GRagnes")){
+              .xlim <- c(start(range(which, ignore.strand = TRUE)),
+                         end(range(which, ignore.strand = TRUE)))
+              p <- c(p, list(scale_by_xlim(.xlim)))      
+          }
+      }else{
+          p <- c(p, list(scale_by_xlim(.xlim)))      
+      }
+      if(missing(xlim)){
+          xlim <- .xlim
+      }
       p <- c(p, list(coord_cartesian(xlim = xlim)))
-    } else if (!is.list(which)) {
-
-      if(!is.null(.xlim))
-        xlim <- expand_range(.xlim, mul = 0.05)
-      else
-        xlim <- c(start(which), end(which))
-      
-      p <- c(p, list(coord_cartesian(xlim = xlim)))
-    }
   }
   p <- setStat(p)  
   p  
@@ -481,7 +475,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
 
 
 .transformTextToSpace <- function(x = character(), limits = NULL,
-                                  fixed = 100, size = 1 ){
+                                  fixed = 80, size = 1 ){
   if(!length(limits))
     stop("pleast provide your limits of current viewed coordinate")
   nchar(x) * size / fixed * diff(limits)

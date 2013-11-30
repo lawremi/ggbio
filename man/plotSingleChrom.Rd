@@ -1,19 +1,25 @@
 \name{plotSingleChrom}
 \alias{plotIdeogram}
 \alias{plotSingleChrom}
-\alias{ideogram-class}
-\alias{+,ideogram,ANY-method}
+\alias{Ideogram}
+\alias{Ideogram-class}
+\alias{+,Ideogram,ANY-method}
 \title{Plot single chromosome with cytoband}
 \usage{
-plotSingleChrom(obj, subchr, zoom.region, xlab, ylab, main, xlabel =
+plotSingleChrom(obj, subchr = NULL, zoom.region, xlab, ylab, main, xlabel =
                  FALSE, color = "red", fill = "red", alpha = 0.7,
                  zoom.offset = 0.1, size = 1, 
                  cytoband = TRUE, aspect.ratio = 1/20, genome)
 
-plotIdeogram(obj, subchr, zoom.region, xlab, ylab, main, xlabel =
+plotIdeogram(obj, subchr = NULL, zoom.region, xlab, ylab, main, xlabel =
                  FALSE, color = "red", fill = "red", alpha = 0.7,
                  zoom.offset = 0.1, size = 1, 
-                 cytoband = TRUE, aspect.ratio = 1/20, genome)       
+                 cytoband = TRUE, aspect.ratio = 1/20, genome)
+Ideogram(obj, subchr = NULL, xlabel = FALSE, cytoband = TRUE, 
+                     color = "red", fill = "red", alpha = 0.7,
+                     zoom.region = "numericORNULL",
+                     zoom.offset = 0.1, size = 1, 
+                     aspect.ratio = 1/20, ..., genome)
 }
 \description{
   Plot single chromosome with cytoband. \code{plotIdeogram} is synonyms
@@ -73,6 +79,9 @@ es  }
   }
   \item{genome}{
     genome character passed to \code{\link{getIdeogram}}
+  }
+  \item{...}{
+    passed to ggbio constructor.
   }
 }
 \examples{

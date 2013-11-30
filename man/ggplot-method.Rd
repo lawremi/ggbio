@@ -1,5 +1,6 @@
 \name{ggplot}
 \alias{ggplot}
+\alias{ggplot,ANY-method}
 \alias{ggplot,GRanges-method}
 \alias{ggplot,GRangesList-method}
 \alias{ggplot,IRanges-method}

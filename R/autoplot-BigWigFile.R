@@ -89,12 +89,13 @@ getGeomConstructor <- function(name) {
 }
 
 ## TO TENGFEI: the main idea is to coerce to RleList and delegate
-setMethod("autoplot", "BigWigFile",
-          function(object, mapping=NULL, geom = c("bar", "line"),
-                   xlim=seqinfo(object), ..., nbins=NA)
-          {
-            object <- crunch(object, nbins=nbins, which=xlim)
-            Geom <- getGeomConstructor(match.arg(geom))
+setAutoplotMethod("autoplot", "BigWigFile",
+                  function(object, mapping=NULL, geom=c("bar", "line"), 
+                           xlim=seqinfo(object), ...,
+                           nbins=NA)
+                  {
+                    object <- crunch(object, nbins=nbins, which=xlim)
+                    Geom <- getGeomConstructor(match.arg(geom))
 ### FIXME: There is an undesirable redundancy here: the GGbio object
 ### has the data, but we pass it again to the geom constructor. We
 ### should probably get away from having geom generics and methods:
@@ -104,8 +105,19 @@ setMethod("autoplot", "BigWigFile",
 ### the geom class. One pain point is that ggplot2 geoms do not have a
 ### meaningful class attribute. Thus, we need to get the 'objname'
 ### property and map it to an S4 class within ggbio.
-            ggplot(object) + Geom(mapping, object, ...)
-          })
+                    ggplot(object) + Geom(mapping, object, ...)
+                  })
+
+## TO TENGFEI: maybe this all points to a more modular approach: there
+## is one basic autoplot method that delegates to generics, i.e., the
+## strategy design pattern. Steps:
+## 1) crunch() from special object => GRanges
+## 2) default_geom() chooses a default geom based on data type
+##    - could be a "meta" geom for complex cases
+## 3) default_aes() chooses a default set of aesthetics based on geom and data
+##    - similarly, could have default_stat(), default_position() if needed
+
+## TO TENGFEI: feel free to email me and tell me I'm crazy
 
 ## TO TENGFEI: maybe the stat_ generics should have a more ggplot2-like
 ## argument set, like this:

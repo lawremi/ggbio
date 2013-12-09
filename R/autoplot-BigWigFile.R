@@ -67,20 +67,44 @@ setAutoplotMethod <- function(signature, definition, ...) {
 ## via GGbio@cmd. Perhaps the boilerplate code for that could be
 ## inserted by the setAutoplotMethod() function above?
 
-setMethod("crunch", "BigWigFile", function(object, nbins=NA, ...) {
-  ### FIXME: faster to get as a GRanges directly, rather than asRle?
-  if (is.na(nbins)) {
-    import(object, ..., asRle=TRUE)
-  } else {
-    summary(object, size=nbins, ...)
-  }
-})
+setMethod("crunch", "BigWigFile",
+          function(object, which=seqinfo(object), nbins=NA, ...)
+          {
+            if (is.na(nbins)) {
+              import(object, ...)
+            } else {
+              rle.list <- summary(object, size=nbins, ...)
+              which.list <- as(which, "List")
+              do.call(c, mapply(function(rle, which) {
+                chunks <- breakInChunks(width(which), width(which)/nbins)
+                GRanges(seqnames(which),
+                        IRanges(start(chunks)+start(which)-1L, width(chunks)),
+                        score = rle)
+              }, rle.list, which.list, SIMPLIFY=FALSE))
+            }
+          })
+
+getGeomConstructor <- function(name) {
+  getGeneric(paste0("geom_", name))
+}
 
 ## TO TENGFEI: the main idea is to coerce to RleList and delegate
 setMethod("autoplot", "BigWigFile",
-          function(object, mapping=NULL, xlim=seqinfo(object), ..., nbins=NA) {
+          function(object, mapping=NULL, geom = c("bar", "line"),
+                   xlim=seqinfo(object), ..., nbins=NA)
+          {
             object <- crunch(object, nbins=nbins, which=xlim)
-            callGeneric()
+            Geom <- getGeomConstructor(match.arg(geom))
+### FIXME: There is an undesirable redundancy here: the GGbio object
+### has the data, but we pass it again to the geom constructor. We
+### should probably get away from having geom generics and methods:
+### all we really want is a way to generate default aesthetics based
+### on the geom and the type of data. This could be done via a generic
+### like 'default_aes' that dispatches on the data inside GGbio and
+### the geom class. One pain point is that ggplot2 geoms do not have a
+### meaningful class attribute. Thus, we need to get the 'objname'
+### property and map it to an S4 class within ggbio.
+            ggplot(object) + Geom(mapping, object, ...)
           })
 
 ## TO TENGFEI: maybe the stat_ generics should have a more ggplot2-like
@@ -89,3 +113,9 @@ setGeneric("stat_aggregate2",
            function(mapping = NULL, data = NULL, geom = "histogram",
                     position = "stack", ...) standardGeneric("stat_aggregate2"),
            signature="data")
+
+setGeneric("geom_bar2",
+           function(mapping = NULL, data = NULL, stat = "bin",
+                    position = "stack", ...) standardGeneric("geom_bar2"),
+           signature="data")
+

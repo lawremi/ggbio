@@ -88,7 +88,6 @@ getGeomConstructor <- function(name) {
   getGeneric(paste0("geom_", name))
 }
 
-## TO TENGFEI: the main idea is to coerce to RleList and delegate
 setAutoplotMethod("autoplot", "BigWigFile",
                   function(object, mapping=NULL, geom=c("bar", "line"), 
                            xlim=seqinfo(object), ...,
@@ -110,11 +109,12 @@ setAutoplotMethod("autoplot", "BigWigFile",
 
 ## TO TENGFEI: maybe this all points to a more modular approach: there
 ## is one basic autoplot method that delegates to generics, i.e., the
-## strategy design pattern. Steps:
-## 1) crunch() from special object => GRanges
-## 2) default_geom() chooses a default geom based on data type
+## "strategy" design pattern. Steps:
+## 1) crunch() from complex data to interpretable summary
+## 2) ggplot() to initialize plot, relies on mold() => data.frame
+## 3) default_geom() chooses a default geom based on data type
 ##    - could be a "meta" geom for complex cases
-## 3) default_aes() chooses a default set of aesthetics based on geom and data
+## 4) default_aes() chooses a default set of aesthetics based on geom and data
 ##    - similarly, could have default_stat(), default_position() if needed
 
 ## TO TENGFEI: feel free to email me and tell me I'm crazy

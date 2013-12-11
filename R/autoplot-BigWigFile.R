@@ -111,6 +111,67 @@ setAutoplotMethod("autoplot", "BigWigFile",
 ## 4) default_aes() chooses a default set of aesthetics based on geom and data
 ##    - similarly, could have default_stat(), default_position() if needed
 
+##' A modular approach to autoplotting. The idea is to rely on S4
+##' generics for determining the appropriate plot components from the
+##' type of object.
+##'
+##' The basic assumption is that there will be a single layer (per
+##' facet), and that the user can add additional layers through the
+##' ordinary ggplot2 syntax.
+##' @title Modular autoplot
+##' @param object The object to display. The data are typically
+##' derived from the object through some preprocessing, as implemented
+##' by a crunch() method.
+##' @param geom Draws the data based on some geometry.  This is one of
+##' the main parameters that determines a plot. Default chosen based
+##' on the object.
+##' @param mapping Aesthetic mappings that connect geometric
+##' parameters with variables in the data. Choosing a default depends
+##' on the object and the geometry. Note that these apply *after* the
+##' statistical transformation, and any other preprocessing.
+##' @param stat Statistical transformation of the (preprocessed)
+##' data. This is often required for the data to fit a particular
+##' geometry. The default then depends on both the object and the
+##' geometry.
+##' @param position Position adjustment for overlapping
+##' geometry. Default chosen according to object and geometry.
+##' @param facets Faceting into small multiple plots. Default chosen
+##' based on the object.
+##' @param scales Parameterizations of the mappings from data to
+##' screen geometry. Most important aspects are the limits and guide
+##' labels. Default scales depend on the object, geometry and the
+##' mappings, as well as user limit overrides.
+##' @param labs Determines default axis labels based on the mapping
+##' and the user-specified overrides.
+##' @param xlim x limits
+##' @param ylim y limits
+##' @param main title
+##' @param xlab x axis label
+##' @param ylab y axis label
+##' @param ... Parameters that apply to the mapping, geom, stat, and
+##' preprocessing, in order.
+##' @return GGbio plot object
+##' @author Tengfei Yin
+.autoplot_default <- function(object,
+                              geom=default_geom(object),
+                              mapping=default_aes(object, geom), 
+                              stat=default_stat(object, geom),
+                              position=default_position(object, geom),
+                              facets=default_facets(object),
+                              scales=default_scales(object, geom, mapping,
+                                xlim=xlim, ylim=ylim),
+                              labs=default_labs(mapping, main=main, xlab=xlab,
+                                ylab=ylab),
+                              xlim=c(NA_real_, NA_real_),
+                              ylim=c(NA_real_, NA_real_),
+                              main=NULL, xlab=NA_character_, ylab=NA_character_,
+                              ...)
+{
+  
+}
+
+
+
 ## TO TENGFEI: feel free to email me and tell me I'm crazy
 
 ## TO TENGFEI: maybe the stat_ generics should have a more ggplot2-like

@@ -68,19 +68,13 @@ setAutoplotMethod <- function(signature, definition, ...) {
 ## inserted by the setAutoplotMethod() function above?
 
 setMethod("crunch", "BigWigFile",
-          function(object, which=seqinfo(object), nbins=NA, ...)
+          function(object, which=seqinfo(object), binwidth=NA, ...)
           {
-            if (is.na(nbins)) {
+            if (is.na(binwidth)) {
               import(object, ...)
             } else {
-              rle.list <- summary(object, size=nbins, ...)
-              which.list <- as(which, "List")
-              do.call(c, mapply(function(rle, which) {
-                chunks <- breakInChunks(width(which), width(which)/nbins)
-                GRanges(seqnames(which),
-                        IRanges(start(chunks)+start(which)-1L, width(chunks)),
-                        score = rle)
-              }, rle.list, which.list, SIMPLIFY=FALSE))
+              size <- round(width(which) / binwidth)
+              summary(object, size=size, ...)
             }
           })
 
@@ -91,9 +85,9 @@ getGeomConstructor <- function(name) {
 setAutoplotMethod("autoplot", "BigWigFile",
                   function(object, mapping=NULL, geom=c("bar", "line"), 
                            xlim=seqinfo(object), ...,
-                           nbins=NA)
+                           binwidth=NA)
                   {
-                    object <- crunch(object, nbins=nbins, which=xlim)
+                    gr <- crunch(object, binwidth=binwidth, which=xlim)
                     Geom <- getGeomConstructor(match.arg(geom))
 ### FIXME: There is an undesirable redundancy here: the GGbio object
 ### has the data, but we pass it again to the geom constructor. We
@@ -104,7 +98,7 @@ setAutoplotMethod("autoplot", "BigWigFile",
 ### the geom class. One pain point is that ggplot2 geoms do not have a
 ### meaningful class attribute. Thus, we need to get the 'objname'
 ### property and map it to an S4 class within ggbio.
-                    ggplot(object) + Geom(mapping, object, ...)
+                    ggplot(gr) + Geom(mapping, object, ...)
                   })
 
 ## TO TENGFEI: maybe this all points to a more modular approach: there

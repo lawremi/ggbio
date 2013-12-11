@@ -103,53 +103,67 @@ setAutoplotMethod("autoplot", "BigWigFile",
 
 ## TO TENGFEI: maybe this all points to a more modular approach: there
 ## is one basic autoplot method that delegates to generics, i.e., the
-## "strategy" design pattern. Steps:
-## 1) crunch() from complex data to interpretable summary
-## 2) ggplot() to initialize plot, relies on mold() => data.frame
-## 3) default_geom() chooses a default geom based on data type
-##    - could be a "meta" geom for complex cases
-## 4) default_aes() chooses a default set of aesthetics based on geom and data
-##    - similarly, could have default_stat(), default_position() if needed
+## "strategy" design pattern.
 
 ##' A modular approach to autoplotting. The idea is to rely on S4
 ##' generics for determining the appropriate plot components from the
 ##' type of object.
 ##'
-##' The basic assumption is that there will be a single layer (per
-##' facet), and that the user can add additional layers through the
-##' ordinary ggplot2 syntax.
+##' The process begins by crunch()ing the object to a canonical
+##' GRanges.  The crunch() stage should only load/process the data
+##' necessary for the plot. This requires figuring out from each
+##' component which variables are needed, and then communicating that
+##' somehow, along with the range of interest (if any), to the crunch
+##' function.
+##'
+##' Besides the GRanges, each plot will need a set of layers, along
+##' with scales, labels and a facetting specification. Each layer
+##' needs a particular geom, stat and position. Layers can be
+##' constructed from either the geom or stat perspective, but usually
+##' layers are constructed by calling a "geom" constructor (honestly,
+##' stats implying geoms never really made sense to me). Therefore, we
+##' assume the user selects a geom (or accepts the default) and the
+##' stat and position are selected based on the geom. Multiple
+##' geom/stat/position objects can be passed (as lists or character
+##' vectors of names). They are treated as parallel vectors for
+##' constructing a list of layers. The layer() generic dispatches on
+##' the data and geom, and is also passed the position and any
+##' relevant parameters from "...".
+##'
+##' Once we have the layers, they are combined with the the scales,
+##' labels and facetting into a final plot.
+##' 
 ##' @title Modular autoplot
-##' @param object The object to display. The data are typically
-##' derived from the object through some preprocessing, as implemented
-##' by a crunch() method.
-##' @param geom Draws the data based on some geometry.  This is one of
-##' the main parameters that determines a plot. Default chosen based
+##' @param object The object to display.
+##' @param geom Draws the data based on some geometry.  This is the
+##' primary parameter that determines the plot. Default chosen based
 ##' on the object.
 ##' @param mapping Aesthetic mappings that connect geometric
 ##' parameters with variables in the data. Choosing a default depends
 ##' on the object and the geometry. Note that these apply *after* the
-##' statistical transformation, and any other preprocessing.
-##' @param stat Statistical transformation of the (preprocessed)
-##' data. This is often required for the data to fit a particular
-##' geometry. The default then depends on both the object and the
-##' geometry.
+##' statistical transformation, and any other preprocessing. If the
+##' user overrides this parameter, it is merged with the defaults.
+##' @param stat Statistical transformation of the data. This is often
+##' required for the data to fit a particular geometry.  The default
+##' then depends on both the object and the geometry. User rarely
+##' overrides this one.
 ##' @param position Position adjustment for overlapping
 ##' geometry. Default chosen according to object and geometry.
 ##' @param facets Faceting into small multiple plots. Default chosen
-##' based on the object.
-##' @param scales Parameterizations of the mappings from data to
-##' screen geometry. Most important aspects are the limits and guide
-##' labels. Default scales depend on the object, geometry and the
-##' mappings, as well as user limit overrides.
+##' based on the object. Typically need to facet by sequence.
+##' @param scales Parameterizations of the aesthetic mappings. Most
+##' important aspects are the limits and guide labels. Default scales
+##' depend on the object, geometry and the mappings, as well as user
+##' limit overrides.
 ##' @param labs Determines default axis labels based on the mapping
 ##' and the user-specified overrides.
-##' @param xlim x limits
+##' @param xlim x limits, typically a GRanges
 ##' @param ylim y limits
 ##' @param main title
 ##' @param xlab x axis label
 ##' @param ylab y axis label
 ##' @param ... Parameters that apply to the mapping, geom, stat, and
-##' preprocessing, in order.
+##' crunch, in order.
 ##' @return GGbio plot object
 ##' @author Tengfei Yin
 .autoplot_default <- function(object,

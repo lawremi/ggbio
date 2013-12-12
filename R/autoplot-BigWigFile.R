@@ -139,10 +139,12 @@ setAutoplotMethod("autoplot", "BigWigFile",
 ##' @param object The object to display.
 ##' @param query Queries a data source and reduces the data to yield a
 ##' data.frame. This can involve a significant amount of processing
-##' and is a large determinant of the plot itself.
+##' and is a large determinant of the plot itself. Note that multiple
+##' queries should be supported, resulting in multiple geoms.
 ##' @param geom Draws the data based on some geometry.  This is the
-##' primary way to indicate the plot type. Default chosen based
-##' on the object.
+##' primary way to indicate the plot type. Default chosen based on the
+##' object. Note that multiple geoms can be passed, resulting in one
+##' layer per geom.
 ##' @param mapping Aesthetic mappings that connect geometric
 ##' parameters with variables in the data. Note that these apply
 ##' *after* the statistical transformation, and any other

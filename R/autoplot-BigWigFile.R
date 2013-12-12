@@ -109,94 +109,91 @@ setAutoplotMethod("autoplot", "BigWigFile",
 ##' generics for determining the appropriate plot components from the
 ##' type of object.
 ##'
-##' The process begins by crunch()ing the object to a canonical
-##' GRanges.  The crunch() stage should only load/process the data
-##' necessary for the plot. This requires figuring out from each
-##' component which variables are needed, and then communicating that
-##' somehow, along with the range of interest (if any), to the crunch
-##' function.
+##' A ggplot2 plot consists of a series of layers. The layer holds the
+##' data, as well as the geom, stat, position and all related
+##' parameters. Other things, like the scales, labels, faceting and
+##' coordinate system transcend layers. The data can be anything! But
+##' before plotting, we need to convert the data to a data.frame. This
+##' "fortify" step should come before everything else.
+##' 
+##' It would be possible to create a LazyLayer object that queries the
+##' data source whenever the plot is rendered. The result of the query
+##' would be a GRanges or something else that is obviously
+##' fortified. The tricky part is generating the appropriate query.
 ##'
-##' Besides the GRanges, each plot will need a set of layers, along
-##' with scales, labels and a facetting specification. Each layer
-##' needs a particular geom, stat and position. Layers can be
-##' constructed from either the geom or stat perspective, but usually
-##' layers are constructed by calling a "geom" constructor (honestly,
-##' stats implying geoms never really made sense to me). Therefore, we
-##' assume the user selects a geom (or accepts the default) and the
-##' stat and position are selected based on the geom. Multiple
-##' geom/stat/position objects can be passed (as lists or character
-##' vectors of names). They are treated as parallel vectors for
-##' constructing a list of layers. The layer() generic dispatches on
-##' the data and geom, and is also passed the position and any
-##' relevant parameters from "...".
+##' Enter autoplot(). Each object type has an autoplot method. The
+##' autoplot() methods should do two things:
+##' (1) initialize a means to query the data source
+##' (2) generate a default plot specification
 ##'
+##' The latter is relatively straightforward, and could be implemented
+##' with S4 generics that dispatch on the data type. Generating the
+##' query is more complicated, because it depends on BOTH the data AND
+##' the plot, in particular the aesthetic mappings. So we will need to
+##' rely on S4 dispatch again.
+##' 
 ##' Once we have the layers, they are combined with the the scales,
 ##' labels and facetting into a final plot.
 ##' 
 ##' @title Modular autoplot
 ##' @param object The object to display.
+##' @param query Queries a data source and reduces the data to yield a
+##' data.frame. This can involve a significant amount of processing
+##' and is a large determinant of the plot itself.
 ##' @param geom Draws the data based on some geometry.  This is the
-##' primary parameter that determines the plot. Default chosen based
+##' primary way to indicate the plot type. Default chosen based
 ##' on the object.
 ##' @param mapping Aesthetic mappings that connect geometric
-##' parameters with variables in the data. Choosing a default depends
-##' on the object and the geometry. Note that these apply *after* the
-##' statistical transformation, and any other preprocessing. If the
-##' user overrides this parameter, it is merged with the defaults.
+##' parameters with variables in the data. Note that these apply
+##' *after* the statistical transformation, and any other
+##' preprocessing. These are merged with the defaults from the
+##' geom and thus default to NULL.
 ##' @param stat Statistical transformation of the data. This is often
 ##' required for the data to fit a particular geometry.  The default
-##' then depends on both the object and the geometry. User rarely
-##' overrides this one.
+##' is communicated by the geom. User rarely overrides this one.
 ##' @param position Position adjustment for overlapping
-##' geometry. Default chosen according to object and geometry.
+##' geometry. Default indicated by the geom.
 ##' @param facets Faceting into small multiple plots. Default chosen
-##' based on the object. Typically need to facet by sequence.
-##' @param scales Parameterizations of the aesthetic mappings. Most
-##' important aspects are the limits and guide labels. Default scales
-##' depend on the object, geometry and the mappings, as well as user
-##' limit overrides.
-##' @param labs Determines default axis labels based on the mapping
-##' and the user-specified overrides.
+##' based on the query. Typically need to facet by sequence.
 ##' @param xlim x limits, typically a GRanges
 ##' @param ylim y limits
 ##' @param main title
 ##' @param xlab x axis label
 ##' @param ylab y axis label
 ##' @param ... Parameters that apply to the mapping, geom, stat, and
-##' crunch, in order.
+##' query, in order.
 ##' @return GGbio plot object
 ##' @author Tengfei Yin
 .autoplot_default <- function(object,
-                              geom=default_geom(object),
-                              mapping=default_aes(object, geom), 
-                              stat=default_stat(object, geom),
-                              position=default_position(object, geom),
-                              facets=default_facets(object),
-                              scales=default_scales(object, geom, mapping,
-                                xlim=xlim, ylim=ylim),
-                              labs=default_labs(mapping, main=main, xlab=xlab,
-                                ylab=ylab),
+                              query=default_query(object),
+                              geom=default_geom(query),
+                              mapping=NULL,
+                              stat=default_stat(geom),
+                              position=default_position(geom)
+                              facets=default_facets(query),
                               xlim=c(NA_real_, NA_real_),
                               ylim=c(NA_real_, NA_real_),
                               main=NULL, xlab=NA_character_, ylab=NA_character_,
                               ...)
 {
+  labs <- default_labs(mapping, main=main, xlab=xlab, ylab=ylab)
+}
+
+## So that people can easily add just a layer...
+.autolayer_default <- function(object,
+                               query=default_query(object),
+                               geom=default_geom(query),
+                               mapping=NULL,
+                               stat=default_stat(geom),
+                               position=default_position(geom))
+{
   
 }
 
-
-
 ## TO TENGFEI: feel free to email me and tell me I'm crazy
 
-## TO TENGFEI: maybe the stat_ generics should have a more ggplot2-like
-## argument set, like this:
-setGeneric("stat_aggregate2",
-           function(mapping = NULL, data = NULL, geom = "histogram",
-                    position = "stack", ...) standardGeneric("stat_aggregate2"),
-           signature="data")
+  
+setGeneric("default_geom", function(data, ...) standardGeneric("default_geom"))
 
-setGeneric("geom_bar2",
-           function(mapping = NULL, data = NULL, stat = "bin",
-                    position = "stack", ...) standardGeneric("geom_bar2"),
-           signature="data")
+setMethod("default_geom", "BigWigFile", function(data) "bar")
 

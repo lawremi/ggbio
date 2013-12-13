@@ -62,22 +62,6 @@ setAutoplotMethod <- function(signature, definition, ...) {
   setMethod("autoplot", signature, wrapper, ...)
 }
 
-## TO TENGFEI: this is my untested attempt at a BigWigFile method.  I
-## think I need to add code to enable dynamic which-based evaluation
-## via GGbio@cmd. Perhaps the boilerplate code for that could be
-## inserted by the setAutoplotMethod() function above?
-
-setMethod("crunch", "BigWigFile",
-          function(object, which=seqinfo(object), binwidth=NA, ...)
-          {
-            if (is.na(binwidth)) {
-              import(object, ...)
-            } else {
-              size <- round(width(which) / binwidth)
-              summary(object, size=size, ...)
-            }
-          })
-
 getGeomConstructor <- function(name) {
   getGeneric(paste0("geom_", name))
 }
@@ -192,10 +176,85 @@ setAutoplotMethod("autoplot", "BigWigFile",
   
 }
 
-## TO TENGFEI: feel free to email me and tell me I'm crazy
+setGeneric("default_query",
+           function(object, ...) standardGeneric("default_query"))
 
-  
+## Design of query objects: Instead of having a special class for
+## every query type and data source, we could have a generic (eval) that
+## dispatches on a "query type" object and the data source. This means that
+## there is no object representing a query; so how to store query
+## parameters? They could be generically stored in the style object,
+## or stored separately with the plot. Since they do parameterize the
+## "style", we should keep them with the style/query object.
+
+## This also allows queries to have specific accessors for changing
+## the parameters.
+
+setClass("Query")
+
+setClass("StandardQuery", contains = "Query")
+setClass("AggregateQuery",
+         representation(binwidth = "integer"),
+         prototype(binwidth = 1L),
+         contains = "Query")
+setClass("CoverageQuery", contains = "Query")
+
+setMethod("default_query", "BigWigFile", function(object) "aggregate")
+
+setMethod("eval", c("AggregateQuery", "BigWigFile", "missing"),
+          function(expr, envir, enclos) {
+            binwidth <- expr@binwidth
+            if (binwidth == 1L) {
+              import(object, ...)
+            } else {
+              size <- round(width(which) / binwidth)
+              summary(object, size=size, ...)
+            }
+          })
+
 setGeneric("default_geom", function(data, ...) standardGeneric("default_geom"))
 
-setMethod("default_geom", "BigWigFile", function(data) "bar")
+setMethod("default_geom", "AggregateQuery", function(data) "bar")
+
+## Alternative: the query is just a function, usually a generic that
+## dispatches on the object type. This makes it super easy to write
+## new/optimized queries. We could store the parameters by storing a
+## prototypical call to the function. When plot parameters are
+## changed (like the xlim), we override the parameters in the call.
+
+## What sort of API should be enforced for the callback, i.e., which
+## parameters will the user be able to adjust? The 'xlim' is obvious.
+## Could have a queryParam()<- accessor to change specific parameters
+## of the query.  Or maybe the ggplot2 way is: p +
+## query(binwidth=15). Either way, the xlim<- and ylim<- should
+## attempt to change the corresponding parameter in the query.
+
+## But dispatching to choose the right geom (and facets) will not work
+## with a plain function, so we need a special class.
+
+## TO TENGFEI: feel free to email me and tell me I'm crazy
+
+setClass("Query", contains = "standardGeneric")
+
+setClass("AggregateQuery", contains = "Query")
+
+setGeneric("query_aggregate",
+           function(x, binwidth = 1L, ...) standardGeneric("query_aggregate"))
+
+query_aggregate <- new("AggregateQuery", query_aggregate)
+
+setMethod("default_query", "BigWigFile", function(object) query_aggregate)
+
+setMethod("default_geom", "AggregateQuery", function(data) "bar")
+
+setMethod("query_aggregate", "BigWigFile",
+          function(x, binwidth = 1L, xlim = seqinfo(x)) {
+            xlim <- normArg_xlim_GRanges(xlim)
+            if (binwidth == 1L) {
+              import(object, which=xlim, ...)
+            } else {
+              size <- round(width(xlim) / binwidth)
+              summary(object, size=size, which=xlim, ...)
+            }
+          })
 

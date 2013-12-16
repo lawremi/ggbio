@@ -133,11 +133,20 @@ setMethod("show", "Ideogram", function(object){
     print(object@ggplot)
 })
 
-plotIdeogram <- function(obj, subchr = NULL, zoom.region = NULL,
+plotIdeogram <- function(obj, subchr = NULL, zoom.region = NULL, which = NULL,
                          xlab, ylab, main, xlabel = FALSE,
                          color = "red", fill = "red", alpha = 0.7,
                          zoom.offset = 0.1, size = 1, 
                          cytoband = TRUE, aspect.ratio = 1/20, genome){
+    if(!is.null(which) && is(which, "GRanges")){
+        if(length(which) > 1){
+            message("only first region used")
+            which <- which[1]
+        }
+        subchr <- as.character(seqnames(which))
+        zoom.region <- c(start(which), end(which))
+    }
+    
     p <- Ideogram(obj,
                   xlabel = xlabel,
                   subchr = subchr,

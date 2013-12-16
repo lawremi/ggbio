@@ -39,10 +39,10 @@ setMethod("Grob", "GGbio", function(x){
 ##          contains = "list")
 
 .validList <- function(object){
-  if(all(sapply(x, is, x@elementType)))
+  if(all(sapply(object, is, object@elementType)))
     return(TRUE)
   else
-    paste("Class must be", x@elementType)
+    paste("Class must be", object@elementType)
 }
 ## setValidity("GrobList", .validList)
 

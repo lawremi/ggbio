@@ -27,63 +27,6 @@ normArg_main <- function(main) {
   main
 }
 
-## TO TENGFEI: I noticed that there was a lot of code duplication in
-## the autoplot methods. Mostly revolving around the trivial tweaks
-## like main, xlab, etc. Perhaps this would make things easier? Notice
-## that the user can just pass all aesthetics as the 'mapping'
-## argument, so there is no need for argument parsing anymore (?)
-
-## FIXME: do we really need this, or could every autoplot method
-## reduce to a GRanges and delegate to autoplot,GenomicRanges?
-setAutoplotMethod <- function(signature, definition, ...) {
-  wrapper <- eval(substitute({
-    function(object, mapping=NULL, xlim=seqinfo(object), ylim, main="",
-             xlab="position", ylab="", ...)
-      {
-        ## FIXME: add the call quoting (GGbio@cmd) stuff here?
-        xlim <- normArg_xlim(xlim)
-        xlab <- normArg_xlab(xlab)
-        ylab <- normArg_ylab(ylab)
-        main <- normArg_main(main)
-        .autoplot <- ..DEFINITION..
-        p <- .autoplot(object, mapping=mapping, xlim=xlim, ...)
-        ## FIXME: this is unnecessary for methods that wrap other
-        ## autoplot methods (like the BigWigFile one below). Could
-        ## control this by a parameter, or maybe it does not matter?
-        if(!missing(xlab))
-          p <- p + ggplot2::xlab(xlab)
-        if(!missing(ylab))
-          p <- p + ggplot2::ylab(ylab)
-        if(!missing(main))
-          p <- p + labs(title = main)
-        p
-      }
-  }, list(..DEFINITION.. = definition)))
-  setMethod("autoplot", signature, wrapper, ...)
-}
-
-getGeomConstructor <- function(name) {
-  getGeneric(paste0("geom_", name))
-}
-
-setAutoplotMethod("autoplot", "BigWigFile",
-                  function(object, mapping=NULL, geom=c("bar", "line"), 
-                           xlim=seqinfo(object), ...,
-                           binwidth=NA)
-                  {
-                    gr <- crunch(object, binwidth=binwidth, which=xlim)
-                    Geom <- getGeomConstructor(match.arg(geom))
-### FIXME: There is an undesirable redundancy here: the GGbio object
-### has the data, but we pass it again to the geom constructor. We
-### should probably get away from having geom generics and methods:
-### all we really want is a way to generate default aesthetics based
-### on the geom and the type of data. This could be done via a generic
-### like 'default_aes' that dispatches on the data inside GGbio and
-### the geom class. One pain point is that ggplot2 geoms do not have a
-### meaningful class attribute. Thus, we need to get the 'objname'
-### property and map it to an S4 class within ggbio.
-                    ggplot(gr) + Geom(mapping, object, ...)
-                  })
 
 ## TO TENGFEI: maybe this all points to a more modular approach: there
 ## is one basic autoplot method that delegates to generics, i.e., the
@@ -155,14 +98,21 @@ setAutoplotMethod("autoplot", "BigWigFile",
                               geom=default_geom(query),
                               mapping=NULL,
                               stat=default_stat(geom),
-                              position=default_position(geom)
+                              position=default_position(geom),
                               facets=default_facets(query),
                               xlim=c(NA_real_, NA_real_),
                               ylim=c(NA_real_, NA_real_),
                               main=NULL, xlab=NA_character_, ylab=NA_character_,
                               ...)
 {
+  query <- normArg_query(query)
   labs <- default_labs(mapping, main=main, xlab=xlab, ylab=ylab)
+}
+
+normArg_query <- function(query) {
+  if (!isSingleString(query))
+    stop("'query' must be a single, non-NA string")
+  
 }
 
 ## So that people can easily add just a layer...
@@ -181,42 +131,9 @@ setGeneric("default_query",
 
 ## Design of query objects: Instead of having a special class for
 ## every query type and data source, we could have a generic (eval) that
-## dispatches on a "query type" object and the data source. This means that
-## there is no object representing a query; so how to store query
-## parameters? They could be generically stored in the style object,
-## or stored separately with the plot. Since they do parameterize the
-## "style", we should keep them with the style/query object.
+## dispatches on a "query type" object and the data source.
 
-## This also allows queries to have specific accessors for changing
-## the parameters.
-
-setClass("Query")
-
-setClass("StandardQuery", contains = "Query")
-setClass("AggregateQuery",
-         representation(binwidth = "integer"),
-         prototype(binwidth = 1L),
-         contains = "Query")
-setClass("CoverageQuery", contains = "Query")
-
-setMethod("default_query", "BigWigFile", function(object) "aggregate")
-
-setMethod("eval", c("AggregateQuery", "BigWigFile", "missing"),
-          function(expr, envir, enclos) {
-            binwidth <- expr@binwidth
-            if (binwidth == 1L) {
-              import(object, ...)
-            } else {
-              size <- round(width(which) / binwidth)
-              summary(object, size=size, ...)
-            }
-          })
-
-setGeneric("default_geom", function(data, ...) standardGeneric("default_geom"))
-
-setMethod("default_geom", "AggregateQuery", function(data) "bar")
-
-## Alternative: the query is just a function, usually a generic that
+## The query is just a function, usually a generic that
 ## dispatches on the object type. This makes it super easy to write
 ## new/optimized queries. We could store the parameters by storing a
 ## prototypical call to the function. When plot parameters are
@@ -236,16 +153,14 @@ setMethod("default_geom", "AggregateQuery", function(data) "bar")
 
 setClass("Query", contains = "standardGeneric")
 
-setClass("AggregateQuery", contains = "Query")
+setClass("QueryAggregate", contains = "Query")
 
 setGeneric("query_aggregate",
            function(x, binwidth = 1L, ...) standardGeneric("query_aggregate"))
 
-query_aggregate <- new("AggregateQuery", query_aggregate)
+query_aggregate <- new("QueryAggregate", query_aggregate)
 
 setMethod("default_query", "BigWigFile", function(object) query_aggregate)
-
-setMethod("default_geom", "AggregateQuery", function(data) "bar")
 
 setMethod("query_aggregate", "BigWigFile",
           function(x, binwidth = 1L, xlim = seqinfo(x)) {
@@ -258,3 +173,80 @@ setMethod("query_aggregate", "BigWigFile",
             }
           })
 
+
+## Choosing a geom based on a query.
+
+## The challenge: how to represent a geom? The ggplot2 API hides the
+## notion of a geom being an object. Instead, each geom has a geom_[x]
+## function that constructs a *layer* containing that geom. The hidden
+## geom object is a factory of the layer. The user typically
+## communicates the geom by its name (like in qplot). The name is
+## looked up against all Geom* symbols, going up from the ggplot2
+## namespace to the global environment. To avoid dealing with ggplot2
+## internals, perhaps the default_geom generic should return the geom
+## name. This is how the user would provide it anyway.
+
+## It is then not clear:
+## (a) how to obtain default stat/position/aes for geom AND query
+##     - default_stat, etc are generics dispatching on query,
+##       methods take geom (name) as argument
+##     - introduce our own class hierarchy of geoms, with default_*
+##       dispatching on both the geom and request
+## (b) how to look up the geom by name without using internals
+##     - Reimplement search for GeomX and call $New?
+##     - Find geom_X function and call it to make the layer?
+##     - Search for our own GeomX class?
+
+setClass("Geom")
+setClass("GeomBar", contains="Geom")
+setClass("GeomPoint", contains="Geom")
+
+camelToUnderscore <- function(x) {
+  sub("^_", "", tolower(gsub("([A-Z])", "_\\1", x)))
+}
+
+setMethod("names", "Geom", function(x) {
+  camelToUnderscore(sub("^Geom", "", class(x)))
+})
+
+setGeneric("default_geom", function(x, ...) standardGeneric("default_geom"))
+setMethod("default_geom", "QueryAggregate", function(x) new("GeomBar"))
+
+setGeneric("default_stat", function(query, geom, ...)
+           standardGeneric("default_stat"))
+
+layer <- function(geom, ...) {
+  fun <- match.fun(paste0("geom_", names(geom)))
+  fun(...)
+}
+
+ggplot2_geom <- function(geom) {
+  layer(geom)$geom
+}
+
+default_stat_for_geom <- function(geom) {
+  ggplot2_geom(geom)$default_stat()
+}
+
+setMethod("default_stat", c("ANY", "ANY"),
+          function(query, geom) default_stat_for_geom(geom))
+setMethod("default_stat", c("QueryAggregate", "GeomBar"),
+          function(query, geom) "identity")
+
+default_position_for_geom <- function(geom) {
+  ggplot2_geom(geom)$default_position()
+}
+
+setGeneric("default_position", function(query, geom, ...)
+           standardGeneric("default_position"))
+setMethod("default_position", c("ANY", "ANY"),
+          function(query, geom) default_position_for_geom(geom))
+
+default_mapping_for_geom <- function(geom) {
+  ggplot2_geom(geom)$default_aes()
+}
+
+setGeneric("default_mapping", function(query, geom, ...)
+           standardGeneric("default_mapping"))
+setMethod("default_mapping", c("ANY", "ANY"),
+          function(query, geom) default_mapping_for_geom(geom))

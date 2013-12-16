@@ -36,7 +36,8 @@ importMethodsFrom(IRanges,  split,
                   "[","[<-","[[", "[[<-","$",
                   show)
 
-importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL, Views, ViewsList, List)
+importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL,
+                  Views, ViewsList, List, expressionORfunction, functionORNULL)
 
 ## ## GenomicRanges
 

@@ -38,7 +38,7 @@ setMethod("Grob", "GGbio", function(x){
 ## setClass("GrobList", prototype = prototype(elementType = "Grob"),
 ##          contains = "list")
 
-.validList <- function(x){
+.validList <- function(object){
   if(all(sapply(x, is, x@elementType)))
     return(TRUE)
   else

@@ -12,14 +12,13 @@ URL: http://tengfei.github.com/ggbio/
 BugReports: https://github.com/tengfei/ggbio/issues
 License: Artistic-2.0 
 LazyLoad: Yes
-Collate: utils.R
-	 AllClasses.R
+Collate: AllClasses.R
 	 AllGenerics.R
 	 Cache-class.R
 	 GGbio-class.R
 	 Grob-class.R
-	 Tracked-class.R		
 	 ideogram.R
+	 Tracked-class.R		
 	 Plot-class.R
 	 ggplot-method.R
 	 theme.R	
@@ -48,10 +47,12 @@ Collate: utils.R
 	 stat_reduce-method.R
 	 coord_genome-method.R
 	 autoplot-method.R
+         autoplot-BigWigFile.R
 	 hack.R
 	 plotGrandLinear.R
 	 plotRangesLinkedToData.R
 	 plotFragLength-method.R
 	 plotSpliceSum-method.R
 	 rescale-method.R
+         utils.R
 	 zzz.R

@@ -1,88 +1,102 @@
 ## ============================================================
 ## Import
 ## ============================================================
-## ggplot2
+
 import(methods)
 import(BiocGenerics)
-import(biovizBase)
-import(grid)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### base packages
+###
+
+importFrom(grid, arrow, convertUnit, editGrob, gList, gTree, gpar, grid.draw,
+           grid.newpage, grobTree, is.unit, rectGrob, textGrob, unit, unit.c)
+importFrom(grDevices, dev.off, png)
+importFrom(graphics, par)
+importFrom(stats, approx, as.formula, df)
+importFrom(utils, capture.output, getFromNamespace)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Non-bioconductor packages
+###
+
 import(ggplot2)
-import(lattice)
-## importFrom(gtable, gtable_add_padding, gtable_add_grob, gtable_add_cols,
-##            gtable_add_rows, cbind)
-import(gtable)
-import(reshape2)
-import(scales)
-import(plyr)
+importFrom(gtable, gtable, gtable_add_grob, gtable_add_cols,
+           gtable_add_rows, gtable_filter)
+importFrom(reshape2, melt)
+importFrom(scales, cbreaks, rescale, expand_range, math_format,
+           scientific_format, trans_breaks, trans_format)
 importFrom(gridExtra, grid.arrange, arrangeGrob, latticeGrob)
 importFrom(Hmisc, bezier)
-## GenomicRanges
-## IRanges
-importFrom(IRanges, IRanges,  disjointBins,
-           findOverlaps, subsetByOverlaps,
-           "elementMetadata", "elementMetadata<-",
-           start, width, end,  resize, metadata, "metadata<-",
-           "values", "values<-",
-           ranges, "ranges<-", 
-           isTRUEorFALSE, coverage, slice,
-           elementLengths,  
-           reduce, punion, pgap, gaps, "%in%")
 
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Bioconductor packages
+###
+
+import(biovizBase)
+
+## Biobase
+importClassesFrom(Biobase, ExpressionSet, eSet)
+importMethodsFrom(Biobase, exprs, pData, phenoData, varLabels)
+
+## Biostrings
+importMethodsFrom(Biostrings, getSeq)
+
+## IRanges
+importFrom(IRanges, DataFrame, IRanges, isSingleString)
 importMethodsFrom(IRanges,  split, 
                   unlist, psetdiff,
                   range, endoapply,
                   as.data.frame,
                   length, as.list, as.matrix,
                   "[","[<-","[[", "[[<-","$",
-                  show)
-
+                  show,
+                  ranges, "ranges<-",
+                  start, end, width, 
+                  "start<-", "end<-", "width<-", "%in%",
+                  Views, coverage, disjointBins,
+                  elementLengths, findOverlaps, gaps, mcols,
+                  "mcols<-", metadata, queryHits, reduce, score,
+                  slice, subjectHits, subsetByOverlaps, values, "values<-",
+                  viewMaxs, viewMeans, viewMins, viewSums, viewWhichMaxs,
+                  viewWhichMins)
 importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL,
-                  Views, ViewsList, List, expressionORfunction, functionORNULL)
+                  Views, expressionORfunction, functionORNULL)
 
-## ## GenomicRanges
-
-importFrom(GenomicRanges, keepSeqlevels, renameSeqlevels, "seqnames<-",
-           seqlevels, "seqlevels<-", genome, "genome<-",
-           GRanges, GRangesList, Seqinfo, seqlengths, "seqlengths<-")
-importMethodsFrom(GenomicRanges, ranges, "ranges<-",
+## GenomicRanges
+importFrom(GenomicRanges, keepSeqlevels, GRanges, GRangesList)
+importMethodsFrom(GenomicRanges, assays, colData, exptData, granges, grglist,
+                  rowData, ranges, "ranges<-",
                   start, end, width, "start<-", "end<-", "width<-",
-                  seqnames, seqinfo, show, 
-                   "elementMetadata<-", elementMetadata,
+                  seqnames, seqinfo, "seqinfo<-", seqlengths, "seqlengths<-",
+                  seqlevels, "seqlevels<-", seqnames, show, 
                   as.data.frame, sort)
-
-
 importClassesFrom(GenomicRanges, GRanges, GRangesList, GenomicRangesList)
 
-## ## ## Rsamtools
+## Rsamtools
+importFrom(Rsamtools, BamFile)
+importMethodsFrom(Rsamtools, ScanBamParam, scanBamHeader)
+importClassesFrom(Rsamtools, BamFile, BamFileList)
 
-importFrom(Rsamtools, ScanBamParam, scanBam, scanBamHeader,
-           scanBamFlag,BamFile,
-           PileupFiles, PileupParam)
-importMethodsFrom(Rsamtools, applyPileups, path)
-importClassesFrom(Rsamtools, BamFile)
+## GenomicAlignments
+importMethodsFrom(GenomicAlignments, readGAlignmentsFromBam)
+importClassesFrom(GenomicAlignments, GAlignments)
 
-## ## ## GenomicAlignments
-importFrom(GenomicAlignments, readGAlignmentsFromBam)
-
-## ## ## BSgenome
+## BSgenome
 importClassesFrom(BSgenome, BSgenome)
 
-## ## ## GenomicFeatures
+## GenomicFeatures
 importClassesFrom(GenomicFeatures,TranscriptDb)
-importFrom(GenomicFeatures,
-           transcriptsByOverlaps,
-           exonsBy, 
-           cdsBy)
-
+importMethodsFrom(GenomicFeatures, exonsBy)
 
 ## rtracklayer
 importMethodsFrom(rtracklayer, import)
+importClassesFrom(rtracklayer, BigWigFile)
 
 ## VariantAnnotation
 importClassesFrom(VariantAnnotation, VCF)
-importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref, "ref<-",
-                  alt, "alt<-", info, "info<-", geno, "geno<-",  readVcf) 
-
+importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref,
+                  alt, info, geno) 
 
 ## ============================================================
 ## Export

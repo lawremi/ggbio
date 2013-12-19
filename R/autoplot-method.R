@@ -631,7 +631,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                 aes.res <- do.call(aes, args.aes)
                 args.res <- c(list(aes.res), args.non)
                   p + do.call(geom_text, args.res)+
-                    scale_color_manual(values = baseColor)
+                    scale_color_manual(values = baseColor, guide = "none")
                 }else{
                 args.aes$x <- as.name("x")
                 args.aes$y <- 0

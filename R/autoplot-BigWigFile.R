@@ -152,7 +152,7 @@ normArg_query <- function(query) {
   mapping <- normArg_mapping(mapping)
   facets <- normArg_facets(facets)
   
-  layers <- ; # TODO
+  layers <- TODO # TODO
   scales <- autoscales(query, aes)
   coord <- autocoord(query)
   

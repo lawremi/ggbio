@@ -5,7 +5,7 @@ Description: The ggbio package extends and specializes the grammar of graphics f
 Author: Tengfei Yin, Dianne Cook, Michael Lawrence
 Maintainer: Tengfei Yin <yintengfei@gmail.com>
 Depends: methods, BiocGenerics, ggplot2 (>= 0.9.3)
-Imports: grid, grDevices, graphics, stats, utils, biovizBase(>= 1.11.9), reshape2, gtable, Biobase, IRanges (>=1.21.19), GenomicRanges (>= 1.13.3), GenomicFeatures, Rsamtools (>= 1.13.1), GenomicAlignments, BSgenome, gridExtra, scales, VariantAnnotation, Hmisc, rtracklayer, Biostrings
+Imports: grid, grDevices, graphics, stats, utils, biovizBase(>= 1.11.9), reshape2, gtable, Biobase, IRanges (>= 1.21.19), GenomicRanges (>= 1.13.3), GenomicFeatures, Rsamtools (>= 1.13.1), GenomicAlignments, BSgenome, gridExtra, scales, VariantAnnotation, Hmisc, rtracklayer, Biostrings
 Suggests: vsn, BSgenome.Hsapiens.UCSC.hg19, TxDb.Hsapiens.UCSC.hg19.knownGene, chipseq, TxDb.Mmusculus.UCSC.mm9.knownGene, knitr
 biocViews: Infrastructure, Visualization, Bioinformatics
 URL: http://tengfei.github.com/ggbio/

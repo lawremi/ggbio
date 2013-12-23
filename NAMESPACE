@@ -16,6 +16,13 @@ importFrom(graphics, par)
 importFrom(stats, approx, as.formula, df)
 importFrom(utils, capture.output, getFromNamespace)
 
+## needed by stuff that will move down to biovizBase with Query framework
+## so remove this soon
+importFrom(tools, file_ext, file_path_sans_ext)
+importFrom(VariantAnnotation, readVcf)
+importFrom(GenomicRanges, genome)
+####
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Non-bioconductor packages
 ###
@@ -36,7 +43,7 @@ importFrom(Hmisc, bezier)
 import(biovizBase)
 
 ## Biobase
-importClassesFrom(Biobase, ExpressionSet, eSet)
+importClassesFrom(Biobase, ExpressionSet, eSet, AssayData)
 importMethodsFrom(Biobase, exprs, pData, phenoData, varLabels)
 
 ## Biostrings
@@ -61,7 +68,8 @@ importMethodsFrom(IRanges,  split,
                   viewMaxs, viewMeans, viewMins, viewSums, viewWhichMaxs,
                   viewWhichMins)
 importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL,
-                  Views, expressionORfunction, functionORNULL)
+                  Views, expressionORfunction, functionORNULL,
+                  SimpleList, List, Vector, Annotated)
 
 ## GenomicRanges
 importFrom(GenomicRanges, keepSeqlevels, GRanges, GRangesList)
@@ -75,7 +83,7 @@ importClassesFrom(GenomicRanges, GRanges, GRangesList, GenomicRangesList)
 
 ## Rsamtools
 importFrom(Rsamtools, BamFile)
-importMethodsFrom(Rsamtools, ScanBamParam, scanBamHeader)
+importMethodsFrom(Rsamtools, ScanBamParam, scanBamHeader, path)
 importClassesFrom(Rsamtools, BamFile, BamFileList)
 
 ## GenomicAlignments

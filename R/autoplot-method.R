@@ -589,6 +589,26 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
     p
 })
 
+## ======================================================================
+##        For "TabixFile"
+## ======================================================================
+setMethod("autoplot", c("TabixFile"), function(object, which, ...)
+          {
+            mc <- as.list(match.call())[-1]
+            mc <- lapply(mc, eval, envir = parent.frame(1))
+            mc <- c(list(as.name("autoplot")), mc)
+            
+            if (tolower(file_ext(file_path_sans_ext(path(object)))) == "vcf") {
+              data <- readVcf(object, genome=unname(genome(which)[1]),
+                              param=which)
+            } else {
+              data <- import(object, which=which)
+            }
+            p <- autoplot(data, ...)
+            p@fetchable <- TRUE
+            p@cmd <- list(mc)
+            p
+          })
 
 
 ## ======================================================================
@@ -610,6 +630,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
+  which <- biovizBase:::rectifySeqnameStyle(which, object)
   seqs <- getSeq(object, which, as.character = TRUE)
   seqs <- IRanges:::safeExplode(seqs)
   xs <- seq(start(which), length.out = width(which))
@@ -1290,17 +1311,18 @@ setMethod("autoplot", "VCF", function(object, ...,
       ## only show SNP
       df <- mold(fix)
       p <- ggplot() + geom_text(data = df, ..., 
-                                aes(x = start, label = type, color = type,  y = stepping)) +
-                                  scale_color_manual(values = baseColor) +  facet
-                              
+                                aes(x = start, label = type, color = type,
+                                    y = stepping))
     }else{
       df <- mold(fix)
       df$type <- factor(df$type, levels = c(names(baseColor)))
       p <- ggplot() + geom_text(data = df, ..., 
-                                aes(x = start, label = value, color = type, y = stepping)) +
-                                scale_color_manual(values = baseColor) + facet
+                                aes(x = start, label = value, color = type,
+                                    y = stepping))
       
     }
+    p <- p + scale_color_manual(values = baseColor, guide="none") +
+      scale_y_continuous(breaks=NULL, labels=NULL) + facet
   }
   if(missing(xlab))
     xlab <- ""

@@ -15,7 +15,7 @@ setClassUnion("GRangesORNULL", c("GRanges", "NULL"))
 
 setOldClass("ggplot")
 setClassUnion("ggplotORNULL", c("ggplot", "NULL"))
-setOldClass("gg")
+setOldClass(c("gg", "ggplot"))
 setClassUnion("ggORNULL", c("gg", "NULL"))
 
 setOldClass("grob")

@@ -238,7 +238,7 @@ setMethod("print", "Tracks", function(x){
                     if(i %in% which(x@mutable))
                       grobs[[i]] <- grobs[[i]] + x@theme
                     grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "")
-                    if(i == 1){
+                    if(i == 1 && !is.null(x@main)){
                       grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(1, 1,
                               as.numeric(x@padding),  0.5), "lines"))
                     }else{

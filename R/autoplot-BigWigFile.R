@@ -63,7 +63,7 @@ normArg_query <- function(query) {
 ##' would be a GRanges or something else that is obviously
 ##' fortified.
 ##'
-##' In a call to autoplot, there is conceptually a *single* layer. This
+##' In a call to bioplot, there is conceptually a *single* layer. This
 ##' means a single statistical reduction, which is the query. The geoms
 ##' may be complex. We allow a *single* level of nesting (like
 ##' GRangesList). And custom geoms in the list compile to a *single*
@@ -98,12 +98,12 @@ normArg_query <- function(query) {
 ##' type of object.
 ##'
 ##' Overall flow of pipeline:
-##' Data =query=> =position=> =split=>
+##' Data =query=> =position=>
 ##' `-> =mold1=> df1 [=scales=> =stat1=> =coord=> =geom1=\        ]
 ##' `-> =mold2=> df2 [=scales=> =stat2=> =coord=> =geom2=/`-> plot]
 ##' Stuff inside [ ] is implemented by ggplot2.
 ##' 
-##' @title Modular autoplot
+##' @title Convenient genomic plots
 ##' @param object The object to display.
 ##' @param query A Query object that accesses a data source and
 ##' reduces the data to yield one or more data.frames. This can
@@ -134,29 +134,28 @@ normArg_query <- function(query) {
 ##' default aesthetics; other argument defaults depend on this.
 ##' @return GGbio plot object
 ##' @author Tengfei Yin
-.autoplot_default <- function(object,
-                              query=autoquery(object),
-                              geom=autogeom(query),
-                              mapping=NULL,
-                              position=autoposition(geom),
-                              facets=autofacets(query),
-                              xlim=c(NA_real_, NA_real_),
-                              ylim=c(NA_real_, NA_real_),
-                              main=NULL,
-                              xlab=xlab(aes), ylab=ylab(aes),
-                              ...,
-                              aes=merge(mapping, autoaes(query)))
+bioplot <- function(object,
+                    query=autoquery(object),
+                    geom=autogeom(query),
+                    mapping=NULL,
+                    position=autoposition(geom),
+                    facets=autofacets(query),
+                    xlim=c(NA_real_, NA_real_), ylim=c(NA_real_, NA_real_),
+                    main=NULL,
+                    xlab=xlab(aes), ylab=ylab(aes),
+                    ...,
+                    aes=merge(mapping, autoaes(query)))
 {
   query <- normArg_query(query)
   geom <- normArg_geom(geom)
   mapping <- normArg_mapping(mapping)
   facets <- normArg_facets(facets)
+
+  layers <- QueryLayer(query, geom=geom, aes=aes, position=position)
   
-  layers <- TODO # TODO
   scales <- autoscales(query, aes)
-  coord <- autocoord(query)
   
-  p <- ggplot() + layers + facets + scales + coord
+  p <- ggplot() + layers + facets + scales
   
   if (!is.null(main)) {
     p <- p + ggtitle(main)
@@ -178,16 +177,16 @@ normArg_query <- function(query) {
 }
 
 ## So that people can easily add just a layer...
-autolayer <- function(object,
-                      query=autoquery(object),
-                      geom=autogeom(query),
-                      mapping=NULL,
-                      position=autoposition(geom))
+biolayer <- function(object,
+                     query=NULL,
+                     geom=autogeom(query),
+                     mapping=NULL,
+                     position=autoposition(geom))
 {
   
 }
 
-setGeneric("autolayer", function(object, ...) standardGeneric("autolayer"))
+setGeneric("biolayer", function(object, ...) standardGeneric("biolayer"))
 
 setGeneric("autoquery",
            function(object, ...) standardGeneric("autoquery"))
@@ -196,39 +195,50 @@ setGeneric("autoquery",
 ## every query type and data source, we could have a generic (eval) that
 ## dispatches on a "query type" object and the data source.
 
-## The query is just a function, usually a generic that
+## The query is implemented by a function, usually a generic that
 ## dispatches on the object type. This makes it super easy to write
 ## new/optimized queries. We could store the parameters by storing a
-## prototypical call to the function. When plot parameters are
-## changed (like the xlim), we override the parameters in the call.
+## prototypical call to the function. The query is represented by that
+## call. When plot parameters are changed (like the xlim), we override
+## the parameters in the call.
 
 ## What sort of API should be enforced for the callback, i.e., which
-## parameters will the user be able to adjust? The 'xlim' is obvious.
-## Could have a queryParam()<- accessor to change specific parameters
-## of the query.  Or maybe the ggplot2 way is: p +
-## query(binwidth=15). Either way, the xlim<- and ylim<- should
-## attempt to change the corresponding parameter in the query.
+## parameters will the user be able to adjust? Under the realization
+## that the query is abstractly equivalent to a stat, there could be a
+## mapping between aesthetics and query parameters. Take the need to
+## restrict by 'xlim' for example. We are drawing genes. At the bottom
+## is a rect geom, with its left/right aesthetics mapped to
+## start/end. At the top is a gene/alignment geom, the data are a
+## GRangesList, and there is an abstract mapping of x=>range. So
+## perhaps the 'xlim' would then be passed as the 'range' argument to
+## the query function? Same for 'ylim', but there would be no 'y'
+## aesthetic for the genes.
 
 ## But dispatching to choose the right geom (and facets) will not work
 ## with a plain function, so we need a special class.
 
 ## TO TENGFEI: feel free to email me and tell me I'm crazy
 
-setClass("Query", contains = "standardGeneric")
+setClass("QueryFunction", contains = "standardGeneric")
+
+setClass("Query", contains = "call")
 
 setClass("QueryAggregate", contains = "Query")
 
-setClass("CompoundQuery", contains="SimpleList",
-         prototype=prototype(elementType="Query"))
+QueryConstructor <- function(FUN, ...) {
+  body <- substitute({
+    mc <- match.call()
+    mc[[1]] <- FUN
+    new(CLASS, mc)
+  }, list(CLASS=deparse(substitute(FUN)), FUN=FUN))
+  as.function(c(formals(FUN), body))
+}
 
-setGeneric("query_aggregate",
-           function(x, binwidth = 1L, ...) standardGeneric("query_aggregate"))
+query_aggregate <- QueryConstructor(aggregate)
 
-query_aggregate <- new("QueryAggregate", query_aggregate)
+setMethod("autoquery", "BigWigFile", function(object) query_aggregate(object))
 
-setMethod("autoquery", "BigWigFile", function(object) query_aggregate)
-
-setMethod("query_aggregate", "BigWigFile",
+setMethod("aggregate", "BigWigFile",
           function(x, binwidth = 1L, xlim = seqinfo(x)) {
             xlim <- normArg_xlim_GRanges(xlim)
             if (binwidth == 1L) {
@@ -239,6 +249,8 @@ setMethod("query_aggregate", "BigWigFile",
             }
           })
 
+## call("foo")[-1] yields NULL, so there is no way to have a no-op call
+setClassUnion("QueryORNULL", c("Query", "NULL"))
 
 ## Choosing a geom based on a query.
 
@@ -291,7 +303,7 @@ ggplot2_geom <- function(geom) {
 }
 
 autostat_for_geom <- function(geom) {
-  ggplot2_geom(geom)$autostat()
+  ggplot2_geom(geom)$default_stat()
 }
 
 setMethod("autostat", c("ANY", "ANY"),
@@ -300,7 +312,7 @@ setMethod("autostat", c("QueryAggregate", "GeomBar"),
           function(query, geom) "identity")
 
 autoposition_for_geom <- function(geom) {
-  ggplot2_geom(geom)$autoposition()
+  ggplot2_geom(geom)$default_position()
 }
 
 setGeneric("autoposition", function(query, geom, ...)
@@ -309,7 +321,7 @@ setMethod("autoposition", c("ANY", "ANY"),
           function(query, geom) autoposition_for_geom(geom))
 
 autoaes_for_geom <- function(geom) {
-  ggplot2_geom(geom)$autoaes()
+  ggplot2_geom(geom)$default_aes()
 }
 
 setGeneric("autoaes", function(query, geom, ...)
@@ -322,58 +334,84 @@ setGeneric("autoscales", function(query, mapping, ...)
            signature = "query")
 setMethod("autoscales", "ANY", function(query, mapping) list())
 
-setGeneric("autocoord", function(query) standardGeneric("autocoord"))
-setMethod("autocoord", "ANY", function(query) coord_cartesian())
-
 ## It makes sense for the type of guide to depend on the scale. The
 ## user can adjust the guide separately from the scale via the
-## guides() function. It seems safest to control this via guides(),
-## even though that applies to all layers, since it is relatively
-## uncommon to have multiple layers.
+## guides() function.
 
-## fixes stuff like having redudant guides when a variable is mapped to 'text'
-## (the legend will just show the text)
-tweak_guides <- function(mapping) {
-  
-}
+## High-level aesthetic class, at least for pretty printing
+setOldClass(c("Aes", "uneval"))
+
+## High-level position class, just a marker for now
+setOldClass(c("Position", "proto", "environment"))
 
 ## Putting the pieces together: Layer objects
 
-## ISSUE: Is 'stat' largely redundant with the query?
+setOldClass(c("proto", "environment"))
 
-## The query often *is* a reduction, like a stat, but it also involves
-## a lot of munging and restriction, in addition to summarization. In
-## terms of the API, it is easiest for the user to just specify the
-## query, instead of a stat. RESOLUTION: drop the stat?
+setClassUnion("Layer", "proto")
 
-## IMPORTANT SIMPLIFICATION:
+setClass("LayerList", prototype=prototype(elementType="Layer"),
+         contains="SimpleList")
 
+setClass("Biolayer",
+         representation(query="QueryORNULL",
+                        geom="Geom",
+                        mappings="Aes",
+                        position="Position"),
+         contains = "Layer")
 
-setOldClass(c("Layer", "proto", "environment"))
-
-QueryLayer <- function(query, geom, aes, stat, position, ...) {
-  layer <- layer(geom, mapping=aes, stat=stat, position=position, ...)
-  new("QueryLayer", layer, query=query)
+Biolayer <- function(query, geom, mappings, position, ...) {
+  new("Biolayer", query=query, geom=geom, mappings=mappings, position=position)
 }
 
-setClass("QueryLayer", representation(query="Query"), contains="Layer")
+setClass("Bioplot",
+         representation(query="Query",
+                        layers="LayerList",
+                        ggplot="ggplot"),
+         contains="Plot")
 
-setClass("LayerList", contains="SimpleList",
-         prototype=prototype(elementType="Layer"))
+setMethod("+", "Bioplot", function(e1, e2) {
+  if (is(e2, "Layer")) {
+    e1@layers <- c(e1@layers, e2)
+  } else {
+    e1@ggplot <- e1@ggplot + e2
+  }
+  e1
+})
 
-LayerList <- function(...) {
-  new("LayerList", SimpleList(...))
+## Compilation algorithm:
+## - Execute plot-level query
+## - fortify() the query result to df, and set to plot$data
+## - For each layer:
+##   - if it is a QueryLayer:
+##     - if there is a query: execute the query
+##     -    else: take result from plot
+##     - apply Position to query result
+##     - request molds from Geom, named by ggplot2 geom
+##     - execute molds from positioned query result
+##     - construct ggplot2 layers from mold results
+##   - add layer(s) to plot$layers
+
+setGeneric("compile", function(x, target, ...) standardGeneric("compile"))
+
+setMethod("compile", c("Bioplot", "missing"), function(x, target, ...) {
+  compile(x, x@ggplot, ...)
+})
+
+setMethod("compile", c("Bioplot", "ggplot"), function(x, target) {
+  d <- x@query()
+})
+
+print.Bioplot <- function(x, ...) {
+  p <- compile(x)
+  print(p, ...)
 }
 
-mlayer <- function(query, geom, aes, stat, position) {
-  if (is(query, "List"))
-    query <- as.list(query)
-  else query <- list(query)
-  if (is(geom, "List"))
-    geom <- as.list(geom)
-  else geom <- list(geom)
-  aes <- list(aes)
-  LayerList(mapply(QueryLayer, query, geom, aes, stat, position,
-                   SIMPLIFY=FALSE))
-}
+setMethod("show", "Bioplot", function(object) {
+  print(object)
+})
 
+## IDEA: dispatch compilation on the high-level AND low-level plot objects,
+##       so that we can target implementations other than ggplot2.
+##       currently, the API is obviously dependent on ggplot2,
+##       but that might eventually change.

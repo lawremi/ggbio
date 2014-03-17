@@ -2,7 +2,7 @@
 ## 1. Txdb
 ## 2. Solve the seqinfo issues
 
-
+plot(1:10)
 library(ggbio)
 library(ggplot2)
 p <- ggplot(data = mtcars)
@@ -14,18 +14,18 @@ library(GenomicRanges)
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
-gr <- GRanges(seqnames = 
+gr <- GRanges(seqnames =
               sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),
               IRanges(
                 start = sample(1:300, size = N, replace = TRUE),
                 width = sample(70:75, size = N,replace = TRUE)),
-              strand = sample(c("+", "-", "*"), size = N, 
+              strand = sample(c("+", "-", "*"), size = N,
                 replace = TRUE),
               value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
-              sample = sample(c("Normal", "Tumor"), 
+              sample = sample(c("Normal", "Tumor"),
                 size = N, replace = TRUE),
-              pair = sample(letters, size = N, 
+              pair = sample(letters, size = N,
                 replace = TRUE))
 
 seqlengths(gr) <- c(400, 500, 700)
@@ -36,8 +36,8 @@ autoplot(gr, facets = grr)
 ggbio() + geom_rect(gr)
 
 ggplot() + circle(gr, geom = "ideo", fill = "gray70") +
-     circle(gr, geom = "bar", aes(fill = score, y = score)) + 
-     circle(gr, geom = "point", color = "red", grid = TRUE, aes(y = score)) + 
+     circle(gr, geom = "bar", aes(fill = score, y = score)) +
+     circle(gr, geom = "point", color = "red", grid = TRUE, aes(y = score)) +
      circle(gr, geom = "link", linked.to = "to.gr", r = 0, )
 
 
@@ -157,7 +157,7 @@ p1 <- qplot(data = mtcars, x = mpg,  y = wt)
 tracks(p1 = p, p2 = p1)
 
 
-## 
+##
 library(ggbio)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
@@ -169,7 +169,104 @@ autoplot(keepSeqlevels(genesymbol[1:100], "chr1"))
 class(p)
 is
 
-## 
+##
 
 
 
+library(ggbio)
+library(ggplot2)
+library(GenomicRanges)
+
+gr = GRanges("1",
+    IRanges(1:5, 1:5))
+
+set.seed(1)
+gr$e = runif(5)
+gr$l = runif(5, -1, 0)
+gr$u = runif(5, 1, 2)
+
+p = autoplot(gr, geom = "pointrange", aes_string(y = "e", ymin = "l", ymax = "u"))
+
+t = tracks(p, p, p)
+t
+t = tracks(p, p, p, title = "title")
+t = tracks(p, p, p, title = "")
+t = tracks(p1 = p, p2 = p, p3 = p, title = "title", xlab = "xlab")
+print(t)
+
+df1 <- data.frame(time = 1:100, score = sin((1:100)/20)10)
+p1 <- qplot(data = df1, x = time, y = score, geom = "line")
+df2 <- data.frame(time = 30:120, score = sin((30:120)/20)10, value = rnorm(120-30 + 1))
+p2 <- ggplot(data = df2, aes(x = time, y = score)) +
+  geom_line() + geom_point(size = 4, aes(color = value))
+
+plot two tracks with a label - this looks OK
+
+tracks (p1, p2, main="myTitle")
+
+plot two labelled tracks - this look OK
+
+tracks (p1=p1, p2=p2)
+
+adding title to the plot with labelled tracks messes up alignment of the labels with the plot
+
+tracks (p1=p1, p2=p2, main="myTitle")
+
+## support VRanges
+# construction
+library(ggbio)
+library(GenomicRanges)
+library(VariantAnnotation)
+vr <- VRanges(seqnames = c("chr1", "chr2"),
+              ranges = IRanges(c(1, 10), c(5, 20)),
+              ref = c("T", "A"), alt = c("C", "T"),
+              refDepth = c(5, 10), altDepth = c(7, 6),
+              totalDepth = c(12, 17), sampleNames = letters[1:2],
+              hardFilters =
+                FilterRules(list(coverage = function(x) totalDepth > 10)),
+              softFilterMatrix =
+                FilterMatrix(matrix = cbind(depth = c(TRUE, FALSE)),
+                             FilterRules(depth = function(x) altDepth(x) > 6)),
+              tumorSpecific = c(FALSE, TRUE))
+
+## simple accessors
+vr
+ref(vr)
+as(vr, "data.frame")
+library(biovizBase)
+mold(vr)
+altDepth(vr)
+vr$tumorSpecific
+called(vr)
+
+data("genesymbol", package = "biovizBase")
+genesymbol["BRCA1"]
+param <- ScanVcfParam(which = GRanges("17", IRanges(41196313, 41277500)))
+vcf <- readVcf("/Users/tengfei/Documents/Data/sbgtest/1000G_phase1.snps.high_confidence.b37.vcf.gz", 
+               genome = "hg19", param = param)
+vcf
+vr <- as(vcf, "VRanges")
+library(biovizBase)
+md <- mold(vr[1:10])
+head(md)
+library(grid) # needed for arrow function
+library(gridExtra)
+head(md)
+p <- ggplot(data.frame(x = range(md$midpoint), 
+                  y = c(1, 2))) + geom_blank( aes(x = x, y = y)) + 
+  ggplot2::geom_segment(data = md, aes(x = midpoint, xend = midpoint), y = 1.4, 
+               yend = 1.6, arrow = arrow(length = unit(0.2,"strwidth", "A"))) +
+  annotate("text", x = md$midpoint, y = 1.75, label = md$alt) + 
+  annotate("text", x = md$midpoint, y = 1.25, label = md$ref) + 
+  theme_alignment()  + 
+  theme(aspect.ratio = 1/10) 
+p
+class(p)
+
+
+library(ggbio)
+tracks(list(p))
+tracks(p = p)
+ggbio:::.supportedPlots
+extends(class(p), 'gg')
+tracks(p = ggbio(p))

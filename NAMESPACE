@@ -110,7 +110,7 @@ importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref,
 ## Export
 ## ============================================================
 ## utils
-exportMethods(autoplot, rescale, mold, fixed, "fixed<-", 
+exportMethods(autoplot, rescale, fixed, "fixed<-", 
               xlim, "xlim<-", reset, backup,
               bgColor, "bgColor<-", labeled, "labeled<-",
               mutable, "mutable<-", height, "height<-",

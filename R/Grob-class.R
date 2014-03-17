@@ -56,7 +56,7 @@ GrobList <- function(...){
 
 reduceListOfPlots <- function(x){
   firstElementIsListOfGrobs <-
-    length(x) == 1 && is.list(x[[1L]]) 
+    length(x) == 1 && is.list(x[[1L]]) && !extends(class(x[[1]]), "gg")
   if (firstElementIsListOfGrobs)
     x <- x[[1]]
   x

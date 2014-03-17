@@ -5,7 +5,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
                                                xlab, ylab, main,
                                                facets = NULL, 
                                                geom = NULL){
-
+  
 
   if(is.null(geom))
     geom <- "area"
@@ -25,7 +25,9 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   if(!length(facets))
     facets <- as.formula(~seqnames)
   facets <- strip_formula_dots(facets)
-  allvars <- all.vars(as.formula(facets))
+  ## need to get variables from all mapping not just facet
+  allvars <- unique(c(all.vars(as.formula(facets)), as.character(args.aes)))
+  ## getting variables need to be kept for aesthetic mapping
   allvars.extra <- allvars[!allvars %in% c(".", "seqnames", "strand")]
   lst <- lapply(grl, function(dt){
     vals <- coverage(keepSeqlevels(dt, unique(as.character(seqnames(dt)))))
@@ -43,10 +45,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
     if(geom == "area" | geom == "polygon"){
       seqs <- c(seqs, rev(seqs))
       vals <- c(vals, rep(0, length(vals)))
-      ## .df <- data.frame(x = seqs, y = vals)
-      ## qplot(data = .df, x = x, y = y, geom = "polygon")
-
-    }
+     }
     if(length(unique(values(dt)$.id.name))){                
       res <- data.frame(coverage = vals, seqs = seqs,
                         seqnames =
@@ -62,13 +61,17 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
         res <- data.frame(coverage = vals, seqs = seqs,
                           seqnames =
                           as.character(seqnames(dt))[1])
+     
 
     }
-    res[,allvars.extra] <- rep(unique(values(dt)[, allvars.extra]),
-                               nrow(res))
-    res
+    
+    for(v in allvars.extra){
+      res[,v] <- rep(unique(values(dt)[, v]), nrow(res))
+    }
+      res
   })
   res <- do.call(rbind, lst)
+
   if(!"y"  %in% names(args.aes))
     args.aes$y <- as.name("coverage")
   

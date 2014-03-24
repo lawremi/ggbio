@@ -1520,7 +1520,7 @@ setMethod("autoplot", "Views", function(object, ...,
 
 
 setMethod("autoplot", "Seqinfo", function(object, ideogram = FALSE, ... ){
-  obj <- .transformSeqinfo(object)
+  obj <- biovizBase:::.transformSeqinfo(object)
   p <- ggplot() + layout_karyogram(obj, geom = NULL)
   if(length(obj) == 1 && ideogram){
       p <- plotIdeogram(obj, as.character(seqnames(obj)), ...)

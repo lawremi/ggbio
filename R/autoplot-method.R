@@ -637,22 +637,31 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
   df <- data.frame(x = xs, seqs = seqs)
   geom <- match.arg(geom)
   p <- ggplot(data = df, ...)
+  
+  
   if(!"color" %in% names(args.non))
     isDNABaseColor <- TRUE
   else
     isDNABaseColor <- FALSE
   baseColor <- getOption("biovizBase")$DNABasesColor
+  fc <- baseColor[df$seqs]
+  
   p <- switch(geom,
               text = {
                 if(isDNABaseColor){
+            
                 args.aes$x <- as.name("x")
                 args.aes$y <- 0
                 args.aes$label = as.name("seqs")
-                args.aes$color = as.name("seqs")
+               # args.aes$color = as.name("seqs")
                 aes.res <- do.call(aes, args.aes)
                 args.res <- c(list(aes.res), args.non)
-                  p + do.call(geom_text, args.res)+
-                    scale_color_manual(values = baseColor, guide = "none")
+                p <- p + do.call(geom_text2, c(args.res, list(color = "white", 
+                                                            
+                                                             fc = fc)))
+                
+                
+                
                 }else{
                 args.aes$x <- as.name("x")
                 args.aes$y <- 0
@@ -1142,11 +1151,56 @@ getNR <- function(x, type = c("NUSE", "RLE"),range = 0, ...){
 ##======================================================================
 ##  For VCF
 ##======================================================================
+setMethod("autoplot", "VRanges", function(object, ...,which,
+                                          xlab, ylab, main){
+  
+  args <- list(...)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  
+  if(!missing(which))
+    object <- subsetByOverlaps(object, which)
+
+  md <- mold(object)
+
+  if(length(md)){
+  baseColor <- getOption("biovizBase")$DNABasesColor
+  fc1 <- baseColor[md$alt]
+  fc2 <- baseColor[md$ref]
+  
+  p <- ggplot(data.frame(x = range(md$midpoint), 
+                         y = c(1, 2))) + geom_blank( aes(x = x, y = y)) + 
+    ggplot2::geom_segment(data = md, aes(x = midpoint, xend = midpoint), y = 1.4, 
+                          yend = 1.6, arrow = arrow(length = unit(0.3,"strwidth", "A"))) +
+    ggbio:::geom_text2(data = md, aes(x = midpoint, y = 1.75, label = alt), color = "white", fc = fc1) + 
+    ggbio:::geom_text2(data = md, aes(x = midpoint, y = 1.25, label = ref), color = "white", fc = fc2) +
+    
+    scale_color_manual(values = baseColor) + 
+    theme_alignment() 
+  
+  if(missing(xlab))
+    xlab <- ""
+  p <- p + ggplot2::xlab(xlab)
+  if(missing(ylab))
+    ylab <- ""
+  p <- p + ggplot2::ylab(ylab)
+  if(!missing(main))
+    p <- p + labs(title = main)
+  
+  if(!is(p, "GGbio"))
+    p <- GGbio(p, data = object)  
+  }else{
+    p <- NULL
+  }
+
+  p
+})
+
 
 setMethod("autoplot", "VCF", function(object, ...,
                                       xlab, ylab, main,
                                       assay.id,                                      
-                                      type = c("geno", "info", "fixed"),
+                                      type = c("default", "geno", "info", "fixed"),
                                       full.string = FALSE,
                                       ref.show = TRUE,
                                       genome.axis = TRUE,
@@ -1157,6 +1211,10 @@ setMethod("autoplot", "VCF", function(object, ...,
   args.non <- parseArgsForNonAes(args)
   type <- match.arg(type)
   hdr <- exptData(object)[["header"]]
+  if(type == "default"){
+    vr <- as(object, "VRanges")
+    p <- autoplot(vr, which = which, ...)
+  }
   
   if(type == "geno"){
     nms <- rownames(geno(hdr))

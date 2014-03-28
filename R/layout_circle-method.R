@@ -1,14 +1,39 @@
-## setClass("Circle", contains = c("gg"),slots = list(radius = "numeric",
-##                                         trackWidth = "numeric"))
-## Circle <- function(object, radius = 10, trackWidth = 5){
-##     new("Circle", object, radius = radius, trackWidth = trackWidth)
-## }
+# setClass("Circle", contains = c("GGbio"),
+#                   slots = list(radius = "numeric",       # starting radius
+#                                trackWidth = "numeric",   # default track width
+#                                buffer = "numeric", 
+#                                curRadius = "numericORNULL",
+#                                trackWidthVec= "numericORNULL",  # track width list
+#                                radiusVec = "numericORNULL",      # starting r of each track
+#                                seqinfo = "Seqinfo"
+#                                ))  #default track width
+# 
+# 
+# Circle <- function(object = ggbio(), radius = 10, trackWidth = 5, buffer = 2,
+#                    curRadius = radius,
+#                    trackWidthVec = NULL, radiusVec = NULL, ...){
+#   ## this should return a call for collecting parameters and evalutte later
+#     new("Circle", object, radius = radius, trackWidth = trackWidth, buffer = buffer,
+#         curRadius = radius, trackWidthVec = trackWidthVec, radiusVec = radiusVec, ...)
+# }
 
+
+# setMethod("circle", "missing", function(){
+#   
+# })
+# is(Circle(), "GGbio")
+# ggbio(data) + layout_circle() + layout_circle() + layout_circle()
+# ggbio() + circle() + circle() + 
+# ggbio() + circle(data1) + circle(data2)
+# ggbio(data) + circle() + circle(data2)
+
+## TODO: also should work for tracks too
+## 1) order
+## 2) remove 
+
+
+# it has to compute at change current growing 
 ## ## accessor
-## setGeneric("radius", function(obj) standardGeneric("radius"))
-## setMethod("radius", "Circle", function(obj) obj@radius)
-## setGeneric("trackWidth", function(obj) standardGeneric("trackWidth"))
-## setMethod("trackWidth", "Circle", function(obj) obj@trackWidth)
 
 
 setGeneric("layout_circle", function(data,...) standardGeneric("layout_circle"))
@@ -25,8 +50,7 @@ setMethod("layout_circle",  "GRanges",
                    grid.n = 5, grid.background = "gray70", grid.line = "white",
                    grid = FALSE,
                    chr.weight = NULL){
-  message("layout_circle() is now a lower level component to transform a
-           linear object, and please check circle() for easier API")
+ 
   args <- dots <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)

@@ -12,13 +12,59 @@ GGbio.gen <- setClass("GGbio",
 
 
 GGbio <- function(ggplot = NULL, data = NULL, fetchable = FALSE, blank = FALSE,...){
+  args <- dots <- list(...)
+ 
+  args.non <- parseArgsForNonAes(args)
+ 
+  
+  ## for circle() function hack
+  if("trackWidth" %in% names(args.non) && is.numeric(args.non[["trackWidth"]])){
+      trackWidth <- args.non[["trackWidth"]]
+     
+  }else{
+    trackWidth <- 7
+  }
+  if("buffer" %in% names(args.non) && is.numeric(args.non[["buffer"]])){
+    buffer <- args.non[["buffer"]]
+  }else{
+    buffer <- 2
+  }
+  if("radius" %in% names(args.non) && is.numeric(args.non[["radius"]])){
+    radius <- args.non[["radius"]]
+  }else{
+    radius <- 30
+  }
+  args <- args[!names(args) %in% c("trackWidth", "radius", "buffer")]
+  
+  
     if(is(ggplot, "GGbio")){
         ggplot <- ggplot@ggplot
     }
-    new("GGbio", ggplot = ggplot, data = data, fetchable = fetchable, blank = blank, ...)
+    if(is.null(ggplot)){
+      ggplot <- ggplot()
+    }
+ 
+    res <- do.call(new, c(list("GGbio", 
+                      ggplot = ggplot, 
+                      data = data, 
+                      fetchable = fetchable, 
+                      blank = blank), 
+                       args))
+
+    
+  
+  ## for circle function hack with a class
+  attr(res, "trackWidth") <- trackWidth
+  attr(res, "radius") <- radius
+  attr(res, "buffer") <- buffer
+  res
 }
+
 ## alias
 ggbio <- GGbio
+
+
+
 
 setReplaceMethod("$", "GGbio",
                  function(x, name, value) {
@@ -111,26 +157,51 @@ argList <- function(cmd){
 }
 
 setMethod("+", c("GGbio"), function(e1, e2){
+  
+  
     if(is(e2, "circle")){
+      args <- e2
+      ## load default
+        buffer <- attr(e1, "buffer")
+        trackWidth <- attr(e1, "trackWidth")
+
+        
+     
         ## compute radius
-        args <- e2
+        
         r.addon <- .radius(e2)
-        r <- attr(e1, "radius")
-        if(is.null(r)){
-            attr(e1, "radius") <- 0
+      t.addon <- .trackWidth(e2)
+
+        if(is.null(t.addon)){
+          t.addon <- trackWidth
         }
-        t.addon <- .trackWidth(e2)
         if(is.null(r.addon)){
-            r.cur <-  attr(e1, "radius") +  t.addon
+            r.cur <-  attr(e1, "radius") +  t.addon + buffer
             attr(e1, "radius") <- r.attr <- r.cur
         }else{
             r.cur <- r.addon
             attr(e1, "radius") <- r.attr <- max(attr(e1, "radius"),  r.cur + t.addon)
         }
+      
         args$radius <- r.cur
         args$trackWidth <- t.addon
-        e1 <- e1 + do.call(layout_circle, args)
-        attr(e1, "radius") <- r.attr
+   
+        if(!"data" %in% names(args)){
+          if(is.null(names(args[[1]])) && is(args[[1]], "GRanges")){
+            names(args)[1] <- "data"
+       
+          }else{
+            stop("no data found")
+          }
+        }
+      
+        
+        object <- do.call(layout_circle, args)
+        e1@ggplot <- mapToGG(e1@ggplot, object)
+                
+        res <- ggplot2:::add_ggplot(e1@ggplot, object, "circle")
+        e1@ggplot <- res
+     
         return(e1)
     }
   if(!is(e2, "xlim")){
@@ -156,6 +227,7 @@ setMethod("+", c("GGbio"), function(e1, e2){
     }else{
       object <- e2
     }
+    
     res <- ggplot2:::add_ggplot(e1@ggplot, object, e2name)
     e1@ggplot <- res
     return(e1)

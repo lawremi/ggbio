@@ -1151,33 +1151,88 @@ getNR <- function(x, type = c("NUSE", "RLE"),range = 0, ...){
 ##======================================================================
 ##  For VCF
 ##======================================================================
-setMethod("autoplot", "VRanges", function(object, ...,which,
+setMethod("autoplot", "VRanges", function(object, ...,which = NULL,
+                                          arrow = TRUE, indel.col = "gray30",
+                                          geom = c("text", "rect"),
                                           xlab, ylab, main){
   
+  geom <- match.arg(geom)
   args <- list(...)
+
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   
-  if(!missing(which))
+  if(length(which)){
     object <- subsetByOverlaps(object, which)
-
+    xlim <- c(start(which), end(which))
+  }else{
+    xlim <- NULL
+  }
   md <- mold(object)
-
+#   indel <- isIndel(object)
+#   obj.indel <- object[indel]
+#  obj.indel
+#  
+#   obj <- object[!indel]
+# 
+#   md <- mold(obj)
+#   md.indel <- mold(obj.indel)
+#  md <- md.indel
+#  md.indel
   if(length(md)){
+    
   baseColor <- getOption("biovizBase")$DNABasesColor
   fc1 <- baseColor[md$alt]
+  fc1[is.na(fc1)] <- indel.col 
   fc2 <- baseColor[md$ref]
-  
-  p <- ggplot(data.frame(x = range(md$midpoint), 
-                         y = c(1, 2))) + geom_blank( aes(x = x, y = y)) + 
-    ggplot2::geom_segment(data = md, aes(x = midpoint, xend = midpoint), y = 1.4, 
-                          yend = 1.6, arrow = arrow(length = unit(0.3,"strwidth", "A"))) +
-    ggbio:::geom_text2(data = md, aes(x = midpoint, y = 1.75, label = alt), color = "white", fc = fc1) + 
-    ggbio:::geom_text2(data = md, aes(x = midpoint, y = 1.25, label = ref), color = "white", fc = fc2) +
+  fc2[is.na(fc2)] <- indel.col 
+  if(geom == "text"){
+   
     
+  p <- ggbio() +     
+    geom_text2(data = md, aes(x = start, y = 1.75, label = alt), 
+                       color = "white", fc = fc1, hjust = 0) + 
+    geom_text2(data = md, aes(x = start, y = 1.25, label = ref), 
+                       color = "white", fc = fc2, hjust = 0) +
     scale_color_manual(values = baseColor) + 
     theme_alignment() 
   
+  }
+  if(geom == "rect"){
+   
+    md$ref
+    md.rect <- md
+    indel <- width(object) > 1 | width(alt(object)) > 1
+    md.rect$ref[indel] <- "Indel"
+    md.rect$alt[indel] <- "Indel"
+    md.rect$ref <- factor(md.rect$ref, levels = c("A", "C", "G", "T", "Indel"))
+    md.rect$alt <- factor(md.rect$alt, levels = c("A", "C", "G", "T", "Indel"))
+  
+    p <- ggplot(md.rect) + 
+      ggplot2::geom_segment(aes(x = midpoint-0.5, y = 1.25, 
+                    xend = midpoint-0.5, yend = 1.35, color = ref)) + 
+      
+      ggplot2::geom_rect(aes(xmin = midpoint - 0.5, ymin = 1.25, 
+                    xmax = midpoint + 0.5, ymax = 1.35, fill = ref), color = NA) + 
+      
+      ggplot2::geom_segment(aes(x = midpoint, y = 1.65, 
+                    xend = midpoint, yend = 1.75, color = alt)) + 
+      
+      ggplot2::geom_rect(aes(xmin = midpoint - 0.5, ymin = 1.65, 
+                            xmax = midpoint + 0.5, ymax = 1.75, fill = alt), color = NA) + 
+      
+      scale_fill_manual(values = c(baseColor, "indel" = indel.col)) + 
+      scale_color_manual(values = c(baseColor, "indel" = indel.col)) + 
+      theme_alignment() 
+  }
+  if(arrow){
+    p <- p + ggplot2::geom_segment(data = md, aes(x = midpoint, xend = midpoint), y = 1.4, 
+                          yend = 1.6, arrow = arrow(length = unit(0.3,"strwidth", "A"))) 
+  }
+  if('sampleNames' %in% colnames(md)){
+    p <- p + facet_grid (sampleNames ~ .) 
+  }
+    
   if(missing(xlab))
     xlab <- ""
   p <- p + ggplot2::xlab(xlab)
@@ -1190,10 +1245,12 @@ setMethod("autoplot", "VRanges", function(object, ...,which,
   if(!is(p, "GGbio"))
     p <- GGbio(p, data = object)  
   }else{
-    p <- NULL
+    p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
+                list(ggplot2::xlim(c(0, 1))))
   }
-
-  p
+  if(length(xlim))
+    p <- p + xlim(xlim)
+  p + ylim(1, 2)
 })
 
 

@@ -711,3 +711,62 @@ combineAes2 <- function(keep, lose){
   }
 }
 ## mark a plot as a blank plot which doesn't
+
+
+## add a new geom text
+## fixme: hjust doesn't work
+btextGrob <- function (label,x = unit(0.5, "npc"), y = unit(0.5, "npc"), 
+                       just = "centre", hjust = NULL, vjust = NULL, rot = 0, check.overlap = FALSE, 
+                       default.units = "npc", name = NULL, gp = gpar(), vp = NULL,  fx=1.1, fy= 1.5,
+                       fc = "white", alp = 1) {
+  require(grid)
+  if (!is.unit(x)) 
+    x <- unit(x, default.units)
+  if (!is.unit(y)) 
+    y <- unit(y, default.units)
+  grob(label = label, x = x, y = y, just = just, hjust = hjust, 
+       vjust = vjust, rot = rot, check.overlap = check.overlap, 
+       name = name, gp = gp, vp = vp, cl = "text")
+  w1 <- unit(1, "strwidth", "A")
+  tg <- textGrob(label = label, x = x - 0.5 * w1, y = y, just = just, hjust = hjust, 
+                 vjust = vjust, rot = rot, check.overlap = check.overlap)
+  w <- unit(rep(1, length(label)), "strwidth", as.list(label))
+  h <- unit(rep(1, length(label)), "strheight", as.list(label))
+  rg <- rectGrob(x=x + 0.5* (1 - hjust) * w - 0.5*w1, y=y, width=fx*w, height=fy*h,
+                 gp=gpar(fill=fc, alpha=alp,  col=NA))
+  
+  gTree(children=gList(rg, tg), vp=vp, gp=gp, name=name)
+}
+
+GeomText2 <- proto(ggplot2:::GeomText, {
+  objname <- "text2"
+  
+  draw <- function(., data, scales, coordinates, ..., fc = "white", alp = 1, 
+                   parse = FALSE, na.rm = FALSE) {
+    data <- remove_missing(data, na.rm, 
+                           c("x", "y", "label"), name = "geom_text2")
+    
+    lab <- data$label
+    if (parse) {
+      lab <- parse(text = lab)
+    }
+    
+    with(coord_transform(coordinates, data, scales),
+         btextGrob(lab, x, y, default.units="native", 
+                   hjust=hjust, vjust=vjust, rot=angle, 
+                   gp = gpar(col = alpha(colour, alpha), fontsize = size * .pt,
+                             fontfamily = family, fontface = fontface, lineheight = lineheight),
+                   fc = fc, alp = alp)
+    )
+  }
+  
+})
+
+geom_text2 <- function (mapping = NULL, data = NULL, stat = "identity", position = "identity", 
+                        parse = FALSE,  ...) { 
+  GeomText2$new(mapping = mapping, data = data, stat = stat,position = position, 
+                parse = parse, ...)
+}
+
+qplot(wt, mpg, data = mtcars, label = rownames(mtcars), size = wt) +
+  geom_text2(colour = "red", hjust = 0)

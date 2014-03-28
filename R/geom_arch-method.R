@@ -183,3 +183,175 @@ setMethod("geom_arch", "GRanges", function(data, ...,
 
 ##   p
 ## })
+
+geom_arch_flip <- function(data, ..., n = 25, max.height = 10, bottom = TRUE){
+  
+  
+  args <- list(...)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  if("y" %in% names(args.aes))
+    y.name <- as.character(args.aes$y)
+  else
+    y.name <- NULL
+  
+  ## check required argument
+  if(!all(c("x", "xend") %in% names(args.aes)))
+    stop("x, xend, are requried in aes(), need to be passed into geom_arch()")
+  startY <- eval(args.aes$y, data)
+  endY <- eval(args.aes$yend, data)
+
+  if("height" %in% names(args.aes)){
+    if(!is.numeric(args.aes$height)){
+      h <- eval(args.aes$height, data)
+    }else{
+      if(length(args.aes$height) == 1)
+        h <- rep(args.aes$height, length(startY))
+      else
+        stop("unequal length of heights specified")
+    }}else{
+      h <- rep(max.height, length(startY))
+    }
+  if("x" %in% names(args.aes))
+    x <- eval(args.aes$x, data)
+  else
+    x <- rep(0, length(startY))
+  args.aes2 <- args.aes[!(names(args.aes) %in% c("x", "y", "group",
+                                                 "hjust", "xend", "yend"))]  
+  xx<-c()
+  yy<-c()
+  for(i in 1:n){
+    ang<-i*pi/(2*n)
+    xx[i]<-sin(ang)
+    yy[i]<-cos(ang)
+  }
+  ##takes the quarter of the curve calculated, flips a copy over the y axis
+  ##reduces time spent in for loop
+  if(bottom){
+    yy <- c(1,yy,rev(-yy),-1, 1)
+    xx <- c(0,xx,rev(xx), 0, 0)
+  }else{
+    yy <- c(1,yy,rev(-yy),-1)
+    xx <- c(0,xx,rev(xx), 0)
+  }
+  ##SETS UP DATAFRAME TO KEEP TRACK OF ALL POINTS TO DRAW ALL ARCHES
+  junc <- rep(seq_along(startY), each = length(yy))
+  startY <- rep(startY, each = length(yy))
+  endY <- rep(endY, each = length(yy))
+  h <- rep(h, each = length(yy))
+  x <- rep(x, each = length(yy))
+  jump <- abs(endY - startY)
+  jumpAdj <- if (length(jump)) max(jump) / max(abs(h)) else NA
+  apoint <- data.frame(yy = yy * (abs(startY - endY) / 2) + (startY + endY) / 2,
+                       xx = xx * h + x, junc,
+                       s = ((abs(h) - jump / jumpAdj)) /
+                         if (length(jump)) max(jump) else NA)
+  data$junc <- seq_len(nrow(data))
+  apoint <- merge(apoint, data, by = "junc")
+  args.aes <- list(x = as.name("xx"),
+                   y = as.name("yy"),
+                   group = as.name("junc"))
+ 
+  aesres <- do.call(aes, c(args.aes, args.aes2))
+  if(nrow(apoint)){
+    reslst <- c(list(data = apoint), list(aesres),args.non)
+    p <- do.call(geom_polygon, reslst)
+    if("ylab" %in% names(args.non)){
+      ylab <- as.character(args.non$ylab)
+    }else if(length(y.name)){
+      ylab <- y.name
+    }else{
+      ylab <- ""
+    }
+    p <- list(p, ggplot2::ylab(ylab))
+  }else{
+    p <- NULL
+  }
+  p
+}
+
+geom_arch_flip2 <- function(data, ..., n = 25, max.height = 10, bottom = FALSE){
+  
+  
+  args <- list(...)
+  args.aes <- parseArgsForAes(args)
+  args.non <- parseArgsForNonAes(args)
+  if("y" %in% names(args.aes))
+    y.name <- as.character(args.aes$y)
+  else
+    y.name <- NULL
+  
+  ## check required argument
+  if(!all(c("x", "xend") %in% names(args.aes)))
+    stop("x, xend, are requried in aes(), need to be passed into geom_arch()")
+  startY <- eval(args.aes$y, data)
+  endY <- eval(args.aes$yend, data)
+  
+  if("height" %in% names(args.aes)){
+    if(!is.numeric(args.aes$height)){
+      h <- eval(args.aes$height, data)
+    }else{
+      if(length(args.aes$height) == 1)
+        h <- rep(args.aes$height, length(startY))
+      else
+        stop("unequal length of heights specified")
+    }}else{
+      h <- rep(max.height, length(startY))
+    }
+  if("x" %in% names(args.aes))
+    x <- eval(args.aes$x, data)
+  else
+    x <- rep(0, length(startY))
+  args.aes2 <- args.aes[!(names(args.aes) %in% c("x", "y", "group",
+                                                 "hjust", "xend", "yend"))]  
+  xx<-c()
+  yy<-c()
+  for(i in 1:n){
+    ang<-i*pi/(2*n)
+    xx[i]<-sin(ang)
+    yy[i]<-cos(ang)
+  }
+  ##takes the quarter of the curve calculated, flips a copy over the y axis
+  ##reduces time spent in for loop
+  if(bottom){
+    yy <- c(1,yy,rev(-yy),-1, 1)
+    xx <- c(0,xx,rev(xx), 0, 0)
+  }else{
+    yy <- c(1,yy,rev(-yy),-1)
+    xx <- c(0,xx,rev(xx), 0)
+  }
+  ##SETS UP DATAFRAME TO KEEP TRACK OF ALL POINTS TO DRAW ALL ARCHES
+  junc <- rep(seq_along(startY), each = length(yy))
+  startY <- rep(startY, each = length(yy))
+  endY <- rep(endY, each = length(yy))
+  h <- rep(h, each = length(yy))
+  x <- rep(x, each = length(yy))
+  jump <- abs(endY - startY)
+  jumpAdj <- if (length(jump)) max(jump) / max(abs(h)) else NA
+  apoint <- data.frame(yy = yy * (abs(startY - endY) / 2) + (startY + endY) / 2,
+                       xx = xx * h + x, junc,
+                       s = ((abs(h) - jump / jumpAdj)) /
+                         if (length(jump)) max(jump) else NA)
+  data$junc <- seq_len(nrow(data))
+  apoint <- merge(apoint, data, by = "junc")
+  args.aes <- list(x = as.name("xx"),
+                   y = as.name("yy"),
+                   group = as.name("junc"))
+
+  aesres <- do.call(aes, c(args.aes, args.aes2))
+  if(nrow(apoint)){
+    reslst <- c(list(data = apoint), list(aesres),args.non)
+    p <- do.call(geom_path, reslst)
+    if("ylab" %in% names(args.non)){
+      ylab <- as.character(args.non$ylab)
+    }else if(length(y.name)){
+      ylab <- y.name
+    }else{
+      ylab <- ""
+    }
+    p <- list(p, ggplot2::ylab(ylab))
+  }else{
+    p <- NULL
+  }
+  p
+}

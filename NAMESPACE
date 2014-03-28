@@ -1,4 +1,3 @@
-## ============================================================
 ## Import
 ## ============================================================
 
@@ -16,15 +15,6 @@ importFrom(graphics, par)
 importFrom(stats, approx, as.formula, df)
 importFrom(utils, capture.output, getFromNamespace)
 
-## needed by stuff that will move down to biovizBase with Query framework
-## so remove this soon
-importFrom(tools, file_ext, file_path_sans_ext)
-importFrom(VariantAnnotation, readVcf)
-importFrom(GenomicRanges, genome)
-####
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Non-bioconductor packages
 ###
 
 import(ggplot2)
@@ -159,7 +149,8 @@ export(tracks,
        plotStackedOverview,
        plotKaryogram,       
        plotSingleChrom,
-       plotIdeogram,       
+       plotIdeogram,    
+       Ideogram,
        plotGrandLinear,
        plotRangesLinkedToData)
 
@@ -168,6 +159,7 @@ export(theme_null, theme_alignment, theme_clear, theme_tracks_sunset,
 
 export(ggsave)
 exportMethods(cbind, rbind)
+exportClasses(GGbio, Ideogram, Plot, Tracked, Tracks, Grob)
 
 ## exportMethods(Grob, Plot, get_gtable, cached, "cached<-",
 ##               cached_xlim, "cached_xlim<-",

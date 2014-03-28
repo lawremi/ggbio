@@ -18,7 +18,7 @@ Imports: grid, grDevices, graphics, stats, utils, biovizBase(>=
         1.11.11), reshape2, gtable, Biobase, IRanges (>= 1.21.19),
         GenomicRanges (>= 1.13.3), GenomicFeatures, Rsamtools (>=
         1.13.1), GenomicAlignments, BSgenome, gridExtra, scales,
-        VariantAnnotation, Hmisc, rtracklayer, Biostrings
+        VariantAnnotation, Hmisc, rtracklayer, Biostrings, proto
 VignetteBuilder: knitr
 Suggests: vsn, BSgenome.Hsapiens.UCSC.hg19,
         TxDb.Hsapiens.UCSC.hg19.knownGene, chipseq,

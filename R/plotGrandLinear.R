@@ -8,7 +8,8 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
                             highlight.label = TRUE,
                             highlight.label.size = 5,
                             highlight.label.offset = 0.05,
-                            highlight.label.col = "black"){
+                            highlight.label.col = "black",
+                            spaceline = FALSE){
 
   if(is.null(geom))
     geom <- "point"
@@ -76,29 +77,33 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
   }
   p <- p +  theme(panel.grid.minor=element_blank())
   ## highlights
+  
   if(!is.null(highlight.gr)){
     idx <- findOverlaps(obj, highlight.gr)
     .h.pos <- lapply(split(queryHits(idx), subjectHits(idx)), function(id){
-      gr <- GRanges(as.character(seqnames(p$.data))[id][1],
-                    IRanges(start = min(start(p$.data[id])),
-                              end = max(end(p$.data[id]))))
-      val <- max(as.numeric(values(p$.data[id])[,as.character(args.aes$y)])) 
+      gr <- GRanges(as.character(seqnames(p@data))[id][1],
+                    IRanges(start = min(start(p@data[id])),
+                              end = max(end(p@data[id]))))
+      val <- max(as.numeric(values(p@data[id])[,as.character(args.aes$y)])) 
       val <- val * (1 + highlight.label.offset)
       values(gr)$val <- val
       gr
     })
     .h.pos <- suppressWarnings(do.call("c", unname(.h.pos)))
+    if(length(.h.pos)){
     if(is.null(highlight.name)){
       highlight.name <- names(highlight.gr)
     }else{
       highlight.name <- values(highlight.gr)[,highlight.name]
     }
-    p <- p +  geom_point(data = mold(p$.data[queryHits(idx)]),
+    p <- p +  geom_point(data = mold(p@data[queryHits(idx)]),
                  do.call(aes, list(x = substitute(midpoint),
                                    y = as.name(args.aes$y))),
                          color = highlight.col)
 
     if(!is.null(highlight.name)){
+   
+  
       seqlevels(.h.pos) <- seqlevels(obj)
       suppressWarnings(seqinfo(.h.pos) <- seqinfo(obj))
       .trans <- transformToGenome(.h.pos, space.skip = space.skip)
@@ -111,8 +116,17 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
                                            label = as.name("names"))))
     }
 
+    }}
+  if(spaceline){
+    vline.df <- p@ggplot$data
+    vline.df <- do.call(rbind, by(vline.df, vline.df$seqnames, function(dd){
+      data.frame(start = min(dd$start),
+                 end = max(dd$end))
+    }))
+    ## compute gap
+    gap <- (vline.df$start[-1] + vline.df$end[-nrow(vline.df)])/2
+    p <- p + geom_vline(xintercept = gap, alpha = 0.5, color = 'gray70') + theme(panel.grid = element_blank())
   }
-  
   if(!missing(main))
     p <- p + labs(title = main)
   if(!missing(xlim))

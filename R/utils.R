@@ -20,23 +20,23 @@ setMethod("getLimits", "ggbioPlot", function(obj){
   ## y
   if(!is.null(obj$mapping$y) && length(obj$data))
     y <- eval(obj$mapping$y, obj$data)
-  
+
   if(!is.null(obj$mapping$xmin) && length(obj$data))
     xmin <- eval(obj$mapping$xmin, obj$data)
 
-  
+
   if(!is.null(obj$mapping$ymin) && length(obj$data))
     ymin <- eval(obj$mapping$ymin, obj$data)
-  
+
   if(!is.null(obj$mapping$xmax) && length(obj$data))
     xmax <- eval(obj$mapping$xmax, obj$data)
-  
+
   if(!is.null(obj$mapping$ymax) && length(obj$data))
     ymax <- eval(obj$mapping$ymax, obj$data)
-  
+
   if(!is.null(obj$mapping$xend) && length(obj$data))
     xend <- eval(obj$mapping$xend, obj$data)
-  
+
   if(!is.null(obj$mapping$yend) && length(obj$data))
     yend <- eval(obj$mapping$yend, obj$data)
   else
@@ -49,13 +49,13 @@ setMethod("getLimits", "ggbioPlot", function(obj){
                                  max(c(l.res$xmax,x, xmax, xend), na.rm = TRUE)),
                                ylim = c(min(c(l.res$ymin, y, ymin), na.rm = TRUE),
                                  max(c(l.res$ymax, y, ymax, yend), na.rm = TRUE))))
-  
+
   if(any(unlist(res) %in% c(Inf, -Inf)))
     res <- evalLan(obj)
-  
+
   if(length(obj$coordinates$limits$x) == 2)
     res$xlim <- obj$coordinates$limits$x
-  
+
   if(length(obj$coordinates$limits$y) == 2)
     res$ylim <- obj$coordinates$limits$y
   ## scales
@@ -118,7 +118,7 @@ getLimitsFromLayer <- function(obj){
   layers <- obj$layer
   lst <- lapply(layers, function(layer){
     if(length(obj$data) | length(layer$data)){
-      
+
     if(length(layer$data))
       dt <- layer$data
     else
@@ -128,42 +128,42 @@ getLimitsFromLayer <- function(obj){
       x <- eval(layer$mapping$x, dt)
     else
       x <- NULL
-    
+
     if(!is.null(layer$mapping$y))
       y <- eval(layer$mapping$y, dt)
     else
       y <- NULL
-    
+
     if(!is.null(layer$mapping$xmin))
       xmin <- eval(layer$mapping$xmin, dt)
     else
       xmin <- NULL
-    
+
     if(!is.null(layer$mapping$ymin))
       ymin <- eval(layer$mapping$ymin, dt)
     else
       ymin <- NULL
-    
+
     if(!is.null(layer$mapping$xmax))
       xmax <- eval(layer$mapping$xmax, dt)
     else
       xmax <- NULL
-    
+
     if(!is.null(layer$mapping$ymax))
       ymax <- eval(layer$mapping$ymax, dt)
     else
       ymax <- NULL
-    
+
     if(!is.null(layer$mapping$xend))
       xend <- eval(layer$mapping$xend, dt)
     else
       xend <- NULL
-    
+
     if(!is.null(layer$mapping$yend))
       yend <- eval(layer$mapping$yend, dt)
     else
       yend <- NULL
-    
+
     res <- data.frame(xmin = min(c(x, xmin), na.rm = TRUE),
                       xmax = max(c(x, xmax, xend), na.rm = TRUE),
                       ymin = min(c(y, ymin), na.rm = TRUE),
@@ -203,7 +203,7 @@ getStatFun <- function(stat){
 getDrawFunFromGeomStat <- function(geom, stat){
   ## how about allways start from geom??
   if(!is.null(stat)){
-    .fun <- getStatFun(stat)      
+    .fun <- getStatFun(stat)
   }else{
     .fun <- getGeomFun(geom)
   }
@@ -260,7 +260,7 @@ getDrawFunFromGeomStat <- function(geom, stat){
       if(!("scales" %in% names(args.facets)))
         args.facets <- c(args.facets, list(scales = "fixed"))
       allvars <- all.vars(as.formula(args.facets$facets))
-      
+
       if(isOneSeq & biovizBase:::isFacetByOnlySeq(args.facets$facets)){
         facet <- NULL
       }else{
@@ -278,7 +278,7 @@ getDrawFunFromGeomStat <- function(geom, stat){
         args.facets <- c(args.facets, list(scales = "fixed"))
       args.facets$facets <- substitute(~seqnames)
       allvars <- all.vars(as.formula(args.facets$facets))
-      
+
       if(isOneSeq & biovizBase:::isFacetByOnlySeq(args.facets$facets)){
         facet <- NULL
       }else{
@@ -432,7 +432,7 @@ scale_by_xlim <- function(xlim, by.unit = TRUE){
 }
 
 sub_names <- function(data, name.expr){
-  .res <- c()  
+  .res <- c()
   for(i in seq_len(nrow(data))){
     res <- data[i,]
     res <- as.list(res)
@@ -458,6 +458,8 @@ sub_names <- function(data, name.expr){
 
 
 getLegendGrob <- function(p){
+  if(is(p, "GGbio"))
+    p <- p@ggplot
   g <- ggplotGrob(p)
   gg <- gtable_filter(g, "guide-box")
 }
@@ -467,11 +469,14 @@ arrangeGrobByParsingLegend <- function(..., nrow = NULL, ncol = NULL,
   lst <- list(...)
   if(length(lst) == 1 && is.list(lst[[1]]))
     lst <- lst[[1]]
-  gg <- lapply(lst, getLegendGrob)  
-  l.g <- lapply(lst, function(x){
-    ggplotGrob(x + theme(legend.position = "none", aspect.ratio = 1))
-  })
   
+  gg <- lapply(lst, getLegendGrob)
+                      
+  l.g <- lapply(lst, function(x){
+    x <- x + theme(legend.position = "none", aspect.ratio = 1)
+    ggplotGrob(x@ggplot)
+  })
+
   if(!is.null(legend.idx))
     gg <- gg[legend.idx]
   gg2 <- do.call(arrangeGrob, c(gg, list(ncol = 1)))
@@ -489,13 +494,7 @@ scale_fill_giemsa <- function(fill = getOption("biovizBase")$cytobandColor){
 
 
 
-.transformSeqinfo <- function(obj){
-  ss <- seqlengths(obj)
-  res <- GRanges(seqnames(obj), IRanges(start = 1, end = ss))
-  res <- keepSeqlevels(res, names(ss))
-  seqlengths(res) <- ss
-  res
-}
+
 
 ## subset chr
 setGeneric("subsetByChrs", function(obj, ...) starndardGeneric("subByChr"))
@@ -504,46 +503,46 @@ setMethod("subsetByChrs", "GRanges", function(obj, subchr){
     subchr <- as.character(seqnames(obj)[1])
   res <- obj[seqnames(obj) %in% subchr]
   res <- keepSeqlevels(res, subchr)
-  res  
+  res
 })
 
 setMethod("subsetByChrs", "Seqinfo", function(obj, subchr){
   if(missing(subchr))
     subchr <- as.character(seqnames(obj)[1])
   res <- obj[subchr]
-  res  
+  res
 })
 
 
 
 
-ggsave <- function (filename = default_name(plot), plot = last_plot(), 
-                       device = default_device(filename), path = NULL, scale = 1, 
+ggsave <- function (filename = default_name(plot), plot = last_plot(),
+                       device = default_device(filename), path = NULL, scale = 1,
                        width = par("din")[1], height = par("din")[2],
-                       units = c("in", "cm", "mm"), dpi = 300, limitsize = TRUE, ...) 
+                       units = c("in", "cm", "mm"), dpi = 300, limitsize = TRUE, ...)
 {
     ## print(class(plot))
-    if (!inherits(plot, "ggplot") & !is(plot, "Tracks")) 
+    if (!inherits(plot, "ggplot") & !is(plot, "Tracks"))
         stop("plot should be a ggplot2 plot or tracks object");
-    eps <- ps <- function(..., width, height) grDevices::postscript(..., 
-        width = width, height = height, onefile = FALSE, horizontal = FALSE, 
+    eps <- ps <- function(..., width, height) grDevices::postscript(...,
+        width = width, height = height, onefile = FALSE, horizontal = FALSE,
         paper = "special")
-    tex <- function(..., width, height) grDevices::pictex(..., 
+    tex <- function(..., width, height) grDevices::pictex(...,
         width = width, height = height)
-    pdf <- function(..., version = "1.4") grDevices::pdf(..., 
+    pdf <- function(..., version = "1.4") grDevices::pdf(...,
         version = version)
     svg <- function(...) grDevices::svg(...)
-    wmf <- function(..., width, height) grDevices::win.metafile(..., 
+    wmf <- function(..., width, height) grDevices::win.metafile(...,
         width = width, height = height)
-    emf <- function(..., width, height) grDevices::win.metafile(..., 
+    emf <- function(..., width, height) grDevices::win.metafile(...,
         width = width, height = height)
-    png <- function(..., width, height) grDevices::png(..., width = width, 
+    png <- function(..., width, height) grDevices::png(..., width = width,
         height = height, res = dpi, units = "in")
-    jpg <- jpeg <- function(..., width, height) grDevices::jpeg(..., 
+    jpg <- jpeg <- function(..., width, height) grDevices::jpeg(...,
         width = width, height = height, res = dpi, units = "in")
-    bmp <- function(..., width, height) grDevices::bmp(..., width = width, 
+    bmp <- function(..., width, height) grDevices::bmp(..., width = width,
         height = height, res = dpi, units = "in")
-    tiff <- function(..., width, height) grDevices::tiff(..., 
+    tiff <- function(..., width, height) grDevices::tiff(...,
         width = width, height = height, res = dpi, units = "in")
     default_name <- function(plot) {
         paste(digest.ggplot(plot), ".pdf", sep = "")
@@ -558,7 +557,7 @@ ggsave <- function (filename = default_name(plot), plot = last_plot(),
         x <- switch(units, `in` = x, cm = x/2.54, mm = x/2.54/10)
     }
     convert_from_inches <- function(x, units) {
-        x <- switch(units, `in` = x, cm = x * 2.54, mm = x * 
+        x <- switch(units, `in` = x, cm = x * 2.54, mm = x *
             2.54 * 10)
     }
     if (!missing(width)) {
@@ -568,14 +567,14 @@ ggsave <- function (filename = default_name(plot), plot = last_plot(),
         height <- convert_to_inches(height, units)
     }
     if (missing(width) || missing(height)) {
-        message("Saving ", prettyNum(convert_from_inches(width * 
-            scale, units), digits = 3), " x ", prettyNum(convert_from_inches(height * 
+        message("Saving ", prettyNum(convert_from_inches(width *
+            scale, units), digits = 3), " x ", prettyNum(convert_from_inches(height *
             scale, units), digits = 3), " ", units, " image")
     }
     width <- width * scale
     height <- height * scale
     if (limitsize && (width >= 50 || height >= 50)) {
-        stop("Dimensions exceed 50 inches (height and width are specified in inches/cm/mm, not pixels).", 
+        stop("Dimensions exceed 50 inches (height and width are specified in inches/cm/mm, not pixels).",
             " If you are sure you want these dimensions, use 'limitsize=FALSE'.")
     }
     if (!is.null(path)) {
@@ -590,13 +589,13 @@ ggsave <- function (filename = default_name(plot), plot = last_plot(),
 ## interaction plot
 plotInter <- function(data, fig.h, save = FALSE){
   data <- data[order(data[, "FDR"]), ]
-  id.inter <- c("Emptyvector.insufficient", "RPA.insufficient", 
+  id.inter <- c("Emptyvector.insufficient", "RPA.insufficient",
   "Emptyvector.sufficient", "RPA.sufficient", "id" )
   res.d <- melt(data[, id.inter])
   id.all <- c("id",  "Emptyvector.sufficient.MAG22", "RPA.sufficient.MAG23",
               "Emptyvector.sufficient.MAG24", "RPA.sufficient.MAG25",
-              "Emptyvector.sufficient.MAG26", "RPA.sufficient.MAG27",          
-              "Emptyvector.insufficient.MAG28", "RPA.insufficient.MAG29",        
+              "Emptyvector.sufficient.MAG26", "RPA.sufficient.MAG27",
+              "Emptyvector.insufficient.MAG28", "RPA.insufficient.MAG29",
               "RPA.insufficient.MAG31", "Emptyvector.insufficient.MAG32",
               "RPA.insufficient.MAG33")
   res.d2 <- melt(data[, id.all])
@@ -608,16 +607,16 @@ plotInter <- function(data, fig.h, save = FALSE){
   i = 0
   for(id in data$id){
     i = i + 1
-    p <- ggplot(data = res.d2[res.d2$id == id, ], 
-                aes(x = fe, shape = geno, color = geno, y= value)) + 
-                  geom_point(size = 3) + 
-                    geom_line(data = res.d[res.d$id == id,], 
+    p <- ggplot(data = res.d2[res.d2$id == id, ],
+                aes(x = fe, shape = geno, color = geno, y= value)) +
+                  geom_point(size = 3) +
+                    geom_line(data = res.d[res.d$id == id,],
                               aes(x = fe, group = geno, color = geno, y= value)) +
-                      labs(title = id) + xlab("Fe") + ylim(ylim) + 
+                      labs(title = id) + xlab("Fe") + ylim(ylim) +
                         ylab("log2(normalized counts + 1)")
     if(save){
     pval <- signif(data[data$id == id,  "FDR"], 3)
-    fig.path <- paste0(fig.h, "Rank_",i, "_",id,"_p",pval, ".png")    
+    fig.path <- paste0(fig.h, "Rank_",i, "_",id,"_p",pval, ".png")
     png(fig.path, 450, 450)
     print(p)
     dev.off()
@@ -628,13 +627,13 @@ plotInter <- function(data, fig.h, save = FALSE){
 }
 
 plotInter2 <- function(data, fig.h, save = FALSE){
-  id.inter <- c("Emptyvector.insufficient", "RPA.insufficient", 
+  id.inter <- c("Emptyvector.insufficient", "RPA.insufficient",
   "Emptyvector.sufficient", "RPA.sufficient", "id" )
   res.d <- melt(data[, id.inter])
   id.all <- c("id",  "Emptyvector.sufficient.MAG22", "RPA.sufficient.MAG23",
               "Emptyvector.sufficient.MAG24", "RPA.sufficient.MAG25",
-              "Emptyvector.sufficient.MAG26", "RPA.sufficient.MAG27",          
-              "Emptyvector.insufficient.MAG28", "RPA.insufficient.MAG29",        
+              "Emptyvector.sufficient.MAG26", "RPA.sufficient.MAG27",
+              "Emptyvector.insufficient.MAG28", "RPA.insufficient.MAG29",
               "RPA.insufficient.MAG31", "Emptyvector.insufficient.MAG32",
               "RPA.insufficient.MAG33")
   res.d2 <- melt(data[, id.all])
@@ -646,16 +645,16 @@ plotInter2 <- function(data, fig.h, save = FALSE){
   i = 0
   for(id in data$id){
     i = i + 1
-    p <- ggplot(data = res.d2[res.d2$id == id, ], 
-                aes(x = fe, shape = geno, color = geno, y= value)) + 
-                  geom_point(size = 3) + 
-                    geom_line(data = res.d[res.d$id == id,], 
+    p <- ggplot(data = res.d2[res.d2$id == id, ],
+                aes(x = fe, shape = geno, color = geno, y= value)) +
+                  geom_point(size = 3) +
+                    geom_line(data = res.d[res.d$id == id,],
                               aes(x = fe, group = geno, color = geno, y= value)) +
-                      labs(title = id) + xlab("Fe") + ylim(ylim) + 
+                      labs(title = id) + xlab("Fe") + ylim(ylim) +
                         ylab("log2(normalized counts + 1)")
     if(save){
     pval <- signif(data[data$id == id,  "FDR"], 3)
-    fig.path <- paste0(fig.h, "Rank_",i, "_",id,"_p",pval, ".png")    
+    fig.path <- paste0(fig.h, "Rank_",i, "_",id,"_p",pval, ".png")
     png(fig.path, 450, 450)
     print(p)
     dev.off()
@@ -678,5 +677,37 @@ copyAttr <- function(x1, x2){
   x2
 }
 
+## combineAes(keep, lost)
+combineAes <- function(keep, lose){
+  
+  keep.nms <- names(keep)
+  lose.nms <- names(lose)
+  
+  nms <- intersect(lose.nms, keep.nms)
+  
+  if(length(nms)){
+    return(c(keep, lose[setdiff(lose.nms, keep.nms)]))
+  }else{
+    return(c(keep, lose))
+  }
+}
 
-## mark a plot as a blank plot which doesn't 
+combineAes2 <- function(keep, lose){
+  
+  keep.nms <- names(keep)
+  lose.nms <- names(lose)
+  if("ymin" %in% keep.nms && "y" %in% lose.nms){
+    lose$y <- keep$ymin
+  }
+  if("ymax" %in% keep.nms && "yend" %in% lose.nms){
+    lose$yend <- keep$ymax
+  }
+  nms <- intersect(lose.nms, keep.nms)
+  
+  if(length(nms)){
+    return(c(keep, lose[setdiff(lose.nms, keep.nms)]))
+  }else{
+    return(c(keep, lose))
+  }
+}
+## mark a plot as a blank plot which doesn't

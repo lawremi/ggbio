@@ -11,13 +11,18 @@ setClass("Ideogram", contains = c("GGbio"),
              zoom.region = "numericORNULL", 
              zoom.offset = "numeric"))
 
-Ideogram <- function(obj, subchr = NULL, xlabel = FALSE, cytoband = TRUE, 
+Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband = TRUE, 
                      color = "red", fill = "red", alpha = 0.7,
-                     zoom.region = "numericORNULL",
-                     zoom.offset = 0.1, size = 1, 
+                     zoom.region = NULL,
+                     zoom.offset = 0.2, size = 1, 
                      aspect.ratio = 1/20, ..., genome){
     if(missing(obj)){
-        obj <- getIdeogram(genome = genome, subchr = subchr, cytoband = cytoband)
+        data(ideoCyto, package = "biovizBase")
+        if(genome %in% names(ideoCyto)){
+          obj <- ideoCyto[[genome]]
+        }else{
+          obj <- getIdeogram(genome = genome, subchr = subchr, cytoband = cytoband)          
+        }
     }
     ## do we need subchr here
     obj.ori <- obj
@@ -136,7 +141,7 @@ setMethod("show", "Ideogram", function(object){
 plotIdeogram <- function(obj, subchr = NULL, zoom.region = NULL, which = NULL,
                          xlab, ylab, main, xlabel = FALSE,
                          color = "red", fill = "red", alpha = 0.7,
-                         zoom.offset = 0.1, size = 1, 
+                         zoom.offset = 0.2, size = 1, 
                          cytoband = TRUE, aspect.ratio = 1/20, genome){
     if(!is.null(which) && is(which, "GRanges")){
         if(length(which) > 1){
@@ -180,7 +185,7 @@ plotIdeogram <- function(obj, subchr = NULL, zoom.region = NULL, which = NULL,
     p
 }
 
-plotSingleChrom <- plotIdeogram
+plotSingleChrom <- .Deprecated("plotIdeogram")
 
 setMethod("+", c("Ideogram"), function(e1, e2){
     if(inherits(e2, "xlim")){

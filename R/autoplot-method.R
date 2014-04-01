@@ -585,7 +585,7 @@ setMethod("autoplot", "TranscriptDb", function(object, which, ...,
     }
     p@fetchable <- TRUE
     p@cmd <- cmd
-    p <- p + theme_bw()
+#     p <- p + theme_bw()
     p
 })
 
@@ -656,9 +656,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                # args.aes$color = as.name("seqs")
                 aes.res <- do.call(aes, args.aes)
                 args.res <- c(list(aes.res), args.non)
-                p <- p + do.call(geom_text2, c(args.res, list(color = "white", 
-                                                            
-                                                             fc = fc)))
+                p <- p + do.call(geom_text2, c(args.res, list(hjust = 0, color = "white", fc = fc)))
                 
                 
                 
@@ -1156,6 +1154,7 @@ setMethod("autoplot", "VRanges", function(object, ...,which = NULL,
                                           geom = c("text", "rect"),
                                           xlab, ylab, main){
   
+  
   geom <- match.arg(geom)
   args <- list(...)
 
@@ -1270,7 +1269,7 @@ setMethod("autoplot", "VCF", function(object, ...,
   hdr <- exptData(object)[["header"]]
   if(type == "default"){
     vr <- as(object, "VRanges")
-    p <- autoplot(vr, which = which, ...)
+    p <- autoplot(vr,  ...)
   }
   
   if(type == "geno"){

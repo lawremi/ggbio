@@ -409,6 +409,18 @@ setMethod("Arith", signature = c("Tracks", "theme"), function(e1, e2) {
     e1
 })
 
+setOldClass("zoom")
+setMethod("Arith", signature = c("Tracks", "zoom"), function(e1, e2) {
+
+  xlim <- e1@xlim
+ 
+e1@xlim <- .zoom(xlim, as.numeric(e2))$limits$x
+  N <- length(e1@grobs)  
+  for(i in 1:N){
+   e1@grobs[[i]] <- e1@grobs[[i]] + e2
+  }
+  e1
+})
 
 setOldClass("position_c")
 setMethod("Arith", signature = c("Tracks", "position_c"), function(e1, e2) {

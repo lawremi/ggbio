@@ -197,8 +197,9 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
                              truncate.fun = truncate.fun, ratio = ratio)
     .xlim <- NULL
     if(length(gr)){
-      .xlim <- c(start(range(gr, ignore.strand = TRUE)),
-                 end(range(gr, ignore.strand = TRUE)))    
+#       .xlim <- c(start(range(gr, ignore.strand = TRUE)),
+#                  end(range(gr, ignore.strand = TRUE)))    
+      .xlim <- c(min(start(which)), max(end(which)))
       
       message("Constructing graphics...")
       ## values(gr)$stepping <-  as.numeric(values(gr)$tx_id)
@@ -211,7 +212,7 @@ setMethod("geom_alignment", "TranscriptDb", function(data, ..., which,xlim,
         gr <- addStepping(gr, group.name = "tx_id", group.selfish = FALSE)
         es <- 0
       }
-      .xlim[1] <- min(.xlim) - es
+#       .xlim[1] <- min(.xlim) - es
       df <- mold(gr)
 
       if(label){

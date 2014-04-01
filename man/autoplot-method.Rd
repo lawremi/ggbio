@@ -105,7 +105,7 @@
 \S4method{autoplot}{VCF}(object, ...,
               xlab, ylab, main,
               assay.id,                                      
-              type = c("geno", "info", "fixed"),
+              type = c("default", "geno", "info", "fixed"),
               full.string = FALSE,
               ref.show = TRUE,
               genome.axis = TRUE,
@@ -913,6 +913,8 @@ autoplot(sset, type = "scatterplot.matrix")
 ###################################################
 ### vcf
 ###################################################
+
+\dontrun{
 library(VariantAnnotation)
 vcffile <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
 vcf <- readVcf(vcffile, "hg19")
@@ -928,10 +930,8 @@ autoplot(vcf)
 autoplot(vcf, assay.id = "DS")
 ## equivalent to 
 autoplot(vcf, assay.id = 2)
-\dontrun{
 ## doesn't work when assay.id cannot find
 autoplot(vcf, assay.id = "NO")
-}
 ## use AF or first
 autoplot(vcf, type = "info")
 ## geom bar
@@ -947,6 +947,8 @@ tracks("full.string = FALSE" = p1, "full.string = TRUE" = p2)+
 p3 <- autoplot(vcf, type = "fixed", ref.show = FALSE) + xlim(50310860, 50310890) +
     scale_y_continuous(breaks = NULL, limits = c(0, 2))
 p3
+
+}
 
 
 ###################################################

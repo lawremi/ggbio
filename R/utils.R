@@ -474,7 +474,11 @@ arrangeGrobByParsingLegend <- function(..., nrow = NULL, ncol = NULL,
                       
   l.g <- lapply(lst, function(x){
     x <- x + theme(legend.position = "none", aspect.ratio = 1)
-    ggplotGrob(x@ggplot)
+    if(is(x, "GGbio"))
+      res <- ggplotGrob(x@ggplot)
+    else
+      res <- ggplotGrob(x)
+    res
   })
 
   if(!is.null(legend.idx))
@@ -768,5 +772,3 @@ geom_text2 <- function (mapping = NULL, data = NULL, stat = "identity", position
                 parse = parse, ...)
 }
 
-qplot(wt, mpg, data = mtcars, label = rownames(mtcars), size = wt) +
-  geom_text2(colour = "red", hjust = 0)

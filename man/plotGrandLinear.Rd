@@ -17,7 +17,8 @@ plotGrandLinear(obj, ..., facets, space.skip = 0.01, geom = NULL,
                  highlight.gr = NULL, highlight.name = NULL,
                  highlight.col = "red", highlight.label = TRUE,
                  highlight.label.size = 5, highlight.label.offset =
-                 0.05, highlight.label.col = "black")
+                 0.05, highlight.label.col = "black", spaceline =
+                 FALSE)
 
 }
 \arguments{
@@ -90,6 +91,11 @@ plotGrandLinear(obj, ..., facets, space.skip = 0.01, geom = NULL,
   \item{highlight.label.col}{
     highlight label color. 
   }
+  \item{spaceline}{show line between chromosomes.
+  
+  }
+  
+  
 }
 \value{
   Return a ggplot object. 

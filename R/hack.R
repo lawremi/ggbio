@@ -25,7 +25,7 @@ for(method in .gr.name.ggbio){
         gr <- GRanges("chr_non", data)
         values(gr) <- df
         .fun(gr, ...)
-      })     
+      })
     }
   }
   ifun(method)
@@ -36,7 +36,7 @@ for(method in .gr.name.ggbio){
     .method <- method
     if(hasMethod(.method, "GRanges") && !hasMethod(.method, "GRangesList")){
       setMethod(.method, "GRangesList", function(data, ...){
-        .fun <- selectMethod(.method, sig = "GRanges")      
+        .fun <- selectMethod(.method, sig = "GRanges")
         gr <- biovizBase:::flatGrl(data)
         .fun(gr, ...)
       })
@@ -50,7 +50,7 @@ for(method in .gr.name.ggbio){
     .method <- method
       setMethod(.method, "missing", function(data,...){
           mc <- match.call()
-        return(mc)        
+        return(mc)
       })
   }
   mfun(method)
@@ -83,7 +83,7 @@ for(method in .gr.name.ggplot){
         gr <- GRanges("chr_non", data)
         values(gr) <- df
         .fun(gr, ...)
-      })     
+      })
     }
   }
   ifun(method)
@@ -94,8 +94,8 @@ for(method in .gr.name.ggplot){
     .method <- method
     if(hasMethod(.method, "GRanges") && !hasMethod(.method, "GRangesList")){
       setMethod(.method, "GRangesList", function(data, ...){
-        .fun <- selectMethod(.method, sig = "GRanges")      
-        gr <- biovizBase:::flatGrl(data)
+        .fun <- selectMethod(.method, sig = "GRanges")
+        gr <- biovizBase::flatGrl(data)
         .fun(gr, ...)
       })
     }
@@ -116,13 +116,13 @@ for(method in .gr.name.ggplot){
               attr(res, "call") <- TRUE
               attr(res, "mc") <- mc
           }
-        return(res)        
+        return(res)
       })
   }
   mfun(method)
 
   ufun <- function(method){
-      .method <- method      
+      .method <- method
       setMethod(.method, "uneval", function(data, ...){
           method0 <- getFromNamespace(method, "ggplot2")
           tm <- try({res <- method0(data, ...)}, silent = TRUE)

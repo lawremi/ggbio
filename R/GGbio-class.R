@@ -204,6 +204,31 @@ setMethod("+", c("GGbio"), function(e1, e2){
      
         return(e1)
     }
+    if(inherits(e2, "zoom")){
+
+      
+      xlim <- ggbio:::getLimits(e1)$xlim
+     
+      if(length(xlim))
+        e1 <- e1 + .zoom(xlim, as.numeric(e2))
+      else
+        stop("fail to parse xlim")
+     return(e1)
+    }
+    if(is(e2, "NextView")){
+      xlim <- ggbio:::getLimits(e1)$xlim
+      xlim.cur <- c(max(xlim), max(xlim) + abs(diff(xlim)))
+      message("change limits to", xlim.cur)
+      e1 <- e1 + ggbio::xlim(xlim.cur)
+      return(e1)
+    }
+    if(is(e2, "PrevView")){
+      xlim <- ggbio:::getLimits(e1)$xlim
+      xlim.cur <- c(min(xlim) -abs(diff(xlim)), min(xlim))
+      message("change limits to", xlim.cur)
+      e1 <- e1 + ggbio::xlim(xlim.cur)
+      return(e1)
+    }
   if(!is(e2, "xlim")){
     args <- as.list(match.call()$e2)
     e2name <-  deparse(args[[1]])
@@ -235,12 +260,18 @@ setMethod("+", c("GGbio"), function(e1, e2){
     if(!e1@fetchable){
       e1@ggplot <- e1@ggplot + e2
     }else{
+      
+     
+      
       grl <- cached_which(e1)
+      
       if(length(grl)){
         current.which <- grl[length(grl)]
         chr.default <- as.character(seqnames(current.which))
-        new.which <- getGrFromXlim(e2, chr.default)        
+        new.which <- getGrFromXlim(e2, chr.default)      
+        
         idx <- needCache(e1, new.which)
+        
         if(!length(idx)){
           ## so need to update cache
           ## point is to re-run the cmd with new which
@@ -249,7 +280,9 @@ setMethod("+", c("GGbio"), function(e1, e2){
         }else{
           ## use cached p
           id <- idx[1]                      #use either one
+         
           e1@ggplot <- e1@cached_item[[id]]@ggplot + e2
+         
         }
       }else{
         new.which <- getGrFromXlim(e2)        
@@ -277,6 +310,7 @@ replaceArg <- function(p, args){
 
 needCache <- function(p, new.which){
   current.which <- cached_which(p)
+  
   suppressWarnings(idx <- subjectHits(findOverlaps(new.which, current.which, type = "within")))  
 }
 
@@ -320,6 +354,79 @@ mapToGG <- function(p, object){
 returnProto <- function(object){
   rapply(object, function(x) x, "proto", how = "unlist")  
 }
+
+
+####
+## navigation
+####
+.zoom <- function(xlim, fac = 2){
+  mid <- mean(xlim)
+  wd <- round(abs(diff(xlim)) * fac)
+  xlim <- ggbio::xlim(c(mid - wd/2, mid + wd/2))
+  
+}
+
+zoom_in <- function(fac = 1/2){
+  if(fac > 1){
+    fac <- 1 / fac
+  }
+  zoom(fac)
+}
+
+zoom_out <- function(fac = 2){
+  if(fac < 1){
+    fac <- 1 / fac
+  }
+  zoom(fac)
+}
+
+
+zoom <- function(fac = 1/2){
+  class(fac) <- "zoom"
+  fac
+}
+
+setClass("Nav", contains = "VIRTUAL")
+setClass("NextView", contains = "Nav")
+setClass("PrevView", contains = "Nav")
+
+nextView <- function(unit = c("view", "gene", "exon", "utr")){
+  unit <- match.arg(unit)
+ 
+  switch(unit, 
+         view = {
+           new("NextView")
+         },
+         gene = {
+           stop("not implemented yet")
+         },
+         exon = {
+           stop("not implemented yet")
+         },
+         utr = {
+           stop("not implemented yet")
+         })
+}
+
+prevView <- function(unit = c("view", "gene", "exon", "utr")){
+  unit <- match.arg(unit)
+  switch(unit, 
+         view = {
+           new("PrevView")
+         },
+         gene = {
+           stop("not implemented yet")
+         },
+         exon = {
+           stop("not implemented yet")
+         },
+         utr = {
+           stop("not implemented yet")
+         })
+  
+}
+
+
 
 
 

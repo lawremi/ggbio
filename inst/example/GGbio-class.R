@@ -270,3 +270,72 @@ tracks(p = p)
 ggbio:::.supportedPlots
 extends(class(p), 'gg')
 tracks(p = ggbio(p))
+
+library(ggbio)
+library(IRanges)
+lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), seq(10, 0.001, length = 500))
+xVector <- dnorm(1:5e3, mean = 1e3, sd = 200)
+xRle <- Rle(xVector)
+v1 <- Views(xRle, start = sample(.4e3:.6e3, size = 50, replace = FALSE), width =1000)
+autoplot(v1)
+
+## let's add  more ideogram data
+library(biovizBase)
+?getIdeogram
+hg19 <- getIdeogram(genome = "hg19")
+hg19
+
+## ggbio
+
+p <- plotGrandLinear(gr.snp, aes(y = pvalue), color = c("#7fc97f", "#fdc086"))
+vline.df <- p@ggpplot$data
+vline.df <- do.call(rbind, by(vline.df, vline.df$seqnames, function(dd){
+  data.frame(start = min(dd$start),
+             end = max(dd$end))
+}))
+## compute gap
+gap <- (vline.df$start[-1] + vline.df$end[-nrow(vline.df)])/2
+p + geom_vline(xintercept = gap, alpha = 0.5, color = 'gray70') + theme(panel.grid = element_blank())
+theme_gray()
+
+library(ggplot2)
+library(proto)
+
+
+
+
+qplot(wt, mpg, data = mtcars, label = rownames(mtcars), size = wt) +
+  geom_text2(colour = "red", fc = c("black", "red"))
+library(grid)
+
+library(BiocInstaller)
+biocLite("FDb.UCSC.snp137common.hg19")
+## load the library
+library(FDb.UCSC.snp137common.hg19)
+## list the contents that are loaded into memory
+ls(’package:FDb.UCSC.snp137common.hg19’)
+## show the db object that is loaded by calling its name
+FDb.UCSC.snp137common.hg19
+## extract features for use in annotating data
+snp137common <- features(FDb.UCSC.snp137common.hg19)
+met <- metadata(FDb.UCSC.snp137common.hg19) ## need to fetch genome
+
+
+library(GenomicRanges)
+snp.gr <- GRanges("chr17", IRanges(41224057,41244883))
+data(genesymbol)
+gr <- GRanges("chr17", IRanges(41196312, 41277500))
+gr
+
+library(VariantAnnotation)
+fl = "/Users/tengfei/Documents/Data/sbgtest/17-1409-CEU.vcf.gz"
+vcf.brca1 <- readVcf(fl, genome = "hg19", param = ScanVcfParam(which = gr))
+
+vcf.brca1
+
+
+library(ggbio)
+autoplot(vcf.brca1)
+?readVcf
+
+writeVcf(vcf.brca1, "/Users/tengfei/Documents/Data/sbgtest/17-1409-CEU-brca1.vcf.gz", index = TRUE)

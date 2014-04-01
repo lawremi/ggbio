@@ -1,27 +1,27 @@
 ## Ideogram has a special response to +xlim() method
 setClass("Ideogram", contains = c("GGbio"),
          slots = list(xlabel = "logical",
-             cytoband = "logical", 
+             cytoband = "logical",
              subchr = "characterORNULL",
              aspect.ratio = "numeric",
              color = "character",
              fill = "character",
              alpha = "numeric",
              size = "numeric",
-             zoom.region = "numericORNULL", 
+             zoom.region = "numericORNULL",
              zoom.offset = "numeric"))
 
-Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband = TRUE, 
+Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband = TRUE,
                      color = "red", fill = "red", alpha = 0.7,
                      zoom.region = NULL,
-                     zoom.offset = 0.2, size = 1, 
+                     zoom.offset = 0.2, size = 1,
                      aspect.ratio = 1/20, ..., genome){
     if(missing(obj)){
         data(ideoCyto, package = "biovizBase")
         if(genome %in% names(ideoCyto)){
           obj <- ideoCyto[[genome]]
         }else{
-          obj <- getIdeogram(genome = genome, subchr = subchr, cytoband = cytoband)          
+          obj <- getIdeogram(genome = genome, subchr = subchr, cytoband = cytoband)
         }
     }
     ## do we need subchr here
@@ -37,7 +37,7 @@ Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband 
     }
     if(length(unique(as.character(seqnames(obj))))>1)
         stop("Mulptiple chromosome information found")
-    if(!biovizBase:::isIdeogram(obj))
+    if(!biovizBase::isIdeogram(obj))
         cytoband <- FALSE
 
     p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, geom = NULL)
@@ -61,16 +61,16 @@ Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband 
     }
     p <- p + theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
         scale_y_continuous(breaks = 5, label = subchr) +
-            theme(strip.background = element_rect(colour = 'NA', fill = 'NA'))+ 
+            theme(strip.background = element_rect(colour = 'NA', fill = 'NA'))+
                 theme(strip.text.y = element_text(colour = 'white'))   + theme(legend.position = "none")+
                     ggplot2::xlab("")
     p <- p + theme(aspect.ratio = aspect.ratio, axis.ticks.y = element_blank())
     if(!xlabel)
         p <- p + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
-    
+
     new("Ideogram", ggbio(p, data = obj.ori, ...), subchr = subchr, xlabel = xlabel,
         cytoband = cytoband, color = color, fill = fill, alpha = alpha,
-        zoom.offset = zoom.offset, size = size, aspect.ratio = aspect.ratio)  
+        zoom.offset = zoom.offset, size = size, aspect.ratio = aspect.ratio)
 }
 
 setMethod("print", "Ideogram", function(x){
@@ -99,9 +99,9 @@ setMethod("print", "Ideogram", function(x){
     }
     if(length(unique(as.character(seqnames(obj))))>1)
         stop("Mulptiple chromosome information found")
-    if(!biovizBase:::isIdeogram(obj))
+    if(!biovizBase::isIdeogram(obj))
         cytoband <- FALSE
-    
+
     p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, geom = NULL)
     ## p.ideo <- p
 
@@ -123,7 +123,7 @@ setMethod("print", "Ideogram", function(x){
     }
     p <- p + theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
         scale_y_continuous(breaks = 5, label = subchr) +
-            theme(strip.background = element_rect(colour = 'NA', fill = 'NA'))+ 
+            theme(strip.background = element_rect(colour = 'NA', fill = 'NA'))+
                 theme(strip.text.y = element_text(colour = 'white'))   + theme(legend.position = "none")+
                     ggplot2::xlab("")
     p <- p + theme(aspect.ratio = aspect.ratio, axis.ticks.y = element_blank())
@@ -141,7 +141,7 @@ setMethod("show", "Ideogram", function(object){
 plotIdeogram <- function(obj, subchr = NULL, zoom.region = NULL, which = NULL,
                          xlab, ylab, main, xlabel = FALSE,
                          color = "red", fill = "red", alpha = 0.7,
-                         zoom.offset = 0.2, size = 1, 
+                         zoom.offset = 0.2, size = 1,
                          cytoband = TRUE, aspect.ratio = 1/20, genome){
     if(!is.null(which) && is(which, "GRanges")){
         if(length(which) > 1){
@@ -151,7 +151,7 @@ plotIdeogram <- function(obj, subchr = NULL, zoom.region = NULL, which = NULL,
         subchr <- as.character(seqnames(which))
         zoom.region <- c(start(which), end(which))
     }
-    
+
     p <- Ideogram(obj,
                   xlabel = xlabel,
                   subchr = subchr,
@@ -163,7 +163,7 @@ plotIdeogram <- function(obj, subchr = NULL, zoom.region = NULL, which = NULL,
                   zoom.region = zoom.region,
                   zoom.offset = zoom.offset,
                   genome = genome)
-    
+
     if(!missing(xlab)){
         p <- p + ggplot2::xlab(xlab)
         attr(p, "xlab") <- xlab
@@ -178,7 +178,7 @@ plotIdeogram <- function(obj, subchr = NULL, zoom.region = NULL, which = NULL,
     }
     if(!missing(main)){
         p <- p + labs(title = main)
-        attr(p, "main") <- main 
+        attr(p, "main") <- main
     }else{
         attr(p, "main") <- ""
     }
@@ -196,7 +196,7 @@ setMethod("+", c("Ideogram"), function(e1, e2){
         }
     }
     if(inherits(e2, "cartesian")){
-        zoom.region <- e2$limits$x        
+        zoom.region <- e2$limits$x
     }else{
         zoom.region <- NULL
     }

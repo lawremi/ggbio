@@ -40,8 +40,12 @@ importMethodsFrom(Biobase, exprs, pData, phenoData, varLabels)
 ## Biostrings
 importMethodsFrom(Biostrings, getSeq)
 
+## S4Vectors
+importFrom(S4Vectors, isSingleString)
+importClassesFrom(S4Vectors, characterORNULL)
+
 ## IRanges
-importFrom(IRanges, DataFrame, IRanges, isSingleString)
+importFrom(IRanges, DataFrame, IRanges)
 importMethodsFrom(IRanges,  split, 
                   unlist, psetdiff,
                   range, endoapply,
@@ -58,8 +62,8 @@ importMethodsFrom(IRanges,  split,
                   slice, subjectHits, subsetByOverlaps, values, "values<-",
                   viewMaxs, viewMeans, viewMins, viewSums, viewWhichMaxs,
                   viewWhichMins)
-importClassesFrom(IRanges, Rle, RleList, IRanges, characterORNULL,
-                  Views, expressionORfunction, functionORNULL,
+importClassesFrom(IRanges, Rle, RleList, IRanges, Views,
+                  expressionORfunction, functionORNULL,
                   SimpleList, List, Vector, Annotated)
 
 ## GenomicRanges

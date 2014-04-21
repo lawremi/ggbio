@@ -2,7 +2,6 @@
 ## ============================================================
 
 import(methods)
-import(proto)
 import(BiocGenerics)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -46,7 +45,7 @@ importClassesFrom(S4Vectors, characterORNULL)
 
 ## IRanges
 importFrom(IRanges, DataFrame, IRanges)
-importMethodsFrom(IRanges,  split, 
+importMethodsFrom(IRanges,  split,
                   unlist, psetdiff,
                   range, endoapply,
                   as.data.frame,
@@ -54,7 +53,7 @@ importMethodsFrom(IRanges,  split,
                   "[","[<-","[[", "[[<-","$",
                   show,
                   ranges, "ranges<-",
-                  start, end, width, 
+                  start, end, width,
                   "start<-", "end<-", "width<-", "%in%",
                   Views, coverage, disjointBins,
                   elementLengths, findOverlaps, gaps, mcols,
@@ -72,7 +71,7 @@ importMethodsFrom(GenomicRanges, assays, colData, exptData, granges, grglist,
                   rowData, ranges, "ranges<-",
                   start, end, width, "start<-", "end<-", "width<-",
                   seqnames, seqinfo, "seqinfo<-", seqlengths, "seqlengths<-",
-                  seqlevels, "seqlevels<-", seqnames, show, 
+                  seqlevels, "seqlevels<-", seqnames, show,
                   as.data.frame, sort)
 importClassesFrom(GenomicRanges, GRanges, GRangesList, GenomicRangesList)
 
@@ -99,13 +98,15 @@ importClassesFrom(rtracklayer, BigWigFile)
 ## VariantAnnotation
 importClassesFrom(VariantAnnotation, VCF)
 importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref,
-                  alt, info, geno) 
+                  alt, info, geno)
 
+## OrganismDb
+importClassesFrom(OrganismDbi, OrganismDb)
 ## ============================================================
 ## Export
 ## ============================================================
 ## utils
-exportMethods(autoplot, rescale, fixed, "fixed<-", 
+exportMethods(autoplot, rescale, fixed, "fixed<-",
               xlim, "xlim<-", reset, backup,
               bgColor, "bgColor<-", labeled, "labeled<-",
               mutable, "mutable<-", height, "height<-",
@@ -124,14 +125,14 @@ exportMethods(geom_chevron,
               geom_arrow,
               geom_arrowrect,
               geom_rect,
-              geom_bar,              
+              geom_bar,
               geom_segment)
 
 ## stat
 exportMethods(stat_aggregate,
               stat_coverage,
-              stat_identity,	
-              stat_mismatch, 	
+              stat_identity,
+              stat_mismatch,
               stat_stepping,
               stat_gene,
               stat_table,
@@ -149,12 +150,12 @@ export(circle)
 export(tracks,
        align.plots,
        alignPlots,
-       plotFragLength,        
-       plotSpliceSum,       
+       plotFragLength,
+       plotSpliceSum,
        plotStackedOverview,
-       plotKaryogram,       
+       plotKaryogram,
        plotSingleChrom,
-       plotIdeogram,    
+       plotIdeogram,
        Ideogram,
        plotGrandLinear,
        plotRangesLinkedToData)
@@ -165,7 +166,8 @@ export(theme_null, theme_alignment, theme_clear, theme_tracks_sunset,
 export(ggsave)
 exportMethods(cbind, rbind)
 exportClasses(GGbio, Ideogram, Plot, Tracked, Tracks, Grob)
-export(btextGrob, geom_text2, zoom, zoom_in, zoom_out, nextView, prevView)
+## export(btextGrob, geom_text2, zoom, zoom_in, zoom_out, nextView, prevView)
+export(zoom, zoom_in, zoom_out, nextView, prevView)
 ## exportMethods(Grob, Plot, get_gtable, cached, "cached<-",
 ##               cached_xlim, "cached_xlim<-",
 ##               cached_ylim, "cached_ylim<-",

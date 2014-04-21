@@ -1,6 +1,7 @@
 \name{GGbio}
 \alias{ggbio}
 \alias{GGbio}
+\alias{GGbio-class}
 \alias{ggbio-class}
 \alias{+,GGbio,ANY-method}
 \alias{$,GGbio-method}
@@ -21,7 +22,7 @@
     raw data
   }
   \item{fetchable}{
-    logical value, default \code{FALSE}, is there any fetch method available. 
+    logical value, default \code{FALSE}, is there any fetch method available.
   }
   \item{blank}{
     logical value, default \code{FALSE}, is this plot a blank plot.

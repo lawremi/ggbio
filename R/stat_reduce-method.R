@@ -4,7 +4,7 @@ setMethod("stat_reduce", "GRanges", function(data, ...,
                                                xlab, ylab, main,
                                                drop.empty.ranges = FALSE,
                                                min.gapwidth = 1L,
-                                               facets = NULL, 
+                                               facets = NULL,
                                                geom = NULL){
 
 
@@ -20,7 +20,7 @@ setMethod("stat_reduce", "GRanges", function(data, ...,
   args.res <- c(list(aes.res), args.non)
   p <- list(do.call(stat_stepping, args.res))
 
-  if(missing(xlab)) 
+  if(missing(xlab))
     xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
 
@@ -31,7 +31,7 @@ setMethod("stat_reduce", "GRanges", function(data, ...,
     p <- c(p, list(ggplot2::ylab("")))
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
-  p <- setStat(p)  
+  p <- setStat(p)
 p
 })
 
@@ -40,7 +40,7 @@ setMethod("stat_reduce", "IRanges", function(data, ...,
                                                drop.empty.ranges = FALSE,
                                                min.gapwidth = 1L,
                                              with.inframe.attrib=FALSE,
-                                               facets = NULL, 
+                                               facets = NULL,
                                                geom = NULL){
 
 
@@ -81,7 +81,7 @@ setMethod("stat_reduce", "TranscriptDb", function(data, ...){
   p <- geom_alignment(data, ..., stat = "reduce")
   p <- setStat(p)
   p
-}) 
+})
 
 
 

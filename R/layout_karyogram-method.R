@@ -1,6 +1,6 @@
 setGeneric("layout_karyogram", function(data,...)
            standardGeneric("layout_karyogram"))
-setMethod("layout_karyogram", "GRanges", 
+setMethod("layout_karyogram", "GRanges",
           function(data,..., xlab, ylab, main,
                    facets = seqnames ~ .,
                    cytoband = FALSE,
@@ -34,7 +34,7 @@ setMethod("layout_karyogram", "GRanges",
               .ideo.range <- ylim
             }
             }
-           
+
             ## check facets
             if(cytoband){
               geom <- NULL
@@ -52,7 +52,7 @@ setMethod("layout_karyogram", "GRanges",
 #               e.cut <- min(unlist(lapply(dd.lst, function(dd){
 #                 min(width(dd[1]), width(dd[length(dd)]))
 #                 })))
-#               
+#
 #               df.left <- do.call(rbind, lapply(dd.lst, function(dd){
 #                 dd.df <- mold(dd)
 #                 dd.df.rect <- dd.df[order(dd.df$start),]
@@ -88,13 +88,13 @@ setMethod("layout_karyogram", "GRanges",
                                                                     ymax = .ideo.range[2],
                                                                     fill = as.name("gieStain")))),
                                                            list(color = NA, alpha = 0.7))))
-              
+
               ## draw line
               df.p <- df.rect[substr(df.rect$name, 1, 1) == "p",]
               df.q <- df.rect[substr(df.rect$name, 1, 1) == "q",]
-             
+
               if(nrow(df.p)){
-  
+
                 df.p.d <- do.call(rbind, by(df.p, df.p$seqnames, function(dd){
                   data.frame(x = min(dd$start),
                              y = .ideo.range[1],
@@ -104,8 +104,8 @@ setMethod("layout_karyogram", "GRanges",
                              yend2 = .ideo.range[2],
                              seqnames = unique(dd$seqnames))
                 }))
-                
-            
+
+
                 p.ideo <- c(p.ideo, list(do.call(ggplot2::geom_segment, c(list(data = df.p.d),
                                                                           list(aes(x = x, y = y, xend = xend, yend = yend)),
                                                                           list(color = "black",
@@ -118,12 +118,12 @@ setMethod("layout_karyogram", "GRanges",
                                                                           list(aes(x = x, y = y, xend = x, yend = y2)),
                                                                           list(color = "black",
                                                                                alpha = 1, size = 0.3)))))
-                                        
-                
-                                                                        
-                
+
+
+
+
               }
-              
+
               if(nrow(df.q)){
                 df.q.d <- do.call(rbind, by(df.q, df.q$seqnames, function(dd){
                   data.frame(x = min(dd$start),
@@ -134,8 +134,8 @@ setMethod("layout_karyogram", "GRanges",
                              yend2 = .ideo.range[2],
                              seqnames = unique(dd$seqnames))
                 }))
-                
-                
+
+
                 p.ideo <- c(p.ideo, list(do.call(ggplot2::geom_segment, c(list(data = df.q.d),
                                                                           list(aes(x = x, y = y, xend = xend, yend = yend)),
                                                                           list(color = "black",
@@ -144,25 +144,25 @@ setMethod("layout_karyogram", "GRanges",
                                                                           list(aes(x = x, y = y2, xend = xend, yend = yend2)),
                                                                           list(color = "black",
                                                                                alpha = 1, size = 0.3)))))
-               
+
                 p.ideo <- c(p.ideo, list(do.call(ggplot2::geom_segment, c(list(data = df.q.d),
                                                                           list(aes(x = xend, y = y, xend = xend, yend = y2)),
                                                                           list(color = "black",
                                                                                alpha = 1, size = 0.3)))))
-                
-                
-               
-                                        
-                                        
-              }
-               
-             
-            
 
-       
+
+
+
+
+              }
+
+
+
+
+
               lst <- lapply(seq_len(nrow(df.tri.p)), function(i){
                 with(df.tri.p[i,],
-                     data.frame(x = start, 
+                     data.frame(x = start,
                                 y = 0,
                                 xend = start,
                                 yend = 10,
@@ -175,11 +175,11 @@ setMethod("layout_karyogram", "GRanges",
                      )
               })
               df.tri.p2 <- do.call(rbind, lst)
-    
-            
+
+
               lst <- lapply(seq_len(nrow(df.tri.q)), function(i){
                 with(df.tri.q[i,],
-                     data.frame(x = end, 
+                     data.frame(x = end,
                                 y = 0,
                                 xend = end,
                                 yend = 10,
@@ -188,58 +188,58 @@ setMethod("layout_karyogram", "GRanges",
                                 strand = strand,
                                 name = name,
                                 gieStain = gieStain)
-                     
+
                      )
               })
               df.tri.q2 <- do.call(rbind, lst)
-            
+
               ## border
               ##browser()
               p.ideo <- c(p.ideo,
                           ifelse(nrow(df.tri.p2),
                           list(do.call(geom_arch_flip2, c(list(data = df.tri.p2),
-                                            list(aes(x = x, 
+                                            list(aes(x = x,
                                                      y = y ,
-                                                     xend = xend, 
+                                                     xend = xend,
                                                      yend = yend,
                                                      height = height)
-                                                ), 
+                                                ),
                                          list(color = "black", size = 0.5)))),
                                  list(NULL)))
               p.ideo <- c(p.ideo,
                           ifelse(nrow(df.tri.p2),
                                  list(geom_arch_flip(data = df.tri.p2,
-                                                     aes(x = x, 
+                                                     aes(x = x,
                                                          y = y ,
-                                                         xend = xend, 
+                                                         xend = xend,
                                                          yend = yend,
                                                          height = height,
                                                          fill = gieStain
                                                        ))),
                                  list(NULL)))
-              
+
             ## q
             p.ideo <- c(p.ideo,
                         ifelse(nrow(df.tri.q2),
                                list(do.call(geom_arch_flip2, c(list(data = df.tri.q2),
-                                                                   list(aes(x = x, 
+                                                                   list(aes(x = x,
                                                                             y = y ,
-                                                                            xend = xend, 
+                                                                            xend = xend,
                                                                             yend = yend,
                                                                             height = height
-                                                                     )), 
+                                                                     )),
                                                                    list(color = "black", size = 0.5)))),
                                list(NULL)))
              p.ideo <- c(p.ideo,
                           ifelse(nrow(df.tri.q2),list(geom_arch_flip(data = df.tri.q2,
-                                            aes(x = x, 
+                                            aes(x = x,
                                                 y = y ,
-                                                xend = xend, 
+                                                xend = xend,
                                                 yend = yend,
                                                 height = height,
                                                 fill = gieStain))),
                                  list(NULL)))
-              
+
 
               p.ideo <- c(p.ideo,
                           list(theme(axis.text.y = element_blank(),
@@ -249,8 +249,8 @@ setMethod("layout_karyogram", "GRanges",
                                     panel.grid.major = element_line(colour = NA)),
                                scale_fill_manual(values = cytobandColor)),
                           list(facet_grid(seqnames ~ .)))
-         
-              
+
+
             }else {
               ideo.gr <- getIdeoGR(data)
               extra.factor <- setdiff(all.vars(as.formula(facets)), c("seqnames", "."))
@@ -259,7 +259,7 @@ setMethod("layout_karyogram", "GRanges",
                   values(ideo.gr)[, extra.factor] <- i
                   ideo.gr
                 })
-                ideo.gr <- do.call(c, lst)                
+                ideo.gr <- do.call(c, lst)
               }
               names(ideo.gr) <- NULL
               df <- as.data.frame(ideo.gr)
@@ -272,9 +272,9 @@ setMethod("layout_karyogram", "GRanges",
                                                       list(fill = "white", color = "black")))
             }
             if(!is.null(geom)){
-              df <- mold(data)              
+              df <- mold(data)
             if(geom == "rect"){
-                
+
               ## check xmin, ymin, ymax, y
               args.aes.rect <- combineAes(args.aes, list(xmin = substitute(start),
                                        xmax = substitute(end),
@@ -297,7 +297,7 @@ setMethod("layout_karyogram", "GRanges",
               args.res <- c(list(data = df), list(aes.res), args.non)
               p.addon <- do.call(.drawFun, args.res)
             }
-            p <- list(p.addon , facet_grid(facets))            
+            p <- list(p.addon , facet_grid(facets))
           }else{
             p <- list(p.ideo,  facet_grid(facets))
           }
@@ -322,7 +322,7 @@ plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
   args.non <- parseArgsForNonAes(args)
   facets <- seqnames ~ .
   if(missing(obj)){
-    obj <- getIdeogram(cytoband = cytoband)
+    obj <- getIdeogram(cytobands = cytobands)
     cat("-------get following seqnames------\n")
     message(paste(seqnames(seqinfo(obj)), collapse = "\n"))
     ## obj <- keepSeqlevels(obj, unique(seqnames()))
@@ -354,7 +354,7 @@ plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
     p <- p + ggplot2::ylab(ylab)
   if(!missing(main))
     p <- p + labs(title = main)
-  
+
   p
 }
 

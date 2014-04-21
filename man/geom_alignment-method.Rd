@@ -1,6 +1,8 @@
 \name{geom_alignment}
 \alias{geom_alignment}
 \alias{geom_alignment,GRanges-method}
+\alias{geom_alignment,GRangesList-method}
+\alias{geom_alignment,OrganismDb-method}
 \alias{geom_alignment,missing-method}
 \alias{geom_alignment,uneval-method}
 \alias{geom_alignment,TranscriptDb-method}
@@ -17,14 +19,34 @@
                  "segment"), rect.height = NULL, group.selfish = TRUE,
                   label = TRUE)
 
-\S4method{geom_alignment}{TranscriptDb}(data, ..., which, xlim, truncate.gaps = FALSE,
-                 truncate.fun = NULL, ratio = 0.0025, xlab, ylab, main,
-                 facets = NULL, geom = "alignment",
-                 stat = c("identity", "reduce"),
-                 range.geom = "rect", gap.geom = "arrow",
-                 utr.geom = "rect", names.expr = "tx_name",
-                 label = TRUE)
+\S4method{geom_alignment}{TranscriptDb}(data, ..., which, columns = c("tx_id", "tx_name",
+                 "gene_id"), names.expr = "tx_name", facets = NULL,
+                 truncate.gaps = FALSE, truncate.fun = NULL, ratio =
+                 0.0025)
 
+\S4method{geom_alignment}{GRangesList}(data, ..., which = NULL,
+                          cds.rect.h = 0.25,
+                          exon.rect.h = cds.rect.h,
+                          utr.rect.h = cds.rect.h/2,
+                          xlab, ylab, main,
+                          facets = NULL, geom = "alignment",
+                          stat = c("identity", "reduce"),
+                          range.geom = "rect",
+                          gap.geom = "arrow",
+                          utr.geom = "rect",
+                          names.expr = NULL,
+                          label = TRUE,
+                          label.color = "gray40",
+                          arrow.rate = 0.015,
+                          length = unit(0.1, "cm"))
+
+\S4method{geom_alignment}{OrganismDb}(data, ..., which,
+                   columns = c("TXNAME", "SYMBOL", "TXID", "GENEID"),
+                   names.expr = "SYMBOL",
+                   facets = NULL,
+                   truncate.gaps = FALSE,
+                   truncate.fun = NULL, ratio = 0.0025
+                   )
 }
 \arguments{
   \item{data}{
@@ -32,6 +54,30 @@
   }
   \item{...}{
     Extra parameters such as aes() passed.
+  }
+  \item{which}{
+    \code{GRanges} object to subset the \code{TranscriptDb} object.
+  }
+  \item{cds.rect.h}{
+    cds heights.
+  }
+  \item{exon.rect.h}{
+    exon heights.
+  }
+  \item{utr.rect.h}{
+    utr heights.
+  }
+  \item{label.color}{
+    label color.
+  }
+  \item{arrow.rate}{
+    arrow rate.
+  }
+  \item{length}{
+    arrow length.
+  }
+  \item{columns}{
+    columns to get from object.
   }
   \item{xlab}{
     Label for x
@@ -52,13 +98,13 @@
     users to specify \code{y} value in \code{aes}.
 
     For  \code{\linkS4class{TranscriptDb}}:
-    defualt "identity" give full gene model and "reduce" for reduced model.    
+    defualt "identity" give full gene model and "reduce" for reduced model.
   }
   \item{gap.geom}{
     Geom for 'gap' computed from the data you passed based on the group information.
   }
   \item{rect.height}{
-    Half height of the arrow body. 
+    Half height of the arrow body.
   }
   \item{group.selfish}{
     Passed to \code{addStepping}, control whether to show each group as
@@ -66,12 +112,6 @@
   overlapped with each other, they will probably be layout in the same
   level to save space.
 }
-  \item{which}{
-    \code{GRanges} object to subset the \code{TranscriptDb} object.
-  }
-  \item{xlim}{
-    Limits for x, to subset the \code{TranscriptDb} object.
-  }
   \item{truncate.gaps}{
     logical value indicate to truncate gaps or not.
   }
@@ -95,7 +135,7 @@
   }
   \item{label}{
     logical value. Whether to label the intervals with names specified
-    by argument \code{names.expr}. 
+    by argument \code{names.expr}.
   }
 }
 \value{
@@ -108,18 +148,18 @@ require(GenomicRanges)
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
-gr <- GRanges(seqnames = 
+gr <- GRanges(seqnames =
               sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),
               IRanges(
                       start = sample(1:300, size = N, replace = TRUE),
                       width = sample(70:75, size = N,replace = TRUE)),
-              strand = sample(c("+", "-", "*"), size = N, 
+              strand = sample(c("+", "-", "*"), size = N,
                 replace = TRUE),
               value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
-              sample = sample(c("Normal", "Tumor"), 
+              sample = sample(c("Normal", "Tumor"),
                 size = N, replace = TRUE),
-              pair = sample(letters, size = N, 
+              pair = sample(letters, size = N,
                 replace = TRUE))
 
 
@@ -141,7 +181,7 @@ ggplot(gr) + geom_alignment(facets = sample ~ seqnames, aes(color = strand, fill
 ggplot(gr) + geom_alignment(stat = "stepping", aes(group = pair))
 
 ## ======================================================================
-##  group.selfish controls when 
+##  group.selfish controls when
 ## ======================================================================
 ggplot(gr) + geom_alignment(stat = "stepping", aes(group = pair), group.selfish = FALSE)
 
@@ -157,7 +197,9 @@ library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 data(genesymbol, package = "biovizBase")
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 ## made a track comparing full/reduce stat.
+ggbio() + geom_alignment(data = txdb, which = genesymbol["RBM17"])
 p1 <- ggplot(txdb) + geom_alignment(which = genesymbol["RBM17"])
+p1
 p2 <- ggplot(txdb) + geom_alignment(which = genesymbol["RBM17"], stat = "reduce")
 tracks(full = p1, reduce = p2, heights = c(3, 1))
 tracks(full = p1, reduce = p2, heights = c(3, 1)) + theme_tracks_sunset()

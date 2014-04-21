@@ -19,7 +19,7 @@ for(method in .gr.name.ggbio){
     .method <- method
     if(hasMethod(.method, "GRanges") && !hasMethod(.method, "IRanges")){
       setMethod(.method, "IRanges", function(data, ...){
-        .fun <- selectMethod(.method, sig = "GRanges")
+        .fun <- selectMethod(.method, signature = "GRanges")
         df <- values(data)
         values(data) <- NULL
         gr <- GRanges("chr_non", data)
@@ -36,7 +36,7 @@ for(method in .gr.name.ggbio){
     .method <- method
     if(hasMethod(.method, "GRanges") && !hasMethod(.method, "GRangesList")){
       setMethod(.method, "GRangesList", function(data, ...){
-        .fun <- selectMethod(.method, sig = "GRanges")
+        .fun <- selectMethod(.method, signature = "GRanges")
         gr <- biovizBase:::flatGrl(data)
         .fun(gr, ...)
       })
@@ -77,7 +77,7 @@ for(method in .gr.name.ggplot){
     .method <- method
     if(hasMethod(.method, "GRanges") && !hasMethod(.method, "IRanges")){
       setMethod(.method, "IRanges", function(data, ...){
-        .fun <- selectMethod(.method, sig = "GRanges")
+        .fun <- selectMethod(.method, signature = "GRanges")
         df <- values(data)
         values(data) <- NULL
         gr <- GRanges("chr_non", data)
@@ -94,7 +94,7 @@ for(method in .gr.name.ggplot){
     .method <- method
     if(hasMethod(.method, "GRanges") && !hasMethod(.method, "GRangesList")){
       setMethod(.method, "GRangesList", function(data, ...){
-        .fun <- selectMethod(.method, sig = "GRanges")
+        .fun <- selectMethod(.method, signature = "GRanges")
         gr <- biovizBase::flatGrl(data)
         .fun(gr, ...)
       })

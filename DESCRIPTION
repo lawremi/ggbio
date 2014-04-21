@@ -18,9 +18,9 @@ Imports: grid, grDevices, graphics, stats, utils, biovizBase(>=
         1.11.11), reshape2, gtable, Biobase, S4Vectors, IRanges (>= 1.99.0),
         GenomicRanges (>= 1.17.6), GenomicFeatures, Rsamtools (>=
         1.17.4), GenomicAlignments, BSgenome, gridExtra, scales,
-        VariantAnnotation, Hmisc, rtracklayer, Biostrings, proto
+        VariantAnnotation, Hmisc, rtracklayer, Biostrings
 VignetteBuilder: knitr
-Suggests: vsn, BSgenome.Hsapiens.UCSC.hg19,
+Suggests: vsn, BSgenome.Hsapiens.UCSC.hg19, Homo.sapiens,
         TxDb.Hsapiens.UCSC.hg19.knownGene, chipseq,
         TxDb.Mmusculus.UCSC.mm9.knownGene, knitr, BiocStyle
 URL: http://tengfei.github.com/ggbio/
@@ -29,7 +29,7 @@ License: Artistic-2.0
 LazyLoad: Yes
 Collate: AllClasses.R AllGenerics.R Cache-class.R GGbio-class.R
         Grob-class.R ideogram.R Tracked-class.R Plot-class.R
-        ggplot-method.R theme.R Tracks-class.R 
+        ggplot-method.R theme.R Tracks-class.R
         geom_chevron-method.R geom_alignment-method.R
         geom_arch-method.R geom_arrow-method.R geom_arrowrect-method.R
         geom_rect-method.R geom_segment-method.R geom_bar-method.R

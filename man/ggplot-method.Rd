@@ -61,7 +61,7 @@
 \value{
   a return \code{ggbio} object, which is a subclass of \code{ggplot}
   defined in ggplot2 package, but that's more, a '.data' list entry is
-  stored with the returned object. 
+  stored with the returned object.
 }
 \details{
     The biggest difference for objects returned by \code{ggplot} in
@@ -75,22 +75,22 @@
     data.frame stored along the original data set, for objects which not
     supported by \code{mold} method, we only store the original copy
     for ggbio specific graphics.
-    
+
     \code{ggplot()} is typically used to construct a plot incrementally,
     using the \code{+} operator to add layers to the existing ggplot object.
     This is advantageous in that the code is explicit about which
     layers are added and the order in which they are added. For
     complex graphics with multiple layers, initialization with
     \code{ggplot} is recommended. You can always call \code{qplot} in
-    package ggplot2 or \code{autoplot} in ggbio for convenient usage. 
+    package ggplot2 or \code{autoplot} in ggbio for convenient usage.
 
     There are three common ways to invoke \code{ggplot}:
-    \itemize{    
+    \itemize{
       \item{}{\code{ggplot(df, aes(x, y, <other aesthetics>))}}
       \item{}{\code{ggplot(df)}}
       \item{}{\code{ggplot()}}
     }
-    
+
     The first method is recommended if all layers use the same data and
     the same set of aesthetics, although this method can also be used to
     add a layer using data from another data frame.  The second method
@@ -111,18 +111,18 @@ set.seed(1)
 N <- 100
 library(GenomicRanges)
 ## GRanges
-gr <- GRanges(seqnames = 
+gr <- GRanges(seqnames =
               sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),
               IRanges(
                       start = sample(1:300, size = N, replace = TRUE),
                       width = sample(70:75, size = N,replace = TRUE)),
-              strand = sample(c("+", "-", "*"), size = N, 
+              strand = sample(c("+", "-", "*"), size = N,
                 replace = TRUE),
               value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
-              sample = sample(c("Normal", "Tumor"), 
+              sample = sample(c("Normal", "Tumor"),
                 size = N, replace = TRUE),
-              pair = sample(letters, size = N, 
+              pair = sample(letters, size = N,
                 replace = TRUE))
 
 ## automatically facetting and assign y
@@ -162,7 +162,7 @@ colnames(mx)
 colnames(mx) <- letters[1:ncol(mx)]
 mx
 ## has extra 'colnames'
-ggplot(mx, aes(x = x, y = row)) + geom_raster(aes(fill = colnames)) 
+ggplot(mx, aes(x = x, y = row)) + geom_raster(aes(fill = colnames))
 rownames(mx)
 rownames(mx) <- LETTERS[1:nrow(mx)]
 ggplot(mx, aes(x = x, y = row)) + geom_raster(aes(fill = rownames))
@@ -176,7 +176,7 @@ ggplot(mx, aes(x = x, y = row)) + geom_raster(aes(fill = rownames))
 % ggplot(v1) + geom_tile(aes(x = x, y = factor(1), fill = value)) +
 % facet_grid(group ~. )
 % ## unequal width
-% v2 <- Views(subject, start=4:1, width = 3:6)  
+% v2 <- Views(subject, start=4:1, width = 3:6)
 % ggplot(v2) + geom_tile(aes(x = x, y = row, fill = value))
 
 ## ExpressionSet
@@ -195,7 +195,7 @@ ggplot(eset) + geom_tile(aes(x = x, y = y, fill = type))
 
 ## Rle
 library(IRanges)
-lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
+lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500),
             seq(10, 0.001, length = 500))
 xVector <- rpois(1e4, lambda)
 xRle <- Rle(xVector)

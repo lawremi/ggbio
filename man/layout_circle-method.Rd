@@ -1,4 +1,5 @@
 \name{layout_circle}
+\alias{circle}
 \alias{layout_circle}
 \alias{layout_circle,GRanges-method}
 \alias{layout_circle,missing-method}
@@ -14,12 +15,13 @@
                  space.skip = 0.015, direction = c("clockwise",
                  "anticlockwise"), link.fun = function(x, y, n = 30)
                  bezier(x, y, evaluation = n), rect.inter.n = 60, rank,
-                 ylim = NULL, 
+                 ylim = NULL,
                  scale.n = 60, scale.unit = NULL, scale.type = c("M",
                  "B", "sci"), grid.n = 5, grid.background = "gray70",
                  grid.line = "white", grid = FALSE, chr.weight = NULL)
 
 \S4method{layout_circle}{missing}(data, ...)
+circle(...)
 }
 \arguments{
   \item{data}{
@@ -27,10 +29,10 @@
   }
   \item{...}{
     Extra parameters such as aesthetics mapping in aes(), or
-    \code{color, size}, etc.
+    \code{color, size}, etc. For circle function, it passed to \code{layout_circle}.
   }
   \item{geom}{
-    The geometric object to use display the data. 
+    The geometric object to use display the data.
   }
   \item{linked.to}{
     Character indicates column that specifying end of the linking lines,
@@ -54,7 +56,7 @@
   }
   \item{rect.inter.n}{
     n passed to interpolate function in rectangle transformation(from a
-    rectangle) to a section in circular view. 
+    rectangle) to a section in circular view.
   }
   \item{rank}{
     For default equal trackWidth, use rank to specify the circle orders.
@@ -67,10 +69,10 @@
     space. used when scale.unit is \code{NULL}.
   }
   \item{scale.unit}{
-    Unit used for computing scale. Default is \code{NULL}, 
+    Unit used for computing scale. Default is \code{NULL},
   }
   \item{scale.type}{
-    Scale type used for 
+    Scale type used for
   }
   \item{grid}{
     logical value indicate showing grid background for track or not.
@@ -90,9 +92,9 @@
   seqnames, other lengths of chromosomes will be assined proportionally
   to their seqlengths, for example, you could specify chr1 to be 0.5, so
   the chr1 will take half of the space and other chromosomes squeezed to
-  take left of the space. 
-  }  
-  
+  take left of the space.
+  }
+
 }
 \value{
   A 'Layer'.
@@ -103,18 +105,18 @@ library(GenomicRanges)
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
-gr <- GRanges(seqnames = 
+gr <- GRanges(seqnames =
               sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),
               IRanges(
                       start = sample(1:300, size = N, replace = TRUE),
                       width = sample(70:75, size = N,replace = TRUE)),
-              strand = sample(c("+", "-", "*"), size = N, 
+              strand = sample(c("+", "-", "*"), size = N,
                 replace = TRUE),
               value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
-              sample = sample(c("Normal", "Tumor"), 
+              sample = sample(c("Normal", "Tumor"),
                 size = N, replace = TRUE),
-              pair = sample(letters, size = N, 
+              pair = sample(letters, size = N,
                 replace = TRUE))
 
 

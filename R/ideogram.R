@@ -21,7 +21,7 @@ Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband 
         if(genome %in% names(ideoCyto)){
           obj <- ideoCyto[[genome]]
         }else{
-          obj <- getIdeogram(genome = genome, subchr = subchr, cytoband = cytoband)
+          obj <- getIdeogram(genome = genome, subchr = subchr, cytobands = cytobands)
         }
     }
     ## do we need subchr here

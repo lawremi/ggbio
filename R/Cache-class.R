@@ -1,11 +1,17 @@
-setClass("Cache", 
+setClass("Cache",
             slots = list(
               cached = "logical",
               cached_xlim = "numericORNULL",
               cached_ylim = "numericORNULL",
               cached_which = "GRangesORNULL",
               cached_item = "list"
-              ))
+              ),
+         prototype = list(cached = TRUE,
+                          cached_xlim = 1,
+                          cached_ylim = NULL,
+                          cached_which = NULL,
+             cached_item = list()
+             ))
 
 ## cached always equal TRUE
 ## only for 'fetchable' object, set it to FALSE
@@ -31,7 +37,7 @@ setReplaceMethod("cached", c("Cache", "logical"), function(x, value){
 
 setGeneric("cached_xlim", function(x, ...) standardGeneric("cached_xlim"))
 setMethod("cached_xlim", "Cache", function(x){
-  x@cached_xlim 
+  x@cached_xlim
 })
 setGeneric("cached_xlim<-", function(x, value) standardGeneric("cached_xlim<-"))
 setReplaceMethod("cached_xlim", c("Cache", "numeric"), function(x, value){
@@ -70,7 +76,7 @@ setReplaceMethod("cached_item", c("Cache", "list"), function(x, value){
 
 setGeneric("addItem", function(x, ...) standardGeneric("addItem"))
 setMethod("addItem", c("Cache"), function(x, ...){
-  x@cached_item <- c(x@cached_item, list(...))    
+  x@cached_item <- c(x@cached_item, list(...))
   x
 })
 

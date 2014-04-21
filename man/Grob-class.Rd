@@ -20,19 +20,19 @@
   'GrobList' is a container of list of 'Grob' object.
 }
 \usage{
-
+\S4method{Grob}{gg}(x)
+\S4method{Grob}{gtable}(x)
+\S4method{Grob}{trellis}(x)
+\S4method{Grob}{lattice}(x)
+\S4method{Grob}{GGbio}(x)
 }
 \arguments{
+  \item{x}{
+    object of class: gg, gtable, trellis, lattice, GGbio.
+  }
 }
 \value{
-}
-\details{
-}
-\references{
-}
-\seealso{
-}
-\examples{
+  A \code{Grob} object.
 }
 \author{Tengfei Yin}
 

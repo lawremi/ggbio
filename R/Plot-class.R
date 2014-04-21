@@ -24,7 +24,7 @@ setMethod("Plot", "trellis", function(x, mutable = FALSE){
     lst$mutable <- mutable
     obj <- do.call("new", c("latticePlot", list(x), lst))
   }else{
-    obj <- new("latticePlot", x, mutable = mutable)    
+    obj <- new("latticePlot", x, mutable = mutable)
   }
   obj
 })
@@ -36,6 +36,9 @@ setMethod("Plot", "GGbio", function(x){
     obj <- do.call("new", c("ggbioPlot", list(x), lst))
   }else{
     obj <- new("ggbioPlot", x)
+  }
+  if("geom" %in% names(attributes(x))){
+      attr(obj, "geom") <- attr(x, "geom")
   }
   obj
 })

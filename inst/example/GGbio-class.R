@@ -242,7 +242,7 @@ called(vr)
 data("genesymbol", package = "biovizBase")
 genesymbol["BRCA1"]
 param <- ScanVcfParam(which = GRanges("17", IRanges(41196313, 41277500)))
-vcf <- readVcf("/Users/tengfei/Documents/Data/sbgtest/1000G_phase1.snps.high_confidence.b37.vcf.gz", 
+vcf <- readVcf("/Users/tengfei/Documents/Data/sbgtest/1000G_phase1.snps.high_confidence.b37.vcf.gz",
                genome = "hg19", param = param)
 vcf
 vr <- as(vcf, "VRanges")
@@ -252,14 +252,14 @@ head(md)
 library(grid) # needed for arrow function
 library(gridExtra)
 head(md)
-p <- ggplot(data.frame(x = range(md$midpoint), 
-                  y = c(1, 2))) + geom_blank( aes(x = x, y = y)) + 
-  ggplot2::geom_segment(data = md, aes(x = midpoint, xend = midpoint), y = 1.4, 
+p <- ggplot(data.frame(x = range(md$midpoint),
+                  y = c(1, 2))) + geom_blank( aes(x = x, y = y)) +
+  ggplot2::geom_segment(data = md, aes(x = midpoint, xend = midpoint), y = 1.4,
                yend = 1.6, arrow = arrow(length = unit(0.2,"strwidth", "A"))) +
-  annotate("text", x = md$midpoint, y = 1.75, label = md$alt) + 
-  annotate("text", x = md$midpoint, y = 1.25, label = md$ref) + 
-  theme_alignment()  + 
-  theme(aspect.ratio = 1/10) 
+  annotate("text", x = md$midpoint, y = 1.75, label = md$alt) +
+  annotate("text", x = md$midpoint, y = 1.25, label = md$ref) +
+  theme_alignment()  +
+  theme(aspect.ratio = 1/10)
 p
 class(p)
 
@@ -339,3 +339,78 @@ autoplot(vcf.brca1)
 ?readVcf
 
 writeVcf(vcf.brca1, "/Users/tengfei/Documents/Data/sbgtest/17-1409-CEU-brca1.vcf.gz", index = TRUE)
+
+
+
+
+library(biovizBase)
+
+genesymbol
+
+library(ggbio)
+library(biovizBase)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+data(genesymbol, package = "biovizBase")
+wh <- genesymbol[c("BRCA1", "NBR1")]
+temp <- crunch(txdb, which = wh)
+temp2 <- crunch(txdb, which = wh)
+temp3 <- temp2
+names(values(temp3))[4] <- "model"
+temp2
+temp.l <- split(temp2, temp2$tx_name)
+temp.l
+
+
+autoplot(temp.l, geom = "alignment")
+ggbio() + geom_alignment(temp.l, aes(type = type))
+ggbio() + geom_alignment(temp.l[1:3])
+ggbio() + geom_alignment(temp.l)
+p2 <- ggbio() + geom_alignment(temp.l, stat = "reduce")
+p1 <- ggbio() + geom_alignment(temp.l, aes(type = model))
+p1
+names(temp.l)
+height(p1) <- 20
+height(p2) <- 1
+tracks(p1, p2) ## to make it look perfect
+height(p2)
+names(temp.l)
+wh
+
+ggplot() + geom_alignment(txdb, which = wh)
+ggplot(txdb) + geom_alignment(which = wh)
+ggplot(txdb) + geom_alignment(which = wh, names.expr = "tx_id(gene_id)")
+ggplot(txdb) + geom_alignment(which = wh, names.expr = "tx_id:::gene_id")
+ggplot() + geom_alignment(data = txdb, which = wh, names.expr = "gene_id")
+ggplot(txdb) + geom_alignment(which = wh)
+
+autoplot(txdb, which = wh)
+autoplot(txdb, which = wh, names.expr = "tx_id:::gene_id")
+autoplot(txdb, which = wh, names.expr = "tx_id:::gene_id", stat = "reduce")
+
+
+library(Homo.sapiens)
+library(ggbio)
+data(genesymbol, package = "biovizBase")
+wh <- genesymbol[c("BRCA1", "NBR1")]
+
+ggplot() + geom_alignment(Homo.sapiens, which = wh)
+ggplot() + geom_alignment(Homo.sapiens, which = wh, names.expr = "SYMBOL(TXNAME)")
+ggplot() + geom_alignment(Homo.sapiens, which = wh, stat = "reduce")
+
+ggplot() + geom_alignment(Homo.sapiens, which = wh, names.expr = "SYMBOL(GENEID)",
+                          stat = "reduce")
+
+
+autoplot(Homo.sapiens, which  = wh)
+p <- autoplot(Homo.sapiens, which  = wh, label.color = "gray40", color = "brown",
+          fill = "brown")
+p <- autoplot(Homo.sapiens, which = wh, stat = "reduce")
+autoplot(Homo.sapiens, which  = wh, label.color = "gray40", gap.geom = "")
+
+p + zoom() ## fix me, arrow cannot be re-drawned
+p + prevView()
+p + nextView()
+
+
+

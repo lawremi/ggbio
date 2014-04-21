@@ -18,19 +18,21 @@
 \alias{autoplot,ExpressionSet-method}
 \alias{autoplot,SummarizedExperiment-method}
 \alias{autoplot,VCF-method}
-
-
+\alias{autoplot,OrganismDb-method}
+\alias{autoplot,VRanges-method}
+\alias{autoplot,TabixFile-method}
+\alias{+,Bioplot,Any-method}
 \title{Generic autoplot function}
 
 \description{
-  
+
   \code{autoplot} is a generic function to visualize various data
   object, it tries to give better default graphics and customized
   choices for each data type, quick and convenient to explore your
   genomic data compare to low level \code{ggplot} method, it is much
   simpler and easy to produce fairly complicate graphics, though you may
   lose some flexibility for each layer.
-  
+
 }
 
 \usage{
@@ -43,9 +45,8 @@
 
 
 \S4method{autoplot}{GRangesList}(object, ..., xlab, ylab, main, indName = "grl_name",
-                 geom = NULL, stat = NULL, type = c("none", "sashimi"),
-                 coverage.col = "gray50", coverage.fill = coverage.col,
-                 group.selfish = FALSE, arch.offset = 1.3)
+                 geom = NULL, stat = NULL, coverage.col = "gray50",
+                 coverage.fill = coverage.col, group.selfish = FALSE)
 
 
 \S4method{autoplot}{IRanges}(object, ..., xlab, ylab, main)
@@ -56,10 +57,11 @@
       geom = NULL, stat = NULL)
 
 \S4method{autoplot}{BamFile}(object, ..., which, xlab, ylab, main,
-              bsgenome, geom = "line", stat = "coverage",
-              method = c("raw","estimate"),
-              coord = c("linear", "genome"), resize.extra = 10,
-              space.skip = 0.1, show.coverage = TRUE)
+                 bsgenome, geom = "line", stat = "coverage", method = c("raw",
+                 "estimate"), coord = c("linear", "genome"),
+                 resize.extra = 10, space.skip = 0.1, show.coverage =
+                 TRUE)
+
 
 \S4method{autoplot}{character}(object, ..., xlab, ylab, main, which, asRangedData = FALSE)
 
@@ -72,8 +74,8 @@
 
 
 \S4method{autoplot}{BSgenome}(object, which, ...,
-                    xlab, ylab, main, geom = c("text",
-                   "segment", "point", "rect"))
+                    xlab, ylab, main, geom = NULL)
+
 
 \S4method{autoplot}{Rle}(object, ..., xlab, ylab, main, binwidth, nbin = 30,
           geom = NULL, stat = c("bin", "identity", "slice"),
@@ -97,24 +99,54 @@
                  = 4.5, padding = 0.2)
 
 
-\S4method{autoplot}{SummarizedExperiment}(object, ..., type = c("heatmap", "link", "pcp",
-                 "boxplot", "scatterplot.matrix"), pheno.plot = FALSE,
+\S4method{autoplot}{SummarizedExperiment}(object, ..., type = c("heatmap", "link", "pcp", "boxplot", "scatterplot.matrix"), pheno.plot = FALSE,
                  main_to_pheno = 4.5, padding = 0.2, assay.id = 1)
 
 
 \S4method{autoplot}{VCF}(object, ...,
               xlab, ylab, main,
-              assay.id,                                      
+              assay.id,
               type = c("default", "geno", "info", "fixed"),
               full.string = FALSE,
               ref.show = TRUE,
               genome.axis = TRUE,
               transpose = TRUE)
+
+\S4method{autoplot}{OrganismDb}(object, which, ...,
+                   xlab, ylab, main,
+                   truncate.gaps = FALSE,
+                   truncate.fun = NULL,
+                   ratio = 0.0025,
+                   geom = c("alignment"),
+                   stat = c("identity", "reduce"),
+                   columns = c("TXNAME", "SYMBOL", "TXID", "GENEID"),
+                   names.expr = "SYMBOL",
+                   label = TRUE,
+                   label.color = "gray40")
+
+\S4method{autoplot}{VRanges}(object, ...,which = NULL,
+                             arrow = TRUE, indel.col = "gray30",
+                             geom = NULL,
+                             xlab, ylab, main)
+
+\S4method{autoplot}{TabixFile}(object, which, ...)
 }
 
 \arguments{
   \item{object}{
     object to be plot.
+  }
+  \item{columns}{
+    columns passed to method works for \code{TranscriptDb} and \code{OrganismDb}.
+  }
+  \item{label.color}{
+    when label turned on for gene model, this parameter controls label color.
+  }
+  \item{arrow}{
+    arrow passed to geome_alignment function to control intron arrow attributes.
+  }
+  \item{indel.col}{
+    indel colors.
   }
   \item{ideogram}{
     Weather to call \code{plotIdeogram} or not, default is \code{FALSE},
@@ -131,7 +163,7 @@
     logical value indicates whether to show x axis and labels or not.
   }
   \item{axis.text.y}{
-    logical value indicates whether to show y axis and labels or not.    
+    logical value indicates whether to show y axis and labels or not.
   }
   \item{hjust}{
     horizontal just for axis text.
@@ -142,13 +174,13 @@
   }
   \item{colnames.label}{
     logical value indicates whether to show colnames of matrix as y
-  label or not.    
+  label or not.
   }
   \item{na.value}{
     color for NA value.
   }
   \item{rotate}{
-    
+
   }
   \item{pheno.plot}{
     show pheno plot or not.
@@ -176,7 +208,7 @@
     used in \code{maxGap}.
   }
   \item{mode}{
-    Display mode for genomic features. 
+    Display mode for genomic features.
   }
   \item{space.skip}{
     space ratio between chromosome spaces in coordate genome.
@@ -190,8 +222,8 @@
   seqnames, other lengths of chromosomes will be assined proportionally
   to their seqlengths, for example, you could specify chr1 to be 0.5, so
   the chr1 will take half of the space and other chromosomes squeezed to
-  take left of the space. 
-  }  
+  take left of the space.
+  }
   \item{legend}{
     A logical value indicates whether to show legend or not. Default is
     \code{TRUE}
@@ -220,7 +252,7 @@
     y label.
   }
   \item{label}{
-    logic value, default TRUE. To show label by the side of features. 
+    logic value, default TRUE. To show label by the side of features.
   }
 \item{facetByRow}{
     A logical value, default is TRUE ,facet RleList by row. If FALSE,
@@ -278,9 +310,6 @@
     unique level or not. If set to \code{FALSE}, if two groups are not
     overlapped with each other, they will probably be layout in the same
     level to save space.
-  }
-  \item{arch.offset}{
-    arch.offset.
   }
   \item{names.expr}{
     names expression used for creating labels.
@@ -429,18 +458,18 @@ library(ggbio)
 set.seed(1)
 N <- 1000
 library(GenomicRanges)
-gr <- GRanges(seqnames = 
+gr <- GRanges(seqnames =
               sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),
               IRanges(
                       start = sample(1:300, size = N, replace = TRUE),
                       width = sample(70:75, size = N,replace = TRUE)),
-              strand = sample(c("+", "-", "*"), size = N, 
+              strand = sample(c("+", "-", "*"), size = N,
                 replace = TRUE),
               value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
-              sample = sample(c("Normal", "Tumor"), 
+              sample = sample(c("Normal", "Tumor"),
                 size = N, replace = TRUE),
-              pair = sample(letters, size = N, 
+              pair = sample(letters, size = N,
                 replace = TRUE))
 
 idx <- sample(1:length(gr), size = 50)
@@ -501,14 +530,14 @@ tracks('non-group' = p1,'group.selfish = TRUE' = p2 , 'group.selfish = FALSE' = 
 ###################################################
 ### code chunk number 8: gr-facet-strand
 ###################################################
-autoplot(gr, stat = "coverage", geom = "area", 
+autoplot(gr, stat = "coverage", geom = "area",
          facets = strand ~ seqnames, aes(fill = strand))
 
 
 ###################################################
 ### code chunk number 9: gr-autoplot-circle
 ###################################################
-autoplot(gr[idx], layout = 'circle') 
+autoplot(gr[idx], layout = 'circle')
 
 
 ###################################################
@@ -519,7 +548,7 @@ values(gr)$to.gr <- gr[sample(1:length(gr), size = length(gr))]
 idx <- sample(1:length(gr), size = 50)
 gr <- gr[idx]
 ggplot() + layout_circle(gr, geom = "ideo", fill = "gray70", radius = 7, trackWidth = 3) +
-  layout_circle(gr, geom = "bar", radius = 10, trackWidth = 4, 
+  layout_circle(gr, geom = "bar", radius = 10, trackWidth = 4,
                 aes(fill = score, y = score)) +
   layout_circle(gr, geom = "point", color = "red", radius = 14,
                 trackWidth = 3, grid = TRUE, aes(y = score)) +
@@ -547,11 +576,11 @@ set.seed(1)
 N <- 100
 ir <-  IRanges(start = sample(1:300, size = N, replace = TRUE),
                width = sample(70:75, size = N,replace = TRUE))
-## add meta data 
+## add meta data
 df <- DataFrame(value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
-              sample = sample(c("Normal", "Tumor"), 
+              sample = sample(c("Normal", "Tumor"),
                 size = N, replace = TRUE),
-              pair = sample(letters, size = N, 
+              pair = sample(letters, size = N,
                 replace = TRUE))
 values(ir) <- df
 ir
@@ -575,18 +604,18 @@ N <- 100
 ## ======================================================================
 ##  simmulated GRanges
 ## ======================================================================
-gr <- GRanges(seqnames = 
+gr <- GRanges(seqnames =
               sample(c("chr1", "chr2", "chr3"),
                      size = N, replace = TRUE),
               IRanges(
                       start = sample(1:300, size = N, replace = TRUE),
                       width = sample(30:40, size = N,replace = TRUE)),
-              strand = sample(c("+", "-", "*"), size = N, 
+              strand = sample(c("+", "-", "*"), size = N,
                 replace = TRUE),
               value = rnorm(N, 10, 3), score = rnorm(N, 100, 30),
-              sample = sample(c("Normal", "Tumor"), 
+              sample = sample(c("Normal", "Tumor"),
                 size = N, replace = TRUE),
-              pair = sample(letters, size = N, 
+              pair = sample(letters, size = N,
                 replace = TRUE))
 
 
@@ -606,7 +635,7 @@ tracks(p1, p2)
 ### code chunk number 17: grl-name
 ###################################################
 autoplot(grl, aes(fill = ..grl_name..))
-## equal to 
+## equal to
 ## autoplot(grl, aes(fill = grl_name))
 
 
@@ -616,7 +645,7 @@ autoplot(grl, aes(fill = ..grl_name..))
 library(IRanges)
 library(ggbio)
 set.seed(1)
-lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
+lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500),
             seq(10, 0.001, length = 500))
 
 ## @knitr create
@@ -694,7 +723,7 @@ txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 ### code chunk number 27: txdb-visual
 ###################################################
 p1 <- autoplot(txdb, which = genesymbol["ALDOA"], names.expr = "tx_name:::gene_id")
-p2 <- autoplot(txdb, which = genesymbol["ALDOA"], stat = "reduce", color = "brown", 
+p2 <- autoplot(txdb, which = genesymbol["ALDOA"], stat = "reduce", color = "brown",
                fill = "brown")
 tracks(full = p1, reduce = p2, heights = c(5, 1)) + ylab("")
 
@@ -735,10 +764,10 @@ tracks(default = p1, rect = p2, coverage = p3)
 ## autoplot(bamfile, which = c("chr1", "chr2"))
 ## autoplot(bf)
 ## autoplot(bf, which = c("chr1", "chr2"))
-## 
+##
 ## data(genesymbol, package = "biovizBase")
 ## autoplot(bamfile,  method = "raw", which = genesymbol["ALDOA"])
-## 
+##
 ## library(BSgenome.Hsapiens.UCSC.hg19)
 ## autoplot(bf, stat = "mismatch", which = genesymbol["ALDOA"], bsgenome = Hsapiens)
 
@@ -802,7 +831,7 @@ mx <- matrix(x, nrow = 5)
 autoplot(mx)
 ## tile gives you a white margin
 rownames(mx) <- LETTERS[1:5]
-autoplot(mx, color = "white") 
+autoplot(mx, color = "white")
 colnames(mx) <- LETTERS[1:20]
 autoplot(mx, color = "white")
 autoplot(mx, color = "white", size = 2)
@@ -815,7 +844,7 @@ autoplot(mx,  aes(width = 0.6, height = 0.6)) + theme_clear()
 ###################################################
 ### Views
 ###################################################
-lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), 
+lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500),
             seq(10, 0.001, length = 500))
 xVector <- dnorm(1:5e3, mean = 1e3, sd = 200)
 xRle <- Rle(xVector)
@@ -928,7 +957,7 @@ autoplot(vcf, genome.axis = FALSE, transpose = FALSE, rownames.label = FALSE)
 autoplot(vcf)
 ## use
 autoplot(vcf, assay.id = "DS")
-## equivalent to 
+## equivalent to
 autoplot(vcf, assay.id = 2)
 ## doesn't work when assay.id cannot find
 autoplot(vcf, assay.id = "NO")
@@ -936,11 +965,11 @@ autoplot(vcf, assay.id = "NO")
 autoplot(vcf, type = "info")
 ## geom bar
 autoplot(vcf, type = "info", aes(y  = THETA))
-autoplot(vcf, type = "info", aes(y  = THETA, fill = VT, color = VT)) 
+autoplot(vcf, type = "info", aes(y  = THETA, fill = VT, color = VT))
 autoplot(vcf, type = "fixed")
 autoplot(vcf, type = "fixed", size = 10) + xlim(c(50310860, 50310890)) + ylim(0.75, 1.25)
 
-p1 <- autoplot(vcf, type = "fixed") + xlim(50310860, 50310890) 
+p1 <- autoplot(vcf, type = "fixed") + xlim(50310860, 50310890)
 p2 <- autoplot(vcf, type = "fixed", full.string = TRUE) + xlim(50310860, 50310890)
 tracks("full.string = FALSE" = p1, "full.string = TRUE" = p2)+
   scale_y_continuous(breaks = NULL, limits = c(0, 3))

@@ -1,56 +1,18 @@
-# setClass("Circle", contains = c("GGbio"),
-#                   slots = list(radius = "numeric",       # starting radius
-#                                trackWidth = "numeric",   # default track width
-#                                buffer = "numeric", 
-#                                curRadius = "numericORNULL",
-#                                trackWidthVec= "numericORNULL",  # track width list
-#                                radiusVec = "numericORNULL",      # starting r of each track
-#                                seqinfo = "Seqinfo"
-#                                ))  #default track width
-# 
-# 
-# Circle <- function(object = ggbio(), radius = 10, trackWidth = 5, buffer = 2,
-#                    curRadius = radius,
-#                    trackWidthVec = NULL, radiusVec = NULL, ...){
-#   ## this should return a call for collecting parameters and evalutte later
-#     new("Circle", object, radius = radius, trackWidth = trackWidth, buffer = buffer,
-#         curRadius = radius, trackWidthVec = trackWidthVec, radiusVec = radiusVec, ...)
-# }
-
-
-# setMethod("circle", "missing", function(){
-#   
-# })
-# is(Circle(), "GGbio")
-# ggbio(data) + layout_circle() + layout_circle() + layout_circle()
-# ggbio() + circle() + circle() + 
-# ggbio() + circle(data1) + circle(data2)
-# ggbio(data) + circle() + circle(data2)
-
-## TODO: also should work for tracks too
-## 1) order
-## 2) remove 
-
-
-# it has to compute at change current growing 
-## ## accessor
-
-
 setGeneric("layout_circle", function(data,...) standardGeneric("layout_circle"))
 
 setMethod("layout_circle",  "GRanges",
           function(data, ..., geom = c("point","line", "link", "ribbon","rect", "bar",
-                                       "segment","hist", "scale",  "heatmap", 
+                                       "segment","hist", "scale",  "heatmap",
                                 "ideogram", "text"), linked.to,
-                          radius = 10, trackWidth = 5, 
+                          radius = 10, trackWidth = 5,
                           space.skip = 0.015, direction = c("clockwise", "anticlockwise"),
                           link.fun = function(x, y, n = 30) bezier(x, y, evaluation = n),
-                   rect.inter.n = 60, rank,  ylim = NULL, 
+                   rect.inter.n = 60, rank,  ylim = NULL,
                    scale.n = 60, scale.unit = NULL, scale.type = c("M", "B", "sci"),
                    grid.n = 5, grid.background = "gray70", grid.line = "white",
                    grid = FALSE,
                    chr.weight = NULL){
- 
+
   args <- dots <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
@@ -84,14 +46,14 @@ setMethod("layout_circle",  "GRanges",
                     space.skip = space.skip, trackWidth = trackWidth,
                                   n = rect.inter.n,
                     radius = radius, direction = direction, chr.weight = chr.weight)
-    names(res) <- NULL    
+    names(res) <- NULL
     df <- as.data.frame(res)
-    args.aes <-   args.non <- list()    
+    args.aes <-   args.non <- list()
     args.aes$y <- as.name(".circle.y")
     args.aes$x <- as.name(".circle.x")
-    args.aes$group <- as.name(".biovizBase.group")    
+    args.aes$group <- as.name(".biovizBase.group")
     aes <- do.call("aes", args.aes)
-    args.non$color <- grid.line  
+    args.non$color <- grid.line
     args.tot <- c(list(data = df), list(aes), args.non)
     res <- do.call(geom_path, args.tot)
     p <- c(p ,list(res))
@@ -113,7 +75,7 @@ setMethod("layout_circle",  "GRanges",
     args.aes$x <- as.name(".circle.x")
     args.aes$group <- as.name(".biovizBase.group")
 
-    
+
     if("fill" %in% names(args.aes)){
       if(!"color" %in% names(args.aes)){
         args.aes$color <- args.aes$fill
@@ -127,11 +89,11 @@ setMethod("layout_circle",  "GRanges",
     args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_polygon, args.tot)
     p <- list(res)
-    
+
   }
 
   if(geom == "text"){
-    obj <- transformToGenome(data, space.skip, chr.weight = chr.weight)        
+    obj <- transformToGenome(data, space.skip, chr.weight = chr.weight)
     if("label" %in% names(args.aes)){
       lbs <- as.character(args.aes$label)
       if(!lbs %in% c(colnames(mold(obj[1,])),"start", "end", "seqnames","width"))
@@ -139,7 +101,7 @@ setMethod("layout_circle",  "GRanges",
     }else{
       stop("missing label argument in aes()")
     }
-    obj <- transformToCircle(obj, y = as.character(args.aes$y), radius= radius, ylim = ylim, 
+    obj <- transformToCircle(obj, y = as.character(args.aes$y), radius= radius, ylim = ylim,
                              trackWidth = trackWidth,
                      direction = direction)
     ## compute angle
@@ -147,17 +109,17 @@ setMethod("layout_circle",  "GRanges",
       ags <- eval(args.aes$angle, data)
       ags <-  - values(obj)$.circle.angle * 180 / pi + ags
       values(obj)$.processed.angle <- ags
-      args.aes$angle <- as.name(".processed.angle")      
+      args.aes$angle <- as.name(".processed.angle")
     }else{
-      ags <-  - values(obj)$.circle.angle * 180/pi 
+      ags <-  - values(obj)$.circle.angle * 180/pi
       values(obj)$.processed.angle <- ags
-      args.aes$angle <- as.name(".processed.angle")      
+      args.aes$angle <- as.name(".processed.angle")
     }
     if("angle" %in% names(dots)){
       ags <-  - values(obj)$.circle.angle * 180 / pi +
         as.numeric(paste(as.character(dots$angle), collapse = ""))
       values(obj)$.processed.angle <- ags
-      args.aes$angle <- as.name(".processed.angle")      
+      args.aes$angle <- as.name(".processed.angle")
     }
     names(obj) <- NULL
     df <- as.data.frame(obj)
@@ -167,7 +129,7 @@ setMethod("layout_circle",  "GRanges",
     args.tot <- c(list(data = df, aes), args.non)
     res <- do.call(geom_text, args.tot)
     p <- list(res)
-    
+
   }
 
   if(geom == "point"){
@@ -178,7 +140,7 @@ setMethod("layout_circle",  "GRanges",
     }else{
       .y <- as.character(args.aes$y)
     }
-    obj <- transformToCircle(obj, y = .y, radius= radius, trackWidth = trackWidth, ylim = ylim, 
+    obj <- transformToCircle(obj, y = .y, radius= radius, trackWidth = trackWidth, ylim = ylim,
                      direction = direction)
     names(obj) <- NULL
     df <- as.data.frame(obj)
@@ -189,12 +151,12 @@ setMethod("layout_circle",  "GRanges",
     res <- do.call(geom_point, args.tot)
     p <- list(res)
   }
-  
+
   if(geom == "line"){
     if(!"y" %in% names(args.aes))
       stop("y is missing in aes()")
-    obj <- transformToGenome(data, space.skip, chr.weight = chr.weight)    
-    obj <- transformToCircle(obj, y = as.character(args.aes$y), ylim = ylim, 
+    obj <- transformToGenome(data, space.skip, chr.weight = chr.weight)
+    obj <- transformToCircle(obj, y = as.character(args.aes$y), ylim = ylim,
                              radius= radius, trackWidth = trackWidth,
                      direction = direction)
     names(obj) <- NULL
@@ -207,16 +169,16 @@ setMethod("layout_circle",  "GRanges",
     res <- do.call(geom_path, args.tot)
     p <- list(res)
   }
-  
+
   if(geom == "segment"){
     res <- transformToSegInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth,
                     radius = radius, direction = direction, chr.weight = chr.weight)
-    names(res) <- NULL    
+    names(res) <- NULL
     df <- as.data.frame(res)
     args.aes$y <- as.name(".circle.y")
     args.aes$x <- as.name(".circle.x")
-    args.aes$group <- as.name(".biovizBase.group")    
+    args.aes$group <- as.name(".biovizBase.group")
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = df), list(aes), args.non)
     res <- do.call(geom_path, args.tot)
@@ -227,17 +189,17 @@ setMethod("layout_circle",  "GRanges",
     res <- biovizBase:::transformToSegInCircle2(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth,
                     radius = radius, direction = direction, chr.weight = chr.weight)
-    names(res) <- NULL    
+    names(res) <- NULL
     df <- as.data.frame(res)
     args.aes$y <- as.name(".circle.y")
     args.aes$x <- as.name(".circle.x")
-    args.aes$group <- as.name(".biovizBase.group")    
+    args.aes$group <- as.name(".biovizBase.group")
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = df), list(aes), args.non)
     res <- do.call(geom_path, args.tot)
     p <- list(res)
   }
-  
+
   if(geom == "scale"){
     ## like ideogram
     res <- getIdeoGR(data)
@@ -247,9 +209,9 @@ setMethod("layout_circle",  "GRanges",
     values(res0)$scale.y <- 0
     values(res0)$.biovizBase.group <- seq_len(length(res0))
     res <- c(res, res0)
-    res <- transformToGenome(res, space.skip, chr.weight = chr.weight)    
+    res <- transformToGenome(res, space.skip, chr.weight = chr.weight)
     res <- transformToCircle(res, y = "scale.y", radius= radius, trackWidth = trackWidth,
-                             ylim = ylim, 
+                             ylim = ylim,
                      direction = direction)
     names(res) <- NULL
     df <- as.data.frame(res)
@@ -269,18 +231,18 @@ setMethod("layout_circle",  "GRanges",
       ags <- eval(args.aes$angle, data)
       ags <- 90 - res$.circle.angle * 180 / pi + ags
       res$.processed.angle <- ags
-      args.aes.text$angle <- as.name(".processed.angle")      
+      args.aes.text$angle <- as.name(".processed.angle")
     }else{
-      ags <- 90 - res$.circle.angle * 180/pi 
+      ags <- 90 - res$.circle.angle * 180/pi
       res$.processed.angle <- ags
-      args.aes.text$angle <- as.name(".processed.angle")      
+      args.aes.text$angle <- as.name(".processed.angle")
     }
     args.aes.text$label <- as.name("text.major")
     if(!"hjust" %in% c(names(args.non), names(args.aes.text)))
       args.non$hjust <- 0
-    if(!"size" %in% c(names(args.non), names(args.aes.text)))    
+    if(!"size" %in% c(names(args.non), names(args.aes.text)))
       args.non$size <- 3
-    
+
     aes <- do.call("aes", args.aes)
     aes.text <- do.call("aes", c(args.aes.text))
     args.tot <- c(list(data = res), list(aes.text), args.non)
@@ -312,12 +274,12 @@ setMethod("layout_circle",  "GRanges",
     res <- do.call(geom_polygon, args.tot)
     p <- list(res)
   }
-  
+
   if(geom == "bar"){
     res <- transformToBarInCircle(data, y = as.character(args.aes$y),
                     space.skip = space.skip, trackWidth = trackWidth, radius = radius,
                     direction = direction, n = rect.inter.n, chr.weight = chr.weight)
-    names(res) <- NULL    
+    names(res) <- NULL
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
     df <- df[idx, ]
@@ -336,7 +298,7 @@ setMethod("layout_circle",  "GRanges",
     res <- do.call(geom_polygon, args.tot)
     p <- list(res)
   }
-  
+
   if(geom == "link"){
     res <- transformToLinkInCircle(data, space.skip = space.skip, linked.to = linked.to,
                      link.fun = link.fun, trackWidth = trackWidth, radius = radius,
@@ -359,7 +321,7 @@ setMethod("layout_circle",  "GRanges",
   if(grid)
     p <- c(p.grid, p)
   p <- c(p, list(theme_null(), theme(aspect.ratio = 1)))
-  p 
+  p
 })
 
 

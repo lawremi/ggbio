@@ -40,7 +40,7 @@ importMethodsFrom(Biobase, exprs, pData, phenoData, varLabels)
 importMethodsFrom(Biostrings, getSeq)
 
 ## S4Vectors
-importFrom(S4Vectors, isSingleString)
+importFrom(S4Vectors, isSingleString, metadata)
 importClassesFrom(S4Vectors, characterORNULL)
 
 ## IRanges
@@ -57,7 +57,7 @@ importMethodsFrom(IRanges,  split,
                   "start<-", "end<-", "width<-", "%in%",
                   Views, coverage, disjointBins,
                   elementLengths, findOverlaps, gaps, mcols,
-                  "mcols<-", metadata, queryHits, reduce, score,
+                  "mcols<-", queryHits, reduce, score,
                   slice, subjectHits, subsetByOverlaps, values, "values<-",
                   viewMaxs, viewMeans, viewMins, viewSums, viewWhichMaxs,
                   viewWhichMins)

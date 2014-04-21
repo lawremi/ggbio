@@ -41,7 +41,7 @@ importMethodsFrom(Biostrings, getSeq)
 
 ## S4Vectors
 importFrom(S4Vectors, isSingleString, metadata)
-importClassesFrom(S4Vectors, characterORNULL)
+importClassesFrom(S4Vectors, characterORNULL, Annotated)
 
 ## IRanges
 importFrom(IRanges, DataFrame, IRanges)
@@ -63,7 +63,7 @@ importMethodsFrom(IRanges,  split,
                   viewWhichMins)
 importClassesFrom(IRanges, Rle, RleList, IRanges, Views,
                   expressionORfunction, functionORNULL,
-                  SimpleList, List, Vector, Annotated)
+                  SimpleList, List, Vector)
 
 ## GenomicRanges
 importFrom(GenomicRanges, keepSeqlevels, GRanges, GRangesList)

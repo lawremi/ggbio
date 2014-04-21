@@ -40,7 +40,7 @@ importMethodsFrom(Biobase, exprs, pData, phenoData, varLabels)
 importMethodsFrom(Biostrings, getSeq)
 
 ## S4Vectors
-importFrom(S4Vectors, isSingleString, metadata)
+importFrom(S4Vectors, isSingleString, metadata, "metadata<-")
 importClassesFrom(S4Vectors, characterORNULL, Annotated)
 
 ## IRanges

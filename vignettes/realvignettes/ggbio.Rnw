@@ -24,9 +24,9 @@ options(replace.assign=TRUE,width=80)
 
 
 
-%% <<include=FALSE>>=
-%% opts_chunk$set(eval=FALSE)
-%% @
+<<include=FALSE>>=
+opts_chunk$set(eval=FALSE)
+@
 
 
 \newcommand{\Rfunarg}[1]{{\texttt{#1}}}

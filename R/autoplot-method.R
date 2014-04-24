@@ -719,7 +719,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
 
 
     seqs <- getSeq(object, which, as.character = TRUE)
-    seqs <- IRanges:::safeExplode(seqs)
+    seqs <- safeExplode(seqs)
     xs <- seq(start(which), length.out = width(which))
     df <- data.frame(x = xs, seqs = seqs)
 

@@ -553,7 +553,7 @@ p
 @
 
 All those code could be simply constructed by following code
-<<eval = TRUE>>=
+<<>>=
 p <- ggbio() +
    circle(gr.crc1, geom = "link", linked.to = "to.gr", aes(color = rearrangements)) +
   circle(gr.crc1, geom = "point", aes(y = score, size = tumreads),

@@ -41,7 +41,9 @@ importMethodsFrom(Biostrings, getSeq)
 
 ## S4Vectors
 importFrom(S4Vectors, isSingleString, metadata, "metadata<-", safeExplode)
-importClassesFrom(S4Vectors, characterORNULL, Annotated)
+importMethodsFrom(S4Vectors, mcols, "mcols<-", values, "values<-",
+                  queryHits, subjectHits)
+importClassesFrom(S4Vectors, characterORNULL, Annotated, Vector)
 
 ## IRanges
 importFrom(IRanges, DataFrame, IRanges)
@@ -56,14 +58,14 @@ importMethodsFrom(IRanges,  split,
                   start, end, width,
                   "start<-", "end<-", "width<-", "%in%",
                   Views, coverage, disjointBins,
-                  elementLengths, findOverlaps, gaps, mcols,
-                  "mcols<-", queryHits, reduce, score,
-                  slice, subjectHits, subsetByOverlaps, values, "values<-",
+                  elementLengths, findOverlaps, gaps,
+                  reduce, score,
+                  slice, subsetByOverlaps,
                   viewMaxs, viewMeans, viewMins, viewSums, viewWhichMaxs,
                   viewWhichMins)
 importClassesFrom(IRanges, Rle, RleList, IRanges, Views,
                   expressionORfunction, functionORNULL,
-                  SimpleList, List, Vector)
+                  SimpleList, List)
 
 ## GenomicRanges
 importFrom(GenomicRanges, keepSeqlevels, GRanges, GRangesList)

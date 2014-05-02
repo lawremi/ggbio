@@ -36,9 +36,6 @@ import(biovizBase)
 importClassesFrom(Biobase, ExpressionSet, eSet, AssayData)
 importMethodsFrom(Biobase, exprs, pData, phenoData, varLabels)
 
-## Biostrings
-importMethodsFrom(Biostrings, getSeq)
-
 ## S4Vectors
 importFrom(S4Vectors, isSingleString, metadata, "metadata<-", safeExplode)
 importMethodsFrom(S4Vectors, mcols, "mcols<-", values, "values<-",
@@ -67,15 +64,19 @@ importClassesFrom(IRanges, Rle, RleList, IRanges, Views,
                   expressionORfunction, functionORNULL,
                   SimpleList, List)
 
+## GenomeInfoDb
+import(GenomeInfoDb)
+
 ## GenomicRanges
-importFrom(GenomicRanges, keepSeqlevels, GRanges, GRangesList)
+importFrom(GenomicRanges, GRanges, GRangesList)
 importMethodsFrom(GenomicRanges, assays, colData, exptData, granges, grglist,
                   rowData, ranges, "ranges<-",
                   start, end, width, "start<-", "end<-", "width<-",
-                  seqnames, seqinfo, "seqinfo<-", seqlengths, "seqlengths<-",
-                  seqlevels, "seqlevels<-", seqnames, show,
-                  as.data.frame, sort)
+                  seqinfo, "seqinfo<-", show, as.data.frame, sort)
 importClassesFrom(GenomicRanges, GRanges, GRangesList, GenomicRangesList)
+
+## Biostrings
+importMethodsFrom(Biostrings, getSeq)
 
 ## Rsamtools
 importFrom(Rsamtools, BamFile)
@@ -89,13 +90,13 @@ importClassesFrom(GenomicAlignments, GAlignments)
 ## BSgenome
 importClassesFrom(BSgenome, BSgenome)
 
-## GenomicFeatures
-importClassesFrom(GenomicFeatures,TranscriptDb)
-importMethodsFrom(GenomicFeatures, exonsBy)
-
 ## rtracklayer
 importMethodsFrom(rtracklayer, import)
 importClassesFrom(rtracklayer, BigWigFile)
+
+## GenomicFeatures
+importClassesFrom(GenomicFeatures,TranscriptDb)
+importMethodsFrom(GenomicFeatures, exonsBy)
 
 ## VariantAnnotation
 importClassesFrom(VariantAnnotation, VCF)

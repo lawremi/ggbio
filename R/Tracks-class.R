@@ -131,7 +131,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
       idx <- sapply(list(...), function(x){is(x, "GRanges")})
       if(any(idx)){
           grs <- list(...)[idx]
-          grs <- do.call(c, grs)
+          grs <- do.call(c, unname(grs))
           chrs <- unique(as.character(seqnames(grs)))
           if(length(chrs) > 1){
               stop("seqnames of passed GRanges has to be the same for tracks")

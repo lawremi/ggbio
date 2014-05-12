@@ -186,6 +186,7 @@ getLimitsFromLayer <- function(obj){
 evalLan <- function(obj){
   x <- obj$mapping$x
   y <- obj$mapping$y
+  xlim <- ylim <- NULL
   if(is.language(x) & is.language(y)){
     xlim <- range(eval(x))
     ylim <- range(eval(y))

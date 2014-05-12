@@ -128,10 +128,13 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
   wh <- NULL
   ## xlim
   if(missing(xlim)){
-      idx <- sapply(list(...), function(x){is(x, "GRanges")})
+    ### FIXME: this should just try to call range(unlist(x)) on each arg
+    ###        and then call range(do.call(c, unname(r))) on the successful
+    ###        results.
+      idx <- sapply(list(...), function(x){is(x, "GenomicRangesORGRangesList")})
       if(any(idx)){
           grs <- list(...)[idx]
-          grs <- do.call(c, unname(grs))
+          grs <- unlist(do.call(c, unname(grs)))
           chrs <- unique(as.character(seqnames(grs)))
           if(length(chrs) > 1){
               stop("seqnames of passed GRanges has to be the same for tracks")

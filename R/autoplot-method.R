@@ -1018,7 +1018,9 @@ setMethod("autoplot", "ExpressionSet", function(object, ...,
     df.exp <- exprs(object)
     df <- as.data.frame(df.exp)
     if(type == "scatterplot.matrix"){
-        p <- plotmatrix(df, ...)
+        stop("scatterplot.matrix is not supported yet")
+       ## p <- ggpairs(df, ...)
+          p <- ggplot()
     }
     if(type == "heatmap"){
         ## add pheno type data
@@ -1818,8 +1820,10 @@ setMethod("autoplot", "SummarizedExperiment", function(object, ...,
         p <- .ggpcp(df, ...) + geom_boxplot(aes(group=variable))+ xlab("Sample Name")
     }
     if(type == "scatterplot.matrix"){
+        stop("scatterplot.matrix is not supported yet")
         df <- as.data.frame(res)
-        p <- plotmatrix(df, ...)
+ ##       p <- ggpairs(df, ...)
+        p <- ggplot()
     }
 
     if(!is(p, "GGbio"))

@@ -16,7 +16,7 @@ importFrom(stats, approx, as.formula, df)
 importFrom(utils, capture.output, getFromNamespace)
 
 ###
-
+importFrom(GGally, ggpairs)
 import(ggplot2)
 import(gtable)
 ### importFrom(gtable, gtable, gtable_add_grob, gtable_add_cols, gtable_add_rows, gtable_filter)

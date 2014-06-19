@@ -1048,8 +1048,8 @@ setMethod("autoplot", "ExpressionSet", function(object, ...,
             })
             ry <- c(rep(TRUE, N), FALSE)
             l <- c(l, list(p))
-            return(do.call(alignPlots, c(l, list(vertical = FALSE, remove.y.axis = ry,
-                                                 widths = hts))))
+            return(grid::grid.draw(do.call(alignPlots, c(l, list(vertical = FALSE, remove.y.axis = ry,
+                                                 widths = hts)))))
         }
     }
     if(type == "pcp"){
@@ -1799,8 +1799,8 @@ setMethod("autoplot", "SummarizedExperiment", function(object, ...,
             })
             ry <- c(rep(TRUE, N), FALSE)
             l <- c(l, list(p))
-            return(do.call(alignPlots, c(l, list(vertical = FALSE, remove.y.axis = ry,
-                                                 widths = hts))))
+            return(grid::grid.draw(do.call(alignPlots, c(l, list(vertical = FALSE, remove.y.axis = ry,
+                                                 widths = hts)))))
         }
 
     }

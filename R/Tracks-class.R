@@ -109,17 +109,6 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
   ## is blank
   isBlank <- sapply(dots, function(x) x@blank)
 
-
-#   if(length(label.text.color) == 1)
-#       label.text.color <- rep(label.text.color, len = length(dots))
-#   if(length(label.text.cex) == 1)
-#       label.text.cex <- rep(label.text.cex, len = length(dots))
-#   if(length(label.bg.color) == 1)
-#       label.bg.color <- rep(label.bg.color, len = length(dots))
-#   if(length(label.bg.fill) == 1)
-#       label.bg.fill <- rep(label.bg.fill, len = length(dots))
-
-
   ## ylim
   ylim <- lapply(dots[!fixed & !isIdeo & !isBlank], function(grob){
      scales::expand_range(getLimits(grob)$ylim, mul = 0.05)
@@ -175,13 +164,6 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     })
     dots <- do.call(PlotList, dots)
   }
-
-  ## track bround
-  ##   if(is.null(track.bg.color))
-  ##     track.plot.color <- sapply(dots, bgColor)
-  ##   else
-  ##     track.plot.color <- rep(track.bg.color, length(dots))
-  ## stopifnot(length(track.bg.color) == N | length(track.bg.color) == 1)
 
   ## plot background
   N <- length(dots)
@@ -255,13 +237,8 @@ setMethod("print", "Tracks", function(x){
                     if(i %in% which(x@mutable))
                       grobs[[i]] <- grobs[[i]] + x@theme
                     grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "")
-#                     if(i == 1 && !is.null(x@main)){
-#                       grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(1, 1,
-#                               as.numeric(x@padding),  0.5), "lines"))
-#                     }else{
                      grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(as.numeric(x@padding), 1,
                               as.numeric(x@padding),  0.5), "lines"))
-                    #}
                     if(i %in% which(!x@hasAxis))
                       grobs[[i]] <- grobs[[i]] + theme(axis.text.x = element_blank(),
                                                        axis.ticks.x = element_blank())
@@ -315,6 +292,7 @@ setGeneric("get_gtable", function(x, ...) standardGeneric("get_gtable"))
 setMethod("get_gtable", "Tracks", function(x){
     grobs <- x@grobs
     N <- length(grobs)
+   .scale.grob <- grobs[[N]]
     if(any(x@labeled))
       nms <- names(x@grobs)
     else
@@ -323,8 +301,8 @@ setMethod("get_gtable", "Tracks", function(x){
                   function(i) {
                     if(i %in% which(x@mutable))
                       grobs[[i]] <- grobs[[i]] + x@theme
-                    grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "") +
-                      theme(plot.margin = unit(c(as.numeric(x@padding), 1,
+                    grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "")
+                     grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(as.numeric(x@padding), 1,
                               as.numeric(x@padding),  0.5), "lines"))
                     if(i %in% which(!x@hasAxis))
                       grobs[[i]] <- grobs[[i]] + theme(axis.text.x = element_blank(),
@@ -339,6 +317,7 @@ setMethod("get_gtable", "Tracks", function(x){
 
     if(!is.null(nms))
       names(lst) <- nms
+
     if(any(x@labeled))
       res <- do.call(alignPlots, c(lst, list(heights = x@heights,
                                              padding = x@padding,
@@ -353,7 +332,8 @@ setMethod("get_gtable", "Tracks", function(x){
                                              xlab = x@xlab,
                                              main.height = x@main.height,
                                              scale.height = x@scale.height,
-                                             xlab.height = x@xlab.height
+                                             xlab.height = x@xlab.height,
+                                             .scale.grob = .scale.grob
                                              )))
     else
       res <- do.call(alignPlots, c(lst, list(heights = x@heights,
@@ -364,10 +344,13 @@ setMethod("get_gtable", "Tracks", function(x){
                                              xlab = x@xlab,
                                              main.height = x@main.height,
                                              scale.height = x@scale.height,
-                                             xlab.height = x@xlab.height
+                                             xlab.height = x@xlab.height,
+                                             .scale.grob = .scale.grob
                                              )))
 
     res
+
+
 })
 
 setMethod("show", "Tracks", function(object){
@@ -536,12 +519,6 @@ setReplaceMethod("xlim", c("Tracks", "numeric"), function(x, value){
   x
 })
 
-## setMethod("update", "Tracks", function(object, xlim){
-##   xlim(object) <- xlim
-##   object@xlim <- xlim
-##   print(object)
-## })
-
 setGeneric("reset", function(obj, ...) standardGeneric("reset"))
 setMethod("reset", "Tracks", function(obj){
   nms <- setdiff(slotNames(obj), "backup")
@@ -610,16 +587,14 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   if(length(track.plot.color) == 1){
       track.plot.color <- rep(track.plot.color, N)
   }
-
   ## add a plot with axis and remove later
-  if(TRUE){
+
+  if(vertical){
     idx.fix <- which(!sapply(ggl, fixed) & !sapply(ggl, is, "Ideogram"))[1]
     if(is.na(idx.fix))
       idx.fix <- length(ggl)
-    ## ggl <- c(ggl, list(ggl[[idx.fix]] + theme_gray()))
     ggl <- c(ggl, list(.scale.grob))
   }
-
   ## parse grobs
   ## a little slow
   grobs <- do.call(GrobList, ggl)
@@ -713,7 +688,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
 
   names(grobs) <- .nms
 
-  if(TRUE){
+  if(vertical){
     g.last <- grobs[[length(grobs)]]
     grobs <- grobs[-length(grobs)]
     g <- g.last$grobs[[1]]$children[[1]]$children$layout
@@ -755,19 +730,10 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
       grobs[[i]] <- removeXAxis(grobs[[i]])
   }
 
-  ## nms <- names(grobs)
-#   nms <- label.name
   ## FIXME:
   lbs <- sapply(grobs, labeled)
   nms <- names(lbs)
-#   print(grid.draw(gTree(grobs[3])))
-#   dev.off()
-# browser()
-#   ## add lables
-# length(grobs)
-# length(nms)
-# nms
-# lbs
+
   if(vertical){
     if(any(!is.null(nms)))
       grobs <- addLabel(grobs, nms, lbs,
@@ -817,7 +783,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     ## TODO check main later
     if(length(main))
       heights <- unit.c(main.height, heights)
-    if(TRUE)
+    if(vertical)
       heights <- unit.c(heights, scale.height)
     if(length(xlab))
       heights <- unit.c(heights, xlab.height)

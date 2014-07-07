@@ -39,8 +39,8 @@ importMethodsFrom(Biobase, exprs, pData, phenoData, varLabels)
 ## S4Vectors
 importFrom(S4Vectors, isSingleString, metadata, "metadata<-", safeExplode)
 importMethodsFrom(S4Vectors, mcols, "mcols<-", values, "values<-",
-                  queryHits, subjectHits)
-importClassesFrom(S4Vectors, characterORNULL, Annotated, Vector)
+                  "%in%", queryHits, subjectHits)
+importClassesFrom(S4Vectors, characterORNULL, Annotated, Vector, Rle)
 
 ## IRanges
 importFrom(IRanges, DataFrame, IRanges)
@@ -53,14 +53,14 @@ importMethodsFrom(IRanges,  split,
                   show,
                   ranges, "ranges<-",
                   start, end, width,
-                  "start<-", "end<-", "width<-", "%in%",
+                  "start<-", "end<-", "width<-",
                   Views, coverage, disjointBins,
                   elementLengths, findOverlaps, gaps,
                   reduce, score,
                   slice, subsetByOverlaps,
                   viewMaxs, viewMeans, viewMins, viewSums, viewWhichMaxs,
                   viewWhichMins)
-importClassesFrom(IRanges, Rle, RleList, IRanges, Views,
+importClassesFrom(IRanges, RleList, IRanges, Views,
                   expressionORfunction, functionORNULL,
                   SimpleList, List)
 

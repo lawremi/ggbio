@@ -24,7 +24,7 @@ Imports: grid, grDevices, graphics, stats, utils, biovizBase (>= 1.13.8),
 VignetteBuilder: knitr
 Suggests: vsn, BSgenome.Hsapiens.UCSC.hg19, Homo.sapiens,
         TxDb.Hsapiens.UCSC.hg19.knownGene, chipseq,
-        TxDb.Mmusculus.UCSC.mm9.knownGene, knitr, BiocStyle
+        TxDb.Mmusculus.UCSC.mm9.knownGene, knitr, BiocStyle, testthat
 URL: http://tengfei.github.com/ggbio/
 BugReports: https://github.com/tengfei/ggbio/issues
 License: Artistic-2.0

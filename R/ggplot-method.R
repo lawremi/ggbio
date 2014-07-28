@@ -99,7 +99,7 @@ setMethod("ggplot", "character", function(data, ...){
 })
 
 
-setMethod("ggplot", "TranscriptDb", function(data, ...){
+setMethod("ggplot", "TxDb", function(data, ...){
   g <- ggplot2::ggplot(...)
   g <- GGbio(g, data = data)                        
   g

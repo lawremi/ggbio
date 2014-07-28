@@ -3,7 +3,7 @@ setMethod("plotSpliceSum", c("character", "GRangesList"),
   freq <- biovizBase:::spliceSummary(data, model, weighted = weighted)
   autoplot(model, freq = freq, ...)
 })
-setMethod("plotSpliceSum", c("character", "TranscriptDb"),
+setMethod("plotSpliceSum", c("character", "TxDb"),
           function(data, model, which, ..., weighted = TRUE){
             exons <- exonsBy(model, by = "tx")
             exons <- subsetByOverlaps(exons, which)

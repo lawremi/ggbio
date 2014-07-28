@@ -5,7 +5,7 @@
 \alias{geom_alignment,OrganismDb-method}
 \alias{geom_alignment,missing-method}
 \alias{geom_alignment,uneval-method}
-\alias{geom_alignment,TranscriptDb-method}
+\alias{geom_alignment,TxDb-method}
 \alias{geom_alignment,BamFile-method}
 \title{Alignment geoms for GRanges object}
 \description{
@@ -19,7 +19,7 @@
                  "segment"), rect.height = NULL, group.selfish = TRUE,
                   label = TRUE)
 
-\S4method{geom_alignment}{TranscriptDb}(data, ..., which, columns = c("tx_id", "tx_name",
+\S4method{geom_alignment}{TxDb}(data, ..., which, columns = c("tx_id", "tx_name",
                  "gene_id"), names.expr = "tx_name", facets = NULL,
                  truncate.gaps = FALSE, truncate.fun = NULL, ratio =
                  0.0025)
@@ -50,13 +50,13 @@
 }
 \arguments{
   \item{data}{
-    A \code{GRanges} or \code{data.frame} or \code{TranscriptDb} object.
+    A \code{GRanges} or \code{data.frame} or \code{TxDb} object.
   }
   \item{...}{
     Extra parameters such as aes() passed.
   }
   \item{which}{
-    \code{GRanges} object to subset the \code{TranscriptDb} object.
+    \code{GRanges} object to subset the \code{TxDb} object.
   }
   \item{cds.rect.h}{
     cds heights.
@@ -97,7 +97,7 @@
     randomly assigned stepping levels as y varialbe. "identity" allow
     users to specify \code{y} value in \code{aes}.
 
-    For  \code{\linkS4class{TranscriptDb}}:
+    For  \code{\linkS4class{TxDb}}:
     defualt "identity" give full gene model and "reduce" for reduced model.
   }
   \item{gap.geom}{
@@ -191,7 +191,7 @@ ggplot(gr) + geom_alignment(stat = "stepping", aes(group = pair), group.selfish 
 ggplot(gr) + geom_alignment(range.geom = "arrowrect", gap.geom = "chevron")
 
 ## =======================================
-##  For TranscriptDb
+##  For TxDb
 ## =======================================
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 data(genesymbol, package = "biovizBase")

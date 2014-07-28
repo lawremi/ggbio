@@ -529,18 +529,18 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
 
 ## FIX THIS first:
 ## ======================================================================
-##        For "TranscriptDb"(Genomic Structure)
+##        For "TxDb"(Genomic Structure)
 ## ======================================================================
-setMethod("autoplot", "TranscriptDb", function(object, which, ...,
-                                               xlab, ylab, main,
-                                               truncate.gaps = FALSE,
-                                               truncate.fun = NULL,
-                                               ratio = 0.0025,
-                                               mode = c("full", "reduce"), #mode is combination of geom and stat and more
-                                               geom = c("alignment"),
-                                               stat = c("identity", "reduce"),
-                                               names.expr = "tx_name",
-                                               label = TRUE){
+setMethod("autoplot", "TxDb", function(object, which, ...,
+                                       xlab, ylab, main,
+                                       truncate.gaps = FALSE,
+                                       truncate.fun = NULL,
+                                       ratio = 0.0025,
+                                       mode = c("full", "reduce"), #mode is combination of geom and stat and more
+                                       geom = c("alignment"),
+                                       stat = c("identity", "reduce"),
+                                       names.expr = "tx_name",
+                                       label = TRUE){
 
 
     ## FIXME: does it always work?

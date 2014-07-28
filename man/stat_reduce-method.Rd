@@ -4,10 +4,10 @@
 \alias{stat_reduce,uneval-method}
 \alias{stat_reduce,GRanges-method}
 \alias{stat_reduce,IRanges-method}
-\alias{stat_reduce,TranscriptDb-method}
+\alias{stat_reduce,TxDb-method}
 \title{Reduce an object.}
 \description{
-  Reduce \code{GRanges}, \code{IRanges} or \code{TranscriptDb} object.
+  Reduce \code{GRanges}, \code{IRanges} or \code{TxDb} object.
 }
 \usage{
 \S4method{stat_reduce}{GRanges}(data, ...,
@@ -23,11 +23,11 @@
            with.inframe.attrib=FALSE,
            facets = NULL, geom = NULL)
 
-\S4method{stat_reduce}{TranscriptDb}(data, ...)
+\S4method{stat_reduce}{TxDb}(data, ...)
 }
 \arguments{
   \item{data}{
-    \code{GRanges}, \code{IRanges} or \code{TranscriptDb} object.
+    \code{GRanges}, \code{IRanges} or \code{TxDb} object.
   }
   \item{...}{
     passed to aesthetics mapping.

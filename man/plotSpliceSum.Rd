@@ -1,7 +1,7 @@
 \name{plotSpliceSum}
 \alias{plotSpliceSum}
 \alias{plotSpliceSum,character,GRangesList-method}
-\alias{plotSpliceSum,character,TranscriptDb-method}
+\alias{plotSpliceSum,character,TxDb-method}
 \title{Plot Splice Summary from RNA-seq data}
 \description{
   Plot splice summary by simply counting overlaped junction read in
@@ -10,8 +10,8 @@
 \usage{
 ## For character,GRangesList
 \S4method{plotSpliceSum}{character,GRangesList}(data, model, ..., weighted = TRUE)
-## For character,TranscriptDb
-\S4method{plotSpliceSum}{character,TranscriptDb}(data, model, which,
+## For character,TxDb
+\S4method{plotSpliceSum}{character,TxDb}(data, model, which,
       ..., weighted = TRUE)
 }
 \arguments{
@@ -19,14 +19,14 @@
     A character specifying the bam file path of RNA-seq data.
   }
   \item{model}{
-    A GRangesList which represting different isoforms, or a TranscriptDb
+    A GRangesList which represting different isoforms, or a TxDb
     object. In the second case, users need to pass "which" argument
     which is a GRanges object to specify the region. And we get
     connonical model internally.
   }
   \item{which}{
     A GRanges object specifying the region you want to get model from
-    the TranscriptDb object.
+    the TxDb object.
   }
   \item{weighted}{
     If \code{TRUE}, weighted by simply add 1/cases matched to each model

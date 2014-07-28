@@ -132,8 +132,7 @@ gene model track:
 \begin{itemize}
   \item \Rclass{OrganismDb} object: recommended, support gene symbols and other
     combination of columns as label.
-  \item \Rclass{TranscriptDb} object: don't support gene symbol
-    labeling.
+  \item \Rclass{TxDb} object: don't support gene symbol labeling.
   \item \Rclass{GRangesList} object: flexible, if you don't have
     annotation package available for the first two methods, you could
     prepare a data set parsed from gtf file, you can simply use it and
@@ -185,8 +184,8 @@ autoplot(Homo.sapiens, which  = wh, columns = c("TXNAME", "GO"), names.expr = "T
 @
 
 
-\subsection{Make gene model from \Rclass{TranscriptDb} object}
-\Rclass{TranscriptDb} doesn't contain any gene symbol information, so
+\subsection{Make gene model from \Rclass{TxDb} object}
+\Rclass{TxDb} doesn't contain any gene symbol information, so
 we use tx\_id as default for label.
 <<>>=
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
@@ -196,7 +195,7 @@ autoplot(txdb, which = wh)
 
 \subsection{Make gene model from \Rclass{GRangesList} object}
 Sometimes your gene model is not available as none of
-\Rclass{OrganismDb} or \Rclass{TranscriptDb} object, it's may be stored
+\Rclass{OrganismDb} or \Rclass{TxDb} object, it's may be stored
 in a table, you could simple parse it into a \Rclass{GRangeList}
 object.
 \begin{itemize}

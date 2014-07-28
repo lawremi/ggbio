@@ -9,7 +9,7 @@
 \alias{autoplot,GAlignments-method}
 \alias{autoplot,BamFile-method}
 \alias{autoplot,BamFileList-method}
-\alias{autoplot,TranscriptDb-method}
+\alias{autoplot,TxDb-method}
 \alias{autoplot,character-method}
 \alias{autoplot,Rle-method}
 \alias{autoplot,RleList-method}
@@ -65,7 +65,7 @@
 
 \S4method{autoplot}{character}(object, ..., xlab, ylab, main, which, asRangedData = FALSE)
 
-\S4method{autoplot}{TranscriptDb}(object, which, ..., xlab, ylab, main, truncate.gaps =
+\S4method{autoplot}{TxDb}(object, which, ..., xlab, ylab, main, truncate.gaps =
                  FALSE, truncate.fun = NULL, ratio = 0.0025,
                  mode = c("full", "reduce"),geom =
                  c("alignment"), stat = c("identity", "reduce"),
@@ -137,7 +137,7 @@
     object to be plot.
   }
   \item{columns}{
-    columns passed to method works for \code{TranscriptDb} and \code{OrganismDb}.
+    columns passed to method works for \code{TxDb} and \code{OrganismDb}.
   }
   \item{label.color}{
     when label turned on for gene model, this parameter controls label color.

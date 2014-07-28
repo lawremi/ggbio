@@ -95,7 +95,7 @@ importMethodsFrom(rtracklayer, import)
 importClassesFrom(rtracklayer, BigWigFile)
 
 ## GenomicFeatures
-importClassesFrom(GenomicFeatures,TranscriptDb)
+importClassesFrom(GenomicFeatures, TxDb)
 importMethodsFrom(GenomicFeatures, exonsBy)
 
 ## VariantAnnotation

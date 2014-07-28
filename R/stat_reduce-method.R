@@ -77,7 +77,7 @@ p
 })
 
 
-setMethod("stat_reduce", "TranscriptDb", function(data, ...){
+setMethod("stat_reduce", "TxDb", function(data, ...){
   p <- geom_alignment(data, ..., stat = "reduce")
   p <- setStat(p)
   p

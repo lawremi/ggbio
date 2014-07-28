@@ -75,7 +75,7 @@
     DEADLINE: <2012-10-01 Mon>
 ** TODO consider row names and label them automatically
    DEADLINE: <2012-09-01 Sat>
-** autoplot,TranscriptDb
+** autoplot,TxDb
 *** DONE gap.geom need to be supported and use direction(arrow).
     DEADLINE: <2012-07-08 Sun>
 *** TODO x lab should be a right default
@@ -174,7 +174,7 @@
 *** arches link region to region.
 * TODO Todo from Michael's email
 ** TODO When I pass "which = list(tx_id = ...)" 
-   to autoplot,TranscriptDb, it shows me the region containing that tx_id,
+   to autoplot,TxDb, it shows me the region containing that tx_id,
 instead of just showing that exact transcript. I think that's a little
 surprising. Any reason why you do this?
 ** TODO autoplot,BamFile 

@@ -1,12 +1,12 @@
 \name{stat_gene}
 \alias{stat_gene}
-\alias{stat_gene,TranscriptDb-method}
+\alias{stat_gene,TxDb-method}
 \title{Calculate gene structure}
 \description{
   Calculate gene structure.
 }
 \usage{
-\S4method{stat_gene}{TranscriptDb}(data, ...)
+\S4method{stat_gene}{TxDb}(data, ...)
 }
 \arguments{
   \item{data}{

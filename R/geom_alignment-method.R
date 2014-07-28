@@ -145,7 +145,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
 
 
 
-setMethod("geom_alignment", "TranscriptDb",
+setMethod("geom_alignment", "TxDb",
           function(data, ..., which,
                    columns = c("tx_id", "tx_name", "gene_id"),
                    names.expr = "tx_name",

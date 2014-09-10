@@ -1,5 +1,5 @@
 Package: ggbio
-Version: 1.13.12
+Version: 1.13.13
 Title: Visualization tools for genomic data.
 Description: The ggbio package extends and specializes the grammar of
         graphics for biological data. The graphics are designed to
@@ -15,11 +15,11 @@ Author: Tengfei Yin, Dianne Cook, Michael Lawrence
 Maintainer: Tengfei Yin <yintengfei@gmail.com>
 Depends: methods, BiocGenerics, ggplot2 (>= 1.0.0)
 Imports: grid, grDevices, graphics, stats, utils, biovizBase (>= 1.13.8),
-        reshape2, gtable, Biobase, S4Vectors (>= 0.1.0), IRanges (>= 1.99.17),
-        GenomeInfoDb (>= 1.1.3), GenomicRanges (>= 1.17.19), Biostrings,
+        reshape2, gtable, Biobase, S4Vectors (>= 0.2.3), IRanges (>= 1.99.28),
+        GenomeInfoDb (>= 1.1.3), GenomicRanges (>= 1.17.40), Biostrings,
         Rsamtools (>= 1.17.28), GenomicAlignments (>= 1.1.16), BSgenome,
         gridExtra, scales, VariantAnnotation (>= 1.11.4), Hmisc,
-        rtracklayer (>= 1.25.13), GenomicFeatures (>= 1.17.13), OrganismDbi,
+        rtracklayer (>= 1.25.16), GenomicFeatures (>= 1.17.13), OrganismDbi,
         GGally
 VignetteBuilder: knitr
 Suggests: vsn, BSgenome.Hsapiens.UCSC.hg19, Homo.sapiens,

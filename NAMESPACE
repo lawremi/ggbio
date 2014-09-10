@@ -3,6 +3,7 @@
 
 import(methods)
 import(BiocGenerics)
+import(S4Vectors)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### base packages
@@ -36,20 +37,14 @@ import(biovizBase)
 importClassesFrom(Biobase, ExpressionSet, eSet, AssayData)
 importMethodsFrom(Biobase, exprs, pData, phenoData, varLabels)
 
-## S4Vectors
-importFrom(S4Vectors, isSingleString, metadata, "metadata<-", safeExplode)
-importMethodsFrom(S4Vectors, mcols, "mcols<-", values, "values<-",
-                  "%in%", queryHits, subjectHits)
-importClassesFrom(S4Vectors, characterORNULL, Annotated, Vector, Rle)
-
 ## IRanges
-importFrom(IRanges, DataFrame, IRanges)
+importFrom(IRanges, IRanges)
 importMethodsFrom(IRanges,  split,
                   unlist, psetdiff,
                   range, endoapply,
                   as.data.frame,
                   length, as.list, as.matrix,
-                  "[","[<-","[[", "[[<-","$",
+                  "[","[<-","[[", "[[<-",
                   show,
                   ranges, "ranges<-",
                   start, end, width,
@@ -61,8 +56,7 @@ importMethodsFrom(IRanges,  split,
                   viewMaxs, viewMeans, viewMins, viewSums, viewWhichMaxs,
                   viewWhichMins)
 importClassesFrom(IRanges, RleList, IRanges, Views,
-                  expressionORfunction, functionORNULL,
-                  SimpleList, List)
+                  expressionORfunction, functionORNULL)
 
 ## GenomeInfoDb
 import(GenomeInfoDb)

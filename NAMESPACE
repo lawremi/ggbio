@@ -78,7 +78,7 @@ importMethodsFrom(Rsamtools, ScanBamParam, scanBamHeader, path)
 importClassesFrom(Rsamtools, BamFile, BamFileList)
 
 ## GenomicAlignments
-importMethodsFrom(GenomicAlignments, readGAlignmentsFromBam)
+importMethodsFrom(GenomicAlignments, readGAlignments)
 importClassesFrom(GenomicAlignments, GAlignments)
 
 ## BSgenome

@@ -735,9 +735,9 @@ library(GenomicAlignments)
 data("genesymbol", package = "biovizBase")
 bamfile <- system.file("extdata", "SRR027894subRBM17.bam", package="biovizBase")
 ## need to set use.names = TRUE
-ga <- readGAlignmentsFromBam(bamfile,
-                             param = ScanBamParam(which = genesymbol["RBM17"]),
-                             use.names = TRUE)
+ga <- readGAlignments(bamfile,
+                      param = ScanBamParam(which = genesymbol["RBM17"]),
+                      use.names = TRUE)
 
 
 ###################################################

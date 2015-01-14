@@ -353,9 +353,8 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
 
     if(geom == "gapped.pair"){
         message("Read GAlignments from BamFile...")
-        ga <- readGAlignmentsFromBam(bf,
-                                     param = ScanBamParam(which = which),
-                                     use.name = TRUE)
+        ga <- readGAlignments(bf, param = ScanBamParam(which = which),
+                                  use.names = TRUE)
         message("plotting...")
         args.ga <- args[names(args) %in% "show.junction"]
         args <- c(args.ga, list(object = ga))
@@ -392,9 +391,8 @@ setMethod("autoplot", "BamFile", function(object, ..., which,
                 p <- ggplot() + stat_mismatch(bf, ..., bsgenome = bsgenome, which = which)
             }
         }else{
-            ga <- readGAlignmentsFromBam(bf,
-                                         param = ScanBamParam(which = which),
-                                         use.name = TRUE)
+            ga <- readGAlignments(bf, param = ScanBamParam(which = which),
+                                      use.names = TRUE)
             gr <- crunch(ga, type = "raw")
             p <- autoplot(gr, ..., geom = geom, stat = stat)
         }

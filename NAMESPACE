@@ -64,7 +64,7 @@ import(GenomeInfoDb)
 ## GenomicRanges
 importFrom(GenomicRanges, GRanges, GRangesList)
 importMethodsFrom(GenomicRanges, assays, colData, exptData, granges, grglist,
-                  rowData, ranges, "ranges<-",
+                  rowRanges, ranges, "ranges<-",
                   start, end, width, "start<-", "end<-", "width<-",
                   seqinfo, "seqinfo<-", show, as.data.frame, sort)
 importClassesFrom(GenomicRanges, GRanges, GRangesList, GenomicRangesList)

@@ -909,14 +909,14 @@ library(GenomicRanges)
 nrows <- 200; ncols <- 6
 counts <- matrix(runif(nrows * ncols, 1, 1e4), nrows)
 counts2 <- matrix(runif(nrows * ncols, 1, 1e4), nrows)
-rowData <- GRanges(rep(c("chr1", "chr2"), c(50, 150)),
+rowRanges <- GRanges(rep(c("chr1", "chr2"), c(50, 150)),
                    IRanges(floor(runif(200, 1e5, 1e6)), width=100),
                    strand=sample(c("+", "-"), 200, TRUE))
 colData <- DataFrame(Treatment=rep(c("ChIP", "Input"), 3),
                      row.names=LETTERS[1:6])
 sset <- SummarizedExperiment(assays=SimpleList(counts=counts,
                                                counts2 = counts2),
-                             rowData=rowData, colData=colData)
+                             rowRanges=rowRanges, colData=colData)
 autoplot(sset) + scale_fill_fold_change()
 autoplot(sset, pheno.plot = TRUE)
 

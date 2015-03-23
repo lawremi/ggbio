@@ -1402,15 +1402,15 @@ setMethod("autoplot", "VCF", function(object, ...,
                 }
                 gt <- geno(object)[[nm]]
             }
-        sts <- start(rowData(object))
+        sts <- start(rowRanges(object))
         idx <- !duplicated(sts)
         ## is this a right thing to do ?
         if(sum(!idx))
             message("Index: ", paste(which(!idx), collapse = ","),
                     " snp with duplicated start position may be masked by each other")
         ## gt <- gt[idx,]
-        rownames(gt) <- start(rowData(object))
-        ## rownames(gt) <- start(rowData(object)[idx])
+        rownames(gt) <- start(rowRanges(object))
+        ## rownames(gt) <- start(rowRanges(object)[idx])
 
         if(!"color" %in% names(args.aes) && !"color" %in% names(args.non))
             args.aes$color <- as.name("value")
@@ -1803,7 +1803,7 @@ setMethod("autoplot", "SummarizedExperiment", function(object, ...,
 
     }
     if(type == "link"){
-        ## res <- rowData(object)
+        ## res <- rowRanges(object)
         ## values(res) <- assay(object)
         ## plotRangesLinkedToData(res[seqnames(res) == "chr1"],
         ## stat.col = seq_len(length(values(res))))

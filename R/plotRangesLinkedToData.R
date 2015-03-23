@@ -12,7 +12,7 @@ setMethod("plotRangesLinkedToData", "SummarizedExperiment",
                    stat.ylab = names(assays(data)[stat.assay]),
                    stat.assay = 1L)
           {
-            gr <- rowData(data)
+            gr <- rowRanges(data)
             m <- assays(data, stat.assay)
             mcols(gr) <- cbind(mcols(gr), DataFrame(m))
             plotRangesLinkedToData(gr, stat.y = stat.y, stat.ylab = stat.ylab,

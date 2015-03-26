@@ -627,12 +627,14 @@ setMethod("isGenemodel", "GRanges", function(data, type = NULL){
     if(is.null(type))
         type <- "type"
     if(type %in% colnames(values(data))){
-        idx <- values(data)[[type]] %in% c("cds", "CDS", "Cds",
-                                           "exon", "EXON","Exon",
-                                           "utr", "UTR", "Utr")
-        message('\"', unique(values(data)[[type]][!idx]), '\"', " is not matching to following arbitrary model terms", '\"', paste("cds", "CDS", "Cds",
-                                                                                                                                   "exon", "EXON","Exon",
-                                                                                                                                   "utr", "UTR", "Utr"), '\"')
+        geneFeatureTerms <- c("cds", "exon", "utr")
+        idx <- tolower(values(data)[[type]]) %in% geneFeatureTerms
+        if (any(!idx)) {
+          message(paste0('\"', unique(values(data)[[type]][!idx]), '\"',
+                         collapse=", "),
+                  " not in any of the valid gene feature terms ",
+                  paste0('\"', geneFeatureTerms, '\"', collapse=", "))
+        }
         return(any(idx))
     }else{
         return(FALSE)

@@ -17,7 +17,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
   data <- data[idx]
   stat <- match.arg(stat)
   ## shape <- match.arg(shape)
-  arrow.r <- round(width(range(ranges(data))) * arrow.rate, 0)
+  arrow.r <- max(1L, round(width(range(ranges(data))) * arrow.rate, 0))
 
   args <- list(...)
   args$facets <- facets

@@ -485,29 +485,26 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
         args.cds.non$rect.height <- cds.rect.h
         args.exon.non <- args.cds.non
         args.exon.non$rect.height <- exon.rect.h
-        if(length(gr.cds)){
+        args.exon <- args.aes[names(args.aes) != "y"]
+        args.exon$y <- as.name("stepping")
+        aes.res <- do.call(aes, args.exon)
+        p <- NULL
+        if (length(gr.cds) > 0L) {
             ## plot cds
-            args.cds <- args.aes[names(args.aes) != "y"]
-            args.cds$y <- as.name("stepping")
-            aes.res <- do.call(aes, args.cds)
             args.cds.res <- c(list(data = gr.cds),
                               list(aes.res),
                               args.cds.non,
                               list(stat = "identity"))
             p <- do.call(range.fun, args.cds.res)
-        }else if(length(gr.exons)){
+        }
+        if (length(gr.exons) > 0L) {
             ## plot exons
-            args.exon <- args.aes[names(args.aes) != "y"]
-            args.exon$y <- as.name("stepping")
-            aes.res <- do.call(aes, args.exon)
             ## input gr.exons
-            args.cds.res <- c(list(data = gr.exons),
-                              list(aes.res),
-                              args.exon.non,
-                              list(stat = "identity"))
-            p <- do.call(range.fun, args.cds.res)
-        }else{
-            p <- NULL
+            args.exon.res <- c(list(data = gr.exons),
+                               list(aes.res),
+                               args.exon.non,
+                               list(stat = "identity"))
+            p <- c(p, list(do.call(range.fun, args.exon.res)))
         }
         ## utrs
         gr.utr <- gr[values(gr)[[.type]] == "utr"]
@@ -540,8 +537,8 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
             grr <- reduce(unlist(.grl))
             .gr$..sample.. <- rep(findOverlaps(.grl, grr)@subjectHits,
                                   times = elementLengths(data))
-            df.gaps <- getGaps(c(.gr[values(.gr)[[.type]] %in% c("utr", "cds")]),
-                               group.name = "..sample..")
+            exonic <- .gr[values(.gr)[[.type]] %in% c("utr", "cds", "exon")]
+            df.gaps <- getGaps(exonic, group.name = "..sample..")
             df.gaps$stepping <- 1
             ## let's figure out strand
             stds <- unique(as.character(strand(.gr)))
@@ -551,10 +548,10 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
                 strand(df.gaps) <- "*"
             }
             ## FIXME: fix reduced strand
-        }else{
-            df.gaps <- getGaps(c(gr[values(gr)[[.type]] %in% c("utr", "cds")]),
-                               group.name = "..inner..")
-        }
+          } else {
+            exonic <- gr[values(gr)[[.type]] %in% c("utr", "cds", "exon")]
+            df.gaps <- getGaps(exonic, group.name = "..inner..")
+          }
 
         args.aes.gaps <- args.aes[!(names(args.aes) %in% c("x", "y", "fill"))]
         aes.res <- do.call(aes, args.aes.gaps)

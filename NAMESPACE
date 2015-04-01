@@ -2,8 +2,6 @@
 ## ============================================================
 
 import(methods)
-import(BiocGenerics)
-import(S4Vectors)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### base packages
@@ -31,43 +29,16 @@ importFrom(Hmisc, bezier)
 ### Bioconductor packages
 ###
 
+import(BiocGenerics)
+import(S4Vectors)
+import(IRanges)
+import(GenomicRanges)
+import(GenomeInfoDb)
 import(biovizBase)
 
 ## Biobase
 importClassesFrom(Biobase, ExpressionSet, eSet, AssayData)
 importMethodsFrom(Biobase, exprs, pData, phenoData, varLabels)
-
-## IRanges
-importFrom(IRanges, IRanges)
-importMethodsFrom(IRanges,  split,
-                  unlist, psetdiff,
-                  range, endoapply,
-                  as.data.frame,
-                  length, as.list, as.matrix,
-                  "[","[<-","[[", "[[<-",
-                  show,
-                  ranges, "ranges<-",
-                  start, end, width,
-                  "start<-", "end<-", "width<-",
-                  Views, coverage, disjointBins,
-                  elementLengths, findOverlaps, gaps,
-                  reduce, score,
-                  slice, subsetByOverlaps,
-                  viewMaxs, viewMeans, viewMins, viewSums, viewWhichMaxs,
-                  viewWhichMins)
-importClassesFrom(IRanges, RleList, IRanges, Views,
-                  expressionORfunction, functionORNULL)
-
-## GenomeInfoDb
-import(GenomeInfoDb)
-
-## GenomicRanges
-importFrom(GenomicRanges, GRanges, GRangesList)
-importMethodsFrom(GenomicRanges, assays, colData, exptData, granges, grglist,
-                  rowRanges, ranges, "ranges<-",
-                  start, end, width, "start<-", "end<-", "width<-",
-                  seqinfo, "seqinfo<-", show, as.data.frame, sort)
-importClassesFrom(GenomicRanges, GRanges, GRangesList, GenomicRangesList)
 
 ## Biostrings
 importMethodsFrom(Biostrings, getSeq)
@@ -86,7 +57,7 @@ importClassesFrom(BSgenome, BSgenome)
 
 ## rtracklayer
 importMethodsFrom(rtracklayer, import)
-importClassesFrom(rtracklayer, BigWigFile)
+importClassesFrom(rtracklayer, BigWigFile, UCSCData)
 
 ## GenomicFeatures
 importClassesFrom(GenomicFeatures, TxDb)

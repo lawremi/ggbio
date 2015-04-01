@@ -41,7 +41,7 @@ Collate: AllClasses.R AllGenerics.R Cache-class.R GGbio-class.R
         stat_mismatch-method.R stat_stepping-method.R
         stat_gene-method.R stat_table-method.R stat_bin-method.R
         stat_slice-method.R stat_reduce-method.R coord_genome-method.R
-        autoplot-method.R autoplot-BigWigFile.R hack.R
+        autoplot-method.R hack.R
         plotGrandLinear.R plotRangesLinkedToData.R
         plotFragLength-method.R plotSpliceSum-method.R rescale-method.R
         utils.R zzz.R

@@ -2,7 +2,6 @@
 \alias{Ideogram}
 \alias{Ideogram-class}
 \alias{plotIdeogram}
-\alias{plotSingleChrom}
 \alias{+,Ideogram,ANY-method}
 \title{Plot single chromosome with cytoband}
 \usage{
@@ -18,16 +17,10 @@ Ideogram(obj, subchr = NULL, which = NULL, xlabel = FALSE,
                  0.7, zoom.region = NULL, zoom.offset = 0.2, size = 1,
                  aspect.ratio = 1/20, ..., genome)
 
-## depricated
-plotSingleChrom(obj, subchr = NULL, zoom.region, xlab, ylab, main, xlabel =
-                 FALSE, color = "red", fill = "red", alpha = 0.7,
-                 zoom.offset = 0.1, size = 1,
-                 cytoband = TRUE, aspect.ratio = 1/20, genome)
-
 }
 \description{
-  Plot single chromosome with cytoband. \code{plotIdeogram} is synonyms
-  to \code{plotSingleChrom}.
+  Plot single chromosome with cytoband. \code{plotIdeogram}.
+
 }
 \details{
   User could provide the whole ideogram and use subchr to point to

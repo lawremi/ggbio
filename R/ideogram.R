@@ -185,6 +185,7 @@ plotIdeogram <- function(obj, subchr = NULL, zoom.region = NULL, which = NULL,
     p
 }
 
+plotSingleChrom <- .Deprecated("plotIdeogram")
 
 setMethod("+", c("Ideogram"), function(e1, e2){
     if(inherits(e2, "xlim")){

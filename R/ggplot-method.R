@@ -51,7 +51,7 @@ setMethod("ggplot", "ExpressionSet", function(data, ...){
   g
 })
 
-setMethod("ggplot", "SummarizedExperiment", function(data, assay.id = 1, ...){
+setMethod("ggplot", "RangedSummarizedExperiment", function(data, assay.id = 1, ...){
   df <- mold(data, assay.id = assay.id)
   g <- ggplot2::ggplot(df, ...)
   g <- GGbio(g, data = data)            

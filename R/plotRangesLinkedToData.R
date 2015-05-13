@@ -6,7 +6,7 @@
 setGeneric("plotRangesLinkedToData",
            function(data, ...) standardGeneric("plotRangesLinkedToData"))
 
-setMethod("plotRangesLinkedToData", "SummarizedExperiment",
+setMethod("plotRangesLinkedToData", "RangedSummarizedExperiment",
           function(data, ...,
                    stat.y = seq_len(ncol(data)),
                    stat.ylab = names(assays(data)[stat.assay]),

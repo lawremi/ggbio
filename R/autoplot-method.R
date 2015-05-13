@@ -1374,7 +1374,7 @@ setMethod("autoplot", "VCF", function(object, ...,
     args.aes <- parseArgsForAes(args)
     args.non <- parseArgsForNonAes(args)
     type <- match.arg(type)
-    hdr <- exptData(object)[["header"]]
+    hdr <- metadata(object)[["header"]]
     if(type == "default"){
         vr <- as(object, "VRanges")
         p <- autoplot(vr,  ...)
@@ -1755,8 +1755,8 @@ setMethod("autoplot", "Seqinfo", function(object, ideogram = FALSE, ... ){
 })
 
 
-## SummarizedExperiment
-setMethod("autoplot", "SummarizedExperiment", function(object, ...,
+## RangedSummarizedExperiment
+setMethod("autoplot", "RangedSummarizedExperiment", function(object, ...,
                                                        type = c("heatmap", "link",
                                                            "pcp", "boxplot",
                                                            "scatterplot.matrix"),

@@ -16,7 +16,7 @@
 \alias{autoplot,matrix-method}
 \alias{autoplot,Views-method}
 \alias{autoplot,ExpressionSet-method}
-\alias{autoplot,SummarizedExperiment-method}
+\alias{autoplot,RangedSummarizedExperiment-method}
 \alias{autoplot,VCF-method}
 \alias{autoplot,OrganismDb-method}
 \alias{autoplot,VRanges-method}
@@ -99,7 +99,7 @@
                  = 4.5, padding = 0.2)
 
 
-\S4method{autoplot}{SummarizedExperiment}(object, ..., type = c("heatmap", "link", "pcp", "boxplot", "scatterplot.matrix"), pheno.plot = FALSE,
+\S4method{autoplot}{RangedSummarizedExperiment}(object, ..., type = c("heatmap", "link", "pcp", "boxplot", "scatterplot.matrix"), pheno.plot = FALSE,
                  main_to_pheno = 4.5, padding = 0.2, assay.id = 1)
 
 
@@ -322,7 +322,7 @@
   }
   \item{genome.axis}{
     logical value, if TRUE, whenever possible, try to parse genomic postition
-    for each column(e.g. SummarizedExperiment), show column as exatcly
+    for each column(e.g. RangedSummarizedExperiment), show column as exatcly
     the genomic position instead of showing them side by side and
     indexed from 1.
   }
@@ -903,9 +903,9 @@ autoplot(eset, type = "mean-sd")
 
 
 ###################################################
-### SummarizedExperiment
+### RangedSummarizedExperiment
 ###################################################
-library(GenomicRanges)
+library(SummarizedExperiment)
 nrows <- 200; ncols <- 6
 counts <- matrix(runif(nrows * ncols, 1, 1e4), nrows)
 counts2 <- matrix(runif(nrows * ncols, 1, 1e4), nrows)

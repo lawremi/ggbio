@@ -1,6 +1,6 @@
 \name{plotRangesLinkedToData}
 \alias{plotRangesLinkedToData}
-\alias{plotRangesLinkedToData,SummarizedExperiment-method}
+\alias{plotRangesLinkedToData,RangedSummarizedExperiment-method}
 \alias{plotRangesLinkedToData,GenomicRangesORGRangesList-method}
 \title{Plot Ranges Linked with Data}
 \description{
@@ -8,7 +8,7 @@
   coordinates plot which represting the data in elementeMetadata.
 }
 \usage{
-\S4method{plotRangesLinkedToData}{SummarizedExperiment}(data, ...,
+\S4method{plotRangesLinkedToData}{RangedSummarizedExperiment}(data, ...,
           stat.y = seq_len(ncol(data)), stat.ylab = names(assays(data)[stat.assay]),
           stat.assay = 1L)
 

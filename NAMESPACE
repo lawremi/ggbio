@@ -32,8 +32,9 @@ importFrom(Hmisc, bezier)
 import(BiocGenerics)
 import(S4Vectors)
 import(IRanges)
-import(GenomicRanges)
 import(GenomeInfoDb)
+import(GenomicRanges)
+import(SummarizedExperiment)
 import(biovizBase)
 
 ## Biobase

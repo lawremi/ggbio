@@ -8,7 +8,7 @@
 \alias{ggplot,matrix-method}
 \alias{ggplot,Views-method}
 \alias{ggplot,ExpressionSet-method}
-\alias{ggplot,SummarizedExperiment-method}
+\alias{ggplot,RangedSummarizedExperiment-method}
 \alias{ggplot,VCF-method}
 \alias{ggplot,GAlignments-method}
 \alias{ggplot,BamFile-method}
@@ -37,7 +37,7 @@
 \S4method{ggplot}{matrix}(data, ...)
 \S4method{ggplot}{Views}(data, ...)
 \S4method{ggplot}{ExpressionSet}(data, ...)
-\S4method{ggplot}{SummarizedExperiment}(data, assay.id = 1, ...)
+\S4method{ggplot}{RangedSummarizedExperiment}(data, assay.id = 1, ...)
 \S4method{ggplot}{VCF}(data, ...)
 \S4method{ggplot}{GAlignments}(data, ...)
 \S4method{ggplot}{BamFile}(data, ...)
@@ -211,8 +211,8 @@ ggplot(xRleList) + geom_tile(aes(x = x, y = y, fill = value)) +
 facet_grid(group~.)
 
 
-## SummarizedExperiments
-library(GenomicRanges)
+## RangedSummarizedExperiment
+library(SummarizedExperiment)
 nrows <- 200; ncols <- 6
 counts <- matrix(runif(nrows * ncols, 1, 1e4), nrows)
 counts2 <- matrix(runif(nrows * ncols, 1, 1e4), nrows)

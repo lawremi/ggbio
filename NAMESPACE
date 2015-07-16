@@ -22,7 +22,7 @@ import(gtable)
 importFrom(reshape2, melt)
 importFrom(scales, cbreaks, rescale, expand_range, math_format,
            scientific_format, trans_breaks, trans_format)
-importFrom(gridExtra, grid.arrange, arrangeGrob, latticeGrob)
+importFrom(gridExtra, grid.arrange, arrangeGrob)
 importFrom(Hmisc, bezier)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

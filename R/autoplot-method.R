@@ -464,8 +464,7 @@ setMethod("autoplot", "BamFileList", function(object, ..., which,
 ##  For "character" need to check if it's path including bamfile or not
 ## ======================================================================
 setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
-                                            which,
-                                            asRangedData = FALSE){
+                                            which){
 
     ## FIXME: does it always work?
     mc <- as.list(match.call())[-1]
@@ -486,7 +485,7 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
         obj <- BamFile(object)
     }else{
         message("reading in")
-        obj <- import(object, asRangedData = asRangedData)
+        obj <- import(object)
         if(!missing(which) && is(which, "GRanges"))
             obj <- subsetByOverlaps(obj, which)
     }

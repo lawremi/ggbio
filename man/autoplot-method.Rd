@@ -63,7 +63,7 @@
                  TRUE)
 
 
-\S4method{autoplot}{character}(object, ..., xlab, ylab, main, which, asRangedData = FALSE)
+\S4method{autoplot}{character}(object, ..., xlab, ylab, main, which)
 
 \S4method{autoplot}{TxDb}(object, which, ..., xlab, ylab, main, truncate.gaps =
                  FALSE, truncate.fun = NULL, ratio = 0.0025,
@@ -276,11 +276,6 @@
 \item{method}{
   method used for parsing coverage from bam files. 'estimate' use fast
   esitmated method  and 'raw' use relatively slow parsing method.
-}
-\item{asRangedData}{
-  when object is character, it may be imported by \code{import} function
-  in package rtracklayer, then asRangedData passed to \code{import}
-  function.  If FALSE, coerce object to \code{GRanges}.
 }
 \item{test.method}{
   test method

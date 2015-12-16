@@ -9,7 +9,7 @@
 \alias{autoplot,GAlignments-method}
 \alias{autoplot,BamFile-method}
 \alias{autoplot,BamFileList-method}
-\alias{autoplot,TxDb-method}
+\alias{autoplot,TxDbOREnsDb-method}
 \alias{autoplot,character-method}
 \alias{autoplot,Rle-method}
 \alias{autoplot,RleList-method}
@@ -65,12 +65,11 @@
 
 \S4method{autoplot}{character}(object, ..., xlab, ylab, main, which)
 
-\S4method{autoplot}{TxDb}(object, which, ..., xlab, ylab, main, truncate.gaps =
+\S4method{autoplot}{TxDbOREnsDb}(object, which, ..., xlab, ylab, main, truncate.gaps =
                  FALSE, truncate.fun = NULL, ratio = 0.0025,
                  mode = c("full", "reduce"),geom =
                  c("alignment"), stat = c("identity", "reduce"),
                  names.expr = "tx_name", label = TRUE)
-
 
 
 \S4method{autoplot}{BSgenome}(object, which, ...,
@@ -137,7 +136,7 @@
     object to be plot.
   }
   \item{columns}{
-    columns passed to method works for \code{TxDb} and \code{OrganismDb}.
+    columns passed to method works for \code{TxDb}, \code{EnsDb} and \code{OrganismDb}.
   }
   \item{label.color}{
     when label turned on for gene model, this parameter controls label color.
@@ -307,7 +306,9 @@
     level to save space.
   }
   \item{names.expr}{
-    names expression used for creating labels.
+    names expression used for creating labels. For
+    \code{\link[ensembldb]{EnsDb}} objects either \code{"tx_id"},
+    \code{"gene_name"} or \code{"gene_id"}.
   }
   \item{binwidth}{
     width of the bins.
@@ -374,7 +375,7 @@
     Showing all the intervals as stepped rectangle, colored by strand
     automatically.
 
-    For \code{TranscripDb} object, showing full model.
+    For \code{TxDb} or \code{\link[ensembldb]{EnsDb}} objects, showing full model.
   }
   \item{segment}{
     Showing all the intervals as stepped segments, colored by strand
@@ -409,10 +410,12 @@
     should represent the counts in each model. Need to provide model.
   }
   \item{single}{
-    For \code{TranscripDb} object, showing single(reduced) model only.
+    For \code{TxDb} or \code{\link[ensembldb]{EnsDb}} objects, showing
+    single(reduced) model only.
   }
   \item{tx}{
-    For \code{TranscripDb} object, showing transcirpts isoforms.
+    For \code{TxDb} or \code{\link[ensembldb]{EnsDb}} objects, showing
+    transcirpts isoforms.
   }
 \item{mismatch.summary}{
   Showing color coded mismatched stacked bar to indicate the proportion
@@ -722,6 +725,33 @@ p2 <- autoplot(txdb, which = genesymbol["ALDOA"], stat = "reduce", color = "brow
                fill = "brown")
 tracks(full = p1, reduce = p2, heights = c(5, 1)) + ylab("")
 
+
+###################################################
+### EnsDb
+###################################################
+## Fetching gene models from an EnsDb object.
+library(EnsDb.Hsapiens.v75)
+ensdb <- EnsDb.Hsapiens.v75
+## We use a GenenameFilter to specifically retrieve all transcripts for that gene.
+p1 <- autoplot(ensdb, which=GenenameFilter("ALDOA"), names.expr="gene_name")
+p2 <- autoplot(ensdb, which=GenenameFilter("ALDOA"), stat="reduce", color="brown",
+               fill="brown")
+tracks(full = p1, reduce = p2, heights = c(5, 1)) + ylab("")
+
+## Alternatively, we can specify a GRangesFilter and display all genes
+## that are (partially) overlapping with that genomic region:
+gr <- GRanges(seqnames=16, IRanges(30768000, 30770000), strand="+")
+autoplot(ensdb, GRangesFilter(gr, "overlapping"), names.expr="gene_name")
+## Just submitting the GRanges object also works.
+autoplot(ensdb, gr, names.expr="gene_name")
+
+## Or genes encoded on both strands.
+gr <- GRanges(seqnames=16, IRanges(30768000, 30770000), strand="*")
+autoplot(ensdb, GRangesFilter(gr, "overlapping"), names.expr="gene_name")
+
+## Also, we can spefify directly the gene ids and plot all transcripts of these
+## genes (not only those overlapping with the region)
+autoplot(ensdb, GeneidFilter(c("ENSG00000196118", "ENSG00000156873")))
 
 ###################################################
 ### code chunk number 28: ga-load

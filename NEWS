@@ -1,3 +1,12 @@
+CHANGES IN VERSION 1.19.1
+-------------------------
+
+NEW FEATURES
+
+    o autoplot method supports now EnsDb objects and related filter objects.
+
+
+
 CHANGES IN VERSION 1.5.16
 ------------------------
 
@@ -12,7 +21,7 @@ NEW FEATURES
     o tracks function updated, API is enhenced, utilities could control attributes
       of plots and trakcs.
 
-    o autoplot now support: VCF, SummarizedExperiments, matrix, where when genomic position is 
+    o autoplot now support: VCF, SummarizedExperiments, matrix, where when genomic position is
       provided, options to visualize a heatmap sitting on the genomic position.
 
     o theme could define track based themes.
@@ -28,9 +37,9 @@ SIGNIFICANT USER-LEVEL CHANGES
 
 Notes
 
-    o updated website for ggbio: 
+    o updated website for ggbio:
       http://tengfei.github.com/ggbio
-      manuals and vignettes and paper added      
+      manuals and vignettes and paper added
 
 
 CHANGES IN VERSION 1.1.8
@@ -40,12 +49,12 @@ NEW FEATURES
 
     o create lower level API and rewrite higher level API
 
-    o new geom: geom_alignment, geom_chevron, geom_arch, geom_arrow, 
+    o new geom: geom_alignment, geom_chevron, geom_arch, geom_arrow,
                 geom_arrowrect
 
     o redefined geom: geom_rect, geom_segment
 
-    o new stat: stat_aggregate, stat_coverage, stat_mismatch, stat_gene, stat_table, 
+    o new stat: stat_aggregate, stat_coverage, stat_mismatch, stat_gene, stat_table,
                 stat_stepping
 
     o redefined stat: stat_identity
@@ -57,7 +66,7 @@ NEW FEATURES
     o themes provided.
 
     o More supported object for autoplot: VCF, ExpressionSet, GenomicRangesList.
-    
+
 SIGNIFICANT USER-LEVEL CHANGES
 
     o qplot changed to generic autoplot function.
@@ -65,10 +74,10 @@ SIGNIFICANT USER-LEVEL CHANGES
     o argument use only "facets", no alias "facet_gr" or "facet" accepted.
 
     o plotMismatchSum will be replaced by stat_mismatch, or autoplot, BamFile.
-    
+
 Notes
 
-    o new website for ggbio: 
+    o new website for ggbio:
       http://tengfei.github.com/ggbio
       hosting docs, tutorials and case study
 

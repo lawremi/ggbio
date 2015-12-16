@@ -5,7 +5,7 @@
 \alias{geom_alignment,OrganismDb-method}
 \alias{geom_alignment,missing-method}
 \alias{geom_alignment,uneval-method}
-\alias{geom_alignment,TxDb-method}
+\alias{geom_alignment,TxDbOREnsDb-method}
 \alias{geom_alignment,BamFile-method}
 \title{Alignment geoms for GRanges object}
 \description{
@@ -19,7 +19,7 @@
                  "segment"), rect.height = NULL, group.selfish = TRUE,
                   label = TRUE)
 
-\S4method{geom_alignment}{TxDb}(data, ..., which, columns = c("tx_id", "tx_name",
+\S4method{geom_alignment}{TxDbOREnsDb}(data, ..., which, columns = c("tx_id", "tx_name",
                  "gene_id"), names.expr = "tx_name", facets = NULL,
                  truncate.gaps = FALSE, truncate.fun = NULL, ratio =
                  0.0025)
@@ -50,13 +50,15 @@
 }
 \arguments{
   \item{data}{
-    A \code{GRanges} or \code{data.frame} or \code{TxDb} object.
+    A \code{GRanges}, \code{data.frame}, \code{TxDb} or \code{EnsDb} object.
   }
   \item{...}{
     Extra parameters such as aes() passed.
   }
   \item{which}{
-    \code{GRanges} object to subset the \code{TxDb} object.
+    \code{GRanges} object to subset the \code{TxDb} or \code{EnsDb}
+    object. For \code{EnsDb}: can also be a single, or a list of, filter object(s)
+    extending \code{\link[ensembldb]{BasicFilter-class}}.
   }
   \item{cds.rect.h}{
     cds heights.

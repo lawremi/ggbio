@@ -524,11 +524,11 @@ setMethod("autoplot", "character", function(object, ..., xlab, ylab, main,
     p
 })
 
-## FIX THIS first:
+
 ## ======================================================================
-##        For "TxDb"(Genomic Structure)
+##        For "TxDb" or "EnsDb"(Genomic Structure)
 ## ======================================================================
-setMethod("autoplot", "TxDb", function(object, which, ...,
+setMethod("autoplot", "TxDbOREnsDb", function(object, which, ...,
                                        xlab, ylab, main,
                                        truncate.gaps = FALSE,
                                        truncate.fun = NULL,
@@ -539,6 +539,17 @@ setMethod("autoplot", "TxDb", function(object, which, ...,
                                        names.expr = "tx_name",
                                        label = TRUE){
 
+    ## Do just some stuff required for EnsDb usage first.
+    if(is(object, "EnsDb")){
+        ## We don't have a column tx_name in EnsDb.
+        if(names.expr == "tx_name")
+            names.expr <- "tx_id"
+    }else{
+        if(!missing(which)){
+            if(!is(which, "GRanges"))
+                stop("which, if provided, must be a GRanges object.")
+        }
+    }
 
     ## FIXME: does it always work?
     mc <- as.list(match.call())[-1]
@@ -546,6 +557,7 @@ setMethod("autoplot", "TxDb", function(object, which, ...,
     mc <- c(list(as.name("autoplot")), mc)
     cmd <- list(mc)
     names(cmd) <- "autoplot"
+
 
     stat <- match.arg(stat)
     args <- list(...)
@@ -560,8 +572,9 @@ setMethod("autoplot", "TxDb", function(object, which, ...,
     args.non$names.expr <- names.expr
     args.non$label <- label
     if(!missing(which)){
-        if(!is(which, "GRanges"))
-            stop("which if provided, must be GRagnes object")
+        if(!is(which, "GRanges") & !is(which, "BasicFilter") & !is(which, "list"))
+            stop("which, if provided, must be a GRanges object, ",
+                 "an single object extending BasicFilter or a list thereof")
         args.non$which <- which
     }
 

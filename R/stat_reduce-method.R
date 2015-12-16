@@ -77,12 +77,11 @@ p
 })
 
 
-setMethod("stat_reduce", "TxDb", function(data, ...){
+setMethod("stat_reduce", "TxDbOREnsDb", function(data, ...){
   p <- geom_alignment(data, ..., stat = "reduce")
   p <- setStat(p)
   p
 })
-
 
 
 

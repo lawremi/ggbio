@@ -145,7 +145,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
 
 
 
-setMethod("geom_alignment", "TxDb",
+setMethod("geom_alignment", "TxDbOREnsDb",
           function(data, ..., which,
                    columns = c("tx_id", "tx_name", "gene_id"),
                    names.expr = "tx_name",
@@ -157,6 +157,11 @@ setMethod("geom_alignment", "TxDb",
     args.aes <- parseArgsForAes(args)
     args.non <- parseArgsForNonAes(args)
     aes.args <- do.call(aes, args.aes)
+
+    if(is(data, "EnsDb")){
+        columns <- sub(columns, pattern="tx_name",
+                       replacement="gene_name", fixed=TRUE)
+    }
 
     if(missing(which)){
         ## stop("missing which is not supported yet")
@@ -223,6 +228,85 @@ setMethod("geom_alignment", "TxDb",
     ## p <- setStat(p)
     p
 })
+
+## setMethod("geom_alignment", "TxDb",
+##           function(data, ..., which,
+##                    columns = c("tx_id", "tx_name", "gene_id"),
+##                    names.expr = "tx_name",
+##                    facets = NULL, truncate.gaps = FALSE,
+##                    truncate.fun = NULL, ratio = 0.0025){
+
+##     args <- list(...)
+##     ## args$facets <- facets
+##     args.aes <- parseArgsForAes(args)
+##     args.non <- parseArgsForNonAes(args)
+##     aes.args <- do.call(aes, args.aes)
+
+##     if(missing(which)){
+##         ## stop("missing which is not supported yet")
+##         p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
+##                list(ggplot2::xlim(c(0, 1))))
+##         return(p)
+##     }
+
+
+##     gr <- crunch(data, which, truncate.gaps = truncate.gaps,
+##                  truncate.fun = truncate.fun, ratio = ratio,
+##                  columns = columns)
+
+##     grl <- split(gr, gr$tx_id)
+
+##     ## getting label
+##     df <- mold(gr)
+##     .df.sub <- do.call(rbind, lapply(grl, function(g){
+##         ## FIXME: check if the id is unique
+##         mold(g)[1, columns]
+##     }))
+##     rownames(.df.sub) <- NULL
+
+##     if(is.expression(names.expr)){
+##         .labels <- eval(names.expr, .df.sub)
+##     }else if(is.character(names.expr)){
+
+##         if(length(names.expr) == nrow(.df.sub) &&
+##            !(names.expr %in% colnames(.df.sub))){
+##             .labels <- names.expr
+##         }else{
+##             .labels <- sub_names(.df.sub, names.expr)
+##         }
+##     }else{
+##         .labels <- sub_names(.df.sub, names.expr)
+##     }
+
+##     names(grl) <- .labels
+
+##     p <- do.call(geom_alignment, c(list(data = grl),
+##                                    args.non,
+##                                  list(aes.args)))
+
+##     ## if(is_coord_truncate_gaps(gr)){
+##     ##     gr <- gr[values(gr)$type %in% c("utr", "cds")]
+##     ##     ss <- getXScale(gr)
+##     ##     p <- c(p, list(scale_x_continuous(breaks = ss$breaks,
+##     ##                                       labels = ss$labels)))
+##     ## }else{
+##     ##     if(is.null(.xlim)){
+##     ##         if(length(which) && is(which, "GRagnes")){
+##     ##             .xlim <- c(start(range(which, ignore.strand = TRUE)),
+##     ##                        end(range(which, ignore.strand = TRUE)))
+##     ##             p <- c(p, list(scale_by_xlim(.xlim)))
+##     ##         }
+##     ##     }else{
+##     ##         p <- c(p, list(scale_by_xlim(.xlim)))
+##     ##     }
+##     ##     if(missing(xlim)){
+##     ##         xlim <- .xlim
+##     ##     }
+##     ##     p <- c(p, list(coord_cartesian(xlim = xlim)))
+##     ## }
+##     ## p <- setStat(p)
+##     p
+## })
 
 
 setMethod("geom_alignment", "OrganismDb",
@@ -648,4 +732,65 @@ setMethod("isGenemodel", "ANY", function(data, type = NULL){
     return(FALSE)
 })
 
+
+## ####============================================================
+## ##  geom_alignment method from ggbio, R/geom_alignment-method.R
+## ##
+## ####------------------------------------------------------------
+## setMethod("geom_alignment", "EnsDb",
+##           function(data, ..., which,
+##                    columns = c("tx_id", "gene_name", "gene_id"),
+##                    names.expr = "tx_id",
+##                    facets = NULL, truncate.gaps = FALSE,
+##                    truncate.fun = NULL, ratio = 0.0025){
+
+##               args <- list(...)
+##               ## args$facets <- facets
+##               args.aes <- parseArgsForAes(args)
+##               args.non <- parseArgsForNonAes(args)
+##               aes.args <- do.call(aes, args.aes)
+
+##               if(missing(which)){
+##                   ## stop("missing which is not supported yet")
+##                   p <- c(list(geom_blank()),list(ggplot2::ylim(c(0, 1))),
+##                          list(ggplot2::xlim(c(0, 1))))
+##                   return(p)
+##               }
+
+##               ## The crunch method for EnsDb ensures that tx_id is provided.
+##               gr <- crunch(data, which, truncate.gaps = truncate.gaps,
+##                            truncate.fun = truncate.fun, ratio = ratio,
+##                            columns = columns)
+
+##               grl <- split(gr, gr$tx_id)
+
+##               ## getting label
+##               df <- mold(gr)
+##               .df.sub <- do.call(rbind, lapply(grl, function(g){
+##                   ## FIXME: check if the id is unique
+##                   mold(g)[1, columns]
+##               }))
+##               rownames(.df.sub) <- NULL
+
+##               if(is.expression(names.expr)){
+##                   .labels <- eval(names.expr, .df.sub)
+##               }else if(is.character(names.expr)){
+
+##                   if(length(names.expr) == nrow(.df.sub) &&
+##                      !(names.expr %in% colnames(.df.sub))){
+##                       .labels <- names.expr
+##                   }else{
+##                       .labels <- sub_names(.df.sub, names.expr)
+##                   }
+##               }else{
+##                   .labels <- sub_names(.df.sub, names.expr)
+##               }
+
+##               names(grl) <- .labels
+
+##               p <- do.call(geom_alignment, c(list(data = grl),
+##                                              args.non,
+##                                              list(aes.args)))
+##               p
+##           })
 

@@ -3,7 +3,9 @@ setClass("Cache",
               cached = "logical",
               cached_xlim = "numericORNULL",
               cached_ylim = "numericORNULL",
-              cached_which = "GRangesORNULL",
+              ## That's bad; would be better to have something like GRangesORBasicFilterORNULL,
+              ## but that's not working as we're also adding stuff extending BasicFilter.
+              cached_which = "GRangesORBasicFilterORlistORNULL",
               cached_item = "list"
               ),
          prototype = list(cached = TRUE,
@@ -87,7 +89,7 @@ setMethod("cached_which", "Cache", function(x){
   x@cached_which
 })
 setGeneric("cached_which<-", function(x, value) standardGeneric("cached_which<-"))
-setReplaceMethod("cached_which", c("Cache", "GRanges"), function(x, value){
+setReplaceMethod("cached_which", c("Cache", "GRangesORBasicFilterORNULL"), function(x, value){
   x@cached_which<- value
   x
 })
@@ -102,10 +104,25 @@ setMethod("addWhich", c("Cache", "GRanges"), function(x, value){
   }
   x
 })
+setMethod("addWhich", c("Cache", "BasicFilterORlist"), function(x, value){
+  if(is.null(x@cached_which)){
+    x@cached_which <- value
+  }else{
+      if(is(x@cached_which, "GRanges"))
+          stop("Shouldn't mix GRanges with BasicFilter objects!")
+      x@cached_which <- c(x@chached_which, value)
+  }
+  x
+})
 
 ## cacheSet cache item and which at the same time, make sure the lengths equals
 setGeneric("cacheSet", function(x, value, ...) standardGeneric("cacheSet"))
 setMethod("cacheSet", c("Cache", "GRanges"), function(x, value){
+  x <- addItem(x, x)
+  x <- addWhich(x, value)
+  x
+})
+setMethod("cacheSet", c("Cache", "BasicFilterORlist"), function(x, value){
   x <- addItem(x, x)
   x <- addWhich(x, value)
   x

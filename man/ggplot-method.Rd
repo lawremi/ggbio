@@ -13,7 +13,7 @@
 \alias{ggplot,GAlignments-method}
 \alias{ggplot,BamFile-method}
 \alias{ggplot,character-method}
-\alias{ggplot,TxDb-method}
+\alias{ggplot,TxDbOREnsDb-method}
 \alias{ggplot,BSgenome-method}
 \alias{ggplot,Rle-method}
 \alias{ggplot,RleList-method}
@@ -42,7 +42,7 @@
 \S4method{ggplot}{GAlignments}(data, ...)
 \S4method{ggplot}{BamFile}(data, ...)
 \S4method{ggplot}{character}(data, ...)
-\S4method{ggplot}{TxDb}(data, ...)
+\S4method{ggplot}{TxDbOREnsDb}(data, ...)
 \S4method{ggplot}{BSgenome}(data, ...)
 \S4method{ggplot}{Rle}(data, ...)
 \S4method{ggplot}{RleList}(data, ...)

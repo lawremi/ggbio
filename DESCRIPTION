@@ -1,5 +1,5 @@
 Package: ggbio
-Version: 1.19.0
+Version: 1.19.1
 Title: Visualization tools for genomic data.
 Description: The ggbio package extends and specializes the grammar of
         graphics for biological data. The graphics are designed to
@@ -11,20 +11,24 @@ Description: The ggbio package extends and specializes the grammar of
         and grand linear views. High-level plots include sequence
         fragment length, edge-linked interval to data view, mismatch
         pileup, and several splicing summaries.
-Author: Tengfei Yin, Dianne Cook, Michael Lawrence
-Maintainer: Tengfei Yin <yintengfei@gmail.com>
+Author: c(person("Tengfei", "Yin", role=c("aut", "cre"),
+                 email="yintengfei@gmail.com"),
+          person("Michael", "Lawrence", role=c("aut", "ths")),
+          person("Dianne", "Cook", role=c("aut", "ths")),
+          person("Johannes", "Rainier", role="ctb"))
 Depends: methods, BiocGenerics, ggplot2 (>= 1.0.0)
 Imports: grid, grDevices, graphics, stats, utils, gridExtra, scales, reshape2,
-        gtable, Hmisc, biovizBase (>= 1.17.1), Biobase, S4Vectors,
+        gtable, Hmisc, biovizBase (>= 1.19.1), Biobase, S4Vectors,
         IRanges, GenomeInfoDb (>= 1.1.3), GenomicRanges (>= 1.21.10),
         SummarizedExperiment, Biostrings, Rsamtools (>= 1.17.28),
         GenomicAlignments (>= 1.1.16), BSgenome, VariantAnnotation (>= 1.11.4),
         rtracklayer (>= 1.25.16), GenomicFeatures (>= 1.17.13), OrganismDbi,
-        GGally
+        GGally, ensembldb (>= 1.3.8)
 VignetteBuilder: knitr
 Suggests: vsn, BSgenome.Hsapiens.UCSC.hg19, Homo.sapiens,
         TxDb.Hsapiens.UCSC.hg19.knownGene, chipseq,
-        TxDb.Mmusculus.UCSC.mm9.knownGene, knitr, BiocStyle, testthat
+        TxDb.Mmusculus.UCSC.mm9.knownGene, knitr, BiocStyle, testthat,
+	EnsDb.Hsapiens.v75
 URL: http://tengfei.github.com/ggbio/
 BugReports: https://github.com/tengfei/ggbio/issues
 License: Artistic-2.0

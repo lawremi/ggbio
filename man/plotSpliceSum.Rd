@@ -2,6 +2,7 @@
 \alias{plotSpliceSum}
 \alias{plotSpliceSum,character,GRangesList-method}
 \alias{plotSpliceSum,character,TxDb-method}
+\alias{plotSpliceSum,character,EnsDb-method}
 \title{Plot Splice Summary from RNA-seq data}
 \description{
   Plot splice summary by simply counting overlaped junction read in
@@ -13,20 +14,28 @@
 ## For character,TxDb
 \S4method{plotSpliceSum}{character,TxDb}(data, model, which,
       ..., weighted = TRUE)
+## For character,EnsDb
+\S4method{plotSpliceSum}{character,EnsDb}(data, model, which,
+      ..., weighted = TRUE)
 }
 \arguments{
   \item{data}{
     A character specifying the bam file path of RNA-seq data.
   }
   \item{model}{
-    A GRangesList which represting different isoforms, or a TxDb
-    object. In the second case, users need to pass "which" argument
-    which is a GRanges object to specify the region. And we get
+    A GRangesList which represting different isoforms, a TxDb or an \code{\link[ensembldb]{EnsDb}}
+    object. For the latter cases, users need to pass "which" argument
+    which, for TxDb, is a GRanges object to specify the region and for
+    \code{EnsDb} can be a GRanges object, a filter extending the
+    \code{\link[ensembldb]{BasicFilter-class}} class or a list thereof. And we get
     connonical model internally.
   }
   \item{which}{
     A GRanges object specifying the region you want to get model from
     the TxDb object.
+    For \code{\link[ensembldb]{EnsDb}}: s GRanges object or a single or
+    list of filter object(s) extending
+    \code{\link[ensembldb]{BasicFilter-class}}.
   }
   \item{weighted}{
     If \code{TRUE}, weighted by simply add 1/cases matched to each model
@@ -44,7 +53,7 @@
   Internally we use biovizBase:::spliceSummary for simple counting, but
   we encourage users to use their own robust way to make slicing summary
   and store it as GRangesList, then plot the summary by \code{qplot}
-  function. 
+  function.
 }
 \seealso{
   \code{\link{qplot}}

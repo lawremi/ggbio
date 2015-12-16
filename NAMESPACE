@@ -71,6 +71,16 @@ importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref,
 
 ## OrganismDb
 importClassesFrom(OrganismDbi, OrganismDb)
+
+## ensembldb
+importClassesFrom(ensembldb, EnsDb)
+## Importing all filter classes... don't clear whether that's needed
+importClassesFrom(ensembldb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilter,
+                  GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter, SeqnameFilter,
+                  SeqstrandFilter, SeqstartFilter, SeqendFilter, GRangesFilter)
+importMethodsFrom(ensembldb, listColumns, exons, exonsBy)
+importFrom(ensembldb, GRangesFilter)
+
 ## ============================================================
 ## Export
 ## ============================================================

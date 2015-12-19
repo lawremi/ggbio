@@ -89,7 +89,7 @@ setMethod("cached_which", "Cache", function(x){
   x@cached_which
 })
 setGeneric("cached_which<-", function(x, value) standardGeneric("cached_which<-"))
-setReplaceMethod("cached_which", c("Cache", "GRangesORBasicFilterORNULL"), function(x, value){
+setReplaceMethod("cached_which", c("Cache", "GRangesORBasicFilterORlistORNULL"), function(x, value){
   x@cached_which<- value
   x
 })

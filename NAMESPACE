@@ -68,9 +68,13 @@ importMethodsFrom(GenomicFeatures, exonsBy)
 importClassesFrom(VariantAnnotation, VCF)
 importMethodsFrom(VariantAnnotation, fixed, "fixed<-", ref,
                   alt, info, geno)
+importFrom(VariantAnnotation, readVcf)
 
 ## OrganismDb
 importClassesFrom(OrganismDbi, OrganismDb)
+
+## AnnotationDbi
+importFrom(AnnotationDbi, select)
 
 ## ensembldb
 importClassesFrom(ensembldb, EnsDb)
@@ -80,6 +84,9 @@ importClassesFrom(ensembldb, BasicFilter, EntrezidFilter, GeneidFilter, Genebiot
                   SeqstrandFilter, SeqstartFilter, SeqendFilter, GRangesFilter)
 importMethodsFrom(ensembldb, listColumns, exons, exonsBy)
 importFrom(ensembldb, GRangesFilter)
+
+## tools
+importFrom(tools, file_ext, file_path_sans_ext)
 
 ## ============================================================
 ## Export

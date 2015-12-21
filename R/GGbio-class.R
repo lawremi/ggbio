@@ -77,10 +77,10 @@ setMethod("$", "GGbio",
 
 
 ## combine command if circle presents
-.circle.geoms <- c("point","line", "link",
-                   "ribbon","rect", "bar",
-                   "segment","hist", "scale",
-                   "heatmap", "ideogram", "text")
+.layout.circle.geoms <- c("point","line", "link",
+                          "ribbon","rect", "bar",
+                          "segment","hist", "scale",
+                          "heatmap", "ideogram", "text")
 
 ## FIXME, need geom_* for something like ideogram
 .combineNames <- function(obj){

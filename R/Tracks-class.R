@@ -630,7 +630,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                               cex = label.text.cex[i]))
           left.grob <- grobTree(gTree(children = gList(rect, label)))
         }else{
-          left.grob <- ggplot2:::zeroGrob()
+          left.grob <- ggplot2::zeroGrob()
         }
         gt <- gtable(widths = unit.c(label.width,unit(1, "null")),
                      heights = unit(1, "null"))
@@ -648,7 +648,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                               cex = label.text.cex[i]))
           top.grob <- grobTree(gTree(children = gList(rect, label)))
         }else{
-          top.grob <- ggplot2:::zeroGrob()
+          top.grob <- ggplot2::zeroGrob()
         }
         gt <- gtable(widths = unit(1, "null"),
                      heights = unit.c(label.width,unit(1, "null")))
@@ -744,7 +744,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        label.width = label.width)
   }else{
     if(any(!is.null(nms)))
-      grobs <- addLabel(lgrobs, nms, lbs,
+      grobs <- addLabel(grobs, nms, lbs,
                         label.bg.color =  label.bg.color,
                        label.bg.fill = label.bg.fill,
                        label.text.color = label.text.color,

@@ -2,7 +2,7 @@
 \alias{ggsave}
 \title{Save a ggplot object or tracks with sensible defaults}
 \usage{
-  ggsave(filename = default_name(plot), plot = last_plot(),
+  ggsave(filename, plot = last_plot(),
     device = default_device(filename), path = NULL,
     scale = 1, width = par("din")[1],
     height = par("din")[2], units = c("in", "cm", "mm"),

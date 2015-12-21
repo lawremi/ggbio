@@ -37,7 +37,7 @@ setMethod("plotFragLength", c("character", "GRanges"),
     if(is(model, "GRanges"))
       model <- GRangesList(model)
     names(model) <- "1"
-    p.exon <- qutoplot(model) + ylab(" ") + theme_bw() +theme(panel.grid.minor=element_blank(),
+    p.exon <- autoplot(model) + ylab(" ") + theme_bw() +theme(panel.grid.minor=element_blank(),
                                              panel.grid.major=element_blank())
                                                ## scale_y_continuous(breaks = c(0),
                                                ##                   labels = " x")

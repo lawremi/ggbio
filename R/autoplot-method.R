@@ -1634,7 +1634,7 @@ setMethod("autoplot", "matrix", function(object, ...,
         if("rownames" %in% colnames(df) && rownames.label){
             y.lab <- rownames(object)
             y <- seq_len(nrow(object))
-            p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+            p <- p + scale_y_continuous(breaks = y, labels = y.lab, expand = c(0, 0))
         }
         if("colnames" %in% colnames(df) && colnames.label){
             x.lab <- colnames(object)
@@ -1653,7 +1653,7 @@ setMethod("autoplot", "matrix", function(object, ...,
         if("rownames" %in% colnames(df) && rownames.label){
             y.lab <- rownames(object)
             y <- seq_len(nrow(object))
-            p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+            p <- p + scale_y_continuous(breaks = y, labels = y.lab, expand = c(0, 0))
         }
         if("colnames" %in% colnames(df) && colnames.label){
             x.lab <- colnames(object)
@@ -1672,7 +1672,7 @@ setMethod("autoplot", "matrix", function(object, ...,
     if(!axis.text.x)
         p <- p + scale_x_continuous(breaks = NULL, label = NULL, expand = c(0, 0))
     if(!axis.text.y)
-        p <- p + scale_y_continuous(breaks = NULL, label = NULL, expand = c(0, 0))
+        p <- p + scale_y_continuous(breaks = NULL, labels = NULL, expand = c(0, 0))
     if(missing(xlab))
         xlab <- ""
     p <- p + ggplot2::xlab(xlab)
@@ -1707,7 +1707,7 @@ setMethod("autoplot", "Views", function(object, ...,
                     if(!is.null(names(object))){
                         y.lab <- names(object)
                         y <- seq_len(length(object))
-                        p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+                        p <- p + scale_y_continuous(breaks = y, labels = y.lab, expand = c(0, 0))
                     }
                     p
                 },
@@ -1718,7 +1718,7 @@ setMethod("autoplot", "Views", function(object, ...,
                     if(!is.null(names(object))){
                         y.lab <- names(object)
                         y <- seq_len(length(object))
-                        p <- p + scale_y_continuous(breaks = y, label = y.lab, expand = c(0, 0))
+                        p <- p + scale_y_continuous(breaks = y, labels = y.lab, expand = c(0, 0))
                     }
                     p
                 },
@@ -1791,7 +1791,6 @@ setMethod("autoplot", "RangedSummarizedExperiment", function(object, ...,
         }else{
             colnames(res) <- colnames(object)
             p <- autoplot(t(res), ...) + xlab("") + ylab("Samples")
-            object <- sset
             pd <- colData(object)
             s <- list(theme(axis.text.y = element_blank(),
                             axis.ticks.y = element_blank()) ,

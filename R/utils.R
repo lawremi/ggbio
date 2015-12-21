@@ -521,7 +521,7 @@ setMethod("subsetByChrs", "Seqinfo", function(obj, subchr){
 
 
 
-ggsave <- function (filename = default_name(plot), plot = last_plot(),
+ggsave <- function (filename, plot = last_plot(),
                        device = default_device(filename), path = NULL, scale = 1,
                        width = par("din")[1], height = par("din")[2],
                        units = c("in", "cm", "mm"), dpi = 300, limitsize = TRUE, ...)
@@ -549,9 +549,6 @@ ggsave <- function (filename = default_name(plot), plot = last_plot(),
         height = height, res = dpi, units = "in")
     tiff <- function(..., width, height) grDevices::tiff(...,
         width = width, height = height, res = dpi, units = "in")
-    default_name <- function(plot) {
-        paste(digest.ggplot(plot), ".pdf", sep = "")
-    }
     default_device <- function(filename) {
         pieces <- strsplit(filename, "\\.")[[1]]
         ext <- tolower(pieces[length(pieces)])

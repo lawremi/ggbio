@@ -60,7 +60,7 @@ Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband 
                                     alpha = alpha)
     }
     p <- p + theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
-        scale_y_continuous(breaks = 5, label = subchr) +
+        scale_y_continuous(breaks = 5, labels = subchr) +
             theme(strip.background = element_rect(colour = 'NA', fill = 'NA'))+
                 theme(strip.text.y = element_text(colour = 'white'))   + theme(legend.position = "none")+
                     ggplot2::xlab("")

@@ -138,7 +138,7 @@ setMethod("stat_mismatch", "BamFile", function(data, ...,  bsgenome, which,
       stop("bsgenome must be A BSgenome object")
     }
     data <- data$path
-    pgr <- pileupAsGRanges(data, region = which)
+    pgr <- pileupAsGRanges(data, regions = which)
     if(length(pgr)){    
     pgr.match <- pileupGRangesAsVariantTable(pgr, bsgenome)
     p <- stat_mismatch(pgr.match, ..., show.coverage = show.coverage, geom = geom)

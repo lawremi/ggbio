@@ -1,121 +1,23 @@
-setGeneric("ggplot")
-setMethod("ggplot", "GRanges", function(data, ...){
-  df <- mold(data)
-  g <- ggplot2::ggplot(df, ...)
-  g <- GGbio(g, data = data)
-  g
-})
+ggbio_ggplot <- function(data, mapping = aes(), ...,
+                         environment = parent.frame()) {
+    df <- mold(data)
+    g <- ggplot(df, mapping, ..., environment=environment)
+    g <- GGbio(g, data = data)
+    g
+}
 
-setMethod("ggplot", "GRangesList", function(data, ...){
-  df <- mold(data)
-  g <- ggplot2::ggplot(df, ...)
-  g <- GGbio(g, data = data)
-  g
-})
+ggplot.Vector <- ggbio_ggplot
+ggplot.matrix <- ggbio_ggplot # highly questionable
+ggplot.ExpressionSet <- ggbio_ggplot
+ggplot.RsamtoolsFile <- ggbio_ggplot
+ggplot.character <- ggbio_ggplot # highly questionable
+ggplot.TxDb <- ggbio_ggplot
+ggplot.BSgenome <- ggbio_ggplot
 
-setMethod("ggplot", "IRanges", function(data, ...){
-  df <- mold(data)
-  g <- ggplot2::ggplot(df, ...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-setMethod("ggplot", "Seqinfo", function(data, ...){
-  df <- mold(data)
-  g <- ggplot2::ggplot(df, ...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-
-setMethod("ggplot", "matrix", function(data, ...){
-  df <- mold(data)
-  g <- ggplot2::ggplot(df, ...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-
-setMethod("ggplot", "Views", function(data, ...){
-  df <- mold(data)
-  g <- ggplot2::ggplot(df, ...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-## to here
-setMethod("ggplot", "ExpressionSet", function(data, ...){
-  df <- mold(data)
-  g <- ggplot2::ggplot(df, ...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-setMethod("ggplot", "RangedSummarizedExperiment", function(data, assay.id = 1, ...){
-  df <- mold(data, assay.id = assay.id)
-  g <- ggplot2::ggplot(df, ...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-setMethod("ggplot", "VCF", function(data, ...){
-  g <- ggplot2::ggplot(...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-setMethod("ggplot", "Rle", function(data, ...){
-  df <- mold(data)
-  g <- ggplot2::ggplot(df, ...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-setMethod("ggplot", "RleList", function(data, ...){
-  df <- mold(data)
-  g <- ggplot2::ggplot(df, ...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-
-setMethod("ggplot", "GAlignments", function(data, ...){
-  g <- ggplot2::ggplot(...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-
-setMethod("ggplot", "BamFile", function(data, ...){
-  g <- ggplot2::ggplot(...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-setMethod("ggplot", "character", function(data, ...){
-  g <- ggplot2::ggplot(...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-
-setMethod("ggplot", "TxDbOREnsDb", function(data, ...){
-  g <- ggplot2::ggplot(...)
-  g <- GGbio(g, data = data)
-  g
-})
-
-
-setMethod("ggplot", "BSgenome", function(data, ...){
-  g <- ggplot2::ggplot(...)
-  g <- GGbio(g, data = data)
-  g
-
-})
-
-setMethod("ggplot", "ANY", function(data, ...){
-  g <- ggplot2::ggplot(data, ...)
-  g
-})
-
-
+ggplot.SummarizedExperiment <- function(data, mapping = aes(), assay.id = 1L,
+                                        ..., environment = parent.frame()) {
+    df <- mold(data, assay.id=assay.id)
+    g <- ggplot(df, mapping, ..., environment=environment)
+    g <- GGbio(g, data = data)
+    g
+}

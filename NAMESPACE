@@ -96,7 +96,7 @@ exportMethods(autoplot, rescale, fixed, "fixed<-",
               xlim, "xlim<-", reset, backup,
               bgColor, "bgColor<-", labeled, "labeled<-",
               mutable, "mutable<-", height, "height<-",
-              hasAxis, "hasAxis<-", ggplot)
+              hasAxis, "hasAxis<-")
 
 
 export(arrangeGrobByParsingLegend, ggbio, GGbio)
@@ -159,3 +159,12 @@ export(zoom, zoom_in, zoom_out, nextView, prevView)
 ##               cached_item, "cached_item<-", addItem, addWhich,
 ##               cached_which, cbind, rbind)
 ## export(PlotList, Tracked, Plot, Grob)
+
+
+S3method(ggplot, Vector)
+S3method(ggplot, matrix)
+S3method(ggplot, ExpressionSet)
+S3method(ggplot, RsamtoolsFile)
+S3method(ggplot, character)
+S3method(ggplot, TxDb)
+S3method(ggplot, BSgenome)

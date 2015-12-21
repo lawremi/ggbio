@@ -1,58 +1,51 @@
 \name{ggplot}
-\alias{ggplot}
-\alias{ggplot,ANY-method}
-\alias{ggplot,GRanges-method}
-\alias{ggplot,GRangesList-method}
-\alias{ggplot,IRanges-method}
-\alias{ggplot,Seqinfo-method}
-\alias{ggplot,matrix-method}
-\alias{ggplot,Views-method}
-\alias{ggplot,ExpressionSet-method}
-\alias{ggplot,RangedSummarizedExperiment-method}
-\alias{ggplot,VCF-method}
-\alias{ggplot,GAlignments-method}
-\alias{ggplot,BamFile-method}
-\alias{ggplot,character-method}
-\alias{ggplot,TxDbOREnsDb-method}
-\alias{ggplot,BSgenome-method}
-\alias{ggplot,Rle-method}
-\alias{ggplot,RleList-method}
-\title{ggplot generic method}
-\description{
-  Usage is similar to \code{ggplot} function in ggplot2 package, but support
-  more objects defined in Bioconductor, or even for object like matrix,
-  which intitialize a ggbio object. It can be used to declare
-  the input data frame for a graphic and to specify the set of plot
-  aesthetics intended to be common throughout all subsequent layers
-  unless specifically overridden. And more than that, it store the
-  original data object before coercion into the returned object.
-  Please check the behavior for  \code{\link{mold}} method to see how
-  each object coerced into data.frame.
-}
+\alias{ggplot.Vector}
+\alias{ggplot.matrix}
+\alias{ggplot.ExpressionSet}
+\alias{ggplot.RsamtoolsFile}
+\alias{ggplot.character}
+\alias{ggplot.TxDb}
+\alias{ggplot.BSgenome}
+\alias{ggplot.SummarizedExperiment}
+
+\title{ggplot methods}
+
+\description{ These methods extend \code{ggplot} to support several
+  types of Bioconductor objects, as well as some base types like
+  matrix. They return a \code{ggbio} object, which stores the original data
+  object.  Please check the corresponding method for \code{\link{mold}}
+  to see how an object is coerced into a data.frame.  }
+ 
 \usage{
-\S4method{ggplot}{GRanges}(data, ...)
-\S4method{ggplot}{GRangesList}(data, ...)
-\S4method{ggplot}{IRanges}(data, ...)
-\S4method{ggplot}{Seqinfo}(data, ...)
-\S4method{ggplot}{matrix}(data, ...)
-\S4method{ggplot}{Views}(data, ...)
-\S4method{ggplot}{ExpressionSet}(data, ...)
-\S4method{ggplot}{RangedSummarizedExperiment}(data, assay.id = 1, ...)
-\S4method{ggplot}{VCF}(data, ...)
-\S4method{ggplot}{GAlignments}(data, ...)
-\S4method{ggplot}{BamFile}(data, ...)
-\S4method{ggplot}{character}(data, ...)
-\S4method{ggplot}{TxDbOREnsDb}(data, ...)
-\S4method{ggplot}{BSgenome}(data, ...)
-\S4method{ggplot}{Rle}(data, ...)
-\S4method{ggplot}{RleList}(data, ...)
+\method{ggplot}{Vector}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
+\method{ggplot}{ExpressionSet}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
+\method{ggplot}{RsamtoolsFile}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
+\method{ggplot}{TxDb}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
+\method{ggplot}{BSgenome}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
+\method{ggplot}{matrix}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
+\method{ggplot}{character}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
+\method{ggplot}{SummarizedExperiemnt}(data, mapping = aes(),
+                        assay.id = 1L, \dots, environment = parent.frame())
 }
 \arguments{
   \item{data}{
     original data object.
   }
+  \item{mapping}{
+    the aesthetic mapping.
+  }
   \item{...}{
     other arguments passed to specific methods.
+  }
+  \item{environment}{
+    fall-back environment for evaluation of aesthetic symbols
   }
   \item{assay.id}{
     index of assay you are using when multiple assays exist.

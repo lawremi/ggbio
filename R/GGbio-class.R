@@ -77,7 +77,7 @@ setMethod("$", "GGbio",
 
 
 ## combine command if circle presents
-.layout.circle.geoms <- c("point","line", "link",
+.layout_circle.geoms <- c("point","line", "link",
                           "ribbon","rect", "bar",
                           "segment","hist", "scale",
                           "heatmap", "ideogram", "text")

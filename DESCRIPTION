@@ -15,7 +15,7 @@ Authors@R: c(person("Tengfei", "Yin", role=c("aut", "cre"),
                  email="yintengfei@gmail.com"),
           person("Michael", "Lawrence", role=c("aut", "ths")),
           person("Dianne", "Cook", role=c("aut", "ths")),
-          person("Johannes", "Rainier", role="ctb"))
+          person("Johannes", "Rainer", role="ctb"))
 Depends: methods, BiocGenerics, ggplot2 (>= 1.0.0)
 Imports: grid, grDevices, graphics, stats, utils, gridExtra, scales, reshape2,
         gtable, Hmisc, biovizBase (>= 1.19.1), Biobase, S4Vectors,

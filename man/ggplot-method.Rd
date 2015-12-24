@@ -4,9 +4,11 @@
 \alias{ggplot.ExpressionSet}
 \alias{ggplot.RsamtoolsFile}
 \alias{ggplot.character}
-\alias{ggplot.TxDb}
+\alias{ggplot.TxDbOREnsDb}
 \alias{ggplot.BSgenome}
 \alias{ggplot.SummarizedExperiment}
+\alias{ggplot.GAlignments}
+\alias{ggplot.VCF}
 
 \title{ggplot methods}
 
@@ -23,7 +25,7 @@
                         environment = parent.frame())
 \method{ggplot}{RsamtoolsFile}(data, mapping = aes(), \dots,
                         environment = parent.frame())
-\method{ggplot}{TxDb}(data, mapping = aes(), \dots,
+\method{ggplot}{TxDbOREnsDb}(data, mapping = aes(), \dots,
                         environment = parent.frame())
 \method{ggplot}{BSgenome}(data, mapping = aes(), \dots,
                         environment = parent.frame())
@@ -33,6 +35,10 @@
                         environment = parent.frame())
 \method{ggplot}{SummarizedExperiment}(data, mapping = aes(),
                         assay.id = 1L, \dots, environment = parent.frame())
+\method{ggplot}{GAlignments}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
+\method{ggplot}{VCF}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
 }
 \arguments{
   \item{data}{

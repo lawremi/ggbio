@@ -31,7 +31,7 @@
                         environment = parent.frame())
 \method{ggplot}{character}(data, mapping = aes(), \dots,
                         environment = parent.frame())
-\method{ggplot}{SummarizedExperiemnt}(data, mapping = aes(),
+\method{ggplot}{SummarizedExperiment}(data, mapping = aes(),
                         assay.id = 1L, \dots, environment = parent.frame())
 }
 \arguments{

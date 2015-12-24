@@ -1,6 +1,6 @@
 \name{stat_identity}
 \alias{stat_identity}
-\alias{stat_identity,data.frame-method}
+\alias{stat_identity,ANY-method}
 \alias{stat_identity,missing-method}
 \alias{stat_identity,uneval-method}
 \alias{stat_identity,GRanges-method}
@@ -12,7 +12,7 @@
   multiple geom or even stat to re-plot the data.
 }
 \usage{
-\S4method{stat_identity}{data.frame}(data, ...)
+\S4method{stat_identity}{ANY}(data, ...)
 
 \S4method{stat_identity}{GRanges}(data, ..., geom = NULL)
 
@@ -23,7 +23,7 @@
 }
 \arguments{
   \item{data}{
-    A \code{GRanges} or \code{data.frame} object.
+    Typically a \code{GRanges} or \code{data.frame} object.
   }
   \item{...}{
     Extra parameters such as aes() passed to \code{geom_rect},

@@ -1,6 +1,6 @@
 \name{geom_bar}
 \alias{geom_bar}
-\alias{geom_bar,data.frame-method}
+\alias{geom_bar,ANY-method}
 \alias{geom_bar,GRanges-method}
 \alias{geom_bar,missing-method}
 \alias{geom_bar,chevron-method}
@@ -10,15 +10,12 @@
   use 'score' or specified 'y' as y scale. 
 }
 \usage{
-##  for data.frame
-\S4method{geom_bar}{data.frame}(data, ...)
-% for GRanges
+\S4method{geom_bar}{ANY}(data, ...)
 \S4method{geom_bar}{GRanges}(data,..., xlab, ylab, main)
-
 }
 \arguments{
   \item{data}{
-    A \code{GRanges} or \code{data.frame} object.
+    Typically a \code{GRanges} or \code{data.frame} object.
   }
   \item{...}{
     Extra parameters such as aes() or \code{color, size} passed.

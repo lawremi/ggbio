@@ -1,6 +1,6 @@
 \name{geom_rect}
 \alias{geom_rect}
-\alias{geom_rect,data.frame-method}
+\alias{geom_rect,ANY-method}
 \alias{geom_rect,GRanges-method}
 \alias{geom_rect,missing-method}
 \alias{geom_rect,uneval-method}
@@ -9,9 +9,7 @@
   Show interval data as rectangle.
 }
 \usage{
-## For data.frame
-\S4method{geom_rect}{data.frame}(data, ...)
-## For GRanges
+\S4method{geom_rect}{ANY}(data, ...)
 \S4method{geom_rect}{GRanges}(data,..., xlab, ylab, main,
           facets = NULL, stat = c("stepping", "identity"),
           rect.height = NULL,
@@ -19,7 +17,7 @@
 }
 \arguments{
   \item{data}{
-    A \code{GRanges} or \code{data.frame} object. When it's
+    Typically a \code{GRanges} or \code{data.frame} object. When it's
     \code{data.frame}, it's simply calling ggplot2::geom_rect.
   }
   \item{...}{

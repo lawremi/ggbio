@@ -2,7 +2,7 @@
 \alias{stat_bin}
 \alias{stat_bin,missing-method}
 \alias{stat_bin,uneval-method}
-\alias{stat_bin,data.frame-method}
+\alias{stat_bin,ANY-method}
 \alias{stat_bin,Rle-method}
 \alias{stat_bin,RleList-method}
 \title{Binning method}
@@ -11,7 +11,7 @@
   \code{data.frame} it's just calling \code{ggplot2::stat_bin}. 
 }
 \usage{
-\S4method{stat_bin}{data.frame}(data, ...)
+\S4method{stat_bin}{ANY}(data, ...)
 
 \S4method{stat_bin}{Rle}(data, ..., binwidth, nbin = 30,
          xlab, ylab, main, geom = c("bar", "heatmap"),
@@ -26,7 +26,7 @@
 }
 \arguments{
 \item{data}{
-    a \code{data.frame} or \code{Rle} or \code{RleList} object.
+    Typically a \code{data.frame} or \code{Rle} or \code{RleList} object.
 }
 \item{...}{
     arguments passed to aesthetics mapping.

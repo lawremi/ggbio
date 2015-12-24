@@ -1,6 +1,6 @@
 \name{geom_segment}
 \alias{geom_segment}
-\alias{geom_segment,data.frame-method}
+\alias{geom_segment,ANY-method}
 \alias{geom_segment,GRanges-method}
 \alias{geom_segment,missing-method}
 \alias{geom_segment,uneval-method}
@@ -9,8 +9,7 @@
   Show interval data as segments.
 }
 \usage{
-##  for data.frame
-\S4method{geom_segment}{data.frame}(data, ...)
+\S4method{geom_segment}{ANY}(data, ...)
 % for GRanges
 \S4method{geom_segment}{GRanges}(data,..., xlab, ylab, main,
           facets = NULL, stat = c("stepping", "identity"),

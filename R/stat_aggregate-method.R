@@ -163,10 +163,10 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
                 list(aes.res),
                 args.non)
   if(!geom %in% c("boxplot")){
-    p <- do.call(ggplot2::stat_identity, args.res)
+    p <- do.ggcall(ggplot2::stat_identity, args.res)
    }else{
      args.res <- args.res[!names(args.res) %in% "geom"]
-     p <- do.call(stat_boxplot, args.res)
+     p <- do.ggcall(stat_boxplot, args.res)
    }
   p <- c(list(p) , list(facet))
   if(missing(xlab)) 

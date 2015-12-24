@@ -88,7 +88,7 @@ setMethod("geom_chevron", "GRanges",
 
               args.res <- c(list(data = df), list(do.call(aes, args)),
                             args.non)
-              p <- c(list(do.call(ggplot2::geom_segment, args.res)), list(ggplot2::ylab("")))
+              p <- c(list(do.ggcall(ggplot2::geom_segment, args.res)), list(ggplot2::ylab("")))
 
               if("group" %in% names(args.aes))
                 gpn <- as.character(args.aes$group)
@@ -143,7 +143,7 @@ setMethod("geom_chevron", "GRanges",
               args.aes$yend <- substitute(yend + yend.offset, list(yend = .yend))
               args.res <- c(list(data = df), list(do.call(aes, args.aes)),
                             args.non)
-              p <- c(list(do.call(ggplot2::geom_segment, args.res)),
+              p <- c(list(do.ggcall(ggplot2::geom_segment, args.res)),
                      list(ggplot2::ylab("")))
 
             }}else{

@@ -82,7 +82,7 @@ setMethod("stat_mismatch", "GRanges", function(data, ..., bsgenome,
                 list(aes.res),
                 args.non)
   if(show.coverage)
-    p <- list(do.call(ggplot2::geom_polygon, args.res))
+    p <- list(do.ggcall(ggplot2::geom_polygon, args.res))
   else
     p <- NULL
   DNABasesColor <- getBioColor("DNA_BASES_N")

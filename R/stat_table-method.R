@@ -28,7 +28,7 @@ setMethod("stat_table", "GRanges", function(data, ..., xlab, ylab, main,
     ## geom/stat check
     ## ------------------------------
     if(is.null(stat) & is.null(geom)){
-      stat <- "steppingg"
+      stat <- "stepping"
       args.non$geom <- "rect"
       args.non$stat <- stat
       if(!"color" %in% names(args.aes))
@@ -46,7 +46,7 @@ setMethod("stat_table", "GRanges", function(data, ..., xlab, ylab, main,
     }
     aes.res <- do.call(aes, args.aes)
     args.res <- c(args.non, list(aes.res))
-    p <- do.call(.fun, args.res)
+    p <- do.ggcall(.fun, args.res)
   }else{
     p <- NULL
   }

@@ -5,7 +5,7 @@
 ## reduce is just a stat transformation at lower level
 setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
 
-setMethod("geom_rect", "data.frame", function(data, ...){
+setMethod("geom_rect", "ANY", function(data, ...){
   ggplot2::geom_rect(data = data, ...)
 })
 
@@ -64,7 +64,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
     aes.res.seg <- do.call(aes, args.aes.seg)
     args.res.seg <- c(list(data = df), list(aes.res.seg),
                   args.non)
-    p <- list(do.call(ggplot2::geom_segment,args.res.seg))
+    p <- list(do.ggcall(ggplot2::geom_segment,args.res.seg))
     
     args.aes <- args.aes[names(args.aes) != "group"]
     args.aes <- c(args.aes, list(xmin = substitute(start),
@@ -77,7 +77,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
     args.res <- c(list(data = df), list(aes.res),
                   args.non)
     
-    p <- c(p, list(do.call(ggplot2::geom_rect,args.res)))
+    p <- c(p, list(do.ggcall(ggplot2::geom_rect,args.res)))
     p <- .changeStrandColor(p, args.aes)
     .df.lvs <- unique(df$stepping)
     .df.sub <- df[, c("stepping", gpn)]
@@ -132,14 +132,14 @@ setMethod("geom_rect", "GRanges", function(data,...,
     aes.res.seg <- do.call(aes, args.aes.seg)
     args.res.seg <- c(list(data = df), list(aes.res.seg),
                   args.non)
-    p <- list(do.call(ggplot2::geom_segment,args.res.seg))
+    p <- list(do.ggcall(ggplot2::geom_segment,args.res.seg))
     args.aes <- args.aes[names(args.aes) != "group"]
     args.aes <- args.aes[names(args.aes) != "size"]
     
     aes.res <- do.call(aes, args.aes)
     args.res <- c(list(data = df), list(aes.res),
                   args.non)
-    p <- c(p, list(do.call(ggplot2::geom_rect,args.res)))
+    p <- c(p, list(do.ggcall(ggplot2::geom_rect,args.res)))
     p <- .changeStrandColor(p, args.aes)
     if(!missing(ylab))
         p <- c(p, list(ggplot2::ylab(ylab)))

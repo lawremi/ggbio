@@ -1,6 +1,6 @@
 setGeneric("geom_bar", function(data, ...) standardGeneric("geom_bar"))
 
-setMethod("geom_bar", "data.frame", function(data, ...){
+setMethod("geom_bar", "ANY", function(data, ...){
   ggplot2::geom_bar(data  = data, ...)
 })
 ## alignment should be convenient toggle with chevron...
@@ -29,9 +29,9 @@ setMethod("geom_bar", "GRanges", function(data,..., xlab, ylab, main){
     args.aes$ymin <- 0
     args.aes$ymax <- as.name(.y)
     aes.res <- do.call(aes, args.aes)
-    p <- list(do.call(geom_rect, c(list(data = mold(data)),
-                                  list(aes.res),
-                                  args.non)))
+    p <- list(do.ggcall(geom_rect, c(list(data = mold(data)),
+                                     list(aes.res),
+                                     args.non)))
 
   }else{
     p <- NULL

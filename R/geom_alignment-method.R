@@ -101,7 +101,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                 gps.lst <- c(list(aes.lst), list(data = gps, stat = "identity"),
                              args.gaps.extra)
 
-                p <- list(do.call(gap.fun, gps.lst))
+                p <- list(do.ggcall(gap.fun, gps.lst))
             }else{
                 p <- NULL
             }
@@ -579,7 +579,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
                               list(aes.res),
                               args.cds.non,
                               list(stat = "identity"))
-            p <- do.call(range.fun, args.cds.res)
+            p <- do.ggcall(range.fun, args.cds.res)
         }
         if (length(gr.exons) > 0L) {
             ## plot exons
@@ -588,7 +588,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
                                list(aes.res),
                                args.exon.non,
                                list(stat = "identity"))
-            p <- c(p, list(do.call(range.fun, args.exon.res)))
+            p <- c(p, list(do.ggcall(range.fun, args.exon.res)))
         }
         ## utrs
         gr.utr <- gr[values(gr)[[.type]] == "utr"]
@@ -612,7 +612,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
                               list(aes.res),
                               args.utr.non,
                               list(stat = "identity"))
-            p <- c(p, list(do.call(utr.fun, args.utr.res)))
+            p <- c(p, list(do.ggcall(utr.fun, args.utr.res)))
         }
         if(stat == "reduce"){
             .grl <- endoapply(data, function(g){
@@ -656,7 +656,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
                            args.non.arrow,
                            list(stat = "identity"))
         if(length(df.gaps)){
-            p <- c(p , list(do.call(gap.fun, args.gaps.res)))
+            p <- c(p , list(do.ggcall(gap.fun, args.gaps.res)))
         }
         if(label){
             aes.label <- do.call(aes, list(label = substitute(.labels),
@@ -672,7 +672,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
                                 list(color = label.color),
                                 args.non)
 
-            p <- c(p , list(do.call(geom_text, args.label.res)))
+            p <- c(p , list(do.ggcall(geom_text, args.label.res)))
             ggplot() + p
         }
         p <- c(p , list(scale_y_continuous(breaks = NULL)))

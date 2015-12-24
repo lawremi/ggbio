@@ -71,7 +71,7 @@ setMethod("plotRangesLinkedToData", "GenomicRangesORGRangesList",
             
             args.aes.seg$yend <- args.aes.seg$y
             aes.res.seg <- do.call(aes, args.aes.seg)
-            p <- p + do.call(ggplot2::geom_segment,
+            p <- p + do.ggcall(ggplot2::geom_segment,
                              c(list(aes.res.seg), args.non))
             df.dash <- data.frame(x = df.new[c(-N, -2*N), "x.new"] + wid,
                                   xend = df.new[c(-1, -(N+1)), "x.new"] - wid,

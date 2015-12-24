@@ -211,6 +211,36 @@ getDrawFunFromGeomStat <- function(geom, stat){
   .fun
 }
 
+do.ggcall <- function(fun, args) {
+    do.call(fun, filterArgs(fun, args))
+}
+
+filterArgs <- function(fun, args) {
+    resolveGeneric <- function(fun, args) {
+        if (is(fun, "genericFunction")) {
+            method <- selectMethod(fun, class(args$data))
+            if (method@defined == "ANY") {
+                ggfun <- get0(fun@generic, getNamespace("ggplot2"),
+                              mode="function")
+                if (!is.null(ggfun)) { # a generic overriding a ggplot2 function
+                    fun <- ggfun
+                }
+            }
+        }
+        fun
+    }
+    fun <- resolveGeneric(fun, args)
+    ggplot2 <- !is(fun, "genericFunction")
+    if (ggplot2) {
+        aes <- vapply(args, is, "uneval", FUN.VALUE=logical(1L))
+        if (is.null(names(args))) {
+            names(args) <- rep("", length(args))
+        }
+        args <- args[names(args) %in% names(formals(fun)) | aes]
+    }
+    args
+}
+
 .changeStrandColor <- function(p, args, fill = TRUE){
   strandColor <- getOption("biovizBase")$strandColor
   isStrand.color <- FALSE

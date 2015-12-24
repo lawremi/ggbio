@@ -38,7 +38,7 @@ setMethod("layout_circle",  "GRanges",
     args.aes$group <- as.name(".biovizBase.group")
     args.non$fill <- args.non$color <- grid.background
     args.tot <- c(list(data = df), list(do.call(aes, args.aes)),args.non)
-    res <- do.call(geom_polygon, args.tot)
+    res <- do.ggcall(geom_polygon, args.tot)
     p <- list(res)
     data <- rep(data, grid.n)
     values(data)$.grid.level <- rep(1:grid.n, each = length(data)/grid.n)
@@ -55,7 +55,7 @@ setMethod("layout_circle",  "GRanges",
     aes <- do.call("aes", args.aes)
     args.non$color <- grid.line
     args.tot <- c(list(data = df), list(aes), args.non)
-    res <- do.call(geom_path, args.tot)
+    res <- do.ggcall(geom_path, args.tot)
     p <- c(p ,list(res))
   }
   if(grid)
@@ -87,7 +87,7 @@ setMethod("layout_circle",  "GRanges",
       args.non$color <- col
     }
     args.tot <- c(list(data = df, aes), args.non)
-    res <- do.call(geom_polygon, args.tot)
+    res <- do.ggcall(geom_polygon, args.tot)
     p <- list(res)
 
   }
@@ -127,7 +127,7 @@ setMethod("layout_circle",  "GRanges",
     args.aes$x <- as.name(".circle.x")
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = df, aes), args.non)
-    res <- do.call(geom_text, args.tot)
+    res <- do.ggcall(geom_text, args.tot)
     p <- list(res)
 
   }
@@ -148,7 +148,7 @@ setMethod("layout_circle",  "GRanges",
     args.aes$x <- as.name(".circle.x")
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = df, aes), args.non)
-    res <- do.call(geom_point, args.tot)
+    res <- do.ggcall(geom_point, args.tot)
     p <- list(res)
   }
 
@@ -166,7 +166,7 @@ setMethod("layout_circle",  "GRanges",
     args.aes$group <- as.name("seqnames")
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = df, aes), args.non)
-    res <- do.call(geom_path, args.tot)
+    res <- do.ggcall(geom_path, args.tot)
     p <- list(res)
   }
 
@@ -181,7 +181,7 @@ setMethod("layout_circle",  "GRanges",
     args.aes$group <- as.name(".biovizBase.group")
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = df), list(aes), args.non)
-    res <- do.call(geom_path, args.tot)
+    res <- do.ggcall(geom_path, args.tot)
     p <- list(res)
   }
 
@@ -196,7 +196,7 @@ setMethod("layout_circle",  "GRanges",
     args.aes$group <- as.name(".biovizBase.group")
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = df), list(aes), args.non)
-    res <- do.call(geom_path, args.tot)
+    res <- do.ggcall(geom_path, args.tot)
     p <- list(res)
   }
 
@@ -246,7 +246,7 @@ setMethod("layout_circle",  "GRanges",
     aes <- do.call("aes", args.aes)
     aes.text <- do.call("aes", c(args.aes.text))
     args.tot <- c(list(data = res), list(aes.text), args.non)
-    res.text <- do.call(geom_text, args.tot)
+    res.text <- do.ggcall(geom_text, args.tot)
     res.seg <- do.call(ggplot2::geom_segment,c(list(data = res), list(aes)))
     p <- c(list(res.text), list(res.seg))
   }
@@ -271,7 +271,7 @@ setMethod("layout_circle",  "GRanges",
       args.non$fill <- "black"
     }
     args.tot <- c(list(data = df, aes.p), args.non)
-    res <- do.call(geom_polygon, args.tot)
+    res <- do.ggcall(geom_polygon, args.tot)
     p <- list(res)
   }
 
@@ -295,7 +295,7 @@ setMethod("layout_circle",  "GRanges",
       args.non$fill <- "black"
     }
     args.tot <- c(list(data = df, aes.p), args.non)
-    res <- do.call(geom_polygon, args.tot)
+    res <- do.ggcall(geom_polygon, args.tot)
     p <- list(res)
   }
 
@@ -308,7 +308,7 @@ setMethod("layout_circle",  "GRanges",
     args.aes$group <- as.name(".biovizBase.group")
     aes <- do.call("aes", args.aes)
     args.tot <- c(list(data = res, aes), args.non )
-    res <- do.call(geom_path, args.tot)
+    res <- do.ggcall(geom_path, args.tot)
     p <- list(res)
 
   }

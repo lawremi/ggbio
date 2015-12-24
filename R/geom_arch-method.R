@@ -66,7 +66,7 @@ setMethod("geom_arch", "data.frame", function(data, ...,
   aesres <- do.call(aes, c(args.aes, args.aes2))
   if(nrow(apoint)){
     reslst <- c(list(data = apoint), list(aesres),args.non)
-    p <- do.call(geom_line, reslst)
+    p <- do.ggcall(geom_line, reslst)
     if("ylab" %in% names(args.non)){
       ylab <- as.character(args.non$ylab)
     }else if(length(y.name)){
@@ -116,7 +116,7 @@ setMethod("geom_arch", "GRanges", function(data, ...,
     args.res <- c(list(data = df),
                   args.non,
                   list(do.call(aes, args.aes)))
-    p <- do.call(geom_arch, args.res)
+    p <- do.ggcall(geom_arch, args.res)
     p <- c(list(p) , list(facet))
   }else{
     p <- NULL
@@ -255,7 +255,7 @@ geom_arch_flip <- function(data, ..., n = 25, max.height = 10, bottom = TRUE){
   aesres <- do.call(aes, c(args.aes, args.aes2))
   if(nrow(apoint)){
     reslst <- c(list(data = apoint), list(aesres),args.non)
-    p <- do.call(geom_polygon, reslst)
+    p <- do.ggcall(geom_polygon, reslst)
     if("ylab" %in% names(args.non)){
       ylab <- as.character(args.non$ylab)
     }else if(length(y.name)){
@@ -341,7 +341,7 @@ geom_arch_flip2 <- function(data, ..., n = 25, max.height = 10, bottom = FALSE){
   aesres <- do.call(aes, c(args.aes, args.aes2))
   if(nrow(apoint)){
     reslst <- c(list(data = apoint), list(aesres),args.non)
-    p <- do.call(geom_path, reslst)
+    p <- do.ggcall(geom_path, reslst)
     if("ylab" %in% names(args.non)){
       ylab <- as.character(args.non$ylab)
     }else if(length(y.name)){

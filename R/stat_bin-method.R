@@ -1,5 +1,5 @@
 setGeneric("stat_bin", function(data, ...) standardGeneric("stat_bin"))
-setMethod("stat_bin", "data.frame", function(data, ...){
+setMethod("stat_bin", "ANY", function(data, ...){
   ggplot2::stat_bin(data = data, ...)
 })
 
@@ -70,7 +70,7 @@ setMethod("stat_bin", "Rle", function(data, ..., binwidth, nbin = 30,
     aes.args <- do.call(aes, args.aes)    
     args.res <- c(list(aes.args),
                   args.non)
-    p <- do.call(geom_bar, args.res)
+    p <- do.ggcall(geom_bar, args.res)
   }
   if(geom == "heatmap"){
     args.aes$xmin <- substitute(x-binwidth/2, list(binwidth = binwidth))
@@ -83,7 +83,7 @@ setMethod("stat_bin", "Rle", function(data, ..., binwidth, nbin = 30,
     aes.args <- do.call(aes, args.aes)        
     args.res <- c(list(aes.args),
                   args.non)
-    p <- do.call(geom_rect, args.res)    
+    p <- do.ggcall(geom_rect, args.res)    
   }
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))
@@ -210,7 +210,7 @@ setMethod("stat_bin", "RleList", function(data, ..., binwidth, nbin = 30,
     aes.args <- do.call(aes, args.aes)    
     args.res <- c(list(aes.args),
                   args.non)
-    p <- do.call(geom_bar, args.res)
+    p <- do.ggcall(geom_bar, args.res)
   }
   if(geom == "heatmap"){
     args.aes$xmin <- substitute(x-binwidth/2, list(binwidth = binwidth))
@@ -223,7 +223,7 @@ setMethod("stat_bin", "RleList", function(data, ..., binwidth, nbin = 30,
     aes.args <- do.call(aes, args.aes)        
     args.res <- c(list(aes.args),
                   args.non)
-    p <- do.call(geom_rect, args.res)    
+    p <- do.ggcall(geom_rect, args.res)    
   }
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))

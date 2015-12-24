@@ -1,6 +1,6 @@
 setGeneric("geom_segment", function(data, ...) standardGeneric("geom_segment"))
 
-setMethod("geom_segment", "data.frame", function(data, ...){
+setMethod("geom_segment", "ANY", function(data, ...){
   ggplot2::geom_segment(data  = data, ...)
 })
 ## alignment should be convenient toggle with chevron...
@@ -55,7 +55,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
     aes.res <- do.call(aes, args.aes)
     args.res <- c(list(data = df), list(aes.res),
                   args.non)
-    p <- list(do.call(ggplot2::geom_segment,args.res))
+    p <- list(do.ggcall(ggplot2::geom_segment,args.res))
     p <- .changeStrandColor(p, args.aes)
     .df.lvs <- unique(df$stepping)
     .df.sub <- df[, c("stepping", gpn)]
@@ -86,7 +86,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
     aes.res <- do.call(aes, args.aes)
     args.res <- c(list(data = df), list(aes.res),
                   args.non)
-    p <- list(do.call(ggplot2::geom_segment,args.res))
+    p <- list(do.ggcall(ggplot2::geom_segment,args.res))
     p <- .changeStrandColor(p, args.aes)
   }}else{
     p <- NULL

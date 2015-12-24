@@ -75,18 +75,18 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
                       args.non$arrow <- arrow(length = length, ends = "last",
                                               type = type, angle = angle)
                       aes.temp <- do.call(aes, args.aes)
-                      do.call(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
+                      do.ggcall(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
                       
                     },
                     "-" = {
                       args.non$arrow <- arrow(length = length, ends = "first",
                                               type = type, angle = angle)
                       aes.temp <- do.call(aes, args.aes)
-                      do.call(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
+                      do.ggcall(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
                     },
                     "*" = {
                       aes.temp <- do.call(aes, args.aes)
-                      do.call(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
+                      do.ggcall(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
                     })
         p
       })
@@ -137,18 +137,18 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
                       args.non$arrow <- arrow(length = length, ends = "last",
                                               type = type, angle = angle)
                       aes.temp <- do.call(aes, args.aes)
-                      do.call(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
+                      do.ggcall(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
                       
                     },
                     "-" = {
                       args.non$arrow <- arrow(length = length, ends = "first",
                                               type = type, angle = angle)
                       aes.temp <- do.call(aes, args.aes)
-                      do.call(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
+                      do.ggcall(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
                     },
                     "*" = {
                       aes.temp <- do.call(aes, args.aes)                    
-                      do.call(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
+                      do.ggcall(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
                     })
         p
       })

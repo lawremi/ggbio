@@ -12,8 +12,6 @@ setMethod("layout_karyogram", "GRanges",
             args <- list(...)
             args.aes <- parseArgsForAes(args)
             args.non <- parseArgsForNonAes(args)
-            if(!"rect.height" %in% names(args.non))
-              args.non$rect.height <- rect.height /2
             if(is.null(ylim)){
               ## compute y lim from data
               if("y" %in% names(args.aes)){
@@ -286,16 +284,16 @@ setMethod("layout_karyogram", "GRanges",
                                                yend = .ideo.range[2]))
 
               ## this hack is to get over 1-pixel problem
-              p.addon <- do.call(ggplot2::geom_segment,
+              p.addon <- do.ggcall(ggplot2::geom_segment,
                                  c(list(data = df), list(do.call(aes, args.aes.seg)),args.non))
 
-              p.addon <- c(list(p.addon), list(do.call(ggplot2::geom_rect,
+              p.addon <- c(list(p.addon), list(do.ggcall(ggplot2::geom_rect,
                           c(list(data = df), list(do.call(aes, args.aes.rect)),args.non))))
             }else{
               .drawFun <- getDrawFunFromGeomStat(geom, stat)
               aes.res <- do.call(aes, args.aes)
               args.res <- c(list(data = df), list(aes.res), args.non)
-              p.addon <- do.call(.drawFun, args.res)
+              p.addon <- do.ggcall(.drawFun, args.res)
             }
             p <- list(p.addon , facet_grid(facets))
           }else{

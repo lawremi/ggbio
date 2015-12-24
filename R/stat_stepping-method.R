@@ -14,9 +14,9 @@ setMethod("stat_stepping", "GRanges", function(data, ...,
   args$data <- data
   if(length(data)){
     p <- switch(geom,
-                rect = do.call(geom_rect, args),
+                rect = do.ggcall(geom_rect, args),
                 alignment = do.call(geom_alignment, args),
-                segment = do.call(geom_segment, args))
+                segment = do.ggcall(geom_segment, args))
 
   }else{
     p <- NULL

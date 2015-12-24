@@ -84,7 +84,7 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   args.res <- c(list(data = res),
                 list(aes),
                 args.non)
-  p <- do.call(stat_identity, args.res)
+  p <- do.ggcall(stat_identity, args.res)
 }else{
   p <- NULL
 }
@@ -123,7 +123,7 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
   aes.res <- do.call(aes, args.aes)
   gr <- flatGrl(data)
   args.non$data <- gr
-  p <- do.call(stat_coverage, c(list(aes.res), args.non))
+  p <- do.ggcall(stat_coverage, c(list(aes.res), args.non))
   if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))
   else
@@ -245,7 +245,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                 list(aes.res),
                 args.non)
 
-  p <- c(list(do.call(stat_identity, args.res)), list(facet))
+  p <- c(list(do.ggcall(stat_identity, args.res)), list(facet))
 }
   if(method == "raw"){
     p <- stat_coverage(res, ..., geom = geom, facets = facets)

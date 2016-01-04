@@ -1,14 +1,18 @@
-ggbio_ggplot <- function(data, mapping = aes(), ...,
-                         environment = parent.frame()) {
-    g <- ggplot(data, mapping, ..., environment=environment)
+.ggbio_ggplot <- function(ggdata, data, mapping = aes(), ...,
+                          environment = parent.frame()) {
+    g <- ggplot(ggdata, mapping, ..., environment=environment)
     g <- GGbio(g, data = data)
     g
 }
 
+ggbio_ggplot <- function(data, mapping = aes(), ...,
+                         environment = parent.frame()) {
+    .ggbio_ggplot(data, data, mapping, ..., environment=environment)
+}
+
 ggbio_ggplot_mold <- function(data, mapping = aes(), ...,
                               environment = parent.frame()) {
-    df <- mold(data)
-    ggbio_ggplot(df, mapping, ..., environment=environment)
+    .ggbio_ggplot(mold(data), data, mapping, ..., environment=environment)
 }
 
 ggplot.Vector <- ggbio_ggplot_mold

@@ -6,7 +6,7 @@ ggbio_ggplot <- function(data, mapping = aes(), ...,
 
 ggbio_ggplot_mold <- function(data, mapping = aes(), ...,
                               environment = parent.frame()) {
-    gg <- ggplot(mold(data), data, mapping, ..., environment=environment)
+    gg <- ggplot(mold(data), mapping, ..., environment=environment)
     GGbio(gg, data = data)
 }
 

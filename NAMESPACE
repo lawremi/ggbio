@@ -7,8 +7,8 @@ import(methods)
 ### base packages
 ###
 
-importFrom(grid, arrow, convertUnit, editGrob, gList, gTree, gpar, grid.draw,
-           grid.newpage, grobTree, is.unit, rectGrob, textGrob, unit, unit.c)
+importFrom(grid, convertUnit, editGrob, gList, gTree, gpar, grid.draw,
+           grid.newpage, grobTree, is.unit, rectGrob, textGrob, unit.c)
 importFrom(grDevices, dev.off, png)
 importFrom(graphics, par)
 importFrom(stats, approx, as.formula, df)

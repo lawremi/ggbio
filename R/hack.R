@@ -75,7 +75,7 @@ for(method in .gr.name.ggplot){
   ## for IRanges
   ifun <- function(method){
     .method <- method
-    if(hasMethod(.method, "GRanges") && !hasMethod(.method, "IRanges")){
+    if(hasMethod(.method, "GRanges")) {
       setMethod(.method, "IRanges", function(data, ...){
         .fun <- selectMethod(.method, signature = "GRanges")
         df <- values(data)
@@ -92,7 +92,7 @@ for(method in .gr.name.ggplot){
 
   gfun <- function(method){
     .method <- method
-    if(hasMethod(.method, "GRanges") && !hasMethod(.method, "GRangesList")){
+    if(hasMethod(.method, "GRanges")) {
       setMethod(.method, "GRangesList", function(data, ...){
         .fun <- selectMethod(.method, signature = "GRanges")
         gr <- biovizBase::flatGrl(data)

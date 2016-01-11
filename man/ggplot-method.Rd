@@ -1,5 +1,6 @@
 \name{ggplot}
 \alias{ggplot.Vector}
+\alias{ggplot.Seqinfo}
 \alias{ggplot.matrix}
 \alias{ggplot.ExpressionSet}
 \alias{ggplot.RsamtoolsFile}
@@ -20,6 +21,8 @@
  
 \usage{
 \method{ggplot}{Vector}(data, mapping = aes(), \dots,
+                        environment = parent.frame())
+\method{ggplot}{Seqinfo}(data, mapping = aes(), \dots,
                         environment = parent.frame())
 \method{ggplot}{ExpressionSet}(data, mapping = aes(), \dots,
                         environment = parent.frame())

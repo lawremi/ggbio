@@ -11,6 +11,7 @@ ggbio_ggplot_mold <- function(data, mapping = aes(), ...,
 }
 
 ggplot.Vector <- ggbio_ggplot_mold
+ggplot.Seqinfo <- ggbio_ggplot_mold
 ggplot.matrix <- ggbio_ggplot_mold # highly questionable
 ggplot.ExpressionSet <- ggbio_ggplot_mold
 ggplot.RsamtoolsFile <- ggbio_ggplot

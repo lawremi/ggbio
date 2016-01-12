@@ -356,7 +356,7 @@ mapToGG <- function(p, object){
 }
 
 returnProto <- function(object){
-    rapply(object, function(x) x, "proto", how = "unlist")
+    rapply(object, function(x) x, c("proto", "ggproto"), how = "unlist")
 }
 
 

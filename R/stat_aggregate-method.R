@@ -17,7 +17,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
   select <- match.arg(select)
   
   if(is.null(geom))
-    geom <- "histogram"
+    geom <- "bar"
 
   if(is.null(window))
     window <- as.integer(width(range(ranges(data)))/20)

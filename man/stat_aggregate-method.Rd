@@ -144,9 +144,9 @@ ggplot(gr) + stat_aggregate(aes(y = value), select = "first")
 ## no hits 
 ggplot(gr) + stat_aggregate(aes(y = value), select = "first", type = "within")
 }
-ggplot(gr) + stat_aggregate(window = 30,  aes(y = value),fill = "gray40", geom = "histogram")
+ggplot(gr) + stat_aggregate(window = 30,  aes(y = value),fill = "gray40", geom = "bar")
 ggplot(gr) + stat_aggregate(window = 100, fill = "gray40", aes(y = value),
-                           method = "max", geom = "histogram")
+                           method = "max", geom = "bar")
 
 ggplot(gr) + stat_aggregate(aes(y = value), geom = "boxplot")
 ggplot(gr) + stat_aggregate(aes(y = value), geom = "boxplot", window = 60)

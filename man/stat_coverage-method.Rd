@@ -98,7 +98,7 @@ ggplot() + stat_coverage(gr)
 
 ggplot(gr) + stat_coverage(geom = "point")
 ggplot(gr) + stat_coverage(geom = "area")
-ggplot(gr) + stat_coverage(aes(y = ..coverage..), geom = "histogram")
+ggplot(gr) + stat_coverage(aes(y = ..coverage..), geom = "bar")
 
 ggplot(gr) + stat_coverage(aes(y = ..coverage..)) + geom_point()
 

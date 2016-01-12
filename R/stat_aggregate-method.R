@@ -145,7 +145,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
   if(".value" %in% colnames(res)  && all(is.na(res$.value))){
     stop("no hits found, please tweak with parametters select and type.")
   }
-  if(!geom %in% c("boxplot", "histogram", "bar")){
+  if(!geom %in% c("boxplot", "bar")){
     args.aes$x <- substitute(.mid)
     args.aes$y <- substitute(.value)
   }else{
@@ -182,6 +182,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
 })
 
 
+### ML: Is this function even called anywhere?
 
 .aggregate <- function(data, ..., xlab, ylab, main, by, FUN, maxgap=0L,
                             minoverlap=1L, type=c("any", "start", "end", "within",
@@ -197,7 +198,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
   select <- match.arg(select)
   
   if(is.null(geom))
-    geom <- "histogram"
+    geom <- "bar"
 
   if(is.null(window))
     window <- as.integer(width(range(ranges(data)))/nbin)

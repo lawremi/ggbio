@@ -139,8 +139,8 @@ setMethod("geom_arch", "GRanges", function(data, ...,
 ##                                                n = 25, max.height = 10
 ##                                                ){
 
-##   if(any(elementLengths(data) != 2))
-##     stop("geom_arch only accept GRangesList which elementLengths is 2, represent
+##   if(any(elementNROWS(data) != 2))
+##     stop("geom_arch only accept GRangesList which elementNROWS is 2, represent
 ##           linked intervals.")
 ##   args <- list(...)  
 ##   args$facets <- facets

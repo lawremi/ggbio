@@ -68,12 +68,12 @@ setMethod("stat_identity", "RleList", function(data, ...,
   if(is.null(geom))
     geom <- "line"
   
-  x <- do.call(c,lapply(elementLengths(data),function(n) 1:n))
+  x <- do.call(c,lapply(elementNROWS(data),function(n) 1:n))
   y <- as.numeric(unlist(data))
   if(is.null(names(data)))
-    nms <- rep(1:length(data), times = elementLengths(data))
+    nms <- rep(1:length(data), times = elementNROWS(data))
   else
-    nms <- rep(names(data), times = elementLengths(data))
+    nms <- rep(names(data), times = elementNROWS(data))
 
   df <- data.frame(x = x, y = y, z = nms)
   colnames(df) <- c("x", "y", indName)

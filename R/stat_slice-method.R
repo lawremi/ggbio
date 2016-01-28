@@ -166,9 +166,9 @@ setMethod("stat_slice", "RleList", function(data, ...,
                    xmin <- start(vs)
                    xmax <- end(vs)
                    if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementLengths(x))
+                     nms <- rep(1:length(x), times = elementNROWS(x))
                    else
-                     nms <- rep(names(x), times = elementLengths(x))
+                     nms <- rep(names(x), times = elementNROWS(x))
                    data.frame(x = unlist(x), y = unlist(y), listName = nms,
                               xmin = unlist(xmin), xmax = unlist(xmax))
                   },
@@ -180,9 +180,9 @@ setMethod("stat_slice", "RleList", function(data, ...,
                    x <- viewWhichMins(vs)                
                    y <- viewMins(vs)
                    if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementLengths(x))
+                     nms <- rep(1:length(x), times = elementNROWS(x))
                    else
-                     nms <- rep(names(x), times = elementLengths(x))
+                     nms <- rep(names(x), times = elementNROWS(x))
                    data.frame(x = unlist(x), y = unlist(y), listName = nms,
                               xmin = unlist(xmin), xmax = unlist(xmax))                
                  },
@@ -196,9 +196,9 @@ setMethod("stat_slice", "RleList", function(data, ...,
                    xmin <- start(vs)
                    xmax <- end(vs)
                    if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementLengths(x))
+                     nms <- rep(1:length(x), times = elementNROWS(x))
                    else
-                     nms <- rep(names(x), times = elementLengths(x))
+                     nms <- rep(names(x), times = elementNROWS(x))
                    y <- viewSums(vs)
                    data.frame(x = unlist(x), y = unlist(y), listName = nms,
                               xmin = unlist(xmin), xmax = unlist(xmax))                
@@ -212,9 +212,9 @@ setMethod("stat_slice", "RleList", function(data, ...,
                    xmin <- start(vs)
                    xmax <- end(vs)
                    if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementLengths(x))
+                     nms <- rep(1:length(x), times = elementNROWS(x))
                    else
-                     nms <- rep(names(x), times = elementLengths(x))
+                     nms <- rep(names(x), times = elementNROWS(x))
                    y <- viewMeans(vs)
                    data.frame(x = unlist(x), y = unlist(y), listName = nms,
                               xmin = unlist(xmin), xmax = unlist(xmax))                

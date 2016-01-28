@@ -18,7 +18,7 @@ Authors@R: c(person("Tengfei", "Yin", role=c("aut", "cre"),
           person("Johannes", "Rainer", role="ctb"))
 Depends: methods, BiocGenerics, ggplot2 (>= 1.0.0)
 Imports: grid, grDevices, graphics, stats, utils, gridExtra, scales, reshape2,
-        gtable, Hmisc, biovizBase (>= 1.19.1), Biobase, S4Vectors,
+        gtable, Hmisc, biovizBase (>= 1.19.1), Biobase, S4Vectors (>= 0.9.25),
         IRanges, GenomeInfoDb (>= 1.1.3), GenomicRanges (>= 1.21.10),
         SummarizedExperiment, Biostrings, Rsamtools (>= 1.17.28),
         GenomicAlignments (>= 1.1.16), BSgenome, VariantAnnotation (>= 1.11.4),

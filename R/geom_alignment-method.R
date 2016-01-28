@@ -474,7 +474,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
     }))
 
     gr <- stack(data, "..sample..")
-    values(gr)$..inner.. <- rep(1:length(data), times = elementLengths(data))
+    values(gr)$..inner.. <- rep(1:length(data), times = elementNROWS(data))
 
 
     if("type" %in% names(args.aes)){
@@ -620,7 +620,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
             })
             grr <- reduce(unlist(.grl))
             .gr$..sample.. <- rep(findOverlaps(.grl, grr)@subjectHits,
-                                  times = elementLengths(data))
+                                  times = elementNROWS(data))
             exonic <- .gr[values(.gr)[[.type]] %in% c("utr", "cds", "exon")]
             df.gaps <- getGaps(exonic, group.name = "..sample..")
             df.gaps$stepping <- 1

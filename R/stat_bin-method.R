@@ -141,9 +141,9 @@ setMethod("stat_bin", "RleList", function(data, ..., binwidth, nbin = 30,
                    })
                    y <- lapply(vs, viewMaxs)
                    if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementLengths(x))
+                     nms <- rep(1:length(x), times = elementNROWS(x))
                    else
-                     nms <- rep(names(x), times = elementLengths(x))
+                     nms <- rep(names(x), times = elementNROWS(x))
                    data.frame(x = unlist(x), y = unlist(y), listName = nms)
                  },
                  viewMins = {
@@ -157,9 +157,9 @@ setMethod("stat_bin", "RleList", function(data, ..., binwidth, nbin = 30,
                    y <- lapply(vs, viewMins)
 
                    if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementLengths(x))
+                     nms <- rep(1:length(x), times = elementNROWS(x))
                    else
-                     nms <- rep(names(x), times = elementLengths(x))
+                     nms <- rep(names(x), times = elementNROWS(x))
                    data.frame(x = unlist(x), y = unlist(y), listName = nms)                
                  },
                  viewSums = {
@@ -172,9 +172,9 @@ setMethod("stat_bin", "RleList", function(data, ..., binwidth, nbin = 30,
                    })
                    y <- lapply(vs, viewSums)
                    if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementLengths(x))
+                     nms <- rep(1:length(x), times = elementNROWS(x))
                    else
-                     nms <- rep(names(x), times = elementLengths(x))
+                     nms <- rep(names(x), times = elementNROWS(x))
                    data.frame(x = unlist(x), y = unlist(y), listName = nms)                
                  },
                  viewMeans = {
@@ -187,9 +187,9 @@ setMethod("stat_bin", "RleList", function(data, ..., binwidth, nbin = 30,
                    })
                    y <- lapply(vs, viewMeans)
                    if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementLengths(x))
+                     nms <- rep(1:length(x), times = elementNROWS(x))
                    else
-                     nms <- rep(names(x), times = elementLengths(x))
+                     nms <- rep(names(x), times = elementNROWS(x))
                    data.frame(x = unlist(x), y = unlist(y), listName = nms)                
                  })
   colnames(df) <- c("x", "y", indName)

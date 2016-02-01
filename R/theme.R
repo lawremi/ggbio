@@ -36,7 +36,7 @@ theme_alignment <-   function (ylabel = FALSE, base_size = 12,
       axis.title.y = element_text(family = base_family, size = base_size,
         angle = 90, vjust = 0.5, colour = "white"),
       axis.ticks.length = unit(0.3, "lines"),
-      axis.ticks.margin = unit(0.5, "lines"),
+      axis.text = element_text(margin=unit(0.5, "lines")),
       panel.background = element_blank(),
       panel.border = {if(border)
                         element_rect(fill = NA, colour = "grey50")

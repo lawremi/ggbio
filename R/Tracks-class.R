@@ -940,7 +940,7 @@ theme_onlyXaxis <- function(){
                  axis.ticks.y = element_blank(),
                  axis.title.x = element_text(),
                  axis.ticks.length = unit(0.15, "cm"),
-                 axis.ticks.margin = unit(0.1, "cm"),
+                 axis.text = element_text(margin = unit(0.1, "cm")),
                  axis.line = element_line(color = "gray50"))
 
   list(res,xlab(""))

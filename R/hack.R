@@ -50,6 +50,7 @@ for(method in .gr.name.ggbio){
     .method <- method
       setMethod(.method, "missing", function(data,...){
           mc <- match.call()
+          mc[-1L] <- list(...)
         return(mc)
       })
   }

@@ -236,9 +236,10 @@ setMethod("+", c("GGbio"), function(e1, e2){
             object <- do.call(as.character(args[[1]]), args[-1])
             e1@ggplot <- mapToGG(e1@ggplot, object)
         }else if(is.call(e2)){
+            call <- e2
             if(!is.null(e1@data) & is.null(args$data))
-                args$data <- e1@data
-            object <- do.call(as.character(args[[1]]), args[-1])
+                call$data <- e1@data
+            object <- eval(call, S4Vectors:::top_prenv(e2))
             e1@ggplot <- mapToGG(e1@ggplot, object)
         }else{
             object <- e2

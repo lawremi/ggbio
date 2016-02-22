@@ -619,7 +619,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
                 range(g, ignore.strand = TRUE)
             })
             grr <- reduce(unlist(.grl))
-            .gr$..sample.. <- rep(findOverlaps(.grl, grr)@subjectHits,
+            .gr$..sample.. <- rep(subjectHits(findOverlaps(.grl, grr)),
                                   times = elementNROWS(data))
             exonic <- .gr[values(.gr)[[.type]] %in% c("utr", "cds", "exon")]
             df.gaps <- getGaps(exonic, group.name = "..sample..")

@@ -756,10 +756,12 @@ autoplot(ensdb, GeneidFilter(c("ENSG00000196118", "ENSG00000156873")))
 ###################################################
 library(GenomicAlignments)
 data("genesymbol", package = "biovizBase")
-bamfile <- system.file("extdata", "SRR027894subRBM17.bam", package="biovizBase")
+bamfile <- system.file("extdata", "SRR027894subRBM17.bam",
+                       package="biovizBase")
+which <- keepStandardChromosomes(genesymbol["RBM17"])
 ## need to set use.names = TRUE
 ga <- readGAlignments(bamfile,
-                      param = ScanBamParam(which = genesymbol["RBM17"]),
+                      param = ScanBamParam(which = which),
                       use.names = TRUE)
 
 

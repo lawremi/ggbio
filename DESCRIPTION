@@ -11,9 +11,9 @@ Description: The ggbio package extends and specializes the grammar of
         and grand linear views. High-level plots include sequence
         fragment length, edge-linked interval to data view, mismatch
         pileup, and several splicing summaries.
-Authors@R: c(person("Tengfei", "Yin", role=c("aut", "cre"),
+Authors@R: c(person("Tengfei", "Yin", role=c("aut"),
                  email="yintengfei@gmail.com"),
-          person("Michael", "Lawrence", role=c("aut", "ths")),
+          person("Michael", "Lawrence", role=c("aut", "ths", "cre")),
           person("Dianne", "Cook", role=c("aut", "ths")),
           person("Johannes", "Rainer", role="ctb"))
 Depends: methods, BiocGenerics, ggplot2 (>= 1.0.0)

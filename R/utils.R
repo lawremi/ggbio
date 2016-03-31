@@ -234,9 +234,16 @@ filterArgs <- function(fun, args) {
     if (ggplot2) {
         aes <- vapply(args, is, "uneval", FUN.VALUE=logical(1L))
         if (is.null(names(args))) {
-            names(args) <- rep("", length(args))
+            args <- args[aes]
+        } else {
+            args <- ggplot2:::rename_aes(args)
+            layer <- fun()
+            validArgs <- c(names(formals(fun)),
+                           layer$geom$aesthetics(),
+                           layer$geom$parameters(TRUE),
+                           layer$stat$parameters(TRUE))
+            args <- args[names(args) %in% validArgs | aes]
         }
-        args <- args[names(args) %in% names(formals(fun)) | aes]
     }
     args
 }

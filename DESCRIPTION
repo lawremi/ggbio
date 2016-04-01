@@ -1,5 +1,5 @@
 Package: ggbio
-Version: 1.19.12
+Version: 1.19.13
 Title: Visualization tools for genomic data.
 Description: The ggbio package extends and specializes the grammar of
         graphics for biological data. The graphics are designed to
@@ -13,7 +13,8 @@ Description: The ggbio package extends and specializes the grammar of
         pileup, and several splicing summaries.
 Authors@R: c(person("Tengfei", "Yin", role=c("aut"),
                  email="yintengfei@gmail.com"),
-          person("Michael", "Lawrence", role=c("aut", "ths", "cre")),
+          person("Michael", "Lawrence", role=c("aut", "ths", "cre"),
+                 email="lawrence.michael@gene.com"),
           person("Dianne", "Cook", role=c("aut", "ths")),
           person("Johannes", "Rainer", role="ctb"))
 Depends: methods, BiocGenerics, ggplot2 (>= 1.0.0)

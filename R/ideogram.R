@@ -70,7 +70,8 @@ Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband 
 
     new("Ideogram", ggbio(p, data = obj.ori, ...), subchr = subchr, xlabel = xlabel,
         cytoband = cytoband, color = color, fill = fill, alpha = alpha,
-        zoom.offset = zoom.offset, size = size, aspect.ratio = aspect.ratio)
+        zoom.offset = zoom.offset, size = size, aspect.ratio = aspect.ratio,
+        zoom.region=zoom.region)
 }
 
 setMethod("print", "Ideogram", function(x){

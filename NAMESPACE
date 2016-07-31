@@ -16,7 +16,7 @@ importFrom(utils, capture.output, getFromNamespace)
 
 ###
 importFrom(GGally, ggpairs)
-import(ggplot2)
+import(ggplot2, except=Position)
 import(gtable)
 ### importFrom(gtable, gtable, gtable_add_grob, gtable_add_cols, gtable_add_rows, gtable_filter)
 importFrom(reshape2, melt)

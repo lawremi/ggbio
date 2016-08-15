@@ -1053,6 +1053,7 @@ constructor, including
    label.bg.fill & character\\\hline
    label.text.color & character\\\hline
    label.text.cex & numeric\\\hline
+   label.text.angle & numeric\\\hline
    track.plot.color & characterORNULL\\\hline
    track.bg.color & characterORNULL\\\hline
    label.width & unit\\\hline

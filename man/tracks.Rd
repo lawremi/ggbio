@@ -99,7 +99,8 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
             label.bg.color =  "white",
             label.bg.fill = "gray80",
             label.text.color = "black",
-            label.text.cex = 1,                   
+            label.text.cex = 1,
+            label.text.angle = 90,
             label.width = unit(2.5, "lines"))
 }
 \arguments{
@@ -144,6 +145,9 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
   \item{label.text.cex}{
     track labeling text size.
   }
+  \item{label.text.angle}{
+    angle to rotate the track labels.
+  }
   \item{label.width}{
     track labeling size.
   } 
@@ -179,7 +183,7 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
   }
   \item{\code{heights, xlim, xlab, main, title, theme, fixed, track.plot.color,
     track.bg.color, main.height, scale.height, xlab.height, padding,
-    label.bg.color, label.bg.fill, label.text.color, label.text.cex, label.width}}{
+    label.bg.color, label.bg.fill, label.text.color, label.text.cex, label.text.angle, label.width}}{
     those slots are described in arguments section for constructor.
   }
   }

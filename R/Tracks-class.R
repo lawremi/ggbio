@@ -20,6 +20,7 @@ tracks.gen <- setClass("Tracks",
                                       label.bg.fill = "character",
                                       label.text.color = "character",
                                       label.text.cex = "numeric",
+                                      label.text.angle = "numeric",
                                       track.plot.color = "characterORNULL",
                                       track.bg.color = "characterORNULL",
                                       label.width = "unit"))
@@ -39,6 +40,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
                    label.bg.fill = "gray80",
                    label.text.color = "black",
                    label.text.cex = 1,
+                   label.text.angle = 90,
                    label.width = unit(2.5, "lines")){
 
 
@@ -188,6 +190,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
                  fixed = fixed, padding = padding,
                  labeled = labeled, label.bg.color = label.bg.color, label.bg.fill = label.bg.fill,
                  label.text.color = label.text.color,
+                 label.text.angle = label.text.angle,
                  track.plot.color = track.plot.color,
                  track.bg.color = track.bg.color,
                  label.text.cex = label.text.cex,
@@ -202,6 +205,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
       fixed = fixed, padding = padding,
       label.bg.color = label.bg.color, label.bg.fill = label.bg.fill,
       label.text.color = label.text.color,
+      label.text.angle = label.text.angle,
       track.plot.color = track.plot.color,
       track.bg.color = track.bg.color,
       label.text.cex = label.text.cex,
@@ -259,6 +263,7 @@ setMethod("print", "Tracks", function(x){
                                              label.bg.color =  x@label.bg.color,
                                              label.bg.fill = x@label.bg.fill,
                                              label.text.color = x@label.text.color,
+                                             label.text.angle = x@label.text.angle,
                                              label.text.cex = x@label.text.cex,
                                              label.width = x@label.width,
                                              track.plot.color = x@track.plot.color,
@@ -324,6 +329,7 @@ setMethod("get_gtable", "Tracks", function(x){
                                              label.bg.color =  x@label.bg.color,
                                              label.bg.fill = x@label.bg.fill,
                                              label.text.color = x@label.text.color,
+                                             label.text.angle = x@label.text.angle,
                                              label.text.cex = x@label.text.cex,
                                              label.width = x@label.width,
                                              track.plot.color = x@track.plot.color,
@@ -548,6 +554,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        label.bg.color =  "white",
                        label.bg.fill = "gray80",
                        label.text.color = "black",
+                       label.text.angle = 90,
                        label.text.cex = 1,
                        label.width = unit(2.5, "lines"),
                        main.height = unit(1.5, "lines"),
@@ -603,11 +610,14 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        label.bg.color =  "white",
                        label.bg.fill = "gray80",
                        label.text.color = "black",
+                       label.text.angle = 90,
                        label.text.cex = 1,
                        label.width = unit(2.5, "lines"),
                        direction = c("row", "col")
                        ){
 
+    if(length(label.text.angle) == 1)
+        label.text.angle <- rep(label.text.angle, len = length(grobs))
     if(length(label.text.color) == 1)
         label.text.color <- rep(label.text.color, len = length(grobs))
     if(length(label.text.cex) == 1)
@@ -625,7 +635,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
         if(lbs[i]){
           rect <- rectGrob(gp = gpar(fill = label.bg.fill[i],
                              col = label.bg.color[i]))
-          label <- textGrob(nms[i], rot = 90,
+          label <- textGrob(nms[i], rot = label.text.angle[i],
                             gp = gpar(col = label.text.color[i],
                               cex = label.text.cex[i]))
           left.grob <- grobTree(gTree(children = gList(rect, label)))
@@ -643,7 +653,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
           grob <- grobs[[i]]
           rect <- rectGrob(gp = gpar(fill = label.bg.fill[i],
                              col = label.bg.color[i]))
-          label <- textGrob(nms[i],
+          label <- textGrob(nms[i], rot = (90 - label.text.angle[i]) %% 360,
                             gp = gpar(col = label.text.color[i],
                               cex = label.text.cex[i]))
           top.grob <- grobTree(gTree(children = gList(rect, label)))
@@ -741,6 +751,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        label.bg.fill = label.bg.fill,
                        label.text.color = label.text.color,
                        label.text.cex = label.text.cex,
+                       label.text.angle = label.text.angle,
                        label.width = label.width)
   }else{
     if(any(!is.null(nms)))
@@ -749,6 +760,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        label.bg.fill = label.bg.fill,
                        label.text.color = label.text.color,
                        label.text.cex = label.text.cex,
+                       label.text.angle = label.text.angle,
                        label.width = label.width,
                         direction = "col")
   }
@@ -1200,6 +1212,7 @@ setMethod("[", c("Tracks", "numeric", "missing", "ANY"),
                   label.bg.color = x@label.bg.color[i],
                   label.bg.fill = x@label.bg.fill[i],
                   label.text.color = x@label.text.color[i],
+                  label.text.angle = x@label.text.angle[i],
                   track.plot.color = x@track.plot.color[i],
                   track.bg.color = x@track.bg.color[i],
                   label.text.cex = x@label.text.cex[i],

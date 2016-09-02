@@ -1424,7 +1424,8 @@ setMethod("autoplot", "VCF", function(object, ...,
         rownames(gt) <- start(rowRanges(object))
         ## rownames(gt) <- start(rowRanges(object)[idx])
 
-        if(!"color" %in% names(args.aes) && !"color" %in% names(args.non))
+        if(!"colour" %in% names(args.aes) && !"colour" %in% names(args.non) &&
+           !"color" %in% names(args.aes) && !"color" %in% names(args.non))
             args.aes$color <- as.name("value")
         if(!"colnames.label" %in% names(args.non)){
             if(transpose)
@@ -1576,7 +1577,8 @@ setMethod("autoplot", "VCF", function(object, ...,
 
 
 colorizeArgs <- function(args.non, args.aes){
-    if(!"color" %in% names(args.non) && !"color" %in% names(args.aes)){
+    if(!"colour" %in% names(args.aes) && !"colour" %in% names(args.non) &&
+       !"color" %in% names(args.non) && !"color" %in% names(args.aes)){
         if("fill" %in% names(args.aes)){
             args.aes$color <- args.aes$fill
         }else if("fill" %in% names(args.non)){

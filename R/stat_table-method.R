@@ -31,7 +31,7 @@ setMethod("stat_table", "GRanges", function(data, ..., xlab, ylab, main,
       stat <- "stepping"
       args.non$geom <- "rect"
       args.non$stat <- stat
-      if(!"color" %in% names(args.aes))
+      if(!"color" %in% names(args.aes) && !"colour" %in% names(args.aes))
         args.aes$color <- args.aes$fill <- as.name("score")
       .fun <- stat_stepping
     }else{

@@ -16,6 +16,7 @@ setMethod("layout_circle",  "GRanges",
   args <- dots <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
+  args.parsed <- c(args.aes, args.non)
   scale.type <- match.arg(scale.type)
   geom <- match.arg(geom)
   ## rank
@@ -77,12 +78,12 @@ setMethod("layout_circle",  "GRanges",
 
 
     if("fill" %in% names(args.aes)){
-      if(!"color" %in% names(args.aes)){
+      if(!"color" %in% names(args.parsed) && !"colour" %in% names(args.parsed)) {
         args.aes$color <- args.aes$fill
       }
     }
     aes <- do.call("aes", args.aes)
-    if(!"color" %in% names(args.aes)){
+    if(!"color" %in% names(args.parsed) && !"colour" %in% names(args.parsed)){
       col <- I("black")
       args.non$color <- col
     }
@@ -264,10 +265,10 @@ setMethod("layout_circle",  "GRanges",
     args.aes.p$x <- as.name(".circle.x")
     args.aes.p$group <- as.name(".biovizBase.group")
     aes.p <- do.call("aes", args.aes.p)
-    if(!"color" %in% names(args.aes) & !"color" %in% names(args.non)){
+    if(!"color" %in% names(args.parsed) && !"colour" %in% names(args.parsed)){
       args.non$color <- "black"
     }
-    if(!"fill" %in% names(args.aes) & !"fill" %in% names(args.non)){
+    if(!"fill" %in% names(args.parsed)){
       args.non$fill <- "black"
     }
     args.tot <- c(list(data = df, aes.p), args.non)

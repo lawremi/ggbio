@@ -374,7 +374,7 @@ scale_fill_fold_change<- function(){
 need_color <- function(args){
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  if("color" %in% c(names(args.non),names(args.aes))){
+  if(any(c("color", "colour") %in% c(names(args.non),names(args.aes)))){
     return(FALSE)
   }else{
     return(TRUE)

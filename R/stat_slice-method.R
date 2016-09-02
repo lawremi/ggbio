@@ -101,7 +101,9 @@ setMethod("stat_slice", "Rle", function(data, ...,
 
   if(geom %in% c("bar", "rect")){
     if(!"color" %in% names(args.aes) &&
-       !"color" %in% names(args.non)){
+       !"color" %in% names(args.non) &&
+       !"colour" %in% names(args.aes) &&
+       !"colour" %in% names(args.non)){
       args.non$color <- "grey20"
     }
   }
@@ -271,7 +273,9 @@ setMethod("stat_slice", "RleList", function(data, ...,
 
   if(geom %in% c("bar", "rect")){
     if(!"color" %in% names(args.aes) &&
-       !"color" %in% names(args.non)){
+       !"color" %in% names(args.non) &&
+       !"colour" %in% names(args.aes) &&
+       !"colour" %in% names(args.non)){
       args.non$color <- "grey20"
     }
   }

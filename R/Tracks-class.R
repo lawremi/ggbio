@@ -1,3 +1,5 @@
+setClassUnion("characterORexpressionORNULL", c("expression", "characterORNULL"))
+
 tracks.gen <- setClass("Tracks",
                        representation(grobs = "PlotList", # working plots, not reall 'Grob'
                                       plot = "list", # original plots passed into tracks
@@ -6,7 +8,7 @@ tracks.gen <- setClass("Tracks",
                                       xlim = "numeric",
                                       ylim = "list",
                                       xlab = "characterORNULL",
-                                      main = "characterORNULL",
+                                      main = "characterORexpressionORNULL",
                                       main.height =  "numericORunit",
                                       scale.height =  "numericORunit",
                                       xlab.height =  "numericORunit",

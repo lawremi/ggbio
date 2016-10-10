@@ -127,8 +127,6 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
         ## tweak with default y lab
         if(!missing(ylab))
             p <- c(p,list(ylab(ylab)))
-        if(!missing(main))
-            p <- c(p, list(labs(title = main)))
         ## if("x" %in% names(args.aes))
         args.aes <- args.aes[names(args.aes) %in% c("x", "y")]
         aes.res <- do.call(aes, args.aes)
@@ -146,6 +144,8 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
     if(layout == "circle"){
         p <- ggplot(object) + circle(object, geom = geom, space.skip = space.skip, ...)
     }
+    if(!missing(main))
+        p <- p + labs(title = main)
     ## test scale
     if(is_coord_truncate_gaps(object) | is_coord_genome(object)){
         ss <- getXScale(object)

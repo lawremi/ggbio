@@ -233,7 +233,7 @@ setMethod("summary", "Tracks", function(object){
 setMethod("print", "Tracks", function(x){
     grobs <- x@grobs
     N <- length(grobs)
-   .scale.grob <- grobs[[N]]
+   .scale.grob <- grobs[[N]] + xlim(x@xlim)
     if(any(x@labeled))
       nms <- names(x@grobs)
     else
@@ -299,7 +299,7 @@ setGeneric("get_gtable", function(x, ...) standardGeneric("get_gtable"))
 setMethod("get_gtable", "Tracks", function(x){
     grobs <- x@grobs
     N <- length(grobs)
-   .scale.grob <- grobs[[N]]
+   .scale.grob <- grobs[[N]] + xlim(x@xlim)
     if(any(x@labeled))
       nms <- names(x@grobs)
     else

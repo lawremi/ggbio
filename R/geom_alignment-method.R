@@ -95,7 +95,8 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                                                               "colour")]
 
                 args.gaps.extra <- args.non[names(args.non) %in%
-                                            c("offset", "chevron.height")]
+                                            c("offset", "chevron.height",
+                                              "inherit.aes")]
                 args.gaps$y <- as.name("stepping")
                 aes.lst <- do.call("aes", args.gaps)
                 gps.lst <- c(list(aes.lst), list(data = gps, stat = "identity"),

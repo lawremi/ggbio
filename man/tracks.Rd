@@ -84,8 +84,8 @@
 \alias{c,PlotList-method}
 \alias{cbind,Tracks-method}
 \alias{rbind,Tracks-method}
-\alias{[,Tracks,numeric,missing-method}
-\alias{[,PlotList,numeric,missing-method}
+\alias{[,Tracks,numeric,missing,ANY-method}
+\alias{[,PlotList,numeric,missing,ANY-method}
 \title{Tracks for genomic graphics}
 \usage{
 tracks(..., heights, xlim, xlab = NULL, main = NULL,

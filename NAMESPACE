@@ -78,13 +78,15 @@ importFrom(AnnotationDbi, select)
 
 ## ensembldb
 importClassesFrom(ensembldb, EnsDb)
-## Importing all filter classes... don't clear whether that's needed
+## Filter classes...
 importClassesFrom(ensembldb, BasicFilter, EntrezidFilter, GeneidFilter,
                   GenebiotypeFilter,
                   GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter,
                   SeqnameFilter,
                   SeqstrandFilter, SeqstartFilter, SeqendFilter, GRangesFilter,
-                  ExonrankFilter)
+                  ExonrankFilter, SymbolFilter, ProteinidFilter,
+                  UniprotidFilter, ProtdomidFilter, UniprotdbFilter,
+                  UniprotmappingtypeFilter)
 importMethodsFrom(ensembldb, listColumns, exons, exonsBy)
 importFrom(ensembldb, GRangesFilter)
 

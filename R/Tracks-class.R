@@ -546,6 +546,10 @@ setMethod("backup", "Tracks", function(obj){
   obj
 })
 
+findGrobs <- function(g, type) {
+    rowSums(vapply(type, function(t) startsWith(g$layout$name, t),
+                   logical(length(g$layout$name)))) > 0L
+}
 
 ## TODO: adust due to left/right legend
 alignPlots <- function(..., vertical = TRUE, widths = NULL,
@@ -686,9 +690,9 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
     ## edit background
     gt.temp$grobs[[1]] <- editGrob(gt.temp$grobs[[1]],
                                    gp = gpar(alpha = 0))
-    if("guide-box" %in% gt.temp$layout$name){
-      idx <- which("guide-box" == gt.temp$layout$name)
-      if(gt.temp$grobs[[idx]]$grobs[[1]]$layout$name[1] == "background"){
+    idx <- which(findGrobs(gt.temp, "guide-box"))
+    if(length(idx) == 1L){
+      if(findGrobs(gt.temp$grobs[[idx]]$grobs[[1]], "background")[1L]){
         gt.temp$grobs[[idx]]$grobs[[1]]$grobs[[1]] <- editGrob(gt.temp$grobs[[idx]]$grobs[[1]]$grobs[[1]], gp = gpar(alpha = 0))
       }
     }
@@ -841,8 +845,7 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
 getPanelIndex <- function(g){
   if(inherits(g, "ggplot"))
     g <- Grob(g)
-  idx <- which("panel" == g$layout$name)
-  idx
+  findGrobs(g, "panel")
 }
 
 spaceAroundPanel <- function(g, type = c("t", "l", "b", "r")){
@@ -975,7 +978,7 @@ ScalePlot <- function(x, color = "black", fill = NA){
 ## always comes last
 
 scaleGrob <- function(g){
-  idx <- g$layout$name %in% c("axis-b")
+  idx <- findGrobs(g, "axis-b")
   idx <- unique(c(g$layout[idx, "t"], g$layout[idx, "b"]))
   res <- g[idx,]
   res
@@ -983,12 +986,11 @@ scaleGrob <- function(g){
 
 ## always comes first
 titleGrob <- function(g){
-  idx <- g$layout$name %in% c("title")
+  idx <- findGrobs(g, "title")
   idx <- unique(c(g$layout[idx, "t"], g$layout[idx, "b"]))
   res <- g[idx,]
   attr(res, "track_name") <- "title"
   res
-
 }
 
 
@@ -1067,13 +1069,10 @@ textPlot <- function(lb="", ut = unit(4, "lines")){
 
 removeXAxis <- function(g){
   if(g$name == "panel.ori"){
-    .g <- g$grobs[[1]]$children[[1]]$children$layout
-    idx <- which(.g$layout$name %in% c("xlab", "axis-b", "title"))
-    idx <- sort(unique(c(.g$layout$t[idx], .g$layout$b[idx])))
-    idx <- setdiff(1:nrow(.g), idx)
-    g$grobs[[1]]$children[[1]]$children$layout <- .g[idx,]
+    g$grobs[[1]]$children[[1]]$children$layout <-
+      removeXAxis(g$grobs[[1]]$children[[1]]$children$layout)
   }else{
-    idx <- which(g$layout$name %in% c("xlab", "axis-b", "title"))
+    idx <- findGrobs(g, c("xlab", "axis-b", "title"))
     idx <- sort(unique(c(g$layout$t[idx], g$layout$b[idx])))
     idx <- setdiff(1:nrow(g), idx)
     g <- g[idx, ]
@@ -1083,13 +1082,10 @@ removeXAxis <- function(g){
 
 removeYAxis <- function(g){
   if(g$name == "panel.ori"){
-    .g <- g$grobs[[1]]$children[[1]]$children$layout
-    idx <- which(.g$layout$name %in% c("axis-l", "ylab"))
-    idx <- sort(unique(c(.g$layout$l[idx], .g$layout$r[idx])))
-    idx <- setdiff(1:ncol(.g), idx)
-    g$grobs[[1]]$children[[1]]$children$layout <- .g[,idx]
+    g$grobs[[1]]$children[[1]]$children$layout <-
+      removeYAxis(g$grobs[[1]]$children[[1]]$children$layout)
   }else{
-    idx <- which(g$layout$name %in% c("axis-l", "ylab"))
+    idx <- findGrobs(g, c("ylab", "axis-l"))
     idx <- sort(unique(c(g$layout$l[idx], g$layout$r[idx])))
     idx <- setdiff(1:ncol(g), idx)
     g <- g[,idx]

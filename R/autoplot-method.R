@@ -1645,7 +1645,7 @@ setMethod("autoplot", "matrix", function(object, ...,
                     axis.text.angle <- -90
             }
             x <- seq_len(ncol(object))
-            p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
+            p <- p + scale_x_continuous(breaks = x, labels = x.lab, expand = c(0, 0))
         }
 
     }
@@ -1667,7 +1667,7 @@ setMethod("autoplot", "matrix", function(object, ...,
             idx <- match(x, df$x)
             x <- eval(args.aes$x, df)[idx]
             x <- eval(args.aes$x, df)[idx]
-            p <- p + scale_x_continuous(breaks = x, label = x.lab, expand = c(0, 0))
+            p <- p + scale_x_continuous(breaks = x, labels = x.lab, expand = c(0, 0))
         }
         p
     }

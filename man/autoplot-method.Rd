@@ -451,8 +451,6 @@ Faceting in ggbio package is a little differnt from ggplot2 in several ways
 }
 \author{Tengfei Yin}
 \examples{
-library(ggbio)
-
 set.seed(1)
 N <- 1000
 library(GenomicRanges)

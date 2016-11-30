@@ -230,9 +230,12 @@ filterArgs <- function(fun, args) {
         fun
     }
     fun <- resolveGeneric(fun, args)
-    ggplot2 <- !is(fun, "genericFunction")
+    ggplot2 <- !is(fun, "genericFunction") ||
+        exists(fun@generic, getNamespace("ggplot2"), mode="function",
+               inherits=FALSE)
     if (ggplot2) {
         aes <- vapply(args, is, "uneval", FUN.VALUE=logical(1L))
+        args[aes] <- lapply(args[aes], filterArgs, fun=fun)
         if (is.null(names(args))) {
             args <- args[aes]
         } else {

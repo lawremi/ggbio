@@ -525,6 +525,8 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
                                        lapply(split(.gr.ori,
                                                     values(.gr.ori)[,which(idx)[1]]),
                            function(g){
+                               if (length(g) == 0L)
+                                   return(NULL)
                                r <- range(g, ignore.strand = TRUE)
                                mid <- start(r) + width(r)/2
                                d <- values(g)[1, idx, drop = FALSE]
@@ -709,7 +711,7 @@ setMethod("isGenemodel", "GRanges", function(data, type = NULL){
     if(is.null(type))
         type <- "type"
     if(type %in% colnames(values(data))){
-        geneFeatureTerms <- c("cds", "exon", "utr")
+        geneFeatureTerms <- c("cds", "exon", "utr", "gap")
         idx <- tolower(values(data)[[type]]) %in% geneFeatureTerms
         if (any(!idx)) {
           message(paste0('\"', unique(values(data)[[type]][!idx]), '\"',

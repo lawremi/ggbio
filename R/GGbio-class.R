@@ -305,7 +305,7 @@ setMethod("+", c("GGbio"), function(e1, e2){
 replaceArg <- function(p, args){
     .cmd <- lapply(p@cmd, function(cm){
         .args <- as.list(cm)
-        .args[names(args)] <- args[[1]]
+        .args[[names(args)]] <- args[[1]]
         as.call(.args)
         ## do.call(as.character(.fun), .arg)
     })

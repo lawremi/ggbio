@@ -240,7 +240,8 @@ filterArgs <- function(fun, args) {
             args <- args[aes]
         } else {
             args <- ggplot2:::rename_aes(args)
-            layer <- fun()
+            funArgs <- args[names(args) %in% c("geom", "stat")]
+            layer <- do.call(fun, funArgs)
             validArgs <- c(names(formals(fun)),
                            layer$geom$aesthetics(),
                            layer$geom$parameters(TRUE),

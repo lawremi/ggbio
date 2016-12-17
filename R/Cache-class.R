@@ -110,7 +110,7 @@ setMethod("addWhich", c("Cache", "BasicFilterORlist"), function(x, value){
   }else{
       if(is(x@cached_which, "GRanges"))
           stop("Shouldn't mix GRanges with BasicFilter objects!")
-      x@cached_which <- c(x@chached_which, value)
+      x@cached_which <- c(x@cached_which, value)
   }
   x
 })

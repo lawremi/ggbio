@@ -255,7 +255,7 @@ setMethod("+", c("GGbio"), function(e1, e2){
         }else{
             grl <- cached_which(e1)
 
-            if(length(grl)){
+            if(is(grl, "GRanges") && length(grl)){
                 current.which <- grl[length(grl)]
                 chr.default <- as.character(seqnames(current.which))
                 new.which <- getGrFromXlim(e2, chr.default)
@@ -290,7 +290,7 @@ setMethod("+", c("GGbio"), function(e1, e2){
                     }
                 }
             }else{
-                new.which <- getGrFromXlim(e2)
+                new.which <- getGrFromXlim(e2, chrDefault(e1@data, grl))
                 e1 <- replaceArg(e1, list(which = new.which))
                 e1 <-eval(e1@cmd[[1]])
                 ## no cached copy and no current range
@@ -300,6 +300,14 @@ setMethod("+", c("GGbio"), function(e1, e2){
     }
 })
 
+chrDefault <- function(data, which) {
+    sn <- if (hasMethod("seqnames", class(data)))
+              sn <- seqnames(data)
+          else seqnames(crunch(data, which))
+    sn <- unlist(sn)
+    if (length(sn) > 0L)
+        as.character(sn[1L])
+}
 
 ## replace *single* arg
 replaceArg <- function(p, args){

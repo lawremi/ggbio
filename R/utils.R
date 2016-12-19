@@ -215,7 +215,9 @@ do.ggcall <- function(fun, args) {
     do.call(fun, filterArgs(fun, args))
 }
 
-filterArgs <- function(fun, args) {
+filterArgs <- function(fun, args,
+                       layerArgs=args[names(args) %in% c("geom", "stat")])
+{
     resolveGeneric <- function(fun, args) {
         if (is(fun, "genericFunction")) {
             method <- selectMethod(fun, class(args$data))
@@ -230,20 +232,18 @@ filterArgs <- function(fun, args) {
         fun
     }
     fun <- resolveGeneric(fun, args)
-    ggplot2 <- !is(fun, "genericFunction") ||
-        exists(fun@generic, getNamespace("ggplot2"), mode="function",
-               inherits=FALSE)
+    ggplot2 <- !is(fun, "genericFunction")
     if (ggplot2) {
         aes <- vapply(args, is, "uneval", FUN.VALUE=logical(1L))
-        args[aes] <- lapply(args[aes], filterArgs, fun=fun)
+        args[aes] <- lapply(args[aes], filterArgs, fun=fun, layerArgs=layerArgs)
         if (is.null(names(args))) {
             args <- args[aes]
         } else {
             args <- ggplot2:::rename_aes(args)
-            funArgs <- args[names(args) %in% c("geom", "stat")]
-            layer <- do.call(fun, funArgs)
+            layer <- do.call(fun, layerArgs)
             validArgs <- c(names(formals(fun)),
                            layer$geom$aesthetics(),
+                           layer$stat$aesthetics(),
                            layer$geom$parameters(TRUE),
                            layer$stat$parameters(TRUE))
             args <- args[names(args) %in% validArgs | aes]

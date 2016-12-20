@@ -1672,7 +1672,7 @@ setMethod("autoplot", "matrix", function(object, ...,
         p
     }
     if(!axis.text.x)
-        p <- p + scale_x_continuous(breaks = NULL, label = NULL, expand = c(0, 0))
+        p <- p + scale_x_continuous(breaks = NULL, labels = NULL, expand = c(0, 0))
     if(!axis.text.y)
         p <- p + scale_y_continuous(breaks = NULL, labels = NULL, expand = c(0, 0))
     if(missing(xlab))

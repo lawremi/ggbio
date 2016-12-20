@@ -86,7 +86,7 @@ importClassesFrom(ensembldb, BasicFilter, EntrezidFilter, GeneidFilter,
                   SeqstrandFilter, SeqstartFilter, SeqendFilter, GRangesFilter,
                   ExonrankFilter, SymbolFilter, ProteinidFilter,
                   UniprotidFilter, ProtdomidFilter, UniprotdbFilter,
-                  UniprotmappingtypeFilter)
+                  UniprotmappingtypeFilter, OnlyCodingTxFilter)
 importMethodsFrom(ensembldb, listColumns, exons, exonsBy)
 importFrom(ensembldb, GRangesFilter)
 

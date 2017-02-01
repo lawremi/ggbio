@@ -1,4 +1,4 @@
-setClassUnion("characterORexpressionORNULL", c("expression", "characterORNULL"))
+setClassUnion("character_OR_expression_OR_NULL", c("expression", "character_OR_NULL"))
 
 tracks.gen <- setClass("Tracks",
                        representation(grobs = "PlotList", # working plots, not reall 'Grob'
@@ -7,12 +7,12 @@ tracks.gen <- setClass("Tracks",
                                       heights = "numericORunit",
                                       xlim = "numeric",
                                       ylim = "list",
-                                      xlab = "characterORNULL",
-                                      main = "characterORexpressionORNULL",
+                                      xlab = "character_OR_NULL",
+                                      main = "character_OR_expression_OR_NULL",
                                       main.height =  "numericORunit",
                                       scale.height =  "numericORunit",
                                       xlab.height =  "numericORunit",
-                                      theme = "themeORNULL",
+                                      theme = "theme_OR_NULL",
                                       fixed = "logical",
                                       labeled = "logical",
                                       mutable = "logical",
@@ -23,8 +23,8 @@ tracks.gen <- setClass("Tracks",
                                       label.text.color = "character",
                                       label.text.cex = "numeric",
                                       label.text.angle = "numeric",
-                                      track.plot.color = "characterORNULL",
-                                      track.bg.color = "characterORNULL",
+                                      track.plot.color = "character_OR_NULL",
+                                      track.bg.color = "character_OR_NULL",
                                       label.width = "unit"))
 
 .tracks.theme <- setdiff(slotNames("Tracks"), c("backup", "grobs"))

@@ -1054,8 +1054,8 @@ constructor, including
    label.text.color & character\\\hline
    label.text.cex & numeric\\\hline
    label.text.angle & numeric\\\hline
-   track.plot.color & characterORNULL\\\hline
-   track.bg.color & characterORNULL\\\hline
+   track.plot.color & character\_OR\_NULL\\\hline
+   track.bg.color & character\_OR\_NULL\\\hline
    label.width & unit\\\hline
   \end{tabular}
   \caption{tracks attributes}

@@ -1,11 +1,11 @@
 setClass("Cache",
             slots = list(
               cached = "logical",
-              cached_xlim = "numericORNULL",
-              cached_ylim = "numericORNULL",
-              ## That's bad; would be better to have something like GRangesORBasicFilterORNULL,
+              cached_xlim = "numeric_OR_NULL",
+              cached_ylim = "numeric_OR_NULL",
+              ## That's bad; would be better to have something like GRanges_OR_BasicFilter_OR_NULL,
               ## but that's not working as we're also adding stuff extending BasicFilter.
-              cached_which = "GRangesORBasicFilterORlistORNULL",
+              cached_which = "GRanges_OR_BasicFilter_OR_list_OR_NULL",
               cached_item = "list"
               ),
          prototype = list(cached = TRUE,
@@ -89,7 +89,7 @@ setMethod("cached_which", "Cache", function(x){
   x@cached_which
 })
 setGeneric("cached_which<-", function(x, value) standardGeneric("cached_which<-"))
-setReplaceMethod("cached_which", c("Cache", "GRangesORBasicFilterORlistORNULL"), function(x, value){
+setReplaceMethod("cached_which", c("Cache", "GRanges_OR_BasicFilter_OR_list_OR_NULL"), function(x, value){
   x@cached_which<- value
   x
 })

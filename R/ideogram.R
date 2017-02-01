@@ -2,13 +2,13 @@
 setClass("Ideogram", contains = c("GGbio"),
          slots = list(xlabel = "logical",
              cytoband = "logical",
-             subchr = "characterORNULL",
+             subchr = "character_OR_NULL",
              aspect.ratio = "numeric",
              color = "character",
              fill = "character",
              alpha = "numeric",
              size = "numeric",
-             zoom.region = "numericORNULL",
+             zoom.region = "numeric_OR_NULL",
              zoom.offset = "numeric"))
 
 Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband = TRUE,

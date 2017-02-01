@@ -2,7 +2,7 @@
 GGbio.gen <- setClass("GGbio",
                       slots = list(
                           data = "ANY",
-                          ggplot = "ggORNULL", #ggplot object
+                          ggplot = "gg_OR_NULL", #ggplot object
                           cmd = "list",
                           fetchable = "logical",
                           blank = "logical"),

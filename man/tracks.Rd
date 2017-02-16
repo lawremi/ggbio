@@ -86,6 +86,7 @@
 \alias{rbind,Tracks-method}
 \alias{[,Tracks,numeric,missing,ANY-method}
 \alias{[,PlotList,numeric,missing,ANY-method}
+\alias{coerce,Tracks,grob-method}
 \title{Tracks for genomic graphics}
 \usage{
 tracks(..., heights, xlim, xlab = NULL, main = NULL,
@@ -251,7 +252,10 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
       \code{\linkS4class{Tracks}} object, \code{x + theme} would  apply
       theme to any plots in the tracks except those are immutable.
     }
-  }  
+    \item{\code{as(x, "grob")}}{Coerces a Tracks object to a grob for
+      embedding in a larger figure.
+    }
+  }
 }
 
 \section{Backup and reset}{

@@ -1,4 +1,5 @@
-setClassUnion("character_OR_expression_OR_NULL", c("expression", "character_OR_NULL"))
+setClassUnion("character_OR_expression_OR_NULL",
+              c("expression", "character_OR_NULL"))
 
 tracks.gen <- setClass("Tracks",
                        representation(grobs = "PlotList", # working plots, not reall 'Grob'
@@ -229,137 +230,76 @@ setMethod("summary", "Tracks", function(object){
   cat("-------------------------------------------\n")
 })
 
-
-setMethod("print", "Tracks", function(x){
-    grobs <- x@grobs
+setAs("Tracks", "grob", function(from) {
+    grobs <- from@grobs
     N <- length(grobs)
-   .scale.grob <- grobs[[N]] + xlim(x@xlim)
-    if(any(x@labeled))
-      nms <- names(x@grobs)
+    .scale.grob <- grobs[[N]] + xlim(from@xlim)
+    if(any(from@labeled))
+        nms <- names(from@grobs)
     else
-      nms <- NULL
+        nms <- NULL
     lst <- lapply(seq_len(N),
                   function(i) {
-                    if(i %in% which(x@mutable))
-                      grobs[[i]] <- grobs[[i]] + x@theme
-                    grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "")
-                     grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(as.numeric(x@padding), 1,
-                              as.numeric(x@padding),  0.5), "lines"))
-                    if(i %in% which(!x@hasAxis))
-                      grobs[[i]] <- grobs[[i]] + theme(axis.text.x = element_blank(),
-                                                       axis.ticks.x = element_blank())
+        if(i %in% which(from@mutable))
+            grobs[[i]] <- grobs[[i]] + from@theme
+        grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "")
+        grobs[[i]] <- grobs[[i]] +
+            theme(plot.margin = unit(c(as.numeric(from@padding), 1,
+                                       as.numeric(from@padding),  0.5),
+                                     "lines"))
+        if(i %in% which(!from@hasAxis))
+            grobs[[i]] <- grobs[[i]] + theme(axis.text.x = element_blank(),
+                                             axis.ticks.x = element_blank())
 
-                    if(i %in% which(!x@fixed)){
-                      s <- coord_cartesian(xlim = x@xlim)
-                      grobs[[i]] <- grobs[[i]] + s
-                    }
-                    grobs[[i]]
-                  })
+        if(i %in% which(!from@fixed)){
+            s <- coord_cartesian(xlim = from@xlim)
+            grobs[[i]] <- grobs[[i]] + s
+        }
+        grobs[[i]]
+    })
 
     if(!is.null(nms))
-      names(lst) <- nms
+        names(lst) <- nms
+
+    if(any(from@labeled))
+        do.call(alignPlots,
+                c(lst, list(heights = from@heights,
+                            padding = from@padding,
+                            label.bg.color =  from@label.bg.color,
+                            label.bg.fill = from@label.bg.fill,
+                            label.text.color = from@label.text.color,
+                            label.text.angle = from@label.text.angle,
+                            label.text.cex = from@label.text.cex,
+                            label.width = from@label.width,
+                            track.plot.color = from@track.plot.color,
+                            track.bg.color = from@track.bg.color,
+                            main = from@main,
+                            xlab = from@xlab,
+                            main.height = from@main.height,
+                            scale.height = from@scale.height,
+                            xlab.height = from@xlab.height,
+                            .scale.grob = .scale.grob
+                            )))
+    else
+        do.call(alignPlots,
+                c(lst, list(heights = from@heights,
+                            padding = from@padding,
+                            track.plot.color = from@track.plot.color,
+                            track.bg.color = from@track.bg.color,
+                            main = from@main,
+                            xlab = from@xlab,
+                            main.height = from@main.height,
+                            scale.height = from@scale.height,
+                            xlab.height = from@xlab.height,
+                            .scale.grob = .scale.grob
+                            )))
+})
+
+print.Tracks <- function(x) {
     grid.newpage()
-    if(any(x@labeled))
-      res <- do.call(alignPlots, c(lst, list(heights = x@heights,
-                                             padding = x@padding,
-                                             label.bg.color =  x@label.bg.color,
-                                             label.bg.fill = x@label.bg.fill,
-                                             label.text.color = x@label.text.color,
-                                             label.text.angle = x@label.text.angle,
-                                             label.text.cex = x@label.text.cex,
-                                             label.width = x@label.width,
-                                             track.plot.color = x@track.plot.color,
-                                             track.bg.color = x@track.bg.color,
-                                             main = x@main,
-                                             xlab = x@xlab,
-                                             main.height = x@main.height,
-                                             scale.height = x@scale.height,
-                                             xlab.height = x@xlab.height,
-                                             .scale.grob = .scale.grob
-                                             )))
-    else
-      res <- do.call(alignPlots, c(lst, list(heights = x@heights,
-                                             padding = x@padding,
-                                             track.plot.color = x@track.plot.color,
-                                             track.bg.color = x@track.bg.color,
-                                             main = x@main,
-                                             xlab = x@xlab,
-                                             main.height = x@main.height,
-                                             scale.height = x@scale.height,
-                                             xlab.height = x@xlab.height,
-                                             .scale.grob = .scale.grob
-                                             )))
-
-    grid.draw(res)
+    grid.draw(as(x, "grob"))
     ggplot2:::set_last_plot(x)
-})
-
-setGeneric("get_gtable", function(x, ...) standardGeneric("get_gtable"))
-
-setMethod("get_gtable", "Tracks", function(x){
-    grobs <- x@grobs
-    N <- length(grobs)
-   .scale.grob <- grobs[[N]] + xlim(x@xlim)
-    if(any(x@labeled))
-      nms <- names(x@grobs)
-    else
-      nms <- NULL
-    lst <- lapply(seq_len(N),
-                  function(i) {
-                    if(i %in% which(x@mutable))
-                      grobs[[i]] <- grobs[[i]] + x@theme
-                    grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "")
-                     grobs[[i]] <- grobs[[i]] + theme(plot.margin = unit(c(as.numeric(x@padding), 1,
-                              as.numeric(x@padding),  0.5), "lines"))
-                    if(i %in% which(!x@hasAxis))
-                      grobs[[i]] <- grobs[[i]] + theme(axis.text.x = element_blank(),
-                                                       axis.ticks.x = element_blank())
-
-                    if(i %in% which(!x@fixed)){
-                      s <- coord_cartesian(xlim = x@xlim)
-                      grobs[[i]] <- grobs[[i]] + s
-                    }
-                    grobs[[i]]
-                  })
-
-    if(!is.null(nms))
-      names(lst) <- nms
-
-    if(any(x@labeled))
-      res <- do.call(alignPlots, c(lst, list(heights = x@heights,
-                                             padding = x@padding,
-                                             label.bg.color =  x@label.bg.color,
-                                             label.bg.fill = x@label.bg.fill,
-                                             label.text.color = x@label.text.color,
-                                             label.text.angle = x@label.text.angle,
-                                             label.text.cex = x@label.text.cex,
-                                             label.width = x@label.width,
-                                             track.plot.color = x@track.plot.color,
-                                             track.bg.color = x@track.bg.color,
-                                             main = x@main,
-                                             xlab = x@xlab,
-                                             main.height = x@main.height,
-                                             scale.height = x@scale.height,
-                                             xlab.height = x@xlab.height,
-                                             .scale.grob = .scale.grob
-                                             )))
-    else
-      res <- do.call(alignPlots, c(lst, list(heights = x@heights,
-                                             padding = x@padding,
-                                             track.plot.color = x@track.plot.color,
-                                             track.bg.color = x@track.bg.color,
-                                             main = x@main,
-                                             xlab = x@xlab,
-                                             main.height = x@main.height,
-                                             scale.height = x@scale.height,
-                                             xlab.height = x@xlab.height,
-                                             .scale.grob = .scale.grob
-                                             )))
-
-    res
-
-
-})
+}
 
 setMethod("show", "Tracks", function(object){
   print(object)
@@ -1162,7 +1102,7 @@ setMethod("c", "Tracks",  function(x, ...){
 setMethod("cbind", "Tracks",  function(...){
   args <- list(...)
   if(all(sapply(args, is, "Tracks"))){
-    lst <- lapply(args, get_gtable)
+    lst <- lapply(args, as, "grob")
     res <- do.call(cbind, lst)
   }else{
     stop("need to be of class Tracks")
@@ -1174,7 +1114,7 @@ setMethod("cbind", "Tracks",  function(...){
 setMethod("rbind", "Tracks",  function(...){
   args <- list(...)
   if(all(sapply(args, is, "Tracks"))){
-    lst <- lapply(args, get_gtable)
+    lst <- lapply(args, as, "grob")
     res <- do.call(rbind, lst)
   }else{
     stop("need to be of class Tracks")

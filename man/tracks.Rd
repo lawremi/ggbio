@@ -349,7 +349,7 @@ tks + tks
 cbind(tks, tks)
 rbind(tks, tks) ## different wth c()!
 library(grid)
-x <- ggbio:::get_gtable(tks)
+x <- as(tks, "grob")
 grid.draw(cbind(x, x))
 
 

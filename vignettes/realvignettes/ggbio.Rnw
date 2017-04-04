@@ -137,6 +137,7 @@ gene model track:
     annotation package available for the first two methods, you could
     prepare a data set parsed from gtf file, you can simply use it and
     plot it as gene model track.
+  \item \Rclass{EnsDb} object: supports gene symbol labeling, filtering etc.
 \end{itemize}
 
 \subsection{Make gene model from \Rclass{OrganismDb} object}
@@ -202,7 +203,8 @@ allows to easily fetch specific information (genes/transcripts) from an
 \Rclass{EnsDb}. The \Rclass{EnsDb} objects provide gene symbol annotations in
 the column gene\_name. Alternatively, we could use tx\_id to label transcripts.
 
-In the example below we plot the gene model of the gene PHKG2.
+In the example below we plot the gene model of the gene PHKG2. We use a
+\Rclass{GenenameFilter} to specify which gene we want to plot.
 
 <<>>=
 library(EnsDb.Hsapiens.v75)
@@ -210,21 +212,29 @@ ensdb <- EnsDb.Hsapiens.v75
 autoplot(ensdb, GenenameFilter("PHKG2"))
 @
 
-Alternatively, we could specify a genomic region and fetch all transcripts
-overlapping that region (also partially, i.e. with a part of an intron or an
-exon).
+We can pass any filter class defined in the \Biocpkg{AnnotationFilter} package
+with argument \Rclass{which}. Alternatively we can combine filter classes using
+an \Rclass{AnnotationFilterList} or we can pass a filter expression in form of a
+\Rclass{formula}. Below we pass such a filter expression to the function.
+
+<<>>=
+autoplot(ensdb, ~ symbol == "PHKG2", names.expr="gene_name")
+@
+
+We could also specify a genomic region and fetch all transcripts overlapping
+that region (also partially, i.e. with a part of an intron or an exon).
 
 <<>>=
 ## We specify "*" as strand, thus we query for genes encoded  on both strands
-gr <- GRanges(seqnames=16, IRanges(30768000, 30770000), strand="*")
-autoplot(ensdb, GRangesFilter(gr, "overlapping"), names.expr="gene_name")
+gr <- GRanges(seqnames = 16, IRanges(30768000, 30770000), strand = "*")
+autoplot(ensdb, GRangesFilter(gr), names.expr = "gene_name")
 @
 
 Also, we can spefify directly the gene ids and plot all transcripts of these
 genes (not only those overlapping with the region)
 
 <<>>=
-autoplot(ensdb, GeneidFilter(c("ENSG00000196118", "ENSG00000156873")))
+autoplot(ensdb, GeneIdFilter(c("ENSG00000196118", "ENSG00000156873")))
 @
 
 \subsection{Make gene model from \Rclass{GRangesList} object}

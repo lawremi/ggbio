@@ -23,19 +23,22 @@
     A character specifying the bam file path of RNA-seq data.
   }
   \item{model}{
-    A GRangesList which represting different isoforms, a TxDb or an \code{\link[ensembldb]{EnsDb}}
-    object. For the latter cases, users need to pass "which" argument
-    which, for TxDb, is a GRanges object to specify the region and for
-    \code{EnsDb} can be a GRanges object, a filter extending the
-    \code{\link[ensembldb]{BasicFilter-class}} class or a list thereof. And we get
-    connonical model internally.
+    A GRangesList which represting different isoforms, a TxDb or an
+    \code{\link[ensembldb]{EnsDb}} object. For the latter cases, users
+    need to pass "which" argument which, for TxDb, is a GRanges object
+    to specify the region and for \code{EnsDb} can be a GRanges object,
+    an object extending
+    \code{\link[AnnotationFilter]{AnnotationFilter}}, an
+    \code{\link[AnnotationFilter]{AnnotationFilterList}} combining such
+    filter objects or a filter expression in form of a \code{formula}.
   }
   \item{which}{
     A GRanges object specifying the region you want to get model from
     the TxDb object.
-    For \code{\link[ensembldb]{EnsDb}}: s GRanges object or a single or
-    list of filter object(s) extending
-    \code{\link[ensembldb]{BasicFilter-class}}.
+    For \code{\link[ensembldb]{EnsDb}}: can be a GRanges object, an
+    object extending \code{\link[AnnotationFilter]{AnnotationFilter}}, an
+    \code{\link[AnnotationFilter]{AnnotationFilterList}} combining such
+    filter objects or a filter expression in form of a \code{formula}.
   }
   \item{weighted}{
     If \code{TRUE}, weighted by simply add 1/cases matched to each model

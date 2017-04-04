@@ -79,16 +79,19 @@ importFrom(AnnotationDbi, select)
 ## ensembldb
 importClassesFrom(ensembldb, EnsDb)
 ## Filter classes...
-importClassesFrom(ensembldb, BasicFilter, EntrezidFilter, GeneidFilter,
-                  GenebiotypeFilter,
-                  GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter,
-                  SeqnameFilter,
-                  SeqstrandFilter, SeqstartFilter, SeqendFilter, GRangesFilter,
-                  ExonrankFilter, SymbolFilter, ProteinidFilter,
-                  UniprotidFilter, ProtdomidFilter, UniprotdbFilter,
-                  UniprotmappingtypeFilter, OnlyCodingTxFilter)
 importMethodsFrom(ensembldb, listColumns, exons, exonsBy)
-importFrom(ensembldb, GRangesFilter)
+## importFrom(ensembldb, GRangesFilter)
+
+## AnnotationFilter
+importClassesFrom(AnnotationFilter, AnnotationFilter, AnnotationFilterList,
+                  CharacterFilter, IntegerFilter, GRangesFilter, ExonIdFilter,
+                  ExonNameFilter, GeneIdFilter, GenenameFilter,
+                  GeneBiotypeFilter, EntrezFilter, SymbolFilter, TxIdFilter,
+                  TxNameFilter, TxBiotypeFilter, ProteinIdFilter, UniprotFilter,
+                  SeqNameFilter, SeqStrandFilter, CdsStartFilter, CdsEndFilter,
+                  ExonStartFilter, ExonRankFilter, ExonEndFilter,
+                  GeneStartFilter, GeneEndFilter, TxStartFilter, TxEndFilter)
+importFrom(AnnotationFilter, GRangesFilter)
 
 ## tools
 importFrom(tools, file_ext, file_path_sans_ext)

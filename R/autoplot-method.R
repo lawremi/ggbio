@@ -544,6 +544,9 @@ setMethod("autoplot", "TxDbOREnsDb", function(object, which, ...,
         ## We don't have a column tx_name in EnsDb.
         if(names.expr == "tx_name")
             names.expr <- "tx_id"
+        ## if which is a GRanges, "convert" that into a GRangesFilter
+        if (!missing(which) && is(which, "GRanges"))
+            which <- GRangesFilter(which)
     }else{
         if(!missing(which)){
             if(!is(which, "GRanges"))
@@ -572,9 +575,14 @@ setMethod("autoplot", "TxDbOREnsDb", function(object, which, ...,
     args.non$names.expr <- names.expr
     args.non$label <- label
     if(!missing(which)){
-        if(!is(which, "GRanges") & !is(which, "BasicFilter") & !is(which, "list"))
+        ## For AnnotationFilter: which has to be an AnnotationFilter object,
+        ## an AnnotationFilterList or a formula with a filter expression.
+        if(!is(which, "AnnotationFilter") & !is(which, "AnnotationFilterList")
+           & !is(which, "formula") & !is(which, "GRanges"))
             stop("which, if provided, must be a GRanges object, ",
-                 "an single object extending BasicFilter or a list thereof")
+                 "an single object extending AnnotationFilter, an ",
+                 "AnnotationFilterList combining such object, or a formula ",
+                 "representing a filter expression.")
         args.non$which <- which
     }
 

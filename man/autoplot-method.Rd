@@ -231,6 +231,12 @@
   \item{which}{
     A \code{\link{GRanges}} object to subset the result, usually passed
     to the \code{\link{ScanBamParam}} function.
+    For \code{autoplot,EnsDb}, \code{which} can in addition also be an
+    object extending \code{\link[AnnotationFilter]{AnnotationFilter}},
+    an \code{\link[AnnotationFilter]{AnnotationFilterList}} combining
+    such objects or a \code{formula} representing a filter
+    expression. See examples below or documentation of
+    \code{\link[AnnotationFilter]{AnnotationFilter}} for more details.
   }
 
   \item{show.coverage}{
@@ -729,25 +735,26 @@ tracks(full = p1, reduce = p2, heights = c(5, 1)) + ylab("")
 library(EnsDb.Hsapiens.v75)
 ensdb <- EnsDb.Hsapiens.v75
 ## We use a GenenameFilter to specifically retrieve all transcripts for that gene.
-p1 <- autoplot(ensdb, which=GenenameFilter("ALDOA"), names.expr="gene_name")
-p2 <- autoplot(ensdb, which=GenenameFilter("ALDOA"), stat="reduce", color="brown",
-               fill="brown")
+p1 <- autoplot(ensdb, which = GenenameFilter("ALDOA"), names.expr = "gene_name")
+## Instead of providing the GenenameFilter, we can also use filter expressions
+p2 <- autoplot(ensdb, which = ~ genename == "ALDOA", stat = "reduce",
+               color = "brown", fill = "brown")
 tracks(full = p1, reduce = p2, heights = c(5, 1)) + ylab("")
 
 ## Alternatively, we can specify a GRangesFilter and display all genes
 ## that are (partially) overlapping with that genomic region:
 gr <- GRanges(seqnames=16, IRanges(30768000, 30770000), strand="+")
-autoplot(ensdb, GRangesFilter(gr, "overlapping"), names.expr="gene_name")
+autoplot(ensdb, GRangesFilter(gr, "any"), names.expr="gene_name")
 ## Just submitting the GRanges object also works.
 autoplot(ensdb, gr, names.expr="gene_name")
 
 ## Or genes encoded on both strands.
-gr <- GRanges(seqnames=16, IRanges(30768000, 30770000), strand="*")
-autoplot(ensdb, GRangesFilter(gr, "overlapping"), names.expr="gene_name")
+gr <- GRanges(seqnames = 16, IRanges(30768000, 30770000), strand = "*")
+autoplot(ensdb, GRangesFilter(gr), names.expr="gene_name")
 
 ## Also, we can spefify directly the gene ids and plot all transcripts of these
 ## genes (not only those overlapping with the region)
-autoplot(ensdb, GeneidFilter(c("ENSG00000196118", "ENSG00000156873")))
+autoplot(ensdb, GeneIdFilter(c("ENSG00000196118", "ENSG00000156873")))
 
 ###################################################
 ### code chunk number 28: ga-load

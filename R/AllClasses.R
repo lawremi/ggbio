@@ -13,8 +13,12 @@ setClassUnion("GRanges_OR_NULL", c("GRanges", "NULL"))
 
 setClassUnion("TxDbOREnsDb", c("TxDb", "EnsDb"))
 ## setClassUnion("GRangesORANY", c("GRanges", "ANY"))
-setClassUnion("GRanges_OR_BasicFilter_OR_list_OR_NULL", c("GRanges", "BasicFilter", "list", "NULL"))
-setClassUnion("BasicFilterORlist", c("BasicFilter", "list"))
+## setClassUnion("GRangesORBasicFilterORlistORNULL",
+setClassUnion("GRanges_OR_BasicFilter_OR_list_OR_NULL",
+              c("GRanges", "AnnotationFilter", "AnnotationFilterList",
+                "formula", "list", "NULL"))
+setClassUnion("BasicFilterORlist",
+              c("AnnotationFilter", "AnnotationFilterList", "formula", "list"))
 
 
 setOldClass("ggplot")

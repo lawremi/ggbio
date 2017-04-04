@@ -57,8 +57,10 @@
   }
   \item{which}{
     \code{GRanges} object to subset the \code{TxDb} or \code{EnsDb}
-    object. For \code{EnsDb}: can also be a single, or a list of, filter object(s)
-    extending \code{\link[ensembldb]{BasicFilter-class}}.
+    object. For \code{EnsDb}: can also be a single object extending
+    \code{\link[AnnotationFilter]{AnnotationFilter}}, an
+    \code{\link[AnnotationFilter]{AnnotationFilterList}}
+    combining such objects or a filter expression in form of a \code{formula}.
   }
   \item{cds.rect.h}{
     cds heights.

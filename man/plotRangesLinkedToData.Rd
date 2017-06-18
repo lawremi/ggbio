@@ -1,7 +1,7 @@
 \name{plotRangesLinkedToData}
 \alias{plotRangesLinkedToData}
 \alias{plotRangesLinkedToData,RangedSummarizedExperiment-method}
-\alias{plotRangesLinkedToData,GenomicRangesORGRangesList-method}
+\alias{plotRangesLinkedToData,GenomicRanges_OR_GRangesList-method}
 \title{Plot Ranges Linked with Data}
 \description{
   Plot GRanges object structure and linked to a even spaced paralell
@@ -12,7 +12,7 @@
           stat.y = seq_len(ncol(data)), stat.ylab = names(assays(data)[stat.assay]),
           stat.assay = 1L)
 
-\S4method{plotRangesLinkedToData}{GenomicRangesORGRangesList}(data, ...,
+\S4method{plotRangesLinkedToData}{GenomicRanges_OR_GRangesList}(data, ...,
           stat.y = seq_len(ncol(mcols(data))),
           stat.ylab, sig, sig.col = c("black", "red"),
           stat.coord.trans = coord_trans(),

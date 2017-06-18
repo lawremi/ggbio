@@ -125,7 +125,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     ### FIXME: this should just try to call range(unlist(x)) on each arg
     ###        and then call range(do.call(c, unname(r))) on the successful
     ###        results.
-      idx <- sapply(list(...), function(x){is(x, "GenomicRangesORGRangesList")})
+      idx <- sapply(list(...), function(x){is(x, "GenomicRanges_OR_GRangesList")})
       if(any(idx)){
           grs <- list(...)[idx]
           grs <- unlist(do.call(c, unname(grs)))

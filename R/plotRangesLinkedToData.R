@@ -19,7 +19,7 @@ setMethod("plotRangesLinkedToData", "RangedSummarizedExperiment",
                                    ...)
           })
 
-setMethod("plotRangesLinkedToData", "GenomicRangesORGRangesList",
+setMethod("plotRangesLinkedToData", "GenomicRanges_OR_GRangesList",
           function(data, ...,
                    stat.y = seq_len(ncol(mcols(data))),
                    stat.ylab, sig, sig.col = c("black", "red"),

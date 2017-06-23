@@ -104,7 +104,7 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
     if(!is.null(highlight.name)){
    
   
-      seqlevels(.h.pos) <- seqlevels(obj)
+      seqlevels(.h.pos, pruning.mode="coarse") <- seqlevels(obj)
       suppressWarnings(seqinfo(.h.pos) <- seqinfo(obj))
       .trans <- transformToGenome(.h.pos, space.skip = space.skip)
       values(.trans)$mean <- (start(.trans) + end(.trans))/2

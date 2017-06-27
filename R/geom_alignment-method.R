@@ -669,11 +669,12 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
             if(!"size" %in% names(args.non))
                 args.non$size <- 2.5
 
-            args.label.res <- c(list(data = .df.sub),
-                                list(vjust = 0),
-                                list(aes.label),
-                                list(color = label.color),
-                                args.non)
+            args.label.res <- args.non
+            args.label.lst <- list(data = .df.sub,
+                                   vjust = 0,
+                                   aes.label,
+                                   color = label.color)
+            args.label.res[names(args.label.lst)] <- args.label.lst
 
             p <- c(p , list(do.ggcall(geom_text, args.label.res)))
             ggplot() + p

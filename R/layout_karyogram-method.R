@@ -44,39 +44,6 @@ setMethod("layout_karyogram", "GRanges",
               df.tri <- subset(df, gieStain == "acen")
               df.tri.p <- df.tri[substr(df.tri$name, 1, 1) == "p",]
               df.tri.q <- df.tri[substr(df.tri$name, 1, 1) == "q",]
-              ## p.ideo <- ggplot(df.rect)
-#               dd.lst <- split(data, seqnames(data))
-              ## to make it pretty, it's not time efficient
-#               e.cut <- min(unlist(lapply(dd.lst, function(dd){
-#                 min(width(dd[1]), width(dd[length(dd)]))
-#                 })))
-#
-#               df.left <- do.call(rbind, lapply(dd.lst, function(dd){
-#                 dd.df <- mold(dd)
-#                 dd.df.rect <- dd.df[order(dd.df$start),]
-#                 dd.df.left <- dd.df.rect[1, ]
-#                 dd.df.left$end <- dd.df.left$end - e.cut
-#                 dd.df.left$width <- e.cut
-#                 dd.df.left
-#               }))
-#               df.right <- do.call(rbind, lapply(dd.lst, function(dd){
-#                 dd.df <- mold(dd)
-#                 dd.df.rect <- dd.df[order(dd.df$start),]
-#                 dd.df.right <- dd.df.rect[nrow(dd.df.rect), ]
-#                 dd.df.right$start <- dd.df.right$end - e.cut
-#                 dd.df.right$width <- e.cut
-#                 dd.df.right
-#               }))
-#               df.rect <- do.call(rbind, lapply(dd.lst, function(dd){
-#                 dd.df <- mold(dd)
-#                 dd.df.rect <- dd.df[order(dd.df$start),]
-#                 df.l <- dd.df.rect[1,]
-#                 df.l$start <- df.l$start + e.cut
-#                 df.r <- dd.df.rect[nrow(dd.df.rect), ]
-#                 df.r$end <- df.r$end -e.cut
-#                 dd.df.rect <- dd.df.rect[c(-1, -1 * nrow(dd.df.rect)), ]
-#                 dd.df.rect <- rbind(df.l, dd.df.rect, df.r)
-#               }))
 
               ## main
               p.ideo <- list(do.call(ggplot2::geom_rect, c(list(data = df.rect),
@@ -158,86 +125,60 @@ setMethod("layout_karyogram", "GRanges",
 
 
 
-              lst <- lapply(seq_len(nrow(df.tri.p)), function(i){
-                with(df.tri.p[i,],
-                     data.frame(x = start,
-                                y = 0,
-                                xend = start,
-                                yend = 10,
-                                height = abs(start - end),
-                                seqnames = seqnames,
-                                strand = strand,
-                                name = name,
-                                gieStain = gieStain)
-
-                     )
-              })
-              df.tri.p2 <- do.call(rbind, lst)
-
-
-              lst <- lapply(seq_len(nrow(df.tri.q)), function(i){
-                with(df.tri.q[i,],
-                     data.frame(x = end,
-                                y = 0,
-                                xend = end,
-                                yend = 10,
-                                height = - abs(start - end),
-                                seqnames = seqnames,
-                                strand = strand,
-                                name = name,
-                                gieStain = gieStain)
-
-                     )
-              })
-              df.tri.q2 <- do.call(rbind, lst)
+              df.tri.p2 <- with(df.tri.p,
+                                data.frame(x=start,
+                                           y=rep(0, nrow(df.tri.p)),
+                                           xend=start,
+                                           yend=rep(10, nrow(df.tri.p)),
+                                           height=abs(start - end),
+                                           seqnames=seqnames, strand=strand,
+                                           name=name, gieStain=gieStain))
+              
+              df.tri.q2 <- with(df.tri.q,
+                                data.frame(x=end,
+                                           y=rep(0, nrow(df.tri.q)),
+                                           xend=end,
+                                           yend=rep(10, nrow(df.tri.q)),
+                                           height=-abs(start - end),
+                                           seqnames=seqnames, strand=strand,
+                                           name=name, gieStain=gieStain))
 
               ## border
-              ##browser()
-              p.ideo <- c(p.ideo,
-                          ifelse(nrow(df.tri.p2),
-                          list(do.call(geom_arch_flip2, c(list(data = df.tri.p2),
-                                            list(aes(x = x,
-                                                     y = y ,
-                                                     xend = xend,
-                                                     yend = yend,
-                                                     height = height)
-                                                ),
-                                         list(color = "black", size = 0.5)))),
-                                 list(NULL)))
-              p.ideo <- c(p.ideo,
-                          ifelse(nrow(df.tri.p2),
-                                 list(geom_arch_flip(data = df.tri.p2,
-                                                     aes(x = x,
-                                                         y = y ,
-                                                         xend = xend,
-                                                         yend = yend,
-                                                         height = height,
-                                                         fill = gieStain
-                                                       ))),
-                                 list(NULL)))
-
-            ## q
-            p.ideo <- c(p.ideo,
-                        ifelse(nrow(df.tri.q2),
-                               list(do.call(geom_arch_flip2, c(list(data = df.tri.q2),
-                                                                   list(aes(x = x,
-                                                                            y = y ,
-                                                                            xend = xend,
-                                                                            yend = yend,
-                                                                            height = height
-                                                                     )),
-                                                                   list(color = "black", size = 0.5)))),
-                               list(NULL)))
-             p.ideo <- c(p.ideo,
-                          ifelse(nrow(df.tri.q2),list(geom_arch_flip(data = df.tri.q2,
-                                            aes(x = x,
-                                                y = y ,
-                                                xend = xend,
-                                                yend = yend,
-                                                height = height,
-                                                fill = gieStain))),
-                                 list(NULL)))
-
+              if(nrow(df.tri.p2) > 0L)
+                  p.ideo <- c(p.ideo,
+                              list(geom_arch_flip2(df.tri.p2,
+                                                   aes(x = x,
+                                                       y = y ,
+                                                       xend = xend,
+                                                       yend = yend,
+                                                       height = height),
+                                                   color = "black", size = 0.5),
+                                   geom_arch_flip(df.tri.p2,
+                                                  aes(x = x,
+                                                      y = y ,
+                                                      xend = xend,
+                                                      yend = yend,
+                                                      height = height,
+                                                      fill = gieStain))))
+              
+              ## q
+              if(nrow(df.tri.p2) > 0L)
+                  p.ideo <- c(p.ideo,
+                               list(geom_arch_flip2(df.tri.q2,
+                                                    aes(x = x,
+                                                        y = y ,
+                                                        xend = xend,
+                                                        yend = yend,
+                                                        height = height),
+                                                    color = "black",
+                                                    size = 0.5),
+                                    geom_arch_flip(df.tri.q2,
+                                                   aes(x = x,
+                                                       y = y ,
+                                                       xend = xend,
+                                                       yend = yend,
+                                                       height = height,
+                                                       fill = gieStain))))
 
               p.ideo <- c(p.ideo,
                           list(theme(axis.text.y = element_blank(),

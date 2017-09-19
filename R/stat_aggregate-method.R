@@ -1,7 +1,7 @@
 setGeneric("stat_aggregate", function(data, ...) standardGeneric("stat_aggregate"))
 
 setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by, FUN,
-                                                maxgap=0L, minoverlap=1L,
+                                                maxgap=-1L, minoverlap=0L,
                                                 type=c("any", "start", "end", "within", "equal"),
                                                 select=c("all", "first", "last", "arbitrary"),
                                                 y = NULL,
@@ -184,8 +184,8 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
 
 ### ML: Is this function even called anywhere?
 
-.aggregate <- function(data, ..., xlab, ylab, main, by, FUN, maxgap=0L,
-                            minoverlap=1L, type=c("any", "start", "end", "within",
+.aggregate <- function(data, ..., xlab, ylab, main, by, FUN, maxgap=-1L,
+                            minoverlap=0L, type=c("any", "start", "end", "within",
                                                 "equal"),
                        select=c("all", "first", "last", "arbitrary"),
                        y = NULL, window = NULL, facets = NULL,

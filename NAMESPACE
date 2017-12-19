@@ -46,7 +46,7 @@ importMethodsFrom(Biostrings, getSeq)
 
 ## Rsamtools
 importFrom(Rsamtools, BamFile)
-importMethodsFrom(Rsamtools, ScanBamParam, scanBamHeader, path)
+importMethodsFrom(Rsamtools, ScanBamParam, scanBamHeader)
 importClassesFrom(Rsamtools, BamFile, BamFileList)
 
 ## GenomicAlignments

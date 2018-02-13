@@ -30,7 +30,7 @@ VignetteBuilder: knitr
 Suggests: vsn, BSgenome.Hsapiens.UCSC.hg19, Homo.sapiens,
         TxDb.Hsapiens.UCSC.hg19.knownGene, chipseq,
         TxDb.Mmusculus.UCSC.mm9.knownGene, knitr, BiocStyle, testthat,
-        EnsDb.Hsapiens.v75
+	EnsDb.Hsapiens.v75, tinytex
 URL: http://tengfei.github.com/ggbio/
 BugReports: https://github.com/tengfei/ggbio/issues
 License: Artistic-2.0

@@ -1334,8 +1334,8 @@ setMethod("autoplot", "VRanges", function(object, ...,which = NULL,
                                            xend = midpoint, yend = 1.75, color = alt)) +
                  ggplot2::geom_rect(aes(xmin = midpoint - 0.5, ymin = 1.65,
                                         xmax = midpoint + 0.5, ymax = 1.75, fill = alt), color = NA) +
-                 scale_fill_manual(values = c(baseColor, "indel" = indel.col)) +
-                 scale_color_manual(values = c(baseColor, "indel" = indel.col))
+                 scale_fill_manual(values = c(baseColor, "Indel" = indel.col)) +
+                 scale_color_manual(values = c(baseColor, "Indel" = indel.col))
         }
         if(geom == "none"){
             p <- ggplot() + annotate("text", x = mean(.xlim), y = 0,

@@ -4,20 +4,20 @@
 \title{Plot stacked overview}
 \usage{
 plotStackedOverview(obj, ..., xlab, ylab, main, geom = "rect",
-                         cytoband = FALSE, rescale = TRUE,
+                         cytobands = FALSE, rescale = TRUE,
                          rescale.range = c(0, 10))
 plotKaryogram(obj, ..., xlab, ylab, main, geom = "rect",
-                         cytoband = FALSE, rescale = TRUE,
+                         cytobands = FALSE, rescale = TRUE,
                          rescale.range = c(0, 10))
 }
 \description{
-  Plot stacked overview for genome with or without cytoband. It's a
+  Plot stacked overview for genome with or without cytobands. It's a
   wrapper around \code{layout_karyogram}.
 }
 \arguments{
   \item{obj}{
     a \code{GRanges} object, which could contain extra
-    information about cytoband. If it's missing, will ask user to
+    information about cytobands. If it's missing, will ask user to
     provide species information and download proper data set from UCSC.
     If you want an accurate genome mapping, please provide
     \code{seqlengths} with this \code{GRanges} object,otherwise it will
@@ -45,13 +45,13 @@ plotKaryogram(obj, ..., xlab, ylab, main, geom = "rect",
     so you don't have to provide information in \code{aes}, users could specify other supported
     geom works for \code{data.frame}.
   }
-  \item{cytoband}{
-    logical value. Default is \code{FALSE}. If \code{TRUE}, plotting cytoband, this
+  \item{cytobands}{
+    logical value. Default is \code{FALSE}. If \code{TRUE}, plotting cytobands, this
     require your data have arbitrary column as \code{name} and
     \code{gieStain}. the easiest way is to use \code{getIdeogram} to get
-    your data. Notice for this function, when cytoband is \code{TRUE},
-    it will only plot cytoband without overlaying your data. If you
-    really need to overlay extra data on cytoband, please plus
+    your data. Notice for this function, when cytobands is \code{TRUE},
+    it will only plot cytobands without overlaying your data. If you
+    really need to overlay extra data on cytobands, please plus
     \code{layout_karyogram} for that purpose.
   }
   \item{rescale}{
@@ -113,7 +113,7 @@ values(dn)$score <- rnorm(length(dn))
 
 ## plotStackedOverview is a simple wrapper around this functions to
    create a stacked layout
-plotStackedOverview(new.ideo, cytoband = TRUE)
+plotStackedOverview(new.ideo, cytobands = TRUE)
 
 plotStackedOverview(dn)
 plotStackedOverview(dn, aes(color = exReg, fill = exReg))
@@ -126,7 +126,7 @@ plotStackedOverview(dn, aes(x = midpoint, y = score), geom = "line", rescale = F
 
 ## no object? will ask you for species and query the data on the fly
 plotStackedOverview()
-plotStackedOverview(cytoband = TRUE)
+plotStackedOverview(cytobands = TRUE)
 }
 }
 

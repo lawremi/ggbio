@@ -3,22 +3,22 @@
 \alias{Ideogram-class}
 \alias{plotIdeogram}
 \alias{+,Ideogram,ANY-method}
-\title{Plot single chromosome with cytoband}
+\title{Plot single chromosome with cytobands}
 \usage{
 
 plotIdeogram(obj, subchr = NULL, zoom.region = NULL, which = NULL, xlab, ylab, main, xlabel =
                  FALSE, color = "red", fill = "red", alpha = 0.7,
                  zoom.offset = 0.2, size = 1,
-                 cytoband = TRUE, aspect.ratio = 1/20, genome)
+                 cytobands = TRUE, aspect.ratio = 1/20, genome)
 
 ## constructor
 Ideogram(obj, subchr = NULL, which = NULL, xlabel = FALSE,
-                 cytoband = TRUE, color = "red", fill = "red", alpha =
+                 cytobands = TRUE, color = "red", fill = "red", alpha =
                  0.7, zoom.region = NULL, zoom.offset = 0.2, size = 1,
                  aspect.ratio = 1/20, ..., genome)
 }
 \description{
-  Plot single chromosome with cytoband.
+  Plot single chromosome with cytobands.
 }
 \details{
   User could provide the whole ideogram and use subchr to point to
@@ -31,7 +31,7 @@ Ideogram(obj, subchr = NULL, which = NULL, xlabel = FALSE,
 \arguments{
   \item{obj}{
     A \code{GenomicRanges} object, which include extra
-    information about cytoband, check biovizBase::isIdeogram.
+    information about cytobands, check biovizBase::isIdeogram.
   }
   \item{subchr}{
     A single character of chromosome names to show.
@@ -69,8 +69,8 @@ Ideogram(obj, subchr = NULL, which = NULL, xlabel = FALSE,
   \item{size}{
     size for zoomed region rectangle boundary.
   }
-  \item{cytoband}{
-    If FALSE, plot just blank chromosome without cytoband. default is TRUE.
+  \item{cytobands}{
+    If FALSE, plot just blank chromosome without cytobands. default is TRUE.
 es  }
   \item{aspect.ratio}{
     aspect ratio for the chromosome ideogram plot, default is NULL.

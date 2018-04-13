@@ -7,14 +7,14 @@
 }
 \usage{
 \S4method{layout_karyogram}{GRanges}(data, ..., xlab, ylab, main,
-          facets = seqnames ~ ., cytoband = FALSE, geom = "rect",
+          facets = seqnames ~ ., cytobands = FALSE, geom = "rect",
           stat = NULL, ylim = NULL, rect.height = 10)
 
 }
 \arguments{
   \item{data}{
     a \code{GRanges} object, which could contain extra
-    information about cytoband. If you want an accurate genome mapping, please provide
+    information about cytobands. If you want an accurate genome mapping, please provide
     \code{seqlengths} with this \code{GRanges} object,otherwise it will
     emit a warning and use data space to estimate the chromosome space
     which is very rough.
@@ -34,7 +34,7 @@
   \item{facets}{
     faceting formula to use.
   }
-  \item{cytoband}{
+  \item{cytobands}{
     logical value indicate to show the cytobands or not.
   }
   \item{geom}{
@@ -71,7 +71,7 @@ getOption("biovizBase")$cytobandColor
 ###################################################
 ### code chunk number 2: default
 ###################################################
-autoplot(hg19IdeogramCyto, layout = "karyogram", cytoband = TRUE)
+autoplot(hg19IdeogramCyto, layout = "karyogram", cytobands = TRUE)
 
 
 
@@ -81,7 +81,7 @@ autoplot(hg19IdeogramCyto, layout = "karyogram", cytoband = TRUE)
 library(GenomicRanges)
 hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X", "Y")))
 head(hg19)
-autoplot(hg19, layout = "karyogram", cytoband = TRUE)
+autoplot(hg19, layout = "karyogram", cytobands = TRUE)
 
 
 ###################################################
@@ -91,7 +91,7 @@ library(GenomicRanges)
 ## it's a 'ideogram'
 biovizBase::isIdeogram(hg19)
 ## set to FALSE
-autoplot(hg19, layout = "karyogram", cytoband = FALSE, aes(fill = gieStain)) +
+autoplot(hg19, layout = "karyogram", cytobands = FALSE, aes(fill = gieStain)) +
   scale_fill_giemsa()
 
 
@@ -150,9 +150,9 @@ autoplot(dn2, layout = "karyogram", aes(color = exReg, fill = exReg))
 ### code chunk number 10: low-default
 ###################################################
 ## plot ideogram
-p <- ggplot(hg19) + layout_karyogram(cytoband = TRUE)
+p <- ggplot(hg19) + layout_karyogram(cytobands = TRUE)
 p
-## eqevelant autoplot(hg19, layout = "karyogram", cytoband = TRUE)
+## eqevelant autoplot(hg19, layout = "karyogram", cytobands = TRUE)
 
 
 ###################################################

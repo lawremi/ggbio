@@ -11,7 +11,7 @@ setClass("Ideogram", contains = c("GGbio"),
              zoom.region = "numeric_OR_NULL",
              zoom.offset = "numeric"))
 
-Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband = TRUE,
+Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytobands = TRUE,
                      color = "red", fill = "red", alpha = 0.7,
                      zoom.region = NULL,
                      zoom.offset = 0.2, size = 1,
@@ -38,9 +38,9 @@ Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband 
     if(length(unique(as.character(seqnames(obj))))>1)
         stop("Mulptiple chromosome information found")
     if(!biovizBase::isIdeogram(obj))
-        cytoband <- FALSE
+        cytobands <- FALSE
 
-    p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, geom = NULL)
+    p <- ggplot() + layout_karyogram(obj, cytoband = cytobands, geom = NULL)
     ## p.ideo <- p
 
     if(length(zoom.region)){
@@ -69,7 +69,7 @@ Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytoband 
         p <- p + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 
     new("Ideogram", ggbio(p, data = obj.ori, ...), subchr = subchr, xlabel = xlabel,
-        cytoband = cytoband, color = color, fill = fill, alpha = alpha,
+        cytoband = cytobands, color = color, fill = fill, alpha = alpha,
         zoom.offset = zoom.offset, size = size, aspect.ratio = aspect.ratio,
         zoom.region=zoom.region)
 }
@@ -103,7 +103,7 @@ setMethod("print", "Ideogram", function(x){
     if(!biovizBase::isIdeogram(obj))
         cytoband <- FALSE
 
-    p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, geom = NULL)
+    p <- ggplot() + layout_karyogram(obj, cytobands = cytoband, geom = NULL)
     ## p.ideo <- p
 
     if(length(zoom.region)){
@@ -143,7 +143,7 @@ plotIdeogram <- function(obj, subchr = NULL, zoom.region = NULL, which = NULL,
                          xlab, ylab, main, xlabel = FALSE,
                          color = "red", fill = "red", alpha = 0.7,
                          zoom.offset = 0.2, size = 1,
-                         cytoband = TRUE, aspect.ratio = 1/20, genome){
+                         cytobands = TRUE, aspect.ratio = 1/20, genome){
     if(!is.null(which) && is(which, "GRanges")){
         if(length(which) > 1){
             message("only first region used")
@@ -163,7 +163,8 @@ plotIdeogram <- function(obj, subchr = NULL, zoom.region = NULL, which = NULL,
                   size = size,
                   zoom.region = zoom.region,
                   zoom.offset = zoom.offset,
-                  genome = genome)
+                  genome = genome,
+                  cytobands = cytobands)
 
     if(!missing(xlab)){
         p <- p + ggplot2::xlab(xlab)

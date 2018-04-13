@@ -3,7 +3,7 @@ setGeneric("layout_karyogram", function(data,...)
 setMethod("layout_karyogram", "GRanges",
           function(data,..., xlab, ylab, main,
                    facets = seqnames ~ .,
-                   cytoband = FALSE,
+                   cytobands = FALSE,
                    geom = "rect", stat = NULL, ylim = NULL,
                    rect.height = 10
                    ) {
@@ -34,7 +34,7 @@ setMethod("layout_karyogram", "GRanges",
             }
 
             ## check facets
-            if(cytoband){
+            if(cytobands){
               geom <- NULL
               cytobandColor <- getOption("biovizBase")$cytobandColor
               if(!isIdeogram(data))
@@ -255,7 +255,7 @@ setMethod("layout_karyogram", "GRanges",
 ## ##        For "Overview"
 ## ## ======================================================================
 plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
-                         cytoband = FALSE, rescale = TRUE, rescale.range = c(0, 10)){
+                         cytobands = FALSE, rescale = TRUE, rescale.range = c(0, 10)){
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
@@ -268,7 +268,7 @@ plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
     idx <- order(seqlengths(obj), decreasing = TRUE)
     nms <- names(seqlengths(obj))[idx]
     obj <- keepSeqlevels(obj, nms)
-    p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, facets = facets, geom =  NULL)
+    p <- ggplot() + layout_karyogram(obj, cytobands = cytobands, facets = facets, geom =  NULL)
   }else{
   if(!is(obj, "GRanges"))
     stop("only GRanges supported now")
@@ -279,10 +279,10 @@ plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
       rescale(values(obj)[, as.character(args.aes$y)],rescale.range)
 
   }}
-  p <- ggplot() + layout_karyogram(obj, cytoband = cytoband, facets = facets, geom = NULL)
+  p <- ggplot() + layout_karyogram(obj, cytobands = cytobands, facets = facets, geom = NULL)
   args.non$geom <- geom
   args.non$facets <- facets
-  if(!cytoband){
+  if(!cytobands){
     args.res <- c(list(data = obj), list(do.call(aes, args.aes)),args.non)
     p <- p + do.call(layout_karyogram,args.res)
   }

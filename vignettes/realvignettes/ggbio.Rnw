@@ -775,12 +775,12 @@ data(ideoCyto, package = "biovizBase")
 autoplot(seqinfo(ideoCyto$hg19), layout = "karyogram")
 @
 
-To show cytoband, your data need to have cytoband information, we stored some data for you, including \textit{hg19, hg18, mm10, mm9}.
+To show cytobands, your data need to have cytoband information, we stored some data for you, including \textit{hg19, hg18, mm10, mm9}.
 
 <<fig.width = 5, fig.height = 4>>=
-## turn on cytoband if it exists
+## turn on cytobands if present
 biovizBase::isIdeogram(ideoCyto$hg19)
-autoplot(ideoCyto$hg19, layout = "karyogram", cytoband = TRUE)
+autoplot(ideoCyto$hg19, layout = "karyogram", cytobands = TRUE)
 @
 
 To change order or only show a subset of the karyogram, you have to manipulate \Rfunction{seqlevels}, please check out manual for \Rfunction{keepSeqlevels, seqlevels} in \Biocpkg{GenomicRanges} package for more information. Or you could read the example below.

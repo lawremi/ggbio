@@ -20,7 +20,7 @@ setMethod("geom_bar", "GRanges", function(data,..., xlab, ylab, main){
         stop("missing y values in aes(), or please provide a column named 'score'")
       }
     }
-    .y <- as.character(args.aes$y)
+    .y <- quo_name(args.aes$y)
     ylab <- .y
     args.aes <- args.aes[names(args.aes) != "y"]
     

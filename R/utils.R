@@ -14,31 +14,31 @@ setMethod("getLimits", "ggbioPlot", function(obj){
   x <- y <- xmin <- ymin <- xmax <- ymax <- xend <- yend <- NULL
   ## x
   if(!is.null(obj$mapping$x) && length(obj$data))
-    x <- eval(obj$mapping$x, obj$data)
+    x <- eval_tidy(obj$mapping$x, obj$data)
   if(!is.null(obj$mapping$x) && length(obj$data))
-    x <- eval(obj$mapping$x, obj$data)
+    x <- eval_tidy(obj$mapping$x, obj$data)
   ## y
   if(!is.null(obj$mapping$y) && length(obj$data))
-    y <- eval(obj$mapping$y, obj$data)
+    y <- eval_tidy(obj$mapping$y, obj$data)
 
   if(!is.null(obj$mapping$xmin) && length(obj$data))
-    xmin <- eval(obj$mapping$xmin, obj$data)
+    xmin <- eval_tidy(obj$mapping$xmin, obj$data)
 
 
   if(!is.null(obj$mapping$ymin) && length(obj$data))
-    ymin <- eval(obj$mapping$ymin, obj$data)
+    ymin <- eval_tidy(obj$mapping$ymin, obj$data)
 
   if(!is.null(obj$mapping$xmax) && length(obj$data))
-    xmax <- eval(obj$mapping$xmax, obj$data)
+    xmax <- eval_tidy(obj$mapping$xmax, obj$data)
 
   if(!is.null(obj$mapping$ymax) && length(obj$data))
-    ymax <- eval(obj$mapping$ymax, obj$data)
+    ymax <- eval_tidy(obj$mapping$ymax, obj$data)
 
   if(!is.null(obj$mapping$xend) && length(obj$data))
-    xend <- eval(obj$mapping$xend, obj$data)
+    xend <- eval_tidy(obj$mapping$xend, obj$data)
 
   if(!is.null(obj$mapping$yend) && length(obj$data))
-    yend <- eval(obj$mapping$yend, obj$data)
+    yend <- eval_tidy(obj$mapping$yend, obj$data)
   else
     yend <- NULL
 
@@ -125,42 +125,42 @@ getLimitsFromLayer <- function(obj){
       dt <- obj$data
     if(!is.null(layer$mapping)){
     if(!is.null(layer$mapping$x))
-      x <- eval(layer$mapping$x, dt)
+      x <- eval_tidy(layer$mapping$x, dt)
     else
       x <- NULL
 
     if(!is.null(layer$mapping$y))
-      y <- eval(layer$mapping$y, dt)
+      y <- eval_tidy(layer$mapping$y, dt)
     else
       y <- NULL
 
     if(!is.null(layer$mapping$xmin))
-      xmin <- eval(layer$mapping$xmin, dt)
+      xmin <- eval_tidy(layer$mapping$xmin, dt)
     else
       xmin <- NULL
 
     if(!is.null(layer$mapping$ymin))
-      ymin <- eval(layer$mapping$ymin, dt)
+      ymin <- eval_tidy(layer$mapping$ymin, dt)
     else
       ymin <- NULL
 
     if(!is.null(layer$mapping$xmax))
-      xmax <- eval(layer$mapping$xmax, dt)
+      xmax <- eval_tidy(layer$mapping$xmax, dt)
     else
       xmax <- NULL
 
     if(!is.null(layer$mapping$ymax))
-      ymax <- eval(layer$mapping$ymax, dt)
+      ymax <- eval_tidy(layer$mapping$ymax, dt)
     else
       ymax <- NULL
 
     if(!is.null(layer$mapping$xend))
-      xend <- eval(layer$mapping$xend, dt)
+      xend <- eval_tidy(layer$mapping$xend, dt)
     else
       xend <- NULL
 
     if(!is.null(layer$mapping$yend))
-      yend <- eval(layer$mapping$yend, dt)
+      yend <- eval_tidy(layer$mapping$yend, dt)
     else
       yend <- NULL
 
@@ -187,9 +187,9 @@ evalLan <- function(obj){
   x <- obj$mapping$x
   y <- obj$mapping$y
   xlim <- ylim <- NULL
-  if(is.language(x) & is.language(y)){
-    xlim <- range(eval(x))
-    ylim <- range(eval(y))
+  if(is_quosure(x) & is_quosure(y)){
+    xlim <- range(eval_tidy(x))
+    ylim <- range(eval_tidy(y))
   }
   list(xlim = xlim, ylim = ylim)
 }

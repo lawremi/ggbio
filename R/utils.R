@@ -841,3 +841,9 @@ zoomLevelToGeom <- function(zoomLevel, track = c("BSgenome",
                    })
     geom
 }
+
+by2 <- function(...) {
+    ans <- by(...)
+    class(ans) <- "list"
+    ans
+}

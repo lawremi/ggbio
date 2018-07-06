@@ -245,7 +245,7 @@ setMethod("+", c("GGbio"), function(e1, e2){
             object <- e2
         }
 
-        res <- ggplot2:::add_ggplot(e1@ggplot, object, e2name)
+        res <- ggplot_add(object, e1@ggplot, e2name)
         e1@ggplot <- res
 
         return(e1)

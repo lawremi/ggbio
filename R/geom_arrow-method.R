@@ -68,7 +68,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
       args.aes$y <- args.aes$yend <- as.name("stepping")
 
       ## need to split to two direction/maybe three?
-      p <- by(res, res$strand, function(x){
+      p <- by2(res, res$strand, function(x){
         s <- unique(as.character(x$strand))
         p <- switch(s,
                     "+" = {
@@ -130,7 +130,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
       })
       res <- do.call(rbind,lst)
 
-      p <- by(res, res$strand, function(x){
+      p <- by2(res, res$strand, function(x){
         s <- unique(as.character(x$strand))        
         p <- switch(s,
                     "+" = {

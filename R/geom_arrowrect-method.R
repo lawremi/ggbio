@@ -29,7 +29,7 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
       res <- endoapply(grl,
                        function(dt){
                          if("group" %in% names(args.aes))
-                           dt <- addStepping(dt, group.name = as.character(args.aes$group),
+                           dt <- addStepping(dt, group.name = quo_name(args.aes$group),
                                               group.selfish = group.selfish)
                          else
                            dt <- addStepping(dt)
@@ -47,9 +47,9 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
       if(!"y" %in% names(args.aes))
         stop("aes(y = ) is requried for stat identity")
       if(is.null(rect.height)){
-         rect.height <- diff(range(values(data)[,as.character(args.aes$y)]))/20
+         rect.height <- diff(range(values(data)[,quo_name(args.aes$y)]))/20
       }
-      df <- breakGrTo5polyDf(data, y = as.character(args.aes$y), rect.height = rect.height,
+      df <- breakGrTo5polyDf(data, y = quo_name(args.aes$y), rect.height = rect.height,
                              arrow.head = arrow.head, arrow.head.rate = arrow.head.rate, arrow.head.fix = arrow.head.fix)
       args.aes$x <- as.name(".temp.x")
       args.aes$y <- as.name(".temp.y")

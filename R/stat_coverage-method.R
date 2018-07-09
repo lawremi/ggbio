@@ -26,7 +26,8 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
     facets <- as.formula(~seqnames)
   facets <- strip_formula_dots(facets)
   ## need to get variables from all mapping not just facet
-  allvars <- unique(c(all.vars(as.formula(facets)), as.character(args.aes)))
+  allvars <- unique(c(all.vars(as.formula(facets)),
+                      vapply(args.aes, quo_name, character(1L))))
   ## getting variables need to be kept for aesthetic mapping
   allvars.extra <- allvars[!allvars %in% c(".", "seqnames", "strand", "coverage")]
   lst <- lapply(grl, function(dt){

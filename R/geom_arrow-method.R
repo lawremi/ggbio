@@ -36,7 +36,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
         res <- endoapply(grl,
                          function(dt){
                            if("group" %in% names(args.aes))
-                             dt <- addStepping(dt, group.name = as.character(args.aes$group),
+                             dt <- addStepping(dt, group.name = quo_name(args.aes$group),
                                                group.selfish = group.selfish)
                            else
                              dt <- addStepping(dt)

@@ -15,7 +15,7 @@ setMethod("layout_karyogram", "GRanges",
             if(is.null(ylim)){
               ## compute y lim from data
               if("y" %in% names(args.aes)){
-                .y <- values(data)[, as.character(args.aes$y)]
+                .y <- values(data)[, quo_name(args.aes$y)]
                 .y.r <- range(.y)
                 .ideo.range <- expand_range(.y.r, mul = 0.05)
               }else{
@@ -23,11 +23,11 @@ setMethod("layout_karyogram", "GRanges",
               }
             }else{
               if("y" %in% names(args.aes)){
-                .y <- values(data)[, as.character(args.aes$y)]
+                .y <- values(data)[, quo_name(args.aes$y)]
                 .y <- scales::rescale(.y, to = ylim)
                 .y.r <- range(.y)
                 .ideo.range <- expand_range(.y.r, mul = 0.05)
-                values(data)[, as.character(args.aes$y)] <- .y
+                values(data)[, quo_name(args.aes$y)] <- .y
               }else{
               .ideo.range <- ylim
             }
@@ -275,8 +275,8 @@ plotStackedOverview <- function(obj, ..., xlab, ylab, main, geom = "rect",
   ## tweak with y
   if(rescale){
   if("y" %in% names(args.aes)){
-    values(obj)[, as.character(args.aes$y)] <-
-      rescale(values(obj)[, as.character(args.aes$y)],rescale.range)
+    values(obj)[, quo_name(args.aes$y)] <-
+      rescale(values(obj)[, quo_name(args.aes$y)],rescale.range)
 
   }}
   p <- ggplot() + layout_karyogram(obj, cytobands = cytobands, facets = facets, geom = NULL)

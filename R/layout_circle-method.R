@@ -64,9 +64,13 @@ setMethod("layout_circle",  "GRanges",
   ## idoegram parse seqlengths
   if(geom == "ideogram"){
     data <- getIdeoGR(data)
-    res <- transformToRectInCircle(data, y = as.character(args.aes$y),
-                    space.skip = space.skip, trackWidth = trackWidth, radius = radius,
-                    direction = direction, n = rect.inter.n, chr.weight = chr.weight)
+    res <- transformToRectInCircle(data,
+                                   y = if (!is.null(args.aes$y))
+                                       quo_name(args.aes$y),
+                                   space.skip = space.skip,
+                                   trackWidth = trackWidth, radius = radius,
+                                   direction = direction,
+                                   n = rect.inter.n, chr.weight = chr.weight)
     names(res) <- NULL
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
@@ -96,18 +100,20 @@ setMethod("layout_circle",  "GRanges",
   if(geom == "text"){
     obj <- transformToGenome(data, space.skip, chr.weight = chr.weight)
     if("label" %in% names(args.aes)){
-      lbs <- as.character(args.aes$label)
+      lbs <- quo_name(args.aes$label)
       if(!lbs %in% c(colnames(mold(obj[1,])),"start", "end", "seqnames","width"))
         stop("label must be one of column names")
     }else{
       stop("missing label argument in aes()")
     }
-    obj <- transformToCircle(obj, y = as.character(args.aes$y), radius= radius, ylim = ylim,
+    obj <- transformToCircle(obj,
+                             y = if(!is.null(args.aes$y)) quo_name(args.aes$y),
+                             radius= radius, ylim = ylim,
                              trackWidth = trackWidth,
-                     direction = direction)
+                             direction = direction)
     ## compute angle
     if("angle" %in% names(args.aes)){
-      ags <- eval(args.aes$angle, data)
+      ags <- eval_tidy(args.aes$angle, data)
       ags <-  - values(obj)$.circle.angle * 180 / pi + ags
       values(obj)$.processed.angle <- ags
       args.aes$angle <- as.name(".processed.angle")
@@ -139,7 +145,7 @@ setMethod("layout_circle",  "GRanges",
       .y <- 1
       warning("y is missing in aes(), use equal y")
     }else{
-      .y <- as.character(args.aes$y)
+      .y <- quo_name(args.aes$y)
     }
     obj <- transformToCircle(obj, y = .y, radius= radius, trackWidth = trackWidth, ylim = ylim,
                      direction = direction)
@@ -157,9 +163,11 @@ setMethod("layout_circle",  "GRanges",
     if(!"y" %in% names(args.aes))
       stop("y is missing in aes()")
     obj <- transformToGenome(data, space.skip, chr.weight = chr.weight)
-    obj <- transformToCircle(obj, y = as.character(args.aes$y), ylim = ylim,
-                             radius= radius, trackWidth = trackWidth,
-                     direction = direction)
+    obj <- transformToCircle(obj,
+                             y = if (!is.null(args.aes$y))
+                                 quo_name(args.aes$y), ylim = ylim,
+                             radius = radius, trackWidth = trackWidth,
+                             direction = direction)
     names(obj) <- NULL
     df <- as.data.frame(obj)
     args.aes$y <- as.name(".circle.y")
@@ -172,9 +180,13 @@ setMethod("layout_circle",  "GRanges",
   }
 
   if(geom == "segment"){
-    res <- transformToSegInCircle(data, y = as.character(args.aes$y),
-                    space.skip = space.skip, trackWidth = trackWidth,
-                    radius = radius, direction = direction, chr.weight = chr.weight)
+      res <- transformToSegInCircle(data,
+                                    y = if (!is.null(args.aes$y))
+                                        quo_name(args.aes$y),
+                                    space.skip = space.skip,
+                                    trackWidth = trackWidth,
+                                    radius = radius, direction = direction,
+                                    chr.weight = chr.weight)
     names(res) <- NULL
     df <- as.data.frame(res)
     args.aes$y <- as.name(".circle.y")
@@ -187,9 +199,14 @@ setMethod("layout_circle",  "GRanges",
   }
 
   if(geom == "heatmap"){
-    res <- biovizBase:::transformToSegInCircle2(data, y = as.character(args.aes$y),
-                    space.skip = space.skip, trackWidth = trackWidth,
-                    radius = radius, direction = direction, chr.weight = chr.weight)
+      res <- biovizBase:::transformToSegInCircle2(data,
+                                                  y = if (!is.null(args.aes$y))
+                                                      quo_name(args.aes$y),
+                                                  space.skip = space.skip,
+                                                  trackWidth = trackWidth,
+                                                  radius = radius,
+                                                  direction = direction,
+                                                  chr.weight = chr.weight)
     names(res) <- NULL
     df <- as.data.frame(res)
     args.aes$y <- as.name(".circle.y")
@@ -229,7 +246,7 @@ setMethod("layout_circle",  "GRanges",
     ## aes <- do.call("aes", args.aes)
     args.aes.text <- args.aes[!names(args.aes) %in% c("xend", "yend")]
     if("angle" %in% names(args.aes)){
-      ags <- eval(args.aes$angle, data)
+      ags <- eval_tidy(args.aes$angle, data)
       ags <- 90 - res$.circle.angle * 180 / pi + ags
       res$.processed.angle <- ags
       args.aes.text$angle <- as.name(".processed.angle")
@@ -253,9 +270,13 @@ setMethod("layout_circle",  "GRanges",
   }
 
   if(geom == "rect"){
-    res <- transformToRectInCircle(data, y = as.character(args.aes$y),
-                    space.skip = space.skip, trackWidth = trackWidth, radius = radius,
-                    direction = direction, n = rect.inter.n, chr.weight = chr.weight)
+      res <- transformToRectInCircle(data,
+                                     y = if (!is.null(args.aes$y))
+                                         quo_name(args.aes$y),
+                                     space.skip = space.skip,
+                                     trackWidth = trackWidth, radius = radius,
+                                     direction = direction, n = rect.inter.n,
+                                     chr.weight = chr.weight)
     names(res) <- NULL
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)
@@ -277,9 +298,13 @@ setMethod("layout_circle",  "GRanges",
   }
 
   if(geom == "bar"){
-    res <- transformToBarInCircle(data, y = as.character(args.aes$y),
-                    space.skip = space.skip, trackWidth = trackWidth, radius = radius,
-                    direction = direction, n = rect.inter.n, chr.weight = chr.weight)
+      res <- transformToBarInCircle(data,
+                                    y = if (!is.null(args.aes$y))
+                                        quo_name(args.aes$y),
+                                    space.skip = space.skip,
+                                    trackWidth = trackWidth, radius = radius,
+                                    direction = direction, n = rect.inter.n,
+                                    chr.weight = chr.weight)
     names(res) <- NULL
     df <- as.data.frame(res)
     idx <- order(df$.biovizBase.group, df$.int.id)

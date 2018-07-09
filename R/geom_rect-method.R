@@ -38,7 +38,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
     res <- endoapply(grl,
                      function(dt){
                        if("group" %in% names(args.aes))
-                         dt <- addStepping(dt, group.name = as.character(args.aes$group),
+                         dt <- addStepping(dt, group.name = quo_name(args.aes$group),
                                             group.selfish = group.selfish,
                                            extend.size = es)
                        else
@@ -50,7 +50,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
     args.aes <- args.aes[!(names(args.aes) %in% c("xmin", "xmax", "ymin", "ymax", "data"))]
     args.non <- args.non[!(names(args.non) %in% c("xmin", "xmax", "ymax", "ymax", "data"))]
     if("group" %in% names(args.aes))
-      gpn <- as.character(args.aes$group)
+      gpn <- quo_name(args.aes$group)
     else
       gpn <- "stepping"
     ## overcome 1 pixel problem

@@ -62,7 +62,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
             res <- endoapply(grl,
                              function(dt){
                                  if("group" %in% names(args.aes)){
-                                     dt <- addStepping(dt, group.name = as.character(args.aes$group),
+                                     dt <- addStepping(dt, group.name = quo_name(args.aes$group),
                                                        group.selfish = group.selfish,
                                                        extend.size = es)
                                  }else{
@@ -74,7 +74,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
             df <- mold(res)
 
             if("group" %in% names(args.aes))
-                gpn <- as.character(args.aes$group)
+                gpn <- quo_name(args.aes$group)
             else
                 gpn <- "stepping"
 
@@ -442,7 +442,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
     ## facet <- .buildFacetsFromArgs(data, args.facets)
 
     if("type" %in% names(args.aes)){
-        .type <- as.character(args.aes$type)
+        .type <- quo_name(args.aes$type)
     }else{
         .type <- NULL
     }
@@ -479,7 +479,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
 
 
     if("type" %in% names(args.aes)){
-        .type <- as.character(args.aes$type)
+        .type <- quo_name(args.aes$type)
         args.aes <- args.aes[names(args.aes) != "type"]
     }else{
         .type <- "type"

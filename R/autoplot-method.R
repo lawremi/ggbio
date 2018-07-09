@@ -192,7 +192,7 @@ setMethod("autoplot", "GRangesList", function(object, ...,
     if(is.null(geom) & is.null(stat))
         geom <- "alignment"
     if("type" %in% names(args.aes)){
-        .type <- as.character(args.aes$type)
+        .type <- quo_name(args.aes$type)
     }else{
         .type <- NULL
     }
@@ -1673,8 +1673,8 @@ setMethod("autoplot", "matrix", function(object, ...,
             }
             x <- seq_len(ncol(object))
             idx <- match(x, df$x)
-            x <- eval(args.aes$x, df)[idx]
-            x <- eval(args.aes$x, df)[idx]
+            x <- eval_tidy(args.aes$x, df)[idx]
+            x <- eval_tidy(args.aes$x, df)[idx]
             p <- p + scale_x_continuous(breaks = x, labels = x.lab, expand = c(0, 0))
         }
         p

@@ -30,7 +30,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
     res <- endoapply(grl,
                      function(dt){
                        if("group" %in% names(args.aes))
-                         dt <- addStepping(dt, group.name = as.character(args.aes$group),
+                         dt <- addStepping(dt, group.name = quo_name(args.aes$group),
                                             group.selfish = group.selfish,
                                            extend.size = es)
                        else
@@ -42,7 +42,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
     args.aes <- args.aes[!(names(args.aes) %in% c("x", "xend", "y", "yend", "data"))]
     args.non <- args.non[!(names(args.non) %in% c("x", "xend", "yend", "yend", "data"))]
     if("group" %in% names(args.aes))
-      gpn <- as.character(args.aes$group)
+      gpn <- quo_name(args.aes$group)
     else
       gpn <- "stepping"
     args.aes <- args.aes[names(args.aes) != "group"]

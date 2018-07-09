@@ -30,7 +30,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
 
   if(!length(y) && "y" %in% names(args.aes))
-    y <- as.character(args.aes$y)
+    y <- quo_name(args.aes$y)
     
   if(!("scales" %in% names(args.facets)))
     args.facets$scales <- "free_x"

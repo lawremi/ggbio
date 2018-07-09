@@ -8,18 +8,18 @@ setMethod("geom_arch", "data.frame", function(data, ...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   if("y" %in% names(args.aes))
-    y.name <- as.character(args.aes$y)
+    y.name <- quo_name(args.aes$y)
   else
     y.name <- NULL
   
   ## check required argument
   if(!all(c("x", "xend") %in% names(args.aes)))
     stop("x, xend, are requried in aes(), need to be passed into geom_arch()")
-  startX <- eval(args.aes$x, data)
-  endX <- eval(args.aes$xend, data)
+  startX <- eval_tidy(args.aes$x, data)
+  endX <- eval_tidy(args.aes$xend, data)
   if("height" %in% names(args.aes)){
   if(!is.numeric(args.aes$height)){
-    h <- eval(args.aes$height, data)
+    h <- eval_tidy(args.aes$height, data)
   }else{
     if(length(args.aes$height) == 1)
       h <- rep(args.aes$height, length(startX))
@@ -29,7 +29,7 @@ setMethod("geom_arch", "data.frame", function(data, ...,
      h <- rep(max.height, length(startX))
   }
   if("y" %in% names(args.aes))
-    y <- eval(args.aes$y, data)
+    y <- eval_tidy(args.aes$y, data)
   else
     y <- rep(0, length(startX))
   args.aes2 <- args.aes[!(names(args.aes) %in% c("x", "y", "group",
@@ -68,7 +68,7 @@ setMethod("geom_arch", "data.frame", function(data, ...,
     reslst <- c(list(data = apoint), list(aesres),args.non)
     p <- do.ggcall(geom_line, reslst)
     if("ylab" %in% names(args.non)){
-      ylab <- as.character(args.non$ylab)
+      ylab <- quo_name(args.non$ylab)
     }else if(length(y.name)){
       ylab <- y.name
     }else{
@@ -100,14 +100,14 @@ setMethod("geom_arch", "GRanges", function(data, ...,
   ## need to make sure they are connected by two nearest point of rectangle
   df <- mold(data)
   if("height" %in% names(args.aes))
-    signs <- sign(eval(args.aes$height, df))
+    signs <- sign(eval_tidy(args.aes$height, df))
   else
     signs <- 1
   args.aes$x <- substitute(start)
   args.aes$xend <- substitute(end)
   if("y" %in% names(args.aes)){
-    y <- eval(args.aes$y, df)
-    df[,as.character(args.aes$y)] <- df[,as.character(args.aes$y)] + rect.height * signs
+    y <- eval_tidy(args.aes$y, df)
+    df[,quo_name(args.aes$y)] <- df[,quo_name(args.aes$y)] + rect.height * signs
   }else{
     df$.y <- rep(0, nrow(df)) + rect.height * signs
     args.aes$y <- substitute(.y)
@@ -191,19 +191,19 @@ geom_arch_flip <- function(data, ..., n = 25, max.height = 10, bottom = TRUE){
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   if("y" %in% names(args.aes))
-    y.name <- as.character(args.aes$y)
+    y.name <- quo_name(args.aes$y)
   else
     y.name <- NULL
   
   ## check required argument
   if(!all(c("x", "xend") %in% names(args.aes)))
     stop("x, xend, are requried in aes(), need to be passed into geom_arch()")
-  startY <- eval(args.aes$y, data)
-  endY <- eval(args.aes$yend, data)
+  startY <- eval_tidy(args.aes$y, data)
+  endY <- eval_tidy(args.aes$yend, data)
 
   if("height" %in% names(args.aes)){
     if(!is.numeric(args.aes$height)){
-      h <- eval(args.aes$height, data)
+      h <- eval_tidy(args.aes$height, data)
     }else{
       if(length(args.aes$height) == 1)
         h <- rep(args.aes$height, length(startY))
@@ -213,7 +213,7 @@ geom_arch_flip <- function(data, ..., n = 25, max.height = 10, bottom = TRUE){
       h <- rep(max.height, length(startY))
     }
   if("x" %in% names(args.aes))
-    x <- eval(args.aes$x, data)
+    x <- eval_tidy(args.aes$x, data)
   else
     x <- rep(0, length(startY))
   args.aes2 <- args.aes[!(names(args.aes) %in% c("x", "y", "group",
@@ -257,7 +257,7 @@ geom_arch_flip <- function(data, ..., n = 25, max.height = 10, bottom = TRUE){
     reslst <- c(list(data = apoint), list(aesres),args.non)
     p <- do.ggcall(geom_polygon, reslst)
     if("ylab" %in% names(args.non)){
-      ylab <- as.character(args.non$ylab)
+      ylab <- quo_name(args.non$ylab)
     }else if(length(y.name)){
       ylab <- y.name
     }else{
@@ -277,19 +277,19 @@ geom_arch_flip2 <- function(data, ..., n = 25, max.height = 10, bottom = FALSE){
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   if("y" %in% names(args.aes))
-    y.name <- as.character(args.aes$y)
+    y.name <- quo_name(args.aes$y)
   else
     y.name <- NULL
   
   ## check required argument
   if(!all(c("x", "xend") %in% names(args.aes)))
     stop("x, xend, are requried in aes(), need to be passed into geom_arch()")
-  startY <- eval(args.aes$y, data)
-  endY <- eval(args.aes$yend, data)
+  startY <- eval_tidy(args.aes$y, data)
+  endY <- eval_tidy(args.aes$yend, data)
   
   if("height" %in% names(args.aes)){
     if(!is.numeric(args.aes$height)){
-      h <- eval(args.aes$height, data)
+      h <- eval_tidy(args.aes$height, data)
     }else{
       if(length(args.aes$height) == 1)
         h <- rep(args.aes$height, length(startY))
@@ -299,7 +299,7 @@ geom_arch_flip2 <- function(data, ..., n = 25, max.height = 10, bottom = FALSE){
       h <- rep(max.height, length(startY))
     }
   if("x" %in% names(args.aes))
-    x <- eval(args.aes$x, data)
+    x <- eval_tidy(args.aes$x, data)
   else
     x <- rep(0, length(startY))
   args.aes2 <- args.aes[!(names(args.aes) %in% c("x", "y", "group",
@@ -343,7 +343,7 @@ geom_arch_flip2 <- function(data, ..., n = 25, max.height = 10, bottom = FALSE){
     reslst <- c(list(data = apoint), list(aesres),args.non)
     p <- do.ggcall(geom_path, reslst)
     if("ylab" %in% names(args.non)){
-      ylab <- as.character(args.non$ylab)
+      ylab <- quo_name(args.non$ylab)
     }else if(length(y.name)){
       ylab <- y.name
     }else{

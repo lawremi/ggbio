@@ -35,7 +35,7 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
       }
     }
   }else{
-    if(as.character(args.aes$colour) == "seqnames")
+    if(quo_name(args.aes$colour) == "seqnames")
       args.aes$colour <- as.name("seqnames")
   }
 
@@ -84,7 +84,7 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
       gr <- GRanges(as.character(seqnames(p@data))[id][1],
                     IRanges(start = min(start(p@data[id])),
                               end = max(end(p@data[id]))))
-      val <- max(as.numeric(values(p@data[id])[,as.character(args.aes$y)])) 
+      val <- max(as.numeric(values(p@data[id])[,quo_name(args.aes$y)])) 
       val <- val * (1 + highlight.label.offset)
       values(gr)$val <- val
       gr

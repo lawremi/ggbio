@@ -58,7 +58,7 @@ setMethod("geom_chevron", "GRanges",
             if(stat == "stepping"){
               group.name <- NULL
               if("group" %in% names(args.aes))
-                group.name <- as.character(args.aes$group)
+                group.name <- quo_name(args.aes$group)
               if(!"stepping" %in% colnames(values(data))){
                 if(length(group.name))
                   data <- addStepping(data, group.name = group.name,
@@ -91,7 +91,7 @@ setMethod("geom_chevron", "GRanges",
               p <- c(list(do.ggcall(ggplot2::geom_segment, args.res)), list(ggplot2::ylab("")))
 
               if("group" %in% names(args.aes))
-                gpn <- as.character(args.aes$group)
+                gpn <- quo_name(args.aes$group)
               else
                 gpn <- "stepping"
               

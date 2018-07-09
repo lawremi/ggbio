@@ -260,11 +260,11 @@ filterArgs <- function(fun, args,
   idx <- c("color", "colour") %in% names(args)
   if((any(idx))){
     nms <- c("color", "colour")[idx][1]
-    if(as.character(args[[nms]]) == "strand")
+    if(quo_name(args[[nms]]) == "strand")
       isStrand.color <- TRUE
   }
   if(("fill" %in% names(args))){
-    if(as.character(args$fill) == "strand")
+    if(quo_name(args$fill) == "strand")
       isStrand.fill <- TRUE
   }
   if(isStrand.color)

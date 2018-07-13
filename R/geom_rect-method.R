@@ -48,7 +48,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
     df <- mold(res)
 
     args.aes <- args.aes[!(names(args.aes) %in% c("xmin", "xmax", "ymin", "ymax", "data"))]
-    args.non <- args.non[!(names(args.non) %in% c("xmin", "xmax", "ymax", "ymax", "data"))]
+    args.non <- args.non[!(names(args.non) %in% c("xmin", "xmax", "ymax", "ymax", "data", "facets"))]
     if("group" %in% names(args.aes))
       gpn <- quo_name(args.aes$group)
     else
@@ -108,7 +108,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
         args.aes.seg$yend <- args.aes$ymax
       }
     }else{
-      .y <- args.aes$y
+      .y <- quo_expr(args.aes$y)
       if(is.null(rect.height)){
          rect.height <- diff(range(values(data)[,as.character(.y)]))/20
       }

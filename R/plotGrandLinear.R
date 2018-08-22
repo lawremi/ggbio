@@ -98,7 +98,7 @@ plotGrandLinear <- function(obj, ..., facets, space.skip = 0.01, geom = NULL,
     }
     p <- p +  geom_point(data = mold(p@data[queryHits(idx)]),
                  do.call(aes, list(x = substitute(midpoint),
-                                   y = as.name(args.aes$y))),
+                                   y = args.aes$y)),
                          color = highlight.col)
 
     if(!is.null(highlight.name)){

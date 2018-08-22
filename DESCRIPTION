@@ -1,5 +1,5 @@
 Package: ggbio
-Version: 1.29.3
+Version: 1.29.4
 Title: Visualization tools for genomic data
 Description: The ggbio package extends and specializes the grammar of
         graphics for biological data. The graphics are designed to
@@ -19,7 +19,7 @@ Authors@R: c(person("Tengfei", "Yin", role=c("aut"),
           person("Johannes", "Rainer", role="ctb"))
 Depends: methods, BiocGenerics, ggplot2 (>= 1.0.0)
 Imports: grid, grDevices, graphics, stats, utils, gridExtra, scales, reshape2,
-        gtable, Hmisc, biovizBase (>= 1.23.3), Biobase, S4Vectors (>= 0.13.13),
+        gtable, Hmisc, biovizBase (>= 1.29.2), Biobase, S4Vectors (>= 0.13.13),
         IRanges (>= 2.11.16), GenomeInfoDb (>= 1.1.3),
         GenomicRanges (>= 1.29.14), SummarizedExperiment, Biostrings,
         Rsamtools (>= 1.17.28), GenomicAlignments (>= 1.1.16), BSgenome,

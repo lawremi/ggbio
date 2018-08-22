@@ -22,13 +22,6 @@ opts_chunk$set(fig.path='./figures/ggbio-',
 options(replace.assign=TRUE,width=80)
 @
 
-
-
-<<include=FALSE>>=
-opts_chunk$set(eval=FALSE)
-@
-
-
 \newcommand{\Rfunarg}[1]{{\texttt{#1}}}
 \newcommand{\Bioc}{\software{Bioconductor}}
 \newcommand{\IRanges}{\Biocpkg{IRanges}}

@@ -308,8 +308,8 @@ qplot(wt, mpg, data = mtcars, label = rownames(mtcars), size = wt) +
   geom_text2(colour = "red", fc = c("black", "red"))
 library(grid)
 
-library(BiocInstaller)
-biocLite("FDb.UCSC.snp137common.hg19")
+library(BiocManager)
+BiocManager::install("FDb.UCSC.snp137common.hg19")
 ## load the library
 library(FDb.UCSC.snp137common.hg19)
 ## list the contents that are loaded into memory

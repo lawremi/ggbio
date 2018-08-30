@@ -4,8 +4,9 @@ tutorials and case studies.
 
 # INSTALL
 
-    source("http://bioconductor.org/biocLite.R")
-    biocLite("ggbio")
+    if (!requireNamespace("BiocManager", quietly=TRUE))
+        install.packages("BiocManager")
+    BiocManager::install("ggbio")
     
 
 

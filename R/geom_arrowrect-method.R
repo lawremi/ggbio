@@ -48,6 +48,8 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
         stop("aes(y = ) is requried for stat identity")
       if(is.null(rect.height)){
          rect.height <- diff(range(values(data)[,quo_name(args.aes$y)]))/20
+         if (rect.height == 0)
+           rect.height <- 1L
       }
       df <- breakGrTo5polyDf(data, y = quo_name(args.aes$y), rect.height = rect.height,
                              arrow.head = arrow.head, arrow.head.rate = arrow.head.rate, arrow.head.fix = arrow.head.fix)

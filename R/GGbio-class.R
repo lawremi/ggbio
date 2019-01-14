@@ -6,7 +6,8 @@ GGbio.gen <- setClass("GGbio",
                           cmd = "list",
                           fetchable = "logical",
                           blank = "logical"),
-                      prototype = list(ggplot = NULL, data = NULL, fechable = FALSE, blank = FALSE),
+                      prototype = list(ggplot = NULL, data = NULL,
+                                       fetchable = FALSE, blank = FALSE),
                       contains = "Cache")
 
 

@@ -155,6 +155,7 @@ setMethod("geom_alignment", "TxDbOREnsDb",
 
     args <- list(...)
     ## args$facets <- facets
+    args$names.expr <- names.expr
     args.aes <- parseArgsForAes(args)
     args.non <- parseArgsForNonAes(args)
     aes.args <- do.call(aes, args.aes)

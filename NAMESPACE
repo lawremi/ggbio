@@ -86,7 +86,7 @@ importMethodsFrom(ensembldb, listColumns, exons, exonsBy)
 ## AnnotationFilter
 importClassesFrom(AnnotationFilter, AnnotationFilter, AnnotationFilterList,
                   CharacterFilter, IntegerFilter, GRangesFilter, ExonIdFilter,
-                  ExonNameFilter, GeneIdFilter, GenenameFilter,
+                  ExonNameFilter, GeneIdFilter, GeneNameFilter, GenenameFilter,
                   GeneBiotypeFilter, EntrezFilter, SymbolFilter, TxIdFilter,
                   TxNameFilter, TxBiotypeFilter, ProteinIdFilter, UniprotFilter,
                   SeqNameFilter, SeqStrandFilter, CdsStartFilter, CdsEndFilter,

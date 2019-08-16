@@ -674,7 +674,8 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
             args.label.lst <- list(data = .df.sub,
                                    vjust = 0,
                                    aes.label,
-                                   color = label.color)
+                                   color = label.color,
+                                   inherit.aes = FALSE)
             args.label.res[names(args.label.lst)] <- args.label.lst
 
             p <- c(p , list(do.ggcall(geom_text, args.label.res)))

@@ -424,6 +424,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
                                                     names.expr = NULL,
                                                     label = TRUE,
                                                     label.color = "gray40",
+                                                    label.size = 3,
                                                     arrow.rate = 0.015,
                                                     length = unit(0.1, "cm")){
 
@@ -667,10 +668,9 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
                                            x = substitute(midpoint),
                                            y = substitute(stepping +
                                                cds.rect.h*1.2)))
-            if(!"size" %in% names(args.non))
-                args.non$size <- 2.5
 
             args.label.res <- args.non
+            args.label.res$size <- label.size
             args.label.lst <- list(data = .df.sub,
                                    vjust = 0,
                                    aes.label,

@@ -1,5 +1,5 @@
 Package: ggbio
-Version: 1.35.0
+Version: 1.35.1
 Title: Visualization tools for genomic data
 Description: The ggbio package extends and specializes the grammar of
         graphics for biological data. The graphics are designed to
@@ -28,7 +28,7 @@ Imports: grid, grDevices, graphics, stats, utils, gridExtra, scales, reshape2,
         GGally, ensembldb (>= 1.99.13), AnnotationDbi, AnnotationFilter, rlang
 VignetteBuilder: knitr
 Suggests: vsn, BSgenome.Hsapiens.UCSC.hg19, Homo.sapiens,
-        TxDb.Hsapiens.UCSC.hg19.knownGene, chipseq,
+        TxDb.Hsapiens.UCSC.hg19.knownGene,
         TxDb.Mmusculus.UCSC.mm9.knownGene, knitr, BiocStyle, testthat,
 	EnsDb.Hsapiens.v75, tinytex
 URL: http://tengfei.github.com/ggbio/

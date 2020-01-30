@@ -35,7 +35,6 @@ options(replace.assign=TRUE,width=80)
 \newcommand{\autoplot}{\Rfunction{autoplot}}
 \newcommand{\knitr}{\CRANpackage{knitr}}
 \newcommand{\tracks}{\Rfunction{tracks}}
-\newcommand{\chipseq}{\Biocpkg{chipseq}}
 \newcommand{\gr}{\Rclass{GRanges}}
 
 

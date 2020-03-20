@@ -1,5 +1,6 @@
 setOldClass("options")
 setOldClass("unit")
+setOldClass(c("simpleUnit", "unit"))
 setOldClass("gtable")
 setOldClass("theme")
 setOldClass("gTree")

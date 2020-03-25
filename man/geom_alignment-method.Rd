@@ -37,6 +37,7 @@
                           names.expr = NULL,
                           label = TRUE,
                           label.color = "gray40",
+                          label.size = 3,
                           arrow.rate = 0.015,
                           length = unit(0.1, "cm"))
 
@@ -73,6 +74,9 @@
   }
   \item{label.color}{
     label color.
+  }
+  \item{label.size}{
+    label size.
   }
   \item{arrow.rate}{
     arrow rate.

@@ -120,7 +120,7 @@ ggplot(gr) + geom_arrow(stat = "stepping", aes(y = value, group = pair), group.s
 ## ======================================================================
 library(grid)
 ggplot(gr) + geom_arrow(stat = "stepping", aes(y = value, group = pair),
-                      arrow.rate = 0.01, legnth = unit(0.3, "cm"), agnle = 45,
+                      arrow.rate = 0.01, length = unit(0.3, "cm"), angle = 45,
                       group.selfish = FALSE)
 
 }

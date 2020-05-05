@@ -5,17 +5,22 @@
   scale x by unit 'Mb','kb', 'bp'.
 }
 \usage{
-scale_x_sequnit(unit = c("Mb", "kb", "bp"), append = NULL)
+scale_x_sequnit(unit = c("Mb", "kb", "bp"), append = NULL, ...)
 }
 \arguments{
   \item{unit}{
-    unit to scale x. Default is Mb. 
+    unit to scale x. Default is Mb.
   }
   \item{append}{
-    default \code{NULL}. If pass a character, it disalbe unit and arbitrarily append a
-    text behind the original x scale numbers. 
+    default \code{NULL}. If pass a character, it disable unit and arbitrarily append a
+    text behind the original x scale numbers.
   }
-
+  \item{...}{
+    arguments to pass to \code{scale_x_continuous}.
+    Note that \code{scale_x_sequnit} sets breaks and labels
+    automatically, so arguments \code{breaks} and \code{labels} cannot
+    be passed (\code{breaks} can if \code{append} is not set).
+  }
 }
 \value{
   'position_c'
@@ -30,4 +35,4 @@ p + scale_x_sequnit("kb")
 p + scale_x_sequnit("bp")
 }
 \author{Tengfei Yin}
-
+\author{samuel barreto}

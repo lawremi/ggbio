@@ -106,26 +106,17 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
       
       df <- mold(data)
 
-      lst <- apply(df, 1, function(x){
-
-        x <- as.data.frame(t(x), stringsAsFactors = FALSE)
-        x.s <- as.numeric(as.character(x$start))
-        x.e <- as.numeric(as.character(x$end))
+    lst <- lapply(split(df, seq_len(nrow(df))), function(x){
+        x.s <- x$start
+        x.e <- x$end
         N <- (x.e - x.s) %/% arrow.r
         N <- ifelse(N <= 2, 2, N )
         res <- approx(c(x.s, x.e ),
                       rep(0, 2),n = N)
-        
-        res.df <- do.call(rbind,lapply(1:N, function(i){
-          x
-        }))
+        res.df <- x[rep(1L, N),]
         res.df$start <- res$x
         .res <- res.df[-N,]
-        .res$end <- res.df[-1, "start"]
-        cols <- colnames(df)[unlist(lapply(1:ncol(df),
-                                           function(i) is.numeric(df[,i])))]
-
-        .res[,cols] <- as.data.frame(data.matrix(.res[,cols]))
+        .res$end <- res.df[-1L, "start"]
         .res
       })
       res <- do.call(rbind,lst)

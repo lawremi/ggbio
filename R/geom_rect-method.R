@@ -108,7 +108,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
         args.aes.seg$yend <- args.aes$ymax
       }
     }else{
-      .y <- quo_expr(args.aes$y)
+      .y <- quo_squash(args.aes$y)
       if(is.null(rect.height)){
          rect.height <- diff(range(values(data)[,as.character(.y)]))/20
       }

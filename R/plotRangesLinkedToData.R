@@ -58,7 +58,7 @@ setMethod("plotRangesLinkedToData", "GenomicRanges_OR_GRangesList",
             stat.y <- stat.y + 5
             df.new <- melt(df, measure.vars = stat.y)  
             stat.label <- colnames(df)[stat.y]
-            df.new$.ggbio.group <- rep(stat.label, each = nrow(df))
+            df.new$.ggbio.group <- factor(rep(stat.label, each = nrow(df)))
             p <- ggplot(df.new)
             args.aes.seg <- args.aes[!names(args.aes) %in%
                                      c("x", "xend", "color", "y")]
@@ -72,12 +72,14 @@ setMethod("plotRangesLinkedToData", "GenomicRanges_OR_GRangesList",
             args.aes.seg$yend <- args.aes.seg$y
             aes.res.seg <- do.call(aes, args.aes.seg)
             p <- p + do.ggcall(ggplot2::geom_segment,
-                             c(list(aes.res.seg), args.non))
-            df.dash <- data.frame(x = df.new[c(-N, -2*N), "x.new"] + wid,
-                                  xend = df.new[c(-1, -(N+1)), "x.new"] - wid,
-                                  y = df.new[c(-N, -2*N), "value"],
-                                  yend = df.new[c(-1, -(N+1)), "value"],
-                                  .ggbio.group = df.new[c(-N, -2*N),
+                               c(list(aes.res.seg), args.non))
+            part <- PartitioningByWidth(rep(length(gr),
+                                            nlevels(df.new$.ggbio.group)))
+            df.dash <- data.frame(x = df.new[-end(part), "x.new"] + wid,
+                                  xend = df.new[-start(part), "x.new"] - wid,
+                                  y = df.new[-end(part), "value"],
+                                  yend = df.new[-start(part), "value"],
+                                  .ggbio.group = df.new[-end(part),
                                     ".ggbio.group"])
             args.dash.a <- args.aes[!names(args.aes) %in%  c("linetype", "y")]
             args.dash <- c(list(x = substitute(x),

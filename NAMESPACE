@@ -24,7 +24,7 @@ importFrom(scales, cbreaks, rescale, expand_range, math_format,
            scientific_format, trans_breaks, trans_format)
 importFrom(gridExtra, grid.arrange, arrangeGrob)
 importFrom(Hmisc, bezier)
-importFrom(rlang, eval_tidy, is_quosure, quo_name, quo_expr)
+importFrom(rlang, eval_tidy, is_quosure, quo_name, quo_squash)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Bioconductor packages

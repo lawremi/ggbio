@@ -201,7 +201,7 @@ In the example below we plot the gene model of the gene PHKG2. We use a
 <<>>=
 library(EnsDb.Hsapiens.v75)
 ensdb <- EnsDb.Hsapiens.v75
-autoplot(ensdb, GenenameFilter("PHKG2"))
+autoplot(ensdb, GeneNameFilter("PHKG2"))
 @
 
 We can pass any filter class defined in the \Biocpkg{AnnotationFilter} package

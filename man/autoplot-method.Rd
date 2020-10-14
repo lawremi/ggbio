@@ -735,7 +735,7 @@ tracks(full = p1, reduce = p2, heights = c(5, 1)) + ylab("")
 library(EnsDb.Hsapiens.v75)
 ensdb <- EnsDb.Hsapiens.v75
 ## We use a GenenameFilter to specifically retrieve all transcripts for that gene.
-p1 <- autoplot(ensdb, which = GenenameFilter("ALDOA"), names.expr = "gene_name")
+p1 <- autoplot(ensdb, which = GeneNameFilter("ALDOA"), names.expr = "gene_name")
 ## Instead of providing the GenenameFilter, we can also use filter expressions
 p2 <- autoplot(ensdb, which = ~ genename == "ALDOA", stat = "reduce",
                color = "brown", fill = "brown")

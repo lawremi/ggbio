@@ -144,7 +144,7 @@ setMethod("plotRangesLinkedToData", "GenomicRanges_OR_GRangesList",
             }
             p.link <- p.link +   theme(plot.margin = unit(c(0, 1,
                                          0,  0.5), "lines"),
-                                       panel.margin = unit(c(0, 0.25, 0, 0.25),
+                                       panel.spacing = unit(c(0, 0.25, 0, 0.25),
                                          "lines")
                                        ) 
             

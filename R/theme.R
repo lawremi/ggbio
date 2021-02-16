@@ -47,7 +47,7 @@ theme_alignment <-   function (ylabel = FALSE, base_size = 12,
       else
         element_blank()},
       panel.grid.minor = element_blank(),
-      panel.margin = unit(0.25, "lines"),
+      panel.spacing = unit(0.25, "lines"),
       strip.background = element_rect(fill = "grey80", colour = "grey50"), 
       strip.text.x = element_text(family = base_family, size = base_size * 0.8),
       strip.text.y = element_text(family = base_family, 
@@ -73,7 +73,7 @@ theme_pack_panels <- function(strip.bg = FALSE, strip.text.y = TRUE){
                 element_blank()
               },
               strip.text.y = if(strip.text.y){element_text(angle = 0)}else{element_blank()},
-              panel.margin = grid::unit(0, "lines"))
+              panel.spacing = grid::unit(0, "lines"))
   res <- c(list(res),
            list(scale_y_continuous(breaks = NULL)))
                        }

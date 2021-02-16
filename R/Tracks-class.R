@@ -999,7 +999,7 @@ textPlot <- function(lb="", ut = unit(4, "lines")){
   df <- data.frame(x =1:10, y = 1)
   p <- qplot(x = 1, y = 1, geom = "text", label = lb) + theme_null()+
     theme(plot.margin = unit(c(0, 0, 0, 0), "lines"),
-          panel.margin = unit(c(0, 0, 0, 0), "lines"))
+          panel.spacing = unit(c(0, 0, 0, 0), "lines"))
   p <- new("ggplotPlot", p)
   mutable(p) <- FALSE
   fixed(p) <- TRUE

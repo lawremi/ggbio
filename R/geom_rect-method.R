@@ -89,10 +89,6 @@ setMethod("geom_rect", "GRanges", function(data,...,
     }else{
       p <- c(p, list(scale_y_continuous(breaks = NULL)))
     }
-    if(missing(ylab))
-      p <- c(p, list(ggplot2::ylab("")))
-    else
-      p <- c(p, list(ggplot2::ylab(ylab)))
   }
   
   if(stat == "identity"){
@@ -141,8 +137,6 @@ setMethod("geom_rect", "GRanges", function(data,...,
                   args.non)
     p <- c(p, list(do.ggcall(ggplot2::geom_rect,args.res)))
     p <- .changeStrandColor(p, args.aes)
-    if(!missing(ylab))
-        p <- c(p, list(ggplot2::ylab(ylab)))
   }}else{
     p <- NULL
   }
@@ -152,6 +146,11 @@ setMethod("geom_rect", "GRanges", function(data,...,
     xlab <- ""
   p <- c(p, list(ggplot2::xlab(xlab)))
   
+  if(missing(ylab) && identical(stat, "stepping"))
+    p <- c(p, list(ggplot2::ylab("")))
+  if (!missing(ylab))
+    p <- c(p, list(ggplot2::ylab(ylab)))
+
   if(!missing(main))
     p <- c(p, list(labs(title = main)))
   

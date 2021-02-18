@@ -1,9 +1,4 @@
 context("geom_rect")
-## TODO:
-## If the naming of 'xlab', 'ylab', and 'main' is handled independently at the end
-## of geom_* method implementation, it will help us to avoid testing for multiple
-## cases of 'stat'. Overall by doing so it will decrease the number of tests.
-##
 ## Assuming 'xlab', 'ylab', and 'main' are independent.
 ## So we can say from above statement
 ## Total test cases =  3                              (for 'xlab', 'ylab', 'main')
@@ -18,27 +13,30 @@ context("geom_rect")
 ## simulate testing data
 source('data.R')
 
+labels <- list(ggplot2::xlab(""), ggplot2::ylab(""))
 # Testing for GRanges ------------------------------------------------------------
 
 test_that("Test xlab parameter of geom_rect", {
     test <- geom_rect(data, xlab = "x-axis")
     # select elements of 'labels' class from a 'test' list
     test <- test[which(sapply(test, function(x) all(class(x) == "labels")))]
-    expected <- list(xlab("x-axis"))
+    labels[[1]] <- ggplot2::xlab("x-axis")
+    expected <- labels
     expect_identical(test, expected)
 })
 
 test_that("Test ylab parameter of geom_rect", {
     test <- geom_rect(data, ylab = "y-axis")
     test <- test[which(sapply(test, function(x) all(class(x) == "labels")))]
-    expected <- list(ylab("y-axis"))
+    labels[[2]] <- ggplot2::ylab("y-axis")
+    expected <- labels
     expect_identical(test, expected)
 })
 
 test_that("Test main parameter of geom_rect", {
     test <- geom_rect(data, main = "Title")
     test <- test[which(sapply(test, function(x) all(class(x) == "labels")))]
-    expected <- list(xlab(""), labs(title = "Title"))
+    expected <- c(labels, list(labs(title = "Title")))
     expect_identical(test, expected)
 })
 
@@ -61,7 +59,7 @@ test_that("Test facets parameter with stat = 'stepping' of geom_rect", {
     expected <- list(ggbio:::do.ggcall(ggplot2::geom_segment, seg_args),
                      ggbio:::do.ggcall(ggplot2::geom_rect, rec_args),
                      scale_y_continuous(breaks = NULL))
-    expected <- list(expected, facets, xlab(""))
+    expected <- c(list(expected), list(facets), labels)
     expect_equal(test, expected)
 })
 
@@ -92,7 +90,7 @@ test_that("Test facets parameter with stat = 'identity' of geom_rect", {
     # simulate expected return list
     expected <- list(ggbio:::do.ggcall(ggplot2::geom_segment, seg_args),
                      ggbio:::do.ggcall(ggplot2::geom_rect, rec_args))
-    expected <- list(expected, facets, xlab(""))
+    expected <- c(list(expected), list(facets), list(xlab("")))
     expect_equal(test, expected)
 })
 
@@ -115,7 +113,7 @@ test_that("Test rect.height parameter with stat = 'stepping' of geom_rect", {
     expected <- list(ggbio:::do.ggcall(ggplot2::geom_segment, seg_args),
                      ggbio:::do.ggcall(ggplot2::geom_rect, rec_args),
                      scale_y_continuous(breaks = NULL))
-    expected <- list(expected, facets, xlab(""))
+    expected <- c(list(expected), list(facets), labels)
     expect_equal(test, expected)
 })
 
@@ -145,7 +143,7 @@ test_that("Test rect.height parameter with stat = 'identity' of geom_rect", {
     # simulate expected return list
     expected <- list(ggbio:::do.ggcall(ggplot2::geom_segment, seg_args),
                      ggbio:::do.ggcall(ggplot2::geom_rect, rec_args))
-    expected <- list(expected, facets, xlab(""))
+    expected <- c(list(expected), list(facets), list(xlab("")))
     expect_equal(test, expected)
 })
 
@@ -168,7 +166,7 @@ test_that("Test group.selfish parameter with stat = 'stepping' of geom_rect", {
     expected <- list(ggbio:::do.ggcall(ggplot2::geom_segment, seg_args),
                      ggbio:::do.ggcall(ggplot2::geom_rect, rec_args),
                      scale_y_continuous(breaks = NULL))
-    expected <- list(expected, facets, xlab(""))
+    expected <- c(list(expected), list(facets), labels)
     expect_equal(test, expected)
 })
 
@@ -198,6 +196,6 @@ test_that("Test group.selfish parameter with stat = 'identity' of geom_rect", {
     # simulate expected return list
     expected <- list(ggbio:::do.ggcall(ggplot2::geom_segment, seg_args),
                      ggbio:::do.ggcall(ggplot2::geom_rect, rec_args))
-    expected <- list(expected, facets, xlab(""))
+    expected <- c(list(expected), list(facets), list(xlab("")))
     expect_equal(test, expected)
 })

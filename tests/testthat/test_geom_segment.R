@@ -17,21 +17,21 @@ source('data.R')
 test_that("Test xlab parameter of geom_segment", {
     test <- geom_segment(data, xlab = "x-axis")
     # select elements of 'labels' class from a 'test' list
-    test <- test[which(sapply(test, function(x) all(class(x) == "labels")))]
+    test <- test[vapply(test, function(x) identical(class(x), "labels"), logical(1L))]
     expected <- list(xlab("x-axis"))
     expect_identical(test, expected)
 })
 
 test_that("Test ylab parameter of geom_segment", {
     test <- geom_segment(data, ylab = "y-axis")
-    test <- test[which(sapply(test, function(x) all(class(x) == "labels")))]
+    test <- test[vapply(test, function(x) identical(class(x), "labels"), logical(1L))]
     expected <- list(xlab(""), ylab("y-axis"))
     expect_identical(test, expected)
 })
 
 test_that("Test main parameter of geom_segment", {
     test <- geom_segment(data, main = "Title")
-    test <- test[which(sapply(test, function(x) all(class(x) == "labels")))]
+    test <- test[vapply(test, function(x) identical(class(x), "labels"), logical(1L))]
     expected <- list(xlab(""), labs(title = "Title"))
     expect_identical(test, expected)
 })

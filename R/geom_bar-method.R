@@ -21,7 +21,8 @@ setMethod("geom_bar", "GRanges", function(data,..., xlab, ylab, main){
       }
     }
     .y <- quo_name(args.aes$y)
-    ylab <- .y
+    if (missing(ylab))
+      ylab <- .y
     args.aes <- args.aes[names(args.aes) != "y"]
     
     args.aes$xmin <- as.name("start")

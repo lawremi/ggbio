@@ -19,7 +19,7 @@ labels <- list(ggplot2::xlab(""), ggplot2::ylab(""))
 test_that("Test xlab parameter of geom_rect", {
     test <- geom_rect(data, xlab = "x-axis")
     # select elements of 'labels' class from a 'test' list
-    test <- test[which(sapply(test, function(x) all(class(x) == "labels")))]
+    test <- test[vapply(test, function(x) identical(class(x), "labels"), logical(1L))]
     labels[[1]] <- ggplot2::xlab("x-axis")
     expected <- labels
     expect_identical(test, expected)
@@ -27,7 +27,7 @@ test_that("Test xlab parameter of geom_rect", {
 
 test_that("Test ylab parameter of geom_rect", {
     test <- geom_rect(data, ylab = "y-axis")
-    test <- test[which(sapply(test, function(x) all(class(x) == "labels")))]
+    test <- test[vapply(test, function(x) identical(class(x), "labels"), logical(1L))]
     labels[[2]] <- ggplot2::ylab("y-axis")
     expected <- labels
     expect_identical(test, expected)
@@ -35,7 +35,7 @@ test_that("Test ylab parameter of geom_rect", {
 
 test_that("Test main parameter of geom_rect", {
     test <- geom_rect(data, main = "Title")
-    test <- test[which(sapply(test, function(x) all(class(x) == "labels")))]
+    test <- test[vapply(test, function(x) identical(class(x), "labels"), logical(1L))]
     expected <- c(labels, list(labs(title = "Title")))
     expect_identical(test, expected)
 })

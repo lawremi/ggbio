@@ -1,7 +1,7 @@
 require(GenomicRanges)
 N <- 100
 data <- GRanges(seqnames = sample(c("chr1", "chr2", "chr3"),
-              size = N, replace = TRUE), 
+              size = N, replace = TRUE),
               IRanges(start = sample(1:300, size = N, replace = TRUE),
                       width = sample(70:75, size = N,replace = TRUE)),
               strand = sample(c("+", "-", "*"), size = N, replace = TRUE),

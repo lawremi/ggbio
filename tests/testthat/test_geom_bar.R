@@ -42,7 +42,7 @@ test_that("Test data of geom_bar", {
     df <- biovizBase::mold(data)
     rec_aes <- aes(xmin = start, xmax = end, ymin = 0, ymax = score)
     rec_args <- list(data = df, rec_aes)
-    expected <- list(ggbio:::do.ggcall(geom_rect, rec_args), 
+    expected <- list(ggbio:::do.ggcall(geom_rect, rec_args),
                     facets, xlab(""), ylab("score"))
     expect_equal(test, expected)
 })

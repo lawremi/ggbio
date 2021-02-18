@@ -57,7 +57,7 @@ test_that("Test facets parameter with stat = 'stepping' of geom_segment", {
 })
 
 test_that("Test facets parameter with stat = 'identity' of geom_segment", {
-    test <- geom_segment(data, facets = sample ~ seqnames, 
+    test <- geom_segment(data, facets = sample ~ seqnames,
                       stat = "identity", aes(y = score))
     # simulate expected facets
     args <- list(facets = sample ~ seqnames, stat = "identity", aes(y = score))

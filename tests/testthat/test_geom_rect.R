@@ -43,7 +43,7 @@ test_that("Test main parameter of geom_rect", {
 })
 
 test_that("Test facets parameter with stat = 'stepping' of geom_rect", {
-    test <- geom_rect(data, facets = sample ~ seqnames, stat = "stepping") 
+    test <- geom_rect(data, facets = sample ~ seqnames, stat = "stepping")
     # simulate expected facets
     args <- list(facets = sample ~ seqnames, stat = "stepping")
     facets_args <- biovizBase::subsetArgsByFormals(args, facet_grid, facet_wrap)
@@ -66,7 +66,7 @@ test_that("Test facets parameter with stat = 'stepping' of geom_rect", {
 })
 
 test_that("Test facets parameter with stat = 'identity' of geom_rect", {
-    test <- geom_rect(data, facets = sample ~ seqnames, 
+    test <- geom_rect(data, facets = sample ~ seqnames,
                       stat = "identity", aes(y = score))
     # simulate expected facets
     args <- list(facets = sample ~ seqnames, stat = "identity", aes(y = score))
@@ -84,7 +84,7 @@ test_that("Test facets parameter with stat = 'identity' of geom_rect", {
     seg_args <- c(list(data = df), list(seg_aes, facets = args$facets))
     rec_aes <- list(y = as.name("score"),
                     xmin = as.name("start"),
-                    xmax = as.name("end"), 
+                    xmax = as.name("end"),
                     ymin = substitute(y + rect.height, list(y = as.name("score"), rect.height = rect.height)),
                     ymax = substitute(y - rect.height, list(y = as.name("score"), rect.height = rect.height)))
     rec_aes <- do.call(aes, rec_aes)
@@ -137,7 +137,7 @@ test_that("Test rect.height parameter with stat = 'identity' of geom_rect", {
     seg_args <- c(list(data = df), list(seg_aes, facets = args$facets))
     rec_aes <- list(y = as.name("score"),
                     xmin = as.name("start"),
-                    xmax = as.name("end"), 
+                    xmax = as.name("end"),
                     ymin = substitute(y + rect.height, list(y = as.name("score"), rect.height = rect.height)),
                     ymax = substitute(y - rect.height, list(y = as.name("score"), rect.height = rect.height)))
     rec_aes <- do.call(aes, rec_aes)
@@ -190,7 +190,7 @@ test_that("Test group.selfish parameter with stat = 'identity' of geom_rect", {
     seg_args <- c(list(data = df), list(seg_aes, facets = args$facets))
     rec_aes <- list(y = as.name("score"),
                     xmin = as.name("start"),
-                    xmax = as.name("end"), 
+                    xmax = as.name("end"),
                     ymin = substitute(y + rect.height, list(y = as.name("score"), rect.height = rect.height)),
                     ymax = substitute(y - rect.height, list(y = as.name("score"), rect.height = rect.height)))
     rec_aes <- do.call(aes, rec_aes)

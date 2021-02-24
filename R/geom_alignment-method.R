@@ -131,12 +131,13 @@ setMethod("geom_alignment", "GRanges", function(data,...,
         }}else{
             p <- NULL
         }
-    p <- c(list(p) , list(ggplot2::ylab("")), list(facet))
+    p <- c(list(p), list(facet))
     if(missing(xlab))
         xlab <- ""
     p <- c(p, list(ggplot2::xlab(xlab)))
-    if(!missing(ylab))
-        p <- c(p, list(ggplot2::ylab(ylab)))
+    if(missing(ylab))
+        ylab <- ""
+    p <- c(p, list(ggplot2::ylab(ylab)))
     if(!missing(main))
         p <- c(p, list(labs(title = main)))
 

@@ -10,8 +10,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                                                 range.geom = c("rect", "arrowrect"),
                                                 gap.geom = c("chevron", "arrow", "segment"),
                                                 rect.height = NULL,
-                                                group.selfish = TRUE,
-                                                label = TRUE){
+                                                group.selfish = TRUE){
 
 
     stat <- match.arg(stat)

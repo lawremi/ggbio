@@ -25,24 +25,15 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
 
-  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  facet <- .buildFacetsFromArgs(data, args.facets)
+  facet <- build_facet(data, args, facet_grid, facet_wrap)
 
   if(length(data)){
     ## small arrow
     if(stat == "stepping"){
       if(!"stepping" %in% colnames(values(data))){
         grl <- splitByFacets(data, facets)
-        res <- endoapply(grl,
-                         function(dt){
-                           if("group" %in% names(args.aes))
-                             dt <- addStepping(dt, group.name = quo_name(args.aes$group),
-                                               group.selfish = group.selfish)
-                           else
-                             dt <- addStepping(dt)
-                         })
-        res <- unlist(res)
-        data <- res
+        res <- endoapply(grl, make_addStepping, args.aes, group.selfish)
+        data <- unlist(res)
       }
       df <- mold(data)
       lst <- apply(df, 1, function(x){
@@ -149,15 +140,8 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
   }
     p <- c(list(p) , list(facet))
 
-  if(missing(xlab)) 
-    xlab <- ""
-  p <- c(p, list(ggplot2::xlab(xlab)))
-  
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
-  
+  labels <- Labels(xlab, ylab, main, fallback = c(x = ""))
+  p <- c(p, labels)
   p
 
 })

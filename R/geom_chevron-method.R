@@ -15,46 +15,8 @@ setMethod("geom_chevron", "GRanges",
             
             args.aes <- parseArgsForAes(args)            
             args.non <- parseArgsForNonAes(args)
-            args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-            facet <- .buildFacetsFromArgs(data, args.facets)
-            if(length(data)){
-            getY <- function(n){
-              switch(n,
-                     {
-                       y.offset <- 0
-                       yend.offset <- offset
-                       data.frame(y.offset = y.offset,
-                                  yend.offset = yend.offset)
-                     },
-                     {
-                       y.offset <- offset
-                       yend.offset <- 0
-                       data.frame(y.offset = y.offset,
-                                  yend.offset = yend.offset)
-                     })
-            }
-            getY2 <- function(df){
-              res <- df[,offset]
-              os <- rescale(res, chevron.height.rescale)
-              lst <- lapply(1:nrow(df), function(i){
-                n <- df[i,".bioviz.chevron"]
-                switch(n,
-                       {
-                         y.offset <- 0
-                         yend.offset <- os[i]
-                         data.frame(y.offset = y.offset,
-                                    yend.offset = yend.offset)
-                       },
-                       {
-                         y.offset <- os[i]
-                         yend.offset <- 0
-                         data.frame(y.offset = y.offset,
-                                    yend.offset = yend.offset)
-                       })
-              })
-                do.call("rbind", lst)
-              }
-              
+            facet <- build_facet(data, args, facet_grid, facet_wrap)
+            if(length(data)) {
             if(stat == "stepping"){
               group.name <- NULL
               if("group" %in% names(args.aes))
@@ -74,11 +36,11 @@ setMethod("geom_chevron", "GRanges",
               if(!is.numeric(offset)){
                 offset <- as.character(offset)
                 if(offset %in% colnames(values(data)))    
-                  ydf <- getY2(df)
+                  ydf <- getY2(df, offset, chevron.height.rescale)
                 else
                   stop("offset must be a numeric value or one of the colnames")
               }else{
-                ydf <- do.call("rbind", lapply(df$.bioviz.chevron, getY))
+                ydf <- do.call("rbind", lapply(df$.bioviz.chevron, getY, offset))
               }
               df <- cbind(df, ydf)
               args <- c(aes.lst, list(x = substitute(start),
@@ -90,22 +52,11 @@ setMethod("geom_chevron", "GRanges",
                             args.non)
               p <- c(list(do.ggcall(ggplot2::geom_segment, args.res)), list(ggplot2::ylab("")))
 
-              if("group" %in% names(args.aes))
-                gpn <- quo_name(args.aes$group)
-              else
-                gpn <- "stepping"
+              gpn <- ifelse("group" %in% names(args.aes), quo_name(args.aes$group), "stepping")
               
-              .df.lvs <- unique(df$stepping)
-              .df.sub <- df[, c("stepping", gpn)]
-              .df.sub <- .df.sub[!duplicated(.df.sub$stepping),]
-
-              if(gpn != "stepping" & group.selfish){
-                p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
-                                                   labels = as.character(.df.sub[, gpn]))))
-              } else{
-                p <- c(p, list(scale_y_continuous(breaks = NULL)))
-              }
-
+              .df.sub <- group_df(df, gpn)
+              y_scale <- scale_y_continuous_by_group(.df.sub, gpn, group.selfish)
+              p <- c(p, y_scale)
             }
             if(stat == "identity"){
               if(!"y" %in% names(args.aes)){
@@ -130,19 +81,18 @@ setMethod("geom_chevron", "GRanges",
               if(!is.numeric(offset)){
                 offset <- as.character(offset)
                 if(offset %in% colnames(values(data)))    
-                  ydf <- getY2(df)
+                  ydf <- getY2(df, offset, chevron.height.rescale)
                 else
                   stop("offset must be a numeric value or one of the colnames")
               }else{
-                ydf <- do.call("rbind", lapply(df$.bioviz.chevron, getY))
+                ydf <- do.call("rbind", lapply(df$.bioviz.chevron, getY, offset))
               }
               df <- cbind(df, ydf)
               .y <- args.aes$y
               .yend <- args.aes$yend
               args.aes$y <- substitute(y + y.offset, list(y = .y))
               args.aes$yend <- substitute(yend + yend.offset, list(yend = .yend))
-              args.res <- c(list(data = df), list(do.call(aes, args.aes)),
-                            args.non)
+              args.res <- c(list(data = df), list(do.call(aes, args.aes)), args.non)
               p <- c(list(do.ggcall(ggplot2::geom_segment, args.res)),
                      list(ggplot2::ylab("")))
 
@@ -150,15 +100,49 @@ setMethod("geom_chevron", "GRanges",
               p <- NULL
             }
             p <- c(list(p) , list(facet))
-            if(missing(xlab)) 
-              xlab <- ""
-            p <- c(p, list(ggplot2::xlab(xlab)))
-            if(!missing(ylab))
-              p <- c(p, list(ggplot2::ylab(ylab)))
-            if(!missing(main))
-              p <- c(p, list(labs(title = main)))
+            labels <- Labels(xlab, ylab, main, fallback = c(x = ""))
+            p <- c(p, labels)
             p
           })
+
+
+getY <- function(n, offset){
+  switch(n,
+          {
+            y.offset <- 0
+            yend.offset <- offset
+            data.frame(y.offset = y.offset,
+                      yend.offset = yend.offset)
+          },
+          {
+            y.offset <- offset
+            yend.offset <- 0
+            data.frame(y.offset = y.offset,
+                      yend.offset = yend.offset)
+          })
+}
+
+getY2 <- function(df, offset, chevron.height.rescale){
+  res <- df[,offset]
+  os <- rescale(res, chevron.height.rescale)
+  lst <- lapply(1:nrow(df), function(i){
+    n <- df[i,".bioviz.chevron"]
+    switch(n,
+            {
+              y.offset <- 0
+              yend.offset <- os[i]
+              data.frame(y.offset = y.offset,
+                        yend.offset = yend.offset)
+            },
+            {
+              y.offset <- os[i]
+              yend.offset <- 0
+              data.frame(y.offset = y.offset,
+                        yend.offset = yend.offset)
+            })
+  })
+  do.call("rbind", lst)
+}
 
 ## 
 breakGr <- function(gr){

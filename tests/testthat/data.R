@@ -9,3 +9,8 @@ data <- GRanges(seqnames = sample(c("chr1", "chr2", "chr3"),
               sample = sample(c("Normal", "Tumor"),
               size = N, replace = TRUE),
               pair = sample(letters, size = N, replace = TRUE))
+
+lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), seq(10, 0.001, length = 500))
+xVector <- rpois(1e4, lambda)
+xRle <- Rle(xVector)
+xRleList <- RleList(xRle, 2L * xRle)

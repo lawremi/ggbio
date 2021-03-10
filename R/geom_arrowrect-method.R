@@ -18,22 +18,13 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
 
-  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  facet <- .buildFacetsFromArgs(data, args.facets)
+  facet <- build_facet(data, args, facet_grid, facet_wrap)
   if(length(data)){  
     if(stat == "stepping"){
-    if(is.null(rect.height))
-      rect.height <- 0.4
+    if(is.null(rect.height)) rect.height <- 0.4
       
       grl <- splitByFacets(data, facets)
-      res <- endoapply(grl,
-                       function(dt){
-                         if("group" %in% names(args.aes))
-                           dt <- addStepping(dt, group.name = quo_name(args.aes$group),
-                                              group.selfish = group.selfish)
-                         else
-                           dt <- addStepping(dt)
-                       })
+      res <- endoapply(grl, make_addStepping, args.aes, group.selfish)
       res <- unlist(res)
       df <- breakGrTo5polyDf(res, y = "stepping", rect.height = rect.height,
                              arrow.head = arrow.head, arrow.head.rate = arrow.head.rate, arrow.head.fix = arrow.head.fix)
@@ -48,8 +39,7 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
         stop("aes(y = ) is requried for stat identity")
       if(is.null(rect.height)){
          rect.height <- diff(range(values(data)[,quo_name(args.aes$y)]))/20
-         if (rect.height == 0)
-           rect.height <- 1L
+         if (rect.height == 0) rect.height <- 1L
       }
       df <- breakGrTo5polyDf(data, y = quo_name(args.aes$y), rect.height = rect.height,
                              arrow.head = arrow.head, arrow.head.rate = arrow.head.rate, arrow.head.fix = arrow.head.fix)
@@ -64,18 +54,9 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
     p <- c(list(p) , list(facet))
 
 
-  if(missing(xlab)) 
-    xlab <- ""
-  p <- c(p, list(ggplot2::xlab(xlab)))
-  
-  if(missing(ylab))
-    ylab <- ""
-  
-  p <- c(p, list(ggplot2::ylab(ylab)))
-
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
-p  
+  labels <- Labels(xlab, ylab, main, fallback = c(x = "", y = ""))
+  p <- c(p, labels)
+  p
 })
 
 

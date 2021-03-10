@@ -32,8 +32,7 @@ setMethod("geom_arch", "data.frame", function(data, ...,
     y <- eval_tidy(args.aes$y, data)
   else
     y <- rep(0, length(startX))
-  args.aes2 <- args.aes[!(names(args.aes) %in% c("x", "y", "group",
-                                              "hjust", "xend", "yend"))]  
+  args.aes2 <- remove_args(args.aes, c("x", "y", "group", "hjust", "xend", "yend"))
   xx<-c()
   yy<-c()
   for(i in 1:n){
@@ -93,8 +92,7 @@ setMethod("geom_arch", "GRanges", function(data, ...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.non$max.height <- max.height
-  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  facet <- .buildFacetsFromArgs(data, args.facets)
+  facet <- build_facet(data, args, facet_grid, facet_wrap)
 
   ## note rect.height = 0.4 is default cross ggbio
   ## need to make sure they are connected by two nearest point of rectangle
@@ -121,13 +119,8 @@ setMethod("geom_arch", "GRanges", function(data, ...,
   }else{
     p <- NULL
   }
-  if(missing(xlab)) 
-    xlab <- ""
-  p <- c(p, list(ggplot2::xlab(xlab)))
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
+  labels <- Labels(xlab, ylab, main, fallback = c(x = ""))
+  p <- c(p, labels)
   p
 })
 
@@ -216,8 +209,7 @@ geom_arch_flip <- function(data, ..., n = 25, max.height = 10, bottom = TRUE){
     x <- eval_tidy(args.aes$x, data)
   else
     x <- rep(0, length(startY))
-  args.aes2 <- args.aes[!(names(args.aes) %in% c("x", "y", "group",
-                                                 "hjust", "xend", "yend"))]  
+  args.aes2 <- remove_args(args.aes, c("x", "y", "group", "hjust", "xend", "yend"))
   xx<-c()
   yy<-c()
   for(i in 1:n){
@@ -302,8 +294,7 @@ geom_arch_flip2 <- function(data, ..., n = 25, max.height = 10, bottom = FALSE){
     x <- eval_tidy(args.aes$x, data)
   else
     x <- rep(0, length(startY))
-  args.aes2 <- args.aes[!(names(args.aes) %in% c("x", "y", "group",
-                                                 "hjust", "xend", "yend"))]  
+  args.aes2 <- remove_args(args.aes, c("x", "y", "group", "hjust", "xend", "yend"))
   xx<-c()
   yy<-c()
   for(i in 1:n){

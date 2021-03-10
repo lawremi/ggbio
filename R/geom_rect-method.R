@@ -23,72 +23,43 @@ setMethod("geom_rect", "GRanges", function(data,...,
   args$facets <- facets
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  if("extend.size" %in% names(args.non))
-    es <- args.non$extend.size
-  else
-    es <- 0
-  args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-  facet <- .buildFacetsFromArgs(data, args.facets)
+  es <- ifelse("extend.size" %in% names(args.non), args.non$extend.size, 0)
+  facet <- build_facet(data, args, facet_grid, facet_wrap)
   stat <- match.arg(stat)
   if(length(data)){
   if(stat == "stepping"){
-    if(is.null(rect.height))
-      rect.height <- 0.4
+    if(is.null(rect.height)) rect.height <- 0.4
     grl <- splitByFacets(data, facets)
-    res <- endoapply(grl,
-                     function(dt){
-                       if("group" %in% names(args.aes))
-                         dt <- addStepping(dt, group.name = quo_name(args.aes$group),
-                                            group.selfish = group.selfish,
-                                           extend.size = es)
-                       else
-                         dt <- addStepping(dt, extend.size = es)
-                     })
-    res <- unlist(res)
-    df <- mold(res)
+    res <- endoapply(grl, make_addStepping, args.aes, group.selfish, extend.size = es)
+    df <- mold(unlist(res))
 
-    args.aes <- args.aes[!(names(args.aes) %in% c("xmin", "xmax", "ymin", "ymax", "data"))]
-    args.non <- args.non[!(names(args.non) %in% c("xmin", "xmax", "ymax", "ymax", "data", "facets"))]
-    if("group" %in% names(args.aes))
-      gpn <- quo_name(args.aes$group)
-    else
-      gpn <- "stepping"
+    args.aes <- remove_args(args.aes, c("xmin", "xmax", "ymin", "ymax", "data"))
+    args.non <- remove_args(args.non, c("xmin", "xmax", "ymax", "ymax", "data", "facets"))
+    gpn <- ifelse("group" %in% names(args), quo_name(args$group), "stepping")
+    args.aes <- remove_args(args.aes, c("group", "size"))
     ## overcome 1 pixel problem
-    args.aes.seg <- args.aes[!names(args.aes) %in%  c("group", "fill", "y", "xend", "yend", "x")]
+    args.aes.seg <- remove_args(args.aes, c("fill", "y", "xend", "yend", "x"))
     args.aes.seg <- c(args.aes.seg, list(x = substitute(start),
                                  xend = substitute(start),
                                  y = substitute(stepping - rect.height),
                                  yend = substitute(stepping + rect.height)))
 
-    args.aes.seg <- args.aes.seg[names(args.aes.seg) != "size"]
     aes.res.seg <- do.call(aes, args.aes.seg)
-    args.res.seg <- c(list(data = df), list(aes.res.seg),
-                  args.non)
+    args.res.seg <- c(list(data = df), list(aes.res.seg), args.non)
     p <- list(do.ggcall(ggplot2::geom_segment,args.res.seg))
-    
-    args.aes <- args.aes[names(args.aes) != "group"]
     args.aes <- c(args.aes, list(xmin = substitute(start),
                                  xmax = substitute(end),
                                  ymin = substitute(stepping - rect.height),
                                  ymax = substitute(stepping + rect.height)))
-
-    args.aes <- args.aes[names(args.aes) != "size"]
     aes.res <- do.call(aes, args.aes)
-    args.res <- c(list(data = df), list(aes.res),
-                  args.non)
+    args.res <- c(list(data = df), list(aes.res), args.non)
     
     p <- c(p, list(do.ggcall(ggplot2::geom_rect,args.res)))
     p <- .changeStrandColor(p, args.aes)
-    .df.lvs <- unique(df$stepping)
-    .df.sub <- df[, c("stepping", gpn)]
-    .df.sub <- .df.sub[!duplicated(.df.sub$stepping),]
+    .df.sub <- group_df(df, gpn)
     ## FIXME:
-    if(gpn != "stepping" & group.selfish){
-      p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
-                                         labels = as.character(.df.sub[, gpn]))))
-    }else{
-      p <- c(p, list(scale_y_continuous(breaks = NULL)))
-    }
+    y_scale <- scale_y_continuous_by_group(.df.sub, gpn, group.selfish)
+    p <- c(p, y_scale)
   }
   
   if(stat == "identity"){
@@ -109,51 +80,44 @@ setMethod("geom_rect", "GRanges", function(data,...,
          rect.height <- diff(range(values(data)[,as.character(.y)]))/20
       }
       args.aes.seg <- args.aes
+      mapping <- list(y = .y, rect.height = rect.height)
       args.aes.seg$x <- as.name("start")
       args.aes.seg$xend <- as.name("start")
-      args.aes.seg$y <- substitute(y + rect.height, list(y = .y, rect.height = rect.height))
-      args.aes.seg$yend <- substitute(y - rect.height , list(y = .y, rect.height = rect.height))
+      args.aes.seg$y <- substitute(y + rect.height, mapping)
+      args.aes.seg$yend <- substitute(y - rect.height , mapping)
       
       args.aes$xmin <- as.name("start")
       args.aes$xmax <- as.name("end")
-      args.aes$ymin <- substitute(y + rect.height, list(y = .y, rect.height = rect.height))
-      args.aes$ymax <- substitute(y - rect.height , list(y = .y, rect.height = rect.height))
+      args.aes$ymin <- substitute(y + rect.height, mapping)
+      args.aes$ymax <- substitute(y - rect.height , mapping)
     }
     df <- mold(data)
 
     ## overcome 1 pixel problem
-    args.aes.seg <- args.aes.seg[names(args.aes.seg) != "group"]
-    args.aes.seg <- args.aes.seg[names(args.aes.seg) != "size"]
-    
+    args.aes.seg <- remove_args(args.aes.seg, c("group", "size"))
     aes.res.seg <- do.call(aes, args.aes.seg)
-    args.res.seg <- c(list(data = df), list(aes.res.seg),
-                  args.non)
-    p <- list(do.ggcall(ggplot2::geom_segment,args.res.seg))
-    args.aes <- args.aes[names(args.aes) != "group"]
-    args.aes <- args.aes[names(args.aes) != "size"]
-    
+
+    args.res.seg <- c(list(data = df), list(aes.res.seg), args.non)
+    p <- list(do.ggcall(ggplot2::geom_segment, args.res.seg))
+
+    args.aes <- remove_args(args.aes, c("group", "size"))
     aes.res <- do.call(aes, args.aes)
-    args.res <- c(list(data = df), list(aes.res),
-                  args.non)
-    p <- c(p, list(do.ggcall(ggplot2::geom_rect,args.res)))
+
+    args.res <- c(list(data = df), list(aes.res), args.non)
+    p <- c(p, list(do.ggcall(ggplot2::geom_rect, args.res)))
     p <- .changeStrandColor(p, args.aes)
-  }}else{
+  }
+  }else{
     p <- NULL
   }
-  p <- c(list(p) , list(facet))
 
-  if(missing(xlab)) 
-    xlab <- ""
-  p <- c(p, list(ggplot2::xlab(xlab)))
-  
-  if(missing(ylab) && identical(stat, "stepping"))
-    p <- c(p, list(ggplot2::ylab("")))
-  if (!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
+  p <- c(list(p), list(facet))
 
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
-  
+  if(identical(stat, "stepping"))
+    labels <- Labels(xlab, ylab, main, fallback = c(x = "", y = ""))
+  else labels <- Labels(xlab, ylab, main, fallback = c(x = ""))
+
+  p <- c(p, labels)
   p
 })
 

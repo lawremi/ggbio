@@ -51,16 +51,10 @@ setMethod("stat_table", "GRanges", function(data, ..., xlab, ylab, main,
     p <- NULL
   }
 
-  if(missing(xlab)) 
-    xlab <- ""
-  p <- c(p, list(ggplot2::xlab(xlab)))
-
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
-  p <- setStat(p)  
-  p  
+  labels <- Labels(xlab, ylab, main, fallback = c(x = ""))
+  p <- c(p, labels)
+  p <- setStat(p)
+  p
 })  
 
 
@@ -77,17 +71,9 @@ setMethod("stat_table", "GRangesList", function(data, ...,
   gr <- flatGrl(data)
   args.non$data <- gr
   p <- do.call(stat_table, c(list(aes.res), args.non))
-  if(!missing(xlab))
-    p <- c(p, list(ggplot2::xlab(xlab)))
-  else
-    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
-
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  else
-    p <- c(p, list(ggplot2::ylab("Score")))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
+  labels <- Labels(xlab, ylab, main, fallback =
+                   c(x = "Genomic Coordinates", y = "Score"))
+  p <- c(p, labels)
   p <- setStat(p)  
   p
 })

@@ -43,17 +43,8 @@ setMethod("stat_identity", "Rle", function(data, ...,
   args.aes <- list(x = substitute(x),
                    y = substitute(y))
   p <- do.ggcall(ggplot2::stat_identity, c(args.non, list(do.call(aes, args.aes))))
-  if(!missing(xlab))
-    p <- c(p, list(ggplot2::xlab(xlab)))
-  else
-    p <- c(p, list(ggplot2::xlab("x")))
-
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  else
-    p <- c(p, list(ggplot2::ylab("y")))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
+  labels <- Labels(xlab, ylab, main, fallback = c(x = "x", y = "y"))
+  p <- c(p, labels)
   p <- setStat(p)  
   p
 })
@@ -88,17 +79,8 @@ setMethod("stat_identity", "RleList", function(data, ...,
                      y = substitute(y))
     p <- do.ggcall(ggplot2::stat_identity, c(args.non, list(do.call(aes, args.aes))))
 
-  if(!missing(xlab))
-    p <- c(p, list(ggplot2::xlab(xlab)))
-  else
-    p <- c(p, list(ggplot2::xlab("x")))
-
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  else
-    p <- c(p, list(ggplot2::ylab("y")))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
+  labels <- Labels(xlab, ylab, main, fallback = c(x = "x", y = "y"))
+  p <- c(p, labels)
 
   p <- c(list(p), list(facet))
   p <- setStat(p)

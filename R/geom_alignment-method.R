@@ -10,8 +10,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
                                                 range.geom = c("rect", "arrowrect"),
                                                 gap.geom = c("chevron", "arrow", "segment"),
                                                 rect.height = NULL,
-                                                group.selfish = TRUE,
-                                                label = TRUE){
+                                                group.selfish = TRUE){
 
 
     stat <- match.arg(stat)
@@ -19,88 +18,50 @@ setMethod("geom_alignment", "GRanges", function(data,...,
     args$facets <- facets
     args.aes <- parseArgsForAes(args)
     args.non <- parseArgsForNonAes(args)
-    args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
-    facet <- .buildFacetsFromArgs(data, args.facets)
+    facet <- build_facet(data, args, facet_grid, facet_wrap)
 
-    if("extend.size" %in% names(args.non))
-        es <- args.non$extend.size
-    else
-        es <- 0
+    es <- ifelse("extend.size" %in% names(args.non), args.non$extend.size, 0)
 
-    if(is.null(rect.height))
-        rect.height <- 0.4
+    if(is.null(rect.height)) rect.height <- 0.4
     args.non$rect.height <- rect.height
     range.geom <- match.arg(range.geom)
     gap.geom <- match.arg(gap.geom)
 
     main.fun <- switch(range.geom,
-                       rect = {
-                           geom_rect
-                       },
-                       "arrowrect" = {
-                           geom_arrowrect
-                       })
+                       rect = geom_rect,
+                       arrowrect = geom_arrowrect)
 
     gap.fun <- switch(gap.geom,
-                      chevron = {
-                          geom_chevron
-                      },
-                      arrow = {
-                          geom_arrow
-                      },
-
-                      segment = {
-                          geom_segment
-                      }
-                      )
+                      chevron = geom_chevron,
+                      arrow = geom_arrow,
+                      segment = geom_segment)
 
     if(length(data)){
         if(stat == "stepping"){
-            args.aes <- args.aes[!(names(args.aes) %in% c("xmin", "xmax", "ymin", "ymax", "data"))]
-            args.non <- args.non[!(names(args.non) %in% c("xmin", "xmin", "ymin", "ymax", "data"))]
+            args.aes <- remove_args(args.aes, c("xmin", "xmax", "ymin", "ymax", "data"))
+            args.non <- remove_args(args.non, c("xmin", "xmin", "ymin", "ymax", "data"))
             grl <- splitByFacets(data, facets)
-            res <- endoapply(grl,
-                             function(dt){
-                                 if("group" %in% names(args.aes)){
-                                     dt <- addStepping(dt, group.name = quo_name(args.aes$group),
-                                                       group.selfish = group.selfish,
-                                                       extend.size = es)
-                                 }else{
-                                     dt <- addStepping(dt,extend.size = es)
-                                 }
-                             })
-
+            res <- endoapply(grl, make_addStepping, args.aes, group.selfish, extend.size = es)
             res <- unlist(res)
             df <- mold(res)
 
-            if("group" %in% names(args.aes))
-                gpn <- quo_name(args.aes$group)
-            else
-                gpn <- "stepping"
+            gpn <- ifelse("group" %in% names(args.aes), quo_name(args.aes$group), "stepping")
 
-            args.aes <- args.aes[names(args.aes) != "group"]
+            args.aes <- remove_args(args.aes, "group")
             ## plot gaps
 
             gps <- getGaps(res, group.name = gpn, facets)
             if(length(gps)){
                 gps <- keepSeqlevels(gps, names(seqlengths(res)))
-                args.gaps <- args.aes[!names(args.aes) %in% c("x", "y",
-                                                              "xend", "yend",
-                                                              "label.type",
-                                                              "label.size",
-                                                              "label.color",
-                                                              "size",
-                                                              "fill",
-                                                              "color",
-                                                              "colour")]
+                args.remove <- c("x", "y", "xend", "yend", "label.type", "label.size", "label.color", "size", "fill", "color", "colour")
+                args.gaps <- remove_args(args.aes, args.remove)
 
                 args.gaps.extra <- args.non[names(args.non) %in%
                                             c("offset", "chevron.height",
                                               "inherit.aes")]
                 args.gaps$y <- as.name("stepping")
                 aes.lst <- do.call("aes", args.gaps)
-                gps.lst <- c(list(aes.lst), list(data = gps, stat = "identity"),
-                             args.gaps.extra)
+                gps.lst <- c(list(aes.lst), list(data = gps, stat = "identity"), args.gaps.extra)
 
                 p <- list(do.ggcall(gap.fun, gps.lst))
             }else{
@@ -108,7 +69,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
             }
             ## plot main
             args.aes$y <- as.name("stepping")
-            args.aes <- args.aes[names(args.aes) != "size"]
+            args.aes <- remove_args(args.aes, "size")
             args.non$stat = "identity"
             aes <- do.call(ggplot2::aes, args.aes)
             args.res <- c(list(data = res), list(aes),
@@ -116,14 +77,9 @@ setMethod("geom_alignment", "GRanges", function(data,...,
 
             p <- c(p, list(do.call(main.fun,args.res)))
             p <- .changeStrandColor(p, args.aes)
-            .df.lvs <- unique(df$stepping)
-            .df.sub <- df[, c("stepping", gpn)]
-            .df.sub <- .df.sub[!duplicated(.df.sub$stepping),]
-            if(gpn != "stepping" & group.selfish)
-                p <- c(p , list(scale_y_continuous(breaks = .df.sub$stepping,
-                                                   labels = as.character(.df.sub[, gpn]))))
-            else
-                p <- c(p, list(scale_y_continuous(breaks = NULL)))
+            .df.sub <- group_df(df, gpn)
+            y_scale <- scale_y_continuous_by_group(.df.sub, gpn, group.selfish)
+            p <- c(p, y_scale)
         }
 
         if(stat == "identity"){
@@ -131,15 +87,9 @@ setMethod("geom_alignment", "GRanges", function(data,...,
         }}else{
             p <- NULL
         }
-    p <- c(list(p) , list(ggplot2::ylab("")), list(facet))
-    if(missing(xlab))
-        xlab <- ""
-    p <- c(p, list(ggplot2::xlab(xlab)))
-    if(!missing(ylab))
-        p <- c(p, list(ggplot2::ylab(ylab)))
-    if(!missing(main))
-        p <- c(p, list(labs(title = main)))
-
+    p <- c(list(p), list(facet))
+    labels <- Labels(xlab, ylab, main, fallback = c(x = "", y = ""))
+    p <- c(p, labels)
     p
 })
 
@@ -443,17 +393,14 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
     ## args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
     ## facet <- .buildFacetsFromArgs(data, args.facets)
 
-    if("type" %in% names(args.aes)){
-        .type <- quo_name(args.aes$type)
-    }else{
-        .type <- NULL
-    }
+    .type <- if("type" %in% names(args.aes)) quo_name(args.aes$type) else NULL
+
     if(!isGenemodel(data, type = .type)){
         gr <- flatGrl(data)
         if(!"group" %in% names(args.aes))
             args.aes$group <- as.name("grl_name")
         if("type" %in% names(args.aes)){
-            args.aes <- args.aes[names(args.aes) != "type"]
+            args.aes <- remove_args(args.aes, "type")
         }
         aes.res <- do.call(aes, args.aes)
 
@@ -482,7 +429,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
 
     if("type" %in% names(args.aes)){
         .type <- quo_name(args.aes$type)
-        args.aes <- args.aes[names(args.aes) != "type"]
+        args.aes <- remove_args(args.aes, "type")
     }else{
         .type <- "type"
     }
@@ -574,7 +521,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
         args.cds.non$rect.height <- cds.rect.h
         args.exon.non <- args.cds.non
         args.exon.non$rect.height <- exon.rect.h
-        args.exon <- args.aes[names(args.aes) != "y"]
+        args.exon <- remove_args(args.aes, "y")
         args.exon$y <- as.name("stepping")
         aes.res <- do.call(aes, args.exon)
         p <- NULL
@@ -597,7 +544,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
         }
         ## utrs
         gr.utr <- gr[values(gr)[[.type]] == "utr"]
-        args.utr <- args.aes[names(args.aes) != "y"]
+        args.utr <- remove_args(args.aes, "y")
         args.utr$y <- as.name("stepping")
         aes.res <- do.call(aes, args.utr)
         args.utr.non <- args.cds.non
@@ -608,7 +555,7 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
                 args.utr.non$arrow.head <- 0.06
             }
             arrow.head.fix <- getArrowLen(gr.cds, arrow.head.rate = args.non$arrow.head)
-            args.utr.non <- args.non[names(args.non) != "arrow.rate"]
+            args.utr.non <- remove_args(args.non, "arrow.rate")
             args.utr.non$arrow.head.fix <- arrow.head.fix
         }
 
@@ -631,18 +578,14 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
             df.gaps$stepping <- 1
             ## let's figure out strand
             stds <- unique(as.character(strand(.gr)))
-            if(length(stds) == 1){
-                strand(df.gaps) <- stds
-            }else{
-                strand(df.gaps) <- "*"
-            }
+            strand(df.gaps) <- ifelse(length(stds) == 1, stds, "*")
             ## FIXME: fix reduced strand
           } else {
             exonic <- gr[values(gr)[[.type]] %in% c("utr", "cds", "exon")]
             df.gaps <- getGaps(exonic, group.name = "..inner..")
           }
 
-        args.aes.gaps <- args.aes[!(names(args.aes) %in% c("x", "y", "fill"))]
+        args.aes.gaps <- remove_args(args.aes, c("x", "y", "fill"))
         aes.res <- do.call(aes, args.aes.gaps)
 
         if(!"arrow.rate" %in%  names(args.non)){
@@ -688,22 +631,8 @@ setMethod("geom_alignment", "GRangesList", function(data, ..., which = NULL,
                list(ggplot2::xlim(c(0, 1))))
     }
 
-    if(missing(xlab)){
-        xlab <- ""
-    }
-    xlab <- ggplot2::xlab(xlab)
-
-    p <- c(p, list(xlab(xlab)))
-
-    if(missing(ylab)){
-        ylab <- ""
-    }
-
-    p <- c(p, list(ylab(ylab)))
-
-    if(!missing(main))
-        p <- c(p, labs(title = main))
-
+    labels <- Labels(xlab, ylab, main, fallback = c(x = "", y = ""))
+    p <- c(p, labels)
 ##    p <- setStat(p)
     return(p)
 })

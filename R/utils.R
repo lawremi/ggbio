@@ -847,3 +847,71 @@ by2 <- function(...) {
     class(ans) <- "list"
     ans
 }
+
+# returns NULL_OR_list
+# if x, y and main are missing then NULL will be returned.
+Labels <- function(x, y, main, fallback) {
+    labels <- c()
+    xflag <- yflag <- mainflag <- FALSE
+    if (!missing(fallback)) {
+        if ("x" %in% names(fallback) && missing(x)) {
+            xflag <- TRUE
+            x <- fallback[["x"]]
+        }
+        if ("y" %in% names(fallback) && missing(y)) {
+            yflag <- TRUE
+            y <- fallback[["y"]]
+        }
+        if ("main" %in% names(fallback) && missing(main)) {
+            mainflag <- TRUE
+            main <- fallback[["main"]]
+        }
+    }
+
+    # When flag is TRUE, label must be created
+    if (!missing(x) || xflag) {
+        stopifnot(is.character(x))
+        labels <- c(labels, list(xlab(x)))
+    }
+    if (!missing(y) || yflag) {
+        stopifnot(is.character(y))
+        labels <- c(labels, list(ylab(y)))
+    }
+    if (!missing(main) || mainflag) {
+        stopifnot(is.character(main))
+        labels <- c(labels, list(labs(title = main)))
+    }
+    return(labels)
+}
+
+remove_args <- function(args, remove) {
+    args[!names(args) %in% remove]
+}
+
+build_facet <- function(data, args, ...) {
+    args <- subsetArgsByFormals(args, ...)
+    .buildFacetsFromArgs(data, args)
+}
+
+make_addStepping <- function(gr, args, group.selfish, ...) {
+    if("group" %in% names(args)) {
+        addStepping(gr, group.name = quo_name(args$group),
+                    group.selfish = group.selfish, ...)
+    } else {
+        addStepping(gr, ...)
+    }
+}
+
+group_df <- function(df, group) {
+    .df.sub <- df[, c("stepping", group)]
+    .df.sub <- .df.sub[!duplicated(.df.sub$stepping),]
+}
+
+scale_y_continuous_by_group <- function(df, group, group.selfish) {
+     if(group != "stepping" & group.selfish) {
+      list(scale_y_continuous(breaks = df$stepping,
+                              labels = as.character(df[, group])))
+    } else {
+      list(scale_y_continuous(breaks = NULL))
+    }
+}

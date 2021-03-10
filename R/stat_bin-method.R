@@ -3,6 +3,25 @@ setMethod("stat_bin", "ANY", function(data, ...){
   ggplot2::stat_bin(data = data, ...)
 })
 
+
+stat_bin_geom_bar <- function(args.aes, args.non) {
+    args.non$stat <- "identity"
+    aes.args <- do.call(aes, args.aes)
+    p <- ggbio:::do.ggcall(geom_bar, c(list(aes.args), args.non))
+}
+
+stat_bin_geom_heatmap <- function(args.aes, args.non, binwidth) {
+    args.aes$xmin <- substitute(x - binwidth / 2, list(binwidth = binwidth))
+    args.aes$xmax <- substitute(x + binwidth / 2, list(binwidth = binwidth))
+    args.aes$ymin <- 0
+    args.aes$ymax <- 5
+    args.aes$color <- as.name("y")
+    args.aes$fill <- as.name("y")
+    args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]
+    aes.args <- do.call(aes, args.aes)
+    p <- ggbio:::do.ggcall(geom_rect, c(list(aes.args), args.non))
+}
+
 setMethod("stat_bin", "Rle", function(data, ..., binwidth, nbin = 30,
                                       xlab, ylab, main, geom = c("bar", "heatmap"),
                                       type = c("viewSums","viewMins",
@@ -26,76 +45,20 @@ setMethod("stat_bin", "Rle", function(data, ..., binwidth, nbin = 30,
     binwidth <- length(data)/nbin
     message("Default use binwidth: range/", nbin)
   }
-    df <- switch(type,
-                 viewMaxs = {
-                   vs <- Views(data,
-                                  start = seq(from = 1,
-                                    to = length(data), by = binwidth),
-                                  width = binwidth)
-                   
-                   x <- seq(from = 1,to = length(data), by = binwidth) + binwidth/2
-                   y <- viewMaxs(vs)
-                   data.frame(x = x, y = y)
-                 },
-                 viewMins = {
-                   vs <- Views(data,
-                                  start = seq(from = 1,
-                                    to = length(data), by = binwidth),
-                                  width = binwidth)
-                   x <- seq(from = 1,to = length(data), by = binwidth) + binwidth/2
-                   y <- viewMins(vs)
-                   data.frame(x = x, y = y)
-                 },
-                 viewSums = {
-                   vs <- Views(data,
-                                  start = seq(from = 1,
-                                    to = length(data), by = binwidth),
-                                  width = binwidth)
-                   x <- seq(from = 1,to = length(data), by = binwidth) + binwidth/2
-                   y <- viewSums(vs)
-                   data.frame(x = x, y = y)                
-                 },
-                 viewMeans = {
-                   vs <- Views(data,
-                                  start = seq(from = 1,
-                                    to = length(data), by = binwidth),
-                                  width = binwidth)
-                   x <- seq(from = 1,to = length(data), by = binwidth) + binwidth/2
-                   y <- viewMeans(vs)
-                   data.frame(x = x, y = y)                
-                 })
-
-  args.non$data <- df
-  if(geom == "bar"){
-    aes.args <- do.call(aes, args.aes)    
-    args.res <- c(list(aes.args),
-                  args.non)
-    p <- do.ggcall(geom_bar, args.res)
-  }
-  if(geom == "heatmap"){
-    args.aes$xmin <- substitute(x-binwidth/2, list(binwidth = binwidth))
-    args.aes$xmax <- substitute(x+binwidth/2, list(binwidth = binwidth))
-    args.aes$ymin <- 0
-    args.aes$ymax <- 5
-    args.aes$color <- as.name("y")
-    args.aes$fill <- as.name("y")
-    args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]
-    aes.args <- do.call(aes, args.aes)        
-    args.res <- c(list(aes.args),
-                  args.non)
-    p <- do.ggcall(geom_rect, args.res)    
-  }
-  if(!missing(xlab))
-    p <- c(p, list(ggplot2::xlab(xlab)))
-  else
-    p <- c(p, list(ggplot2::xlab("x")))
-
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  else
-    p <- c(p, list(ggplot2::ylab("y")))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
+  vs <- Views(data, start = seq(from = 1, to = length(data), by = binwidth),
+              width = binwidth)
+  x <- seq(from = 1, to = length(data), by = binwidth) + binwidth/2
+  y <- switch(type, viewMaxs = viewMaxs(vs),
+                      viewMins = viewMins(vs), 
+                      viewSums =  viewSums(vs),
+                      viewMeans = viewMeans(vs))
+  args.non$data <- data.frame(x = x, y = y)
+  if(geom == "bar")
+    p <- stat_bin_geom_bar(args.aes, args.non)
+  if(geom == "heatmap")
+    p <- stat_bin_geom_heatmap(args.aes, args.non, binwidth)
+  labels <- Labels(xlab, ylab, main, fallback = c(x = "x", y = "y"))
+  p <- c(p, labels)
   p
 })
 
@@ -130,70 +93,23 @@ setMethod("stat_bin", "RleList", function(data, ..., binwidth, nbin = 30,
       binwidth <- mn/nbin
       message("Default use binwidth: range/", nbin)
     }
-    df <- switch(type,
-                 viewMaxs = {
-                   vs <- lapply(data, function(x) {
-                     Views(x, start = seq(from = 1,
-                                    to = length(x), by = binwidth),
-                                  width = binwidth)})
-                   x <- lapply(data, function(x) {
-                     seq(from = 1, to = length(x), by = binwidth) + binwidth/2
-                   })
-                   y <- lapply(vs, viewMaxs)
-                   if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementNROWS(x))
-                   else
-                     nms <- rep(names(x), times = elementNROWS(x))
-                   data.frame(x = unlist(x), y = unlist(y), listName = nms)
-                 },
-                 viewMins = {
-                   vs <- lapply(data, function(x) {
-                     Views(x, start = seq(from = 1,
-                                    to = length(x), by = binwidth),
-                                  width = binwidth)})
-                   x <- lapply(data, function(x) {
-                     seq(from = 1, to = length(x), by = binwidth) + binwidth/2
-                   })
-                   y <- lapply(vs, viewMins)
-
-                   if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementNROWS(x))
-                   else
-                     nms <- rep(names(x), times = elementNROWS(x))
-                   data.frame(x = unlist(x), y = unlist(y), listName = nms)                
-                 },
-                 viewSums = {
-                   vs <- lapply(data, function(x) {
-                     Views(x, start = seq(from = 1,
-                                    to = length(x), by = binwidth),
-                                  width = binwidth)})
-                   x <- lapply(data, function(x) {
-                     seq(from = 1, to = length(x), by = binwidth) + binwidth/2
-                   })
-                   y <- lapply(vs, viewSums)
-                   if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementNROWS(x))
-                   else
-                     nms <- rep(names(x), times = elementNROWS(x))
-                   data.frame(x = unlist(x), y = unlist(y), listName = nms)                
-                 },
-                 viewMeans = {
-                   vs <- lapply(data, function(x) {
-                     Views(x, start = seq(from = 1,
-                                    to = length(x), by = binwidth),
-                                  width = binwidth)})
-                   x <- lapply(data, function(x) {
-                     seq(from = 1, to = length(x), by = binwidth) + binwidth/2
-                   })
-                   y <- lapply(vs, viewMeans)
-                   if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementNROWS(x))
-                   else
-                     nms <- rep(names(x), times = elementNROWS(x))
-                   data.frame(x = unlist(x), y = unlist(y), listName = nms)                
-                 })
+  vs <- lapply(data, function(x) {
+      Views(x, start = seq(from = 1, to = length(x), by = binwidth),
+            width = binwidth)
+  })
+  x <- lapply(data, function(x) {
+      seq(from = 1, to = length(x), by = binwidth) + binwidth/2
+  })
+  y <- switch(type, viewMaxs = lapply(vs, viewMaxs),
+                    viewMins = lapply(vs, viewMins),
+                    viewSums = lapply(vs, viewSums),
+                    viewMeans = lapply(vs, viewMeans))
+  if(is.null(names(x)))
+      nms <- rep(1:length(x), times = elementNROWS(x))
+  else
+      nms <- rep(names(x), times = elementNROWS(x))
+  df <- data.frame(x = unlist(x), y = unlist(y), listName = nms)
   colnames(df) <- c("x", "y", indName)
-  
   if(is.null(names(x)))
     levels(df[, indName]) <- 1:length(x)
   else
@@ -205,37 +121,13 @@ setMethod("stat_bin", "RleList", function(data, ..., binwidth, nbin = 30,
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- do.call(facet_grid, args.facets)
   
-    args.non$data <- df
-  if(geom == "bar"){
-    aes.args <- do.call(aes, args.aes)    
-    args.res <- c(list(aes.args),
-                  args.non)
-    p <- do.ggcall(geom_bar, args.res)
-  }
-  if(geom == "heatmap"){
-    args.aes$xmin <- substitute(x-binwidth/2, list(binwidth = binwidth))
-    args.aes$xmax <- substitute(x+binwidth/2, list(binwidth = binwidth))
-    args.aes$ymin <- 0
-    args.aes$ymax <- 5
-    args.aes$color <- as.name("y")
-    args.aes$fill <- as.name("y")
-    args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]
-    aes.args <- do.call(aes, args.aes)        
-    args.res <- c(list(aes.args),
-                  args.non)
-    p <- do.ggcall(geom_rect, args.res)    
-  }
-  if(!missing(xlab))
-    p <- c(p, list(ggplot2::xlab(xlab)))
-  else
-    p <- c(p, list(ggplot2::xlab("x")))
-
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  else
-    p <- c(p, list(ggplot2::ylab("y")))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
+  args.non$data <- df
+  if(geom == "bar")
+    p <- stat_bin_geom_bar(args.aes, args.non)
+  if(geom == "heatmap")
+    p <- stat_bin_geom_heatmap(args.aes, args.non, binwidth)
+  labels <- Labels(xlab, ylab, main, fallback = c(x = "x", y = "y"))
+  p <- c(p, labels)
   p <- c(list(p), list(facet))
   p <- setStat(p)
   p

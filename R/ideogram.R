@@ -26,47 +26,20 @@ Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytobands
     }
     ## do we need subchr here
     obj.ori <- obj
-    if(length(subchr)){
-        obj <- obj[seqnames(obj) == subchr]
-        obj <- keepSeqlevels(obj, subchr)
-    }else{
+    if(!length(subchr)){
         subchr <- sort(unique(as.character(seqnames(obj))))[1]
         message("use ", subchr, " automatically")
         obj <- obj[seqnames(obj) == subchr]
         obj <- keepSeqlevels(obj, subchr)
+    } else {
+        obj <- selectChromosome(obj, subchr)
     }
-    if(length(unique(as.character(seqnames(obj))))>1)
-        stop("Mulptiple chromosome information found")
     if(!biovizBase::isIdeogram(obj))
         cytobands <- FALSE
 
-    p <- ggplot() + layout_karyogram(obj, cytoband = cytobands, geom = NULL)
-    ## p.ideo <- p
-
-    if(length(zoom.region)){
-        if(length(zoom.region) != 2)
-            stop("zoom.region must be a numeric vector of length 2")
-        zoom.df <- data.frame(x1 = zoom.region[1],
-                              x2 = zoom.region[2],
-                              y1 = 0 - zoom.offset,
-                              y2 = 10 + zoom.offset,
-                              seqnames = unique(as.character(seqnames(obj))))
-        p <- p + ggplot2::geom_rect(data = zoom.df,
-                                    do.call(aes, list(xmin = substitute(x1),
-                                                      xmax = substitute(x2),
-                                                      ymin = substitute(y1),
-                                                      ymax = substitute(y2))),
-                                    color = color, fill = fill, size = size,
-                                    alpha = alpha)
-    }
-    p <- p + theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
-        scale_y_continuous(breaks = 5, labels = subchr) +
-            theme(strip.background = element_rect(colour = 'NA', fill = 'NA'))+
-                theme(strip.text.y = element_text(colour = 'white'))   + theme(legend.position = "none")+
-                    ggplot2::xlab("")
-    p <- p + theme(aspect.ratio = aspect.ratio, axis.ticks.y = element_blank())
-    if(!xlabel)
-        p <- p + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+    p <- ggplot() + layout_karyogram(obj, cytobands = cytobands, geom = NULL)
+    p <- adjustZoom(obj, p, zoom.region, zoom.offset, color, fill, size, alpha)
+    p <- applyTheme(p, xlabel, subchr, aspect.ratio)
 
     new("Ideogram", ggbio(p, data = obj.ori, ...), subchr = subchr, xlabel = xlabel,
         cytoband = cytobands, color = color, fill = fill, alpha = alpha,
@@ -77,7 +50,6 @@ Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytobands
 setMethod("print", "Ideogram", function(x){
     ## essentially a karyogram with single chrom
     obj <- x@data
-    zoom.region <- x@zoom.region
     xlabel <- x@xlabel
     subchr <- x@subchr
     aspect.ratio <- x@aspect.ratio
@@ -88,48 +60,13 @@ setMethod("print", "Ideogram", function(x){
     zoom.region <- x@zoom.region
     zoom.offset <- x@zoom.offset
     cytoband <- x@cytoband
-
-    if(!missing(subchr)){
-        obj <- obj[seqnames(obj) == subchr]
-        obj <- keepSeqlevels(obj, subchr)
-    }else{
-        subchr <- sort(unique(as.character(seqnames(obj))))[1]
-        message("use ", subchr, " automatically")
-        obj <- obj[seqnames(obj) == subchr]
-        obj <- keepSeqlevels(obj, subchr)
-    }
-    if(length(unique(as.character(seqnames(obj))))>1)
-        stop("Mulptiple chromosome information found")
+    obj <- selectChromosome(obj, subchr)
     if(!biovizBase::isIdeogram(obj))
-        cytoband <- FALSE
+        cytobands <- FALSE
 
     p <- ggplot() + layout_karyogram(obj, cytobands = cytoband, geom = NULL)
-    ## p.ideo <- p
-
-    if(length(zoom.region)){
-        if(length(zoom.region) != 2)
-            stop("zoom.region must be a numeric vector of length 2")
-        zoom.df <- data.frame(x1 = zoom.region[1],
-                              x2 = zoom.region[2],
-                              y1 = 0 - zoom.offset,
-                              y2 = 10 + zoom.offset,
-                              seqnames = unique(as.character(seqnames(obj))))
-        p <- p + ggplot2::geom_rect(data = zoom.df,
-                                    do.call(aes, list(xmin = substitute(x1),
-                                                      xmax = substitute(x2),
-                                                      ymin = substitute(y1),
-                                                      ymax = substitute(y2))),
-                                    color = color, fill = fill, size = size,
-                                    alpha = alpha)
-    }
-    p <- p + theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
-        scale_y_continuous(breaks = 5, labels = subchr) +
-            theme(strip.background = element_rect(colour = 'NA', fill = 'NA'))+
-                theme(strip.text.y = element_text(colour = 'white'))   + theme(legend.position = "none")+
-                    ggplot2::xlab("")
-    p <- p + theme(aspect.ratio = aspect.ratio, axis.ticks.y = element_blank())
-    if(!xlabel)
-        p <- p + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+    p <- adjustZoom(obj, p, zoom.region, zoom.offset, color, fill, size, alpha)
+    p <- applyTheme(p, xlabel, subchr, aspect.ratio)
     x@ggplot <- p
     x
 })
@@ -206,4 +143,52 @@ setMethod("+", c("Ideogram"), function(e1, e2){
     e1 <- print(e1)
     e1
 })
+
+selectChromosome <- function(obj, subchr) {
+    if(length(subchr)) {
+        obj <- obj[seqnames(obj) == subchr]
+        obj <- keepSeqlevels(obj, subchr)
+    } else {
+        subchr <- sort(unique(as.character(seqnames(obj))))[1]
+        message("use ", subchr, " automatically")
+        obj <- obj[seqnames(obj) == subchr]
+        obj <- keepSeqlevels(obj, subchr)
+    }
+    if(length(unique(as.character(seqnames(obj)))) > 1)
+        stop("Mulptiple chromosome information found")
+    obj
+}
+
+adjustZoom <- function(obj, plot, zoom.region, zoom.offset, color, fill, size, alpha) {
+    if(length(zoom.region)) {
+        if(length(zoom.region) != 2)
+            stop("zoom.region must be a numeric vector of length 2")
+        zoom.df <- data.frame(x1 = zoom.region[1],
+                              x2 = zoom.region[2],
+                              y1 = 0 - zoom.offset,
+                              y2 = 10 + zoom.offset,
+                              seqnames = unique(as.character(seqnames(obj))))
+        plot <- plot + ggplot2::geom_rect(data = zoom.df,
+                                    do.call(aes, list(xmin = substitute(x1),
+                                                      xmax = substitute(x2),
+                                                      ymin = substitute(y1),
+                                                      ymax = substitute(y2))),
+                                    color = color, fill = fill, size = size,
+                                    alpha = alpha)
+    } else {
+        plot
+    }
+}
+
+applyTheme <- function(plot, xlabel, subchr, aspect.ratio) {
+    plot <- plot + theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
+            scale_y_continuous(breaks = 5, labels = subchr) +
+            theme(strip.background = element_rect(colour = 'NA', fill = 'NA')) +
+            theme(strip.text.y = element_text(colour = 'white')) + theme(legend.position = "none") +
+            ggplot2::xlab("")
+    plot <- plot + theme(aspect.ratio = aspect.ratio, axis.ticks.y = element_blank())
+    if(!xlabel)
+        plot <- plot + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+    plot
+}
 

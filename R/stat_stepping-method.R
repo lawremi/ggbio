@@ -21,17 +21,8 @@ setMethod("stat_stepping", "GRanges", function(data, ...,
   }else{
     p <- NULL
   }
-  if(missing(xlab)) 
-    xlab <- ""
-  p <- c(p, list(ggplot2::xlab(xlab)))
-
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  else
-    p <- c(p, list(ggplot2::ylab("")))
-  
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
+  labels <- Labels(xlab, ylab, main, fallback = c(x = "", y = ""))
+  p <- c(p, labels)
   p <- setStat(p)
   p
 })

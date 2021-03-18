@@ -78,3 +78,9 @@ test_generator <- function(td) {
         }
     }
 }
+
+function_wrapper <- function(FUNC, data) {
+    function(...) {
+        FUNC(data, ...)
+    }
+}

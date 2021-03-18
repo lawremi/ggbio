@@ -14,3 +14,6 @@ lambda <- c(rep(0.001, 4500), seq(0.001, 10, length = 500), seq(10, 0.001, lengt
 xVector <- rpois(1e4, lambda)
 xRle <- Rle(xVector)
 xRleList <- RleList(xRle, 2L * xRle)
+require(Rsamtools)
+bamFile <- system.file("extdata", "ex1.bam", package="Rsamtools")
+bamFile <- BamFile(bamFile)

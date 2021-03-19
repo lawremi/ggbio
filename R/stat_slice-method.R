@@ -181,6 +181,8 @@ setMethod("stat_slice", "RleList", function(data, ...,
                                rangesOnly = rangesOnly)
                    x <- viewWhichMins(vs)                
                    y <- viewMins(vs)
+                   xmin <- start(vs)
+                   xmax <- end(vs)
                    if(is.null(names(x)))
                      nms <- rep(1:length(x), times = elementNROWS(x))
                    else

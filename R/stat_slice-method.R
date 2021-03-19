@@ -163,8 +163,8 @@ setMethod("stat_slice", "RleList", function(data, ...,
                                includeLower = includeLower,
                                includeUpper = includeUpper,
                                rangesOnly = rangesOnly)
-                   x <- viewWhichMaxs(vs)
-                   y <- viewMaxs(vs)
+                   x <- viewWhichMaxs(vs, na.rm = na.rm)
+                   y <- viewMaxs(vs, na.rm = na.rm)
                    xmin <- start(vs)
                    xmax <- end(vs)
                    if(is.null(names(x)))
@@ -179,8 +179,8 @@ setMethod("stat_slice", "RleList", function(data, ...,
                                includeLower = includeLower,
                                includeUpper = includeUpper,
                                rangesOnly = rangesOnly)
-                   x <- viewWhichMins(vs)                
-                   y <- viewMins(vs)
+                   x <- viewWhichMins(vs, na.rm = na.rm)
+                   y <- viewMins(vs, na.rm = na.rm)
                    xmin <- start(vs)
                    xmax <- end(vs)
                    if(is.null(names(x)))
@@ -203,7 +203,7 @@ setMethod("stat_slice", "RleList", function(data, ...,
                      nms <- rep(1:length(x), times = elementNROWS(x))
                    else
                      nms <- rep(names(x), times = elementNROWS(x))
-                   y <- viewSums(vs)
+                   y <- viewSums(vs, na.rm = na.rm)
                    data.frame(x = unlist(x), y = unlist(y), listName = nms,
                               xmin = unlist(xmin), xmax = unlist(xmax))                
                  },
@@ -219,7 +219,7 @@ setMethod("stat_slice", "RleList", function(data, ...,
                      nms <- rep(1:length(x), times = elementNROWS(x))
                    else
                      nms <- rep(names(x), times = elementNROWS(x))
-                   y <- viewMeans(vs)
+                   y <- viewMeans(vs, na.rm = na.rm)
                    data.frame(x = unlist(x), y = unlist(y), listName = nms,
                               xmin = unlist(xmin), xmax = unlist(xmax))                
                  })

@@ -888,33 +888,6 @@ uniformAroundPanel <- function(..., direction = c("row", "col")){
 
 align.plots <- alignPlots
 
-theme_onlyXaxis <- function(){
-  res <- theme_null()
-  res <- res + theme(
-                 panel.border = element_rect(fill = NA, color = NA),
-                 axis.text.x = element_text(vjust = 1),
-                 axis.ticks = element_line(colour = "grey50"),
-                 axis.ticks.y = element_blank(),
-                 axis.title.x = element_text(),
-                 axis.ticks.length = unit(0.15, "cm"),
-                 axis.text = element_text(margin = unit(0.1, "cm")),
-                 axis.line = element_line(color = "gray50"))
-
-  list(res,xlab(""))
-}
-
-ScalePlot <- function(x, color = "black", fill = NA){
-  df <- data.frame(x =x, y = 1)
-  p <- qplot(data = df, x = x, y = y, geom = "blank") +
-    theme_onlyXaxis() + theme(aspect.ratio = 1/1000) +
-      theme(panel.border = element_rect(color = color, fill = fill))
-  p <- new("ggplotPlot", p)
-  mutable(p) <- FALSE
-  hasAxis(p) <- TRUE
-  ## height(p) <- unit(4, "lines")
-  p
-}
-
 ## always comes last
 
 scaleGrob <- function(g){
@@ -922,89 +895,6 @@ scaleGrob <- function(g){
   idx <- unique(c(g$layout[idx, "t"], g$layout[idx, "b"]))
   res <- g[idx,]
   res
-}
-
-## always comes first
-titleGrob <- function(g){
-  idx <- findGrobs(g, "title")
-  idx <- unique(c(g$layout[idx, "t"], g$layout[idx, "b"]))
-  res <- g[idx,]
-  attr(res, "track_name") <- "title"
-  res
-}
-
-
-
-
-## cannot figure out right range when zoom in/out
-ScalePlot2 <- function(xlim, format = scientific_format(),
-                      aspect.ratio = 1/15, tick.length = 0.4,
-                      text.offset = 0.5,
-                      pos = c("bottom", "top", "inter")){
-
-  pos <- match.arg(pos)
-  p <- switch(pos,
-              bottom = {
-                y <- 1
-                cbs <- as.data.frame(cbreaks(range(xlim), labels = format))
-                idx <- rep(-1, length = nrow(cbs))
-                cbs$y <- y
-                cbs$y.text <- y + tick.length * idx + text.offset*idx
-                cbs$yend <- y + tick.length * idx
-
-                ylim <- scales::expand_range(range(c(cbs$y.text,y,cbs$yend)), mul = 0.3)
-                p <- qplot(x = range(cbs$breaks), y = y, geom = "lines") +
-                  geom_segment(data = cbs, aes(x = breaks, y = y, yend = yend, xend = breaks)) +
-                   geom_text(data = cbs, aes(x = breaks, y = y.text, label = labels), vjust = 0.5,
-                             size = 4) + coord_cartesian(ylim = ylim)+
-                      theme_null() + theme(aspect.ratio = aspect.ratio)
-                p
-              },
-
-              top = {
-                y <- 1
-                cbs <- as.data.frame(cbreaks(range(xlim), labels = format))
-                idx <- rep(1, length = nrow(cbs))
-                cbs$y <- y
-                cbs$y.text <- y + tick.length * idx + text.offset*idx
-                cbs$yend <- y + tick.length * idx
-                ylim <- scales::expand_range(range(c(cbs$y.text,y,cbs$yend)), mul = 0.3)
-                p <- qplot(x = range(cbs$breaks), y = y, geom = "lines") +
-                  geom_segment(data = cbs, aes(x = breaks, y = y, yend = yend, xend = breaks)) +
-                   geom_text(data = cbs, aes(x = breaks, y = y.text, label = labels), vjust = 0.5,
-                             size = 4) + coord_cartesian(ylim = ylim)+
-                      theme_null() + theme(aspect.ratio = aspect.ratio)
-                p
-              },
-              inter = {
-                y <- 1
-                cbs <- as.data.frame(cbreaks(range(xlim), labels = format))
-                idx <- rep(c(1, -1), length = nrow(cbs))
-                cbs$y <- y
-                cbs$y.text <- y + tick.length * idx + text.offset*idx
-                cbs$yend <- y + tick.length * idx
-                ylim <- scales::expand_range(range(cbs$y.text), mul = 0.3)
-                p <- qplot(x = range(cbs$breaks), y = y, geom = "lines") +
-                  geom_segment(data = cbs, aes(x = breaks, y = y, yend = yend, xend = breaks)) +
-                   geom_text(data = cbs, aes(x = breaks, y = y.text, label = labels), vjust = 0.5,
-                             size = 4) + coord_cartesian(ylim = ylim)+
-                      theme_null() + theme(aspect.ratio = aspect.ratio)
-                p
-              })
-  p
-}
-
-
-textPlot <- function(lb="", ut = unit(4, "lines")){
-  df <- data.frame(x =1:10, y = 1)
-  p <- qplot(x = 1, y = 1, geom = "text", label = lb) + theme_null()+
-    theme(plot.margin = unit(c(0, 0, 0, 0), "lines"),
-          panel.spacing = unit(c(0, 0, 0, 0), "lines"))
-  p <- new("ggplotPlot", p)
-  mutable(p) <- FALSE
-  fixed(p) <- TRUE
-  height(p) <- ut
-  p
 }
 
 removeXAxis <- function(g){
@@ -1031,15 +921,6 @@ removeYAxis <- function(g){
     g <- g[,idx]
   }
   g
-}
-
-getAxisHeight <- function(p, base){
-  .base <- as.numeric(base)
-  p2 <- p + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
-  h1 <- sum(Grob(p)$height)
-  h2 <- sum(Grob(p2)$height)
-  .h <- convertUnit(h1, "cm", valueOnly = TRUE)/convertUnit(h2, "cm", valueOnly = TRUE) * .base
-  unit(.h, "null")
 }
 
 getHeight <- function(dts){

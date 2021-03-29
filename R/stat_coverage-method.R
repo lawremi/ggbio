@@ -92,18 +92,8 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
 
   p <- .changeStrandColor(p, args.aes)
   p <- c(list(p) , list(facet))
-  if(missing(xlab))
-    xlab <- ""
-  p <- c(p, list(ggplot2::xlab(xlab)))
-
-
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  else
-    p <- c(p, list(ggplot2::ylab("Coverage")))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
-
+  labels <- Labels(xlab, ylab, main, fallback = c(x = "", y = "Coverage"))
+  p <- c(p, labels)
   p <- setStat(p)
   p
 })
@@ -125,18 +115,8 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
   gr <- flatGrl(data)
   args.non$data <- gr
   p <- do.ggcall(stat_coverage, c(list(aes.res), args.non))
-  if(!missing(xlab))
-    p <- c(p, list(ggplot2::xlab(xlab)))
-  else
-    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
-
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  else
-    p <- c(p, list(ggplot2::ylab("Coverage")))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
-
+  labels <- Labels(xlab, ylab, main, fallback = c(x = "Genomic Coordinates", y = "Coverage"))
+  p <- c(p, labels)
   p <- setStat(p)
   p
 })
@@ -252,18 +232,8 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
     p <- stat_coverage(res, ..., geom = geom, facets = facets)
   }
 
-  if(!missing(xlab))
-    p <- c(p, list(ggplot2::xlab(xlab)))
-  else
-    p <- c(p, list(ggplot2::xlab("Genomic Coordinates")))
-
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  else
-    p <- c(p, list(ggplot2::ylab("Coverage")))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
-
+  labels <- Labels(xlab, ylab, main, fallback = c(x = "Genomic Coordinates", y = "Coverage"))
+  p <- c(p, labels)
   if(is_coord_genome(res.ori)){
     ss <- getXScale(res.ori)
     p <- c(p, list(scale_x_continuous(breaks = ss$breaks,

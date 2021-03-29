@@ -20,17 +20,8 @@ setMethod("stat_reduce", "GRanges", function(data, ...,
   args.res <- c(list(aes.res), args.non)
   p <- list(do.call(stat_stepping, args.res))
 
-  if(missing(xlab))
-    xlab <- ""
-  p <- c(p, list(ggplot2::xlab(xlab)))
-
-
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  else
-    p <- c(p, list(ggplot2::ylab("")))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
+  labels <- Labels(xlab, ylab, main, fallback = c(x = "", y = ""))
+  p <- c(p, labels)
   p <- setStat(p)
 p
 })
@@ -62,18 +53,10 @@ setMethod("stat_reduce", "IRanges", function(data, ...,
   args.res <- c(list(aes.res), args.non)
   p <- list(do.call(stat_stepping, args.res))
 
-  if(!missing(xlab))
-    p <- c(p, list(ggplot2::xlab(xlab)))
-  else
-    p <- c(p, list(ggplot2::xlab("Position")))
-  if(!missing(ylab))
-    p <- c(p, list(ggplot2::ylab(ylab)))
-  else
-    p <- c(p, list(ggplot2::ylab("")))
-  if(!missing(main))
-    p <- c(p, list(labs(title = main)))
-    p <- setStat(p)
-p
+  labels <- Labels(xlab, ylab, main, fallback = c(x = "Position", y = ""))
+  p <- c(p, labels)
+  p <- setStat(p)
+  p
 })
 
 

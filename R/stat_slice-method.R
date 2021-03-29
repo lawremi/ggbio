@@ -1,6 +1,71 @@
 ## FIXME: add ..coverage.., and a new way
 setGeneric("stat_slice", function(data, ...) standardGeneric("stat_slice"))
 
+get_coordinate_by_type <- function(type, vs, na.rm, islist = FALSE) {
+   values <- switch(type,
+            viewMaxs = list(x = viewWhichMaxs(vs, na.rm = na.rm), y = viewMaxs(vs, na.rm = na.rm)),
+            viewMins = list(x = viewWhichMins(vs, na.rm = na.rm), y = viewMins(vs, na.rm = na.rm)),
+            viewSums = list(x = start(vs) + width(vs)/2, y = viewSums(vs, na.rm = na.rm)),
+            viewMeans = list(x = start(vs) + width(vs)/2, y = viewMeans(vs, na.rm = na.rm)))
+    if (islist) {
+        values[["xmin"]] <- start(vs)
+        values[["xmax"]] <- end(vs)
+    }
+    values
+}
+
+map_coordinate_by_geom <- function(geom, args.aes, args.non, vs, islist = FALSE) {
+    values <- list()
+    if (islist) {
+        values[["xmin"]] <- as.name("xmin")
+        values[["xmax"]] <- as.name("xmax")
+    } else {
+        values[["xmin"]] <- start(vs)
+        values[["xmax"]] <- end(vs)
+    }
+
+    if (geom == "segment") {
+        args.aes$x <- as.name("x")
+        args.aes$xend <- as.name("x")
+        args.aes$y <- 0
+        args.aes$yend <- as.name("y")
+    }
+    if (geom == "rect") {
+        args.aes$xmin <- values[["xmin"]]
+        args.aes$xmax <- values[["xmax"]]
+        args.aes$ymin <- 0
+        args.aes$ymax <- 5
+        args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]
+    }
+    if (geom == "heatmap") {
+        args.non$geom <- "rect"
+        args.aes$xmin <- values[["xmin"]]
+        args.aes$xmax <- values[["xmax"]]
+        args.aes$ymin <- 0
+        args.aes$ymax <- 5
+        args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]
+        args.aes$color <- as.name("y")
+        args.aes$fill <- as.name("y")
+    }
+    if (geom == "bar") {
+        args.non$geom <- "rect"
+        args.aes$xmin <- values[["xmin"]]
+        args.aes$xmax <- values[["xmax"]]
+        args.aes$ymin <- 0
+        args.aes$ymax <- as.name("y")
+        args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]
+    }
+    if (geom %in% c("bar", "rect")) {
+        if(!"color" %in% names(args.aes) &&
+        !"color" %in% names(args.non) &&
+        !"colour" %in% names(args.aes) &&
+        !"colour" %in% names(args.non)) {
+            args.non$color <- "grey20"
+        }
+    }
+    list(args.aes = args.aes, args.non = args.non)
+}
+
 setMethod("stat_slice", "Rle", function(data, ...,
                                         xlab, ylab, main,
                                         na.rm = FALSE,
@@ -29,86 +94,13 @@ setMethod("stat_slice", "Rle", function(data, ...,
     args.aes$y <- substitute(y)
 
   args.non$geom <- geom  
-
-    df <- switch(type,
-                 viewMaxs = {
-                   vs <- slice(data, upper = upper, lower = lower,
-                               includeLower = includeLower,
-                               includeUpper = includeUpper,
-                               rangesOnly = rangesOnly)
-                   x <- viewWhichMaxs(vs, na.rm = na.rm)                
-                   y <- viewMaxs(vs, na.rm = na.rm)
-                   data.frame(x = x, y = y)
-                 },
-                 viewMins = {
-                   vs <- slice(data, upper = upper, lower = lower,
-                               includeLower = includeLower,
-                               includeUpper = includeUpper,
-                               rangesOnly = rangesOnly)
-                   x <- viewWhichMins(vs, na.rm = na.rm)                
-                   y <- viewMins(vs, na.rm = na.rm)
-                   data.frame(x = x, y = y)
-                 },
-                 viewSums = {
-                   vs <- slice(data, upper = upper, lower = lower,
-                               includeLower = includeLower,
-                               includeUpper = includeUpper,
-                               rangesOnly = rangesOnly)
-                   x <- start(vs) + width(vs)/2
-                   y <- viewSums(vs, na.rm = na.rm)
-                   data.frame(x = x, y = y)                
-                 },
-                 viewMeans = {
-                   vs <- slice(data, upper = upper, lower = lower,
-                               includeLower = includeLower,
-                               includeUpper = includeUpper,
-                               rangesOnly = rangesOnly)
-                   x <- start(vs) + width(vs)/2
-                   y <- viewMeans(vs, na.rm = na.rm)
-                   data.frame(x = x, y = y)                
-                 })
-  if(geom == "segment"){
-    args.aes$x <- as.name("x")
-    args.aes$xend <- as.name("x")
-    args.aes$y <- 0
-    args.aes$yend <- as.name("y")
-  }
-  if(geom == "rect"){
-    args.aes$xmin <- start(vs)
-    args.aes$xmax <- end(vs)
-    args.aes$ymin <- 0
-    args.aes$ymax <- 5
-    args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]
-  }
-  if(geom == "heatmap"){
-    args.non$geom <- "rect"
-    args.aes$xmin <- start(vs)
-    args.aes$xmax <- end(vs)
-    args.aes$ymin <- 0
-    args.aes$ymax <- 5
-    args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]    
-    args.aes$color <- as.name("y")
-    args.aes$fill <- as.name("y")    
-  }
-  if(geom == "bar"){
-    args.non$geom <- "rect"
-    args.aes$xmin <- start(vs)
-    args.aes$xmax <- end(vs)
-    args.aes$ymin <- 0
-    args.aes$ymax <- as.name("y")
-    args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]    
-  }
-
-  if(geom %in% c("bar", "rect")){
-    if(!"color" %in% names(args.aes) &&
-       !"color" %in% names(args.non) &&
-       !"colour" %in% names(args.aes) &&
-       !"colour" %in% names(args.non)){
-      args.non$color <- "grey20"
-    }
-  }
-    
-  
+  vs <- slice(data, upper = upper, lower = lower, includeLower = includeLower,
+              includeUpper = includeUpper, rangesOnly = rangesOnly)
+  values <- get_coordinate_by_type(type, vs, na.rm)
+  df <- data.frame(x = values[["x"]], y = values[["y"]])
+  values <- map_coordinate_by_geom(geom, args.aes, args.non, vs)
+  args.aes <- values[["args.aes"]]
+  args.non <- values[["args.non"]]
   args.non$data <- df
   aes.args <- do.call(aes, args.aes)
   res.args <- c(list(aes.args), args.non)
@@ -156,74 +148,16 @@ setMethod("stat_slice", "RleList", function(data, ...,
   
   args.non <- parseArgsForNonAes(args)
   args.non$geom <- geom
-
-    df <- switch(type,
-                 viewMaxs = {
-                   vs <- slice(data, upper = upper, lower = lower,
-                               includeLower = includeLower,
-                               includeUpper = includeUpper,
-                               rangesOnly = rangesOnly)
-                   x <- viewWhichMaxs(vs)
-                   y <- viewMaxs(vs)
-                   xmin <- start(vs)
-                   xmax <- end(vs)
-                   if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementNROWS(x))
-                   else
-                     nms <- rep(names(x), times = elementNROWS(x))
-                   data.frame(x = unlist(x), y = unlist(y), listName = nms,
-                              xmin = unlist(xmin), xmax = unlist(xmax))
-                  },
-                 viewMins = {
-                   vs <- slice(data, upper = upper, lower = lower,
-                               includeLower = includeLower,
-                               includeUpper = includeUpper,
-                               rangesOnly = rangesOnly)
-                   x <- viewWhichMins(vs)                
-                   y <- viewMins(vs)
-                   if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementNROWS(x))
-                   else
-                     nms <- rep(names(x), times = elementNROWS(x))
-                   data.frame(x = unlist(x), y = unlist(y), listName = nms,
-                              xmin = unlist(xmin), xmax = unlist(xmax))                
-                 },
-                 viewSums = {
-                   vs <- slice(data, upper = upper, lower = lower,
-                               includeLower = includeLower,
-                               includeUpper = includeUpper,
-                               rangesOnly = rangesOnly)
-                   
-                   x <- start(vs) + width(vs)/2
-                   xmin <- start(vs)
-                   xmax <- end(vs)
-                   if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementNROWS(x))
-                   else
-                     nms <- rep(names(x), times = elementNROWS(x))
-                   y <- viewSums(vs)
-                   data.frame(x = unlist(x), y = unlist(y), listName = nms,
-                              xmin = unlist(xmin), xmax = unlist(xmax))                
-                 },
-                 viewMeans = {
-                   vs <- slice(data, upper = upper, lower = lower,
-                               includeLower = includeLower,
-                               includeUpper = includeUpper,
-                               rangesOnly = rangesOnly)
-                   x <- start(vs) + width(vs)/2
-                   xmin <- start(vs)
-                   xmax <- end(vs)
-                   if(is.null(names(x)))
-                     nms <- rep(1:length(x), times = elementNROWS(x))
-                   else
-                     nms <- rep(names(x), times = elementNROWS(x))
-                   y <- viewMeans(vs)
-                   data.frame(x = unlist(x), y = unlist(y), listName = nms,
-                              xmin = unlist(xmin), xmax = unlist(xmax))                
-                 })
-
-
-
+  vs <- slice(data, upper = upper, lower = lower, includeLower = includeLower,
+              includeUpper = includeUpper, rangesOnly = rangesOnly)
+  values <- get_coordinate_by_type(type, vs, na.rm, islist = TRUE)
+  x <- values[["x"]]
+  if (is.null(names(x)))
+      nms <- rep(1:length(x), times = elementNROWS(x))
+  else
+      nms <- rep(names(x), times = elementNROWS(x))
+  df <- data.frame(x = unlist(values[["x"]]), y = unlist(values[["y"]]), listName = nms,
+                    xmin = unlist(values[["xmin"]]), xmax = unlist(values[["xmax"]]))
   colnames(df) <- c("x", "y", indName, "xmin", "xmax")
 
   if(is.null(names(x)))
@@ -237,49 +171,9 @@ setMethod("stat_slice", "RleList", function(data, ...,
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- do.call(facet_grid, args.facets)
 
-
-  if(geom == "segment"){
-    args.aes$x <- as.name("x")
-    args.aes$xend <- as.name("x")
-    args.aes$y <- 0
-    args.aes$yend <- as.name("y")
-  }
-
-  if(geom == "rect"){
-    args.aes$xmin <- as.name("xmin")
-    args.aes$xmax <- as.name("xmax")
-    args.aes$ymin <- 0
-    args.aes$ymax <- 5
-    args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]
-  }
-  if(geom == "heatmap"){
-    args.non$geom <- "rect"
-    args.aes$xmin <- as.name("xmin")
-    args.aes$xmax <- as.name("xmax")
-    args.aes$ymin <- 0
-    args.aes$ymax <- 5
-    args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]    
-    args.aes$color <- as.name("y")
-    args.aes$fill <- as.name("y")    
-  }
-  if(geom == "bar"){
-    args.non$geom <- "rect"
-    args.aes$xmin <- as.name("xmin")
-    args.aes$xmax <- as.name("xmax")
-    args.aes$ymin <- 0
-    args.aes$ymax <- as.name("y")
-    args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]    
-  }
-
-  if(geom %in% c("bar", "rect")){
-    if(!"color" %in% names(args.aes) &&
-       !"color" %in% names(args.non) &&
-       !"colour" %in% names(args.aes) &&
-       !"colour" %in% names(args.non)){
-      args.non$color <- "grey20"
-    }
-  }
-  
+  values <- map_coordinate_by_geom(geom, args.aes, args.non, vs, islist = TRUE)
+  args.aes <- values[["args.aes"]]
+  args.non <- values[["args.non"]]
 
   args.non$data <- df
   aes.args <- do.call(aes, args.aes)

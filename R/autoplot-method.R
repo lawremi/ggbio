@@ -1463,7 +1463,7 @@ setMethod("autoplot", "VCF", function(object, ...,
             sapply(info(x)@listData, class)
         }
         cls <- colClasses(object)
-        idx.cls <- which(cls %in% c("numeric", "integer", "character", "factor"))
+        idx <- which(cls %in% c("numeric", "integer", "character", "factor"))
         temp <- granges(object)
         values(temp) <- info(object)
         df <- mold(temp)

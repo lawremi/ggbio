@@ -1274,8 +1274,8 @@ setMethod("autoplot", "VRanges", function(object, ...,which = NULL,
 
     if(is.null(geom)){
         geom <- zoomLevelToGeom(diff(.xlim), "VRanges")
-    }else if(!geom %in% c("text", "rect")){
-        stop("geom must be one of: ", paste("text", "rect"))
+    }else if(!geom %in% c("text", "rect", "none")){
+        stop("geom must be one of: ", paste("text", "rect", "none"))
     }
 
     message(geom, " geom is used")

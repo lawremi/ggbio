@@ -151,12 +151,15 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
         ss <- getXScale(object)
         p <- p + scale_x_continuous(breaks = ss$breaks,
                                     labels = ss$labels)
-        if(metadata(object)$x.max < 1e8){
-            sls <- seqlengths(.obj)
-            sls <- sum(sls)
-            if(!is.na(sls)){
-                .xlim <- c(0, sls)
-                p <- p + xlim(.xlim)
+        metadata <- metadata(object)
+        if (!is.null(metadata$x.max)) {
+            if(metadata$x.max < 1e8) {
+                sls <- seqlengths(.obj)
+                sls <- sum(sls)
+                if(!is.na(sls)) {
+                    .xlim <- c(0, sls)
+                    p <- p + xlim(.xlim)
+                }
             }
         }
     }

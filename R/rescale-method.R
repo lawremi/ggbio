@@ -18,16 +18,16 @@ setMethod("rescale", "gg", function(x, xlim, ylim, sx = 1, sy = 1){
     res <- x + coord_cartesian(ylim = ylim)    
     ## res <- x + scale_x_continuous(limits = ylim)
   if(sx != 1){
-    xlim <- getLimits(x)$xlim
+    xlim <- .getLimits(x)$xlim
     xlim.mean <- mean(xlim)
     extra.new <- diff(xlim) * sx/2
     xlim <- c(xlim.mean - extra.new, xlim.mean + extra.new)
     res <- x + coord_cartesian(xlim = xlim)
   }
   if(sy != 1){
-    ylim <- getLimits(x)$ylim
+    ylim <- .getLimits(x)$ylim
     ylim.mean <- mean(ylim)
-    extra.new <- diff(ylim) * sx/2
+    extra.new <- diff(ylim) * sy/2
     ylim <- c(ylim.mean - extra.new, ylim.mean + extra.new)
     res <- x + coord_cartesian(ylim = ylim)
   }

@@ -1,3 +1,4 @@
+setClassUnion("list_OR_NULL", c("list", "NULL"))
 setClass("TestDetails", representation(
     with_parameter_name = "character_OR_NULL",
     with_parameter_values = "list_OR_NULL",

@@ -3,121 +3,87 @@
 ## naming the interval
 ## two mode? packed, full with name (default)
 ## reduce is just a stat transformation at lower level
+GeomGRect <- ggproto("GeomGRect", GeomRect,
+    required_aes = c("xmin", "xmax", "ymin|y", "ymax|y"),
+
+    extra_params = c("rect.height"),
+
+    draw_key = GeomRect$draw_key,
+
+    setup_data = function(data, params) {
+        params$rect.height <- params$rect.height %||% (diff(range(data$y))/10)
+        data$ymin <- data$y + params$rect.height
+        data$ymax <- data$y
+        data
+    },
+
+    draw_panel = function(self, data, panel_params, coord, na.rm = FALSE) {
+        ggproto_parent(GeomRect, self)$draw_panel(data, panel_params, coord)
+    }
+)
+
+geom_grect <- function(mapping = NULL, data = NULL, stat = "identity",
+                       position = "identity", ..., na.rm = FALSE,
+                       show.legend = NA, inherit.aes = TRUE,
+                       rect.height = NULL) {
+    layer <- layer(
+        data = data,
+        mapping = mapping,
+        stat = stat,
+        geom = GeomGRect,
+        position = position,
+        show.legend = show.legend,
+        inherit.aes = inherit.aes,
+        params = list(
+            rect.height = rect.height,
+            na.rm = na.rm,
+            ...
+        )
+    )
+    .changeStrandColor(layer, mapping)
+}
+
 setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
 
-setMethod("geom_rect", "ANY", function(data, ...){
-  ggplot2::geom_rect(data = data, ...)
+setMethod(geom_rect, "data.frame",
+          function(data = NULL, mapping = NULL, stat = "identity",
+                   position = "identity", ..., na.rm = FALSE,
+                   show.legend = NA, inherit.aes = TRUE,
+                   rect.height = NULL) {
+    geom_grect(mapping = mapping, data = data, stat = stat,
+               position = position, ..., na.rm = na.rm,
+               show.legend = show.legend,
+               inherit.aes = inherit.aes,
+               rect.height = rect.height)
 })
 
-## alignment should be convenient toggle with chevron...
-setMethod("geom_rect", "GRanges", function(data,...,
-                                           xlab, ylab, main,
-                                           facets = NULL,
-                                           stat = c("stepping", "identity"),
-                                           rect.height = NULL,
-                                           group.selfish = TRUE){
+setMethod(geom_rect, "GRanges",
+          function(data = NULL, mapping = NULL, ...,
+                   facets = ~seqnames, rect.height = NULL,
+                   stat = c("stepping", "identity"),
+                   group.selfish = TRUE, na.rm = FALSE,
+                   group = NULL, extend.size = 0,
+                   xlab = "Genomic Coordinates",
+                   ylab, main) {
+    stat <- match.arg(stat)
 
-
-  ## make this by hand
-  args <- list(...)
-  args$facets <- facets
-  args.aes <- parseArgsForAes(args)
-  args.non <- parseArgsForNonAes(args)
-  es <- ifelse("extend.size" %in% names(args.non), args.non$extend.size, 0)
-  facet <- build_facet(data, args, facet_grid, facet_wrap)
-  stat <- match.arg(stat)
-  if(length(data)){
-  if(stat == "stepping"){
-    if(is.null(rect.height)) rect.height <- 0.4
-    grl <- splitByFacets(data, facets)
-    res <- endoapply(grl, make_addStepping, args.aes, group.selfish, extend.size = es)
-    df <- mold(unlist(res))
-
-    args.aes <- remove_args(args.aes, c("xmin", "xmax", "ymin", "ymax", "data"))
-    args.non <- remove_args(args.non, c("xmin", "xmax", "ymax", "ymax", "data", "facets"))
-    gpn <- ifelse("group" %in% names(args), quo_name(args$group), "stepping")
-    args.aes <- remove_args(args.aes, c("group", "size"))
-    ## overcome 1 pixel problem
-    args.aes.seg <- remove_args(args.aes, c("fill", "y", "xend", "yend", "x"))
-    args.aes.seg <- c(args.aes.seg, list(x = substitute(start),
-                                 xend = substitute(start),
-                                 y = substitute(stepping - rect.height),
-                                 yend = substitute(stepping + rect.height)))
-
-    aes.res.seg <- do.call(aes, args.aes.seg)
-    args.res.seg <- c(list(data = df), list(aes.res.seg), args.non)
-    p <- list(do.ggcall(ggplot2::geom_segment,args.res.seg))
-    args.aes <- c(args.aes, list(xmin = substitute(start),
-                                 xmax = substitute(end),
-                                 ymin = substitute(stepping - rect.height),
-                                 ymax = substitute(stepping + rect.height)))
-    aes.res <- do.call(aes, args.aes)
-    args.res <- c(list(data = df), list(aes.res), args.non)
-    
-    p <- c(p, list(do.ggcall(ggplot2::geom_rect,args.res)))
-    p <- .changeStrandColor(p, args.aes)
-    .df.sub <- group_df(df, gpn)
-    ## FIXME:
-    y_scale <- scale_y_continuous_by_group(.df.sub, gpn, group.selfish)
-    p <- c(p, y_scale)
-  }
-  
-  if(stat == "identity"){
-    if(!"y" %in% names(args.aes)){
-      if(!all(c("ymin","ymax", "xmin", "xmax") %in% names(args.aes))){
-        stop("aes(xmin =, xmax= , ymin =, ymax= ) is required for stat 'identity',
-              you could also specify aes(y =) only as alternative")
-      }else{
-        args.aes.seg <- args.aes
-        args.aes.seg$x <- args.aes$xmin
-        args.aes.seg$xend <- args.aes$xmax
-        args.aes.seg$y <- args.aes$ymin
-        args.aes.seg$yend <- args.aes$ymax
-      }
-    }else{
-      .y <- quo_squash(args.aes$y)
-      if(is.null(rect.height)){
-         rect.height <- diff(range(values(data)[,as.character(.y)]))/20
-      }
-      args.aes.seg <- args.aes
-      mapping <- list(y = .y, rect.height = rect.height)
-      args.aes.seg$x <- as.name("start")
-      args.aes.seg$xend <- as.name("start")
-      args.aes.seg$y <- substitute(y + rect.height, mapping)
-      args.aes.seg$yend <- substitute(y - rect.height , mapping)
-      
-      args.aes$xmin <- as.name("start")
-      args.aes$xmax <- as.name("end")
-      args.aes$ymin <- substitute(y + rect.height, mapping)
-      args.aes$ymax <- substitute(y - rect.height , mapping)
+    if (identical(stat, "identity")) {
+        if (!"y" %in% names(mapping) &&
+            !all(c("xmin", "xmax", "ymin", "ymax") %in% names(mapping)))
+            stop("aes(xmin =, xmax= , ymin =, ymax= ) is required for stat 'identity',
+                  you could also specify aes(y =) only as alternative", .Call = FALSE)
+        mapping <- aes_merge(aes(xmin = start, xmax = end), mapping)
+    } else if (identical(stat, "stepping")) {
+        mapping <- mapping %||% aes(y = stepping)
+        mapping <- aes_merge(aes(xmin = start, xmax = end), mapping)
+        rect.height <- rect.height %||% 0.8
+        data <- data |> stepping(group = group, group.selfish = group.selfish,
+                                 extend.size = extend.size)
     }
-    df <- mold(data)
 
-    ## overcome 1 pixel problem
-    args.aes.seg <- remove_args(args.aes.seg, c("group", "size"))
-    aes.res.seg <- do.call(aes, args.aes.seg)
-
-    args.res.seg <- c(list(data = df), list(aes.res.seg), args.non)
-    p <- list(do.ggcall(ggplot2::geom_segment, args.res.seg))
-
-    args.aes <- remove_args(args.aes, c("group", "size"))
-    aes.res <- do.call(aes, args.aes)
-
-    args.res <- c(list(data = df), list(aes.res), args.non)
-    p <- c(p, list(do.ggcall(ggplot2::geom_rect, args.res)))
-    p <- .changeStrandColor(p, args.aes)
-  }
-  }else{
-    p <- NULL
-  }
-
-  p <- c(list(p), list(facet))
-
-  if(identical(stat, "stepping"))
-    labels <- Labels(xlab, ylab, main, fallback = c(x = "", y = ""))
-  else labels <- Labels(xlab, ylab, main, fallback = c(x = ""))
-
-  p <- c(p, labels)
-  p
+    c(geom_grect(mapping, fortify(data), rect.height = rect.height,
+      na.rm = na.rm, ...),
+      facet_grid(facets),
+      Labels(xlab, ylab, main))
 })
 

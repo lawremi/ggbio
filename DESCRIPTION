@@ -17,7 +17,7 @@ Authors@R: c(person("Tengfei", "Yin", role=c("aut"),
                  email="michafla@gene.com"),
           person("Dianne", "Cook", role=c("aut", "ths")),
           person("Johannes", "Rainer", role="ctb"))
-Depends: methods, BiocGenerics, ggplot2 (>= 1.0.0)
+Depends: methods, R7, BiocGenerics, ggplot2 (>= 1.0.0)
 Imports: grid, grDevices, graphics, stats, utils, gridExtra, scales, reshape2,
         gtable, Hmisc, biovizBase (>= 1.29.2), Biobase, S4Vectors (>= 0.13.13),
         IRanges (>= 2.11.16), GenomeInfoDb (>= 1.1.3),
@@ -35,7 +35,7 @@ URL: http://tengfei.github.com/ggbio/
 BugReports: https://github.com/tengfei/ggbio/issues
 License: Artistic-2.0
 LazyLoad: Yes
-Collate: AllClasses.R AllGenerics.R Cache-class.R GGbio-class.R
+Collate: AllClasses.R AllGenerics.R Cache-class.R fortify.R transformations.R GGbio-class.R
         Grob-class.R ideogram.R Tracked-class.R Plot-class.R
         ggplot-method.R theme.R Tracks-class.R
         geom_chevron-method.R geom_alignment-method.R

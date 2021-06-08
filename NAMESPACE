@@ -2,6 +2,7 @@
 ## ============================================================
 
 import(methods)
+import(R7)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### base packages
@@ -170,6 +171,7 @@ export(zoom, zoom_in, zoom_out, nextView, prevView)
 ##               cached_which, cbind, rbind)
 ## export(PlotList, Tracked, Plot, Grob)
 
+export(fortify, stepping)
 
 S3method(ggplot, Vector)
 S3method(ggplot, matrix)

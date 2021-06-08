@@ -915,3 +915,13 @@ scale_y_continuous_by_group <- function(df, group, group.selfish) {
       list(scale_y_continuous(breaks = NULL))
     }
 }
+
+"%||%" <- ggplot2:::"%||%"
+
+aes_merge <- function(mapping, ...) {
+    args <- list(...)
+    if (length(args) == 1 && identical(args[[1]], NULL))
+        mapping
+    else
+        ggplot2:::rename_aes(modifyList(mapping, ...))
+}

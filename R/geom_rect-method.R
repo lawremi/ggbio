@@ -45,7 +45,7 @@ geom_grect <- function(mapping = NULL, data = NULL, stat = "identity",
 
 setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
 
-setMethod(geom_rect, "data.frame",
+setMethod("geom_rect", "data.frame",
           function(data = NULL, mapping = NULL, stat = "identity",
                    position = "identity", ..., na.rm = FALSE,
                    show.legend = NA, inherit.aes = TRUE,
@@ -57,7 +57,7 @@ setMethod(geom_rect, "data.frame",
                rect.height = rect.height)
 })
 
-setMethod(geom_rect, "GRanges",
+setMethod("geom_rect", "GRanges",
           function(data = NULL, mapping = NULL, ...,
                    facets = ~seqnames, rect.height = NULL,
                    stat = c("stepping", "identity"),

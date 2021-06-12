@@ -22,7 +22,7 @@ GeomGRect <- ggproto("GeomGRect", GeomRect,
     }
 )
 
-geom_grect <- function(mapping = NULL, data = NULL, stat = "identity",
+geom_grect <- function(data = NULL, mapping = NULL, stat = "identity",
                        position = "identity", ..., na.rm = FALSE,
                        show.legend = NA, inherit.aes = TRUE,
                        rect.height = NULL) {
@@ -81,7 +81,7 @@ setMethod("geom_rect", "GRanges",
                                  extend.size = extend.size)
     }
 
-    c(geom_grect(mapping, fortify(data), rect.height = rect.height,
+    c(geom_grect(fortify(data), mapping, rect.height = rect.height,
       na.rm = na.rm, ...),
       facet_grid(facets),
       Labels(xlab, ylab, main))

@@ -58,6 +58,7 @@ setMethod("geom_rect", "GRanges",
                    xlab = "Genomic Coordinates",
                    ylab, main) {
     stat <- match.arg(stat)
+    y_scale <- NULL
 
     if (identical(stat, "identity")) {
         if (!"y" %in% names(mapping) &&
@@ -71,10 +72,20 @@ setMethod("geom_rect", "GRanges",
         rect.height <- rect.height %||% 0.8
         data <- data |> stepping(group = group, group.selfish = group.selfish,
                                  extend.size = extend.size)
+
+        if (missing(ylab))
+            ylab <- ""
+        if (is.null(group))
+            group <- "stepping"
+
+        df <- elementMetadata(data)
+        df <- group_df(df, group)
+        y_scale <- scale_y_continuous_by_group(df, group, group.selfish)
     }
 
     c(geom_grect(fortify(data), mapping, rect.height = rect.height,
       na.rm = na.rm, ...),
       facet_grid(facets),
+      y_scale,
       Labels(xlab, ylab, main))
 })

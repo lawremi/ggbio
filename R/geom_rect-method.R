@@ -45,6 +45,10 @@ geom_grect <- function(data = NULL, mapping = NULL, stat = "identity",
 
 setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
 
+setMethod("geom_rect", "ANY", function(data, ...) {
+    ggplot2::geom_rect(data = data, ...)
+})
+
 setMethod("geom_rect", "GRanges",
           function(data = NULL, mapping = NULL, ...,
                    facets = ~seqnames, rect.height = NULL,

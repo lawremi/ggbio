@@ -45,18 +45,6 @@ geom_grect <- function(data = NULL, mapping = NULL, stat = "identity",
 
 setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
 
-setMethod("geom_rect", "data.frame",
-          function(data = NULL, mapping = NULL, stat = "identity",
-                   position = "identity", ..., na.rm = FALSE,
-                   show.legend = NA, inherit.aes = TRUE,
-                   rect.height = NULL) {
-    geom_grect(mapping = mapping, data = data, stat = stat,
-               position = position, ..., na.rm = na.rm,
-               show.legend = show.legend,
-               inherit.aes = inherit.aes,
-               rect.height = rect.height)
-})
-
 setMethod("geom_rect", "GRanges",
           function(data = NULL, mapping = NULL, ...,
                    facets = ~seqnames, rect.height = NULL,
@@ -86,4 +74,3 @@ setMethod("geom_rect", "GRanges",
       facet_grid(facets),
       Labels(xlab, ylab, main))
 })
-

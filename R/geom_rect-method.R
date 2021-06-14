@@ -11,9 +11,12 @@ GeomGRect <- ggproto("GeomGRect", GeomRect,
     draw_key = GeomRect$draw_key,
 
     setup_data = function(data, params) {
-        params$rect.height <- params$rect.height %||% (diff(range(data$y))/10)
-        data$ymin <- data$y + params$rect.height
-        data$ymax <- data$y
+        if (!is.null(data$y)) {
+            params$rect.height <- params$rect.height %||%
+                                  (diff(range(data$y))/10)
+            data$ymin <- data$y + params$rect.height
+            data$ymax <- data$y
+        }
         data
     },
 
@@ -66,6 +69,7 @@ setMethod("geom_rect", "GRanges",
             stop("aes(xmin =, xmax= , ymin =, ymax= ) is required for stat 'identity',
                   you could also specify aes(y =) only as alternative", .Call = FALSE)
         mapping <- aes_merge(aes(xmin = start, xmax = end), mapping)
+        ylab <- quo_name(mapping$y %||% mapping$ymin)
     } else if (identical(stat, "stepping")) {
         mapping <- mapping %||% aes(y = stepping)
         mapping <- aes_merge(aes(xmin = start, xmax = end), mapping)

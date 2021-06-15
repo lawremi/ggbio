@@ -1,73 +1,74 @@
+GeomGSegment <- ggproto("GeomGSegment", GeomSegment,
+    required_aes = c("x", "xend", "y", "yend")
+)
+
+geom_gsegmment <- function(data = NULL, mapping = NULL, stat = "identity",
+                           position = "identity", ..., arrow = NULL,
+                           arrow.fill = NULL, lineend = "butt",
+                           linejoin = "round", na.rm = FALSE,
+                           show.legend = NA, inherit.aes = TRUE) {
+    layer <- layer(
+        data = data,
+        mapping = mapping,
+        stat = stat,
+        geom = GeomGSegment,
+        position = position,
+        show.legend = show.legend,
+        inherit.aes = inherit.aes,
+        params = list(
+            arrow = arrow,
+            arrow.fill = arrow.fill,
+            lineend = lineend,
+            linejoin = linejoin,
+            na.rm = na.rm,
+            ...
+        )
+    )
+    .changeStrandColor(layer, mapping)
+}
+
 setGeneric("geom_segment", function(data, ...) standardGeneric("geom_segment"))
 
-setMethod("geom_segment", "ANY", function(data, ...){
-  ggplot2::geom_segment(data  = data, ...)
+setMethod("geom_segment", "ANY", function(data, ...) {
+    ggplot2::geom_segment(data  = data, ...)
 })
-## alignment should be convenient toggle with chevron...
-setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
-                                           facets = NULL,
-                                           stat = c("stepping", "identity"),
-                                           group.selfish = TRUE){
 
-  args <- list(...)
-  args$facets <- facets
-  args.aes <- parseArgsForAes(args)
-  args.non <- parseArgsForNonAes(args)
-  facet <- build_facet(data, args, facet_grid, facet_wrap)
-  
-  stat <- match.arg(stat)
-  es <- ifelse("extend.size" %in% names(args.non), args.non$extend.size, 0)
-  if(length(data)){
-  if(stat == "stepping"){
-    grl <- splitByFacets(data, facets)
-    res <- endoapply(grl, make_addStepping, args.aes, group.selfish, extend.size = es)
-    df <- mold(unlist(res))
+setMethod("geom_segment", "GRanges",
+          function(data = NULL, mapping = NULL, ...,
+                   facets = ~seqnames,
+                   stat = c("stepping", "identity"),
+                   group.selfish = TRUE, extend.size = 0,
+                   xlab = "Genomic Coordinates", na.rm = FALSE,
+                   ylab, main) {
+    stat <- match.arg(stat)
+    y_scale <- NULL
 
-    args.aes <- remove_args(args.aes, c("x", "xend", "y", "yend", "data"))
-    args.non <- remove_args(args.non, c("x", "xend", "yend", "yend", "data"))
-    gpn <- ifelse("group" %in% names(args), quo_name(args$group), "stepping")
-    args.aes <- remove_args(args.aes, "group")
-    args.aes <- c(args.aes, list(x = substitute(start),
-                                 xend = substitute(end),
-                                 y = substitute(stepping),
-                                 yend = substitute(stepping)))
+    if (identical(stat, "identity")) {
+        if (!"y" %in% names(mapping) &&
+            !all(c("y","yend", "x", "xend") %in% names(mapping)))
+            stop("aes(x =, xend= , y =, yend= ) is required for stat 'identity',
+              you could also specify aes(y =) only as alternative", call. = FALSE)
+        y <- quo_name(mapping$y)
+        default <- aes(x = start, xend = end, y = !!mapping$y, yend = !!mapping$y)
+        mapping <- aes_merge(default, mapping)
+    } else if (identical(stat, "stepping")) {
+        default <- aes(x = start, xend = end, y = stepping, yend = stepping)
+        mapping <- aes_merge(default, mapping)
+        group <- if (is.null(mapping$group)) NULL else quo_name(mapping$group)
+        data <- data |> stepping(group = group, group.selfish = group.selfish,
+                                 extend.size = extend.size)
 
-    args.aes <- remove_args(args.aes, "size")
-    aes.res <- do.call(aes, args.aes)
-    args.res <- c(list(data = df), list(aes.res), args.non)
-    p <- list(do.ggcall(ggplot2::geom_segment,args.res))
-    p <- .changeStrandColor(p, args.aes)
-    .df.sub <- group_df(df, gpn)
-    y_scale <- scale_y_continuous_by_group(.df.sub, gpn, group.selfish)
-    p <- c(p, y_scale)
-  }
-  
-  if(stat == "identity"){
-    if(!"y" %in% names(args.aes)){
-      if(!all(c("y","yend", "x", "xend") %in% names(args.aes))){
-        stop("aes(x =, xend= , y =, yend= ) is required for stat 'identity',
-              you could also specify aes(y =) only as alternative")
-      }
-    }else{
-      .y <- args.aes$y
-      args.aes$x <- as.name("start")
-      args.aes$xend <- as.name("end")
-      args.aes$y <- args.aes$yend <- .y
+        y <- "stepping"
+        if (is.null(group))
+            group <- "stepping"
+
+        df <- elementMetadata(data)
+        df <- group_df(df, group)
+        y_scale <- scale_y_continuous_by_group(df, group, group.selfish)
     }
-    df <- mold(data)
-    args.aes <- remove_args(args.aes, "group")
-    args.aes <- remove_args(args.aes, "size")
-    
-    aes.res <- do.call(aes, args.aes)
-    args.res <- c(list(data = df), list(aes.res),args.non)
-    p <- list(do.ggcall(ggplot2::geom_segment,args.res))
-    p <- .changeStrandColor(p, args.aes)
-  }
-  }else{
-    p <- NULL
-  }
-  p <- c(list(p) , list(facet))
-  labels <- Labels(xlab, ylab, main, fallback = c(x = ""))
-  p <- c(p, labels)
-  p
+
+    c(geom_gsegmment(fortify(data), mapping, na.rm = na.rm, ...),
+      facet_grid(facets),
+      y_scale,
+      Labels(xlab, ylab, main, fallback = c(y = y)))
 })

@@ -56,8 +56,8 @@ setMethod("geom_rect", "GRanges",
           function(data = NULL, mapping = NULL, ...,
                    facets = ~seqnames, rect.height = NULL,
                    stat = c("stepping", "identity"),
-                   group.selfish = TRUE, na.rm = FALSE,
-                   group = NULL, extend.size = 0,
+                   group.selfish = TRUE,
+                   na.rm = FALSE, extend.size = 0,
                    xlab = "Genomic Coordinates",
                    ylab, main) {
     stat <- match.arg(stat)
@@ -71,7 +71,8 @@ setMethod("geom_rect", "GRanges",
         mapping <- aes_merge(aes(xmin = start, xmax = end), mapping)
         ylab <- quo_name(mapping$y %||% mapping$ymin)
     } else if (identical(stat, "stepping")) {
-        mapping <- mapping %||% aes(y = stepping)
+        group <- if (is.null(mapping$group)) NULL else quo_name(mapping$group)
+        mapping <- aes_merge(mapping %||% aes(), aes(y = stepping))
         mapping <- aes_merge(aes(xmin = start, xmax = end), mapping)
         rect.height <- rect.height %||% 0.8
         data <- data |> stepping(group = group, group.selfish = group.selfish,

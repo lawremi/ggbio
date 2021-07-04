@@ -441,15 +441,29 @@ trans_seq_rev<- function(unit = c("Mb", "kb", "bp")){
     function(x) {paste(x, unit)}
 }
 
-scale_x_sequnit <- function(unit = c("Mb", "kb", "bp"), append = NULL){
+scale_x_sequnit <- function(unit = c("Mb", "kb", "bp"), append = NULL, ...){
   unit <- match.arg(unit)
-  if(is.null(append)){
-      scale_x_continuous(breaks = trans_breaks(trans_seq(unit),
-                             trans_seq_rev(unit)),
-                         labels = trans_format(trans_seq_format(unit), math_format(.x)))
-  }else{
+  check_args <- function() {
+    kwargs <- names(list(...))
+    if (is.null(append)) {
+      if (any(c("breaks", "labels") %in% kwargs))
+        stop("scale_x_sequnit already sets breaks and labels arguments when 'append' is set.")
+    } else {
       stopifnot(is.character(append))
-      scale_x_continuous(labels = trans_format(.append_unit(append), math_format(.x)))
+      if ("labels" %in% names(list(...)))
+        stop("scale_x_sequnit already sets 'labels' argument.")
+    }
+  }
+  check_args()
+  if(is.null(append)){
+    scale_x_continuous(
+      breaks = trans_breaks(trans_seq(unit), trans_seq_rev(unit)),
+      labels = trans_format(trans_seq_format(unit), math_format(.x)),
+      ...)
+  } else {
+    scale_x_continuous(
+      labels = trans_format(.append_unit(append), math_format(.x)),
+      ...)
   }
 }
 

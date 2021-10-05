@@ -1,32 +1,31 @@
 setClassUnion("character_OR_expression_OR_NULL",
               c("expression", "character_OR_NULL"))
 
-tracks.gen <- setClass("Tracks",
-                       representation(grobs = "PlotList", # working plots, not reall 'Grob'
-                                      plot = "list", # original plots passed into tracks
-                                      backup = "list", # backup of the whole tracks object
-                                      heights = "numericORunit",
-                                      xlim = "numeric",
-                                      ylim = "list",
-                                      xlab = "character_OR_NULL",
-                                      main = "character_OR_expression_OR_NULL",
-                                      main.height =  "numericORunit",
-                                      scale.height =  "numericORunit",
-                                      xlab.height =  "numericORunit",
-                                      theme = "theme_OR_NULL",
-                                      fixed = "logical",
-                                      labeled = "logical",
-                                      mutable = "logical",
-                                      hasAxis = "logical",
-                                      padding = "numericORunit",
-                                      label.bg.color = "character",
-                                      label.bg.fill = "character",
-                                      label.text.color = "character",
-                                      label.text.cex = "numeric",
-                                      label.text.angle = "numeric",
-                                      track.plot.color = "character_OR_NULL",
-                                      track.bg.color = "character_OR_NULL",
-                                      label.width = "unit"))
+setClass("Tracks", representation(grobs = "PlotList", # working plots, not reall 'Grob'
+                                 plot = "list", # original plots passed into tracks
+                                 backup = "list", # backup of the whole tracks object
+                                 heights = "numericORunit",
+                                 xlim = "numeric",
+                                 ylim = "list",
+                                 xlab = "character_OR_NULL",
+                                 main = "character_OR_expression_OR_NULL",
+                                 main.height =  "numericORunit",
+                                 scale.height =  "numericORunit",
+                                 xlab.height =  "numericORunit",
+                                 theme = "theme_OR_NULL",
+                                 fixed = "logical",
+                                 labeled = "logical",
+                                 mutable = "logical",
+                                 hasAxis = "logical",
+                                 padding = "numericORunit",
+                                 label.bg.color = "character",
+                                 label.bg.fill = "character",
+                                 label.text.color = "character",
+                                 label.text.cex = "numeric",
+                                 label.text.angle = "numeric",
+                                 track.plot.color = "character_OR_NULL",
+                                 track.bg.color = "character_OR_NULL",
+                                 label.width = "unit"))
 
 .tracks.theme <- setdiff(slotNames("Tracks"), c("backup", "grobs"))
 
@@ -44,180 +43,134 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
                    label.text.color = "black",
                    label.text.cex = 1,
                    label.text.angle = 90,
-                   label.width = unit(2.5, "lines")){
+                   label.width = unit(2.5, "lines")) {
 
+    if (is.numeric(padding) && !is.unit(padding))
+        padding <- unit(padding, "lines")
 
+    if (is.numeric(main.height) && !is.unit(main.height))
+        main.height <- unit(main.height, "lines")
 
+    if (is.numeric(scale.height) && !is.unit(scale.height))
+        scale.height <- unit(scale.height, "lines")
 
-  if(is.numeric(padding) && !is.unit(padding))
-    padding <- unit(padding, "lines")
+    if (is.numeric(xlab.height) && !is.unit(xlab.height))
+        xlab.height <- unit(xlab.height, "lines")
 
+    if (!is.null(title) && is.null(main))
+        main <- title
 
-  if(is.numeric(main.height) && !is.unit(main.height))
-    main.height <- unit(main.height, "lines")
+    args <- list(...)
+    dots <- reduceListOfPlots(args)
+    ## return plots if not
+    dots <- genPlots(dots)
 
-  if(is.numeric(scale.height) && !is.unit(scale.height))
-    scale.height <- unit(scale.height, "lines")
+    plotList <- do.call(plotList, dots)
 
-  if(is.numeric(xlab.height) && !is.unit(xlab.height))
-    xlab.height <- unit(xlab.height, "lines")
+    ## convert to Plot object with extra slots
+    PlotList <- do.call(PlotList, dots)
 
+    fixed <- vapply(PlotList, fixed, logical(1L))
+    mutable <- vapply(PlotList, mutable, logical(1L))
+    hasAxis <- vapply(PlotList, hasAxis, logical(1L))
+    labeled <- vapply(PlotList, labeled, logical(1L))
+    isIdeo <- vapply(PlotList, is, "Ideogram", FUN.VALUE = logical(1L))
+    isBlank <- vapply(PlotList, function(x) x@blank, logical(1L))
 
-
-  if(!is.null(title) && is.null(main))
-    main <- title
-
-  dots <- list(...)
-
-  ## reduce plots
-  dots <- reduceListOfPlots(dots)
-
-
-
-  ## return plots if not
-  dots <- genPlots(dots)
-
-
-  ## original plots
-  ppl.ori <- do.call(plotList, dots)
-
-  ## ## Make sure Tracks are combined later
-  ## isTracks <- lapply(dots, is, "Tracks")
-  ## dots <- dots[!isTracks]
-  ## tks.addon <- dots[isTracks]
-
-  ## convert to Plot object with extra slots
-  dots <- do.call(PlotList, dots)
-
-  ## fixed
-  fixed <- sapply(dots, fixed)
-
-  ## mutable
-  mts <- sapply(dots, mutable)
-
-  ## hasAxis
-  axs <- sapply(dots, hasAxis)
-
-  ## get height
-  if(missing(heights)){
-    heights <- getHeight(dots)
-  }else{
-    heights <- parseHeight(heights, length(dots))
-  }
-
-  ## labeld
-  labeled <- sapply(dots, labeled)
-
-  ## Ideo
-  isIdeo <- sapply(dots, is, "Ideogram")
-
-  ## is blank
-  isBlank <- sapply(dots, function(x) x@blank)
-
-  ## ylim
-  ylim <- lapply(dots[!fixed & !isIdeo & !isBlank], function(grob){
-     scales::expand_range(getLimits(grob)$ylim, mul = 0.05)
-  })
-
-  wh <- NULL
-  ## xlim
-  if(missing(xlim)){
-    ### FIXME: this should just try to call range(unlist(x)) on each arg
-    ###        and then call range(do.call(c, unname(r))) on the successful
-    ###        results.
-      idx <- sapply(list(...), function(x){is(x, "GenomicRanges_OR_GRangesList")})
-      if(any(idx)){
-          grs <- list(...)[idx]
-          grs <- unlist(do.call(c, unname(grs)))
-          chrs <- unique(as.character(seqnames(grs)))
-          if(length(chrs) > 1){
-              stop("seqnames of passed GRanges has to be the same for tracks")
-          }
-          ir <- reduce(ranges(grs))
-          wh <- GRanges(chrs, ir)
-      }
-      xid <- !fixed & !isIdeo & !isBlank
-      if(sum(xid)){
-          lst <- lapply(dots[xid], function(obj){
-              res <- getLimits(obj)
-              data.frame(xmin = res$xlim[1], xmax = res$xlim[2])
-          })
-          res <- do.call(rbind, lst)
-          xlim <- c(min(res$xmin), max(res$xmax))
-          xlim <- scales::expand_range(xlim, mul = 0.1)
-      }else{
-          xlim <- c(0, 1)
-      }
-  }else{
-    if(is(xlim, "IRanges")){
-      xlim <- c(start(xlim), end(xlim))
+    ## get height
+    if (missing(heights)) {
+        heights <- getHeight(PlotList)
+    } else {
+        heights <- parseHeight(heights, length(PlotList))
     }
-    if(is(xlim,"GRanges")){
-      wh <- xlim
-      xlim <- c(start(ranges(reduce(xlim, ignore.strand = TRUE))),
-                end(ranges(reduce(xlim, ignore.strand = TRUE))))
-    }
-    if(is.numeric(xlim)){
-      xlim <- range(xlim)
-    }
-  }
 
-  ## sync xlim when construct them??
-  if(!is.null(wh)){
-    dots <- lapply(dots, function(x){
-        x + xlim(wh)
+    ## ylim
+    ylim <- lapply(PlotList[!fixed & !isIdeo & !isBlank], function(grob) {
+        scales::expand_range(getLimits(grob)$ylim, mul = 0.05)
     })
-    dots <- do.call(PlotList, dots)
-  }
 
-  ## plot background
-  N <- length(dots)
-  if(is.null(track.plot.color)){
-    if(is.null(track.bg.color))
-      track.plot.color <- sapply(dots, bgColor)
-    else
-      track.plot.color <- rep(track.bg.color, length(dots))
-  }
-  stopifnot(length(track.plot.color) == N | length(track.plot.color) == 1)
+    wh <- NULL
 
+    ## xlim
+    if (missing(xlim)) {
+      ### FIXME: this should just try to call range(unlist(x)) on each arg
+      ###        and then call range(do.call(c, unname(r))) on the successful
+      ###        results.
+        idx <- vapply(args, function(x) is(x, "GenomicRanges_OR_GRangesList"), logical(1L))
+        if (any(idx)) {
+            grs <- args[idx]
+            grs <- unlist(do.call(c, unname(grs)))
+            chrs <- unique(as.character(seqnames(grs)))
+            if (length(chrs) > 1) {
+                stop("seqnames of passed GRanges has to be the same for tracks")
+            }
+            ir <- reduce(ranges(grs))
+            wh <- GRanges(chrs, ir)
+        }
+        xid <- !fixed & !isIdeo & !isBlank
+        if (sum(xid)) {
+            lst <- lapply(PlotList[xid], function(obj) {
+                res <- getLimits(obj)
+                data.frame(xmin = res$xlim[1], xmax = res$xlim[2])
+            })
+            res <- do.call(rbind, lst)
+            xlim <- c(min(res$xmin), max(res$xmax))
+            xlim <- scales::expand_range(xlim, mul = 0.1)
+        } else {
+            xlim <- c(0, 1)
+        }
+    } else {
+      if (is(xlim, "IRanges")) {
+          xlim <- c(start(xlim), end(xlim))
+      }
+      if (is(xlim,"GRanges")) {
+          wh <- xlim
+          xlim <- c(start(ranges(reduce(xlim, ignore.strand = TRUE))),
+                    end(ranges(reduce(xlim, ignore.strand = TRUE))))
+      }
+      if (is.numeric(xlim)) {
+          xlim <- range(xlim)
+      }
+    }
 
-  ## backup: record a state
-  backup <- list(grobs = dots,
-                 plot = ppl.ori,
-                 heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab,
-                 main = main,
-                 main.height = main.height,
-                 scale.height = scale.height,
-                 xlab.height = xlab.height,
-                 theme = theme, mutable = mts, hasAxis = axs,
-                 fixed = fixed, padding = padding,
-                 labeled = labeled, label.bg.color = label.bg.color, label.bg.fill = label.bg.fill,
-                 label.text.color = label.text.color,
-                 label.text.angle = label.text.angle,
-                 track.plot.color = track.plot.color,
-                 track.bg.color = track.bg.color,
-                 label.text.cex = label.text.cex,
-                 label.width = label.width)
+    ## sync xlim when construct them??
+    if (!is.null(wh)) {
+        PlotList <- lapply(PlotList, function(x) {
+            x + xlim(wh)
+        })
+        PlotList <- do.call(PlotList, PlotList)
+    }
 
-  obj <- new("Tracks", grobs = dots, plot = ppl.ori, backup = backup, labeled = labeled,
-      heights = heights,  xlim = xlim,  ylim = ylim, xlab = xlab, main = main,
-      main.height = main.height,
-      scale.height = scale.height,
-      xlab.height = xlab.height,
-      theme = theme,  mutable = mts, hasAxis = axs,
-      fixed = fixed, padding = padding,
-      label.bg.color = label.bg.color, label.bg.fill = label.bg.fill,
-      label.text.color = label.text.color,
-      label.text.angle = label.text.angle,
-      track.plot.color = track.plot.color,
-      track.bg.color = track.bg.color,
-      label.text.cex = label.text.cex,
-      label.width = label.width)
-  ## obj <- c(obj, tks.addon)
-  ggplot2:::set_last_plot(obj)
-  obj
+    ## plot background
+    N <- length(PlotList)
+    if (is.null(track.plot.color)) {
+        if (is.null(track.bg.color))
+            track.plot.color <- vapply(PlotList, bgColor, logical(1L))
+        else
+            track.plot.color <- rep(track.bg.color, length(PlotList))
+    }
+    stopifnot(length(track.plot.color) == N | length(track.plot.color) == 1)
+
+    ## backup: record a state
+    backup <- list(grobs = PlotList, plot = plotList, heights = heights,
+                   xlim = xlim, ylim = ylim, xlab = xlab, main = main,
+                   main.height = main.height, scale.height = scale.height,
+                   xlab.height = xlab.height, theme = theme, mutable = mutable,
+                   hasAxis = hasAxis, fixed = fixed, padding = padding,
+                   labeled = labeled, label.bg.color = label.bg.color,
+                   label.bg.fill = label.bg.fill,
+                   label.text.color = label.text.color,
+                   label.text.angle = label.text.angle,
+                   track.plot.color = track.plot.color,
+                   track.bg.color = track.bg.color,
+                   label.text.cex = label.text.cex,
+                   label.width = label.width)
+    track_args <- list(backup = backup)
+    track_args <- c("Tracks", track_args, backup)
+    tracks <- do.call(new, track_args)
+    ggplot2:::set_last_plot(tracks)
+    tracks
 }
-
 
 setMethod("summary", "Tracks", function(object){
   cat("-------------------------------------------\n")
@@ -234,31 +187,34 @@ setAs("Tracks", "grob", function(from) {
     grobs <- from@grobs
     N <- length(grobs)
     .scale.grob <- grobs[[N]] + xlim(from@xlim)
-    if(any(from@labeled))
+
+    if (any(from@labeled))
         nms <- names(from@grobs)
     else
         nms <- NULL
-    lst <- lapply(seq_len(N),
-                  function(i) {
-        if(i %in% which(from@mutable))
+
+    lst <- lapply(seq_len(N), function(i) {
+        if (i %in% which(from@mutable))
             grobs[[i]] <- grobs[[i]] + from@theme
-        grobs[[i]] <- grobs[[i]] + ggplot2::xlab("")  + labs(title = "")
+
+        grobs[[i]] <- grobs[[i]] + ggplot2::xlab("") + labs(title = "")
+        padding <- as.numeric(from@padding)
         grobs[[i]] <- grobs[[i]] +
-            theme(plot.margin = unit(c(as.numeric(from@padding), 1,
-                                       as.numeric(from@padding),  0.5),
-                                     "lines"))
-        if(i %in% which(!from@hasAxis))
+                      theme(plot.margin = unit(c(padding, 1, padding, 0.5), "lines"))
+
+        if (i %in% which(!from@hasAxis))
             grobs[[i]] <- grobs[[i]] + theme(axis.text.x = element_blank(),
                                              axis.ticks.x = element_blank())
 
-        if(i %in% which(!from@fixed)){
+        if (i %in% which(!from@fixed)) {
             s <- coord_cartesian(xlim = from@xlim)
             grobs[[i]] <- grobs[[i]] + s
         }
+
         grobs[[i]]
     })
 
-    if(!is.null(nms))
+    if (!is.null(nms))
         names(lst) <- nms
 
     if(any(from@labeled))

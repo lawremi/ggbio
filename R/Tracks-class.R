@@ -1038,34 +1038,34 @@ setMethod("[", c("Tracks", "numeric", "missing", "ANY"),
                   label.width = x@label.width)
           })
 
-getLegendGrob <- function(p){
-  if(is(p, "GGbio"))
-    p <- p@ggplot
-  g <- ggplotGrob(p)
-  gg <- gtable_filter(g, "guide-box")
+ggbioGrob <- function(x) {
+    if (is(x, "GGbio"))
+        ggplot2::ggplotGrob(x@ggplot)
+    else
+        ggplot2::ggplotGrob(x)
+}
+
+getLegendGrob <- function(plot) {
+    gtable <- ggbioGrob(plot)
+    gtable <- gtable_filter(gtable, "guide-box")
 }
 
 arrangeGrobByParsingLegend <- function(..., nrow = NULL, ncol = NULL,
-                                       widths = c(4, 1), legend.idx = NULL){
-  lst <- list(...)
-  if(length(lst) == 1 && is.list(lst[[1]]))
-    lst <- lst[[1]]
+                                       widths = c(4, 1), legend.idx = NULL) {
+    lst <- list(...)
+    if (length(lst) == 1 && is.list(lst[[1]]))
+        lst <- lst[[1]]
 
-  gg <- lapply(lst, getLegendGrob)
+    legends <- lapply(lst, getLegendGrob)
 
-  l.g <- lapply(lst, function(x){
-    x <- x + theme(legend.position = "none", aspect.ratio = 1)
-    if(is(x, "GGbio"))
-      res <- ggplotGrob(x@ggplot)
-    else
-      res <- ggplotGrob(x)
-    res
-  })
+    plots <- lapply(lst, function(x) {
+        x <- x + theme(legend.position = "none", aspect.ratio = 1)
+        ggbioGrob(x)
+    })
 
-  if(!is.null(legend.idx))
-    gg <- gg[legend.idx]
-  gg2 <- do.call(arrangeGrob, c(gg, list(ncol = 1)))
-  print(grid.arrange(do.call(arrangeGrob, c(l.g, list(nrow = nrow, ncol = ncol))),
-                     gg2, ncol = 2, widths = widths))
+    if (!is.null(legend.idx))
+        legends <- legends[legend.idx]
+    legends <- do.call(gridExtra::arrangeGrob, c(legends, list(ncol = 1)))
+    plots <- do.call(gridExtra::arrangeGrob, c(plots, list(nrow = nrow, ncol = ncol)))
+    print(gridExtra::grid.arrange(plots, legends, ncol = 2, widths = widths))
 }
-

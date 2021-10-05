@@ -1,12 +1,15 @@
 setGeneric("getLimits", function(obj, ...) standardGeneric("getLimits"))
-setMethod("getLimits", "GGbio", function(obj){
-  .getLimits(obj@ggplot)
+
+setMethod("getLimits", "GGbio", function(obj) {
+    .getLimits(obj@ggplot)
 })
-setMethod("getLimits", "ggplotPlot", function(obj){
-  .getLimits(obj)
+
+setMethod("getLimits", "ggplotPlot", function(obj) {
+    .getLimits(obj)
 })
-setMethod("getLimits", "ggbioPlot", function(obj){
-  .getLimits(obj@ggplot)
+
+setMethod("getLimits", "ggbioPlot", function(obj) {
+    .getLimits(obj@ggplot)
 })
 
 # SPECIAL operator to get values from the list(b) and
@@ -130,32 +133,31 @@ getLimitsFromLayer <- function(obj) {
     res
 }
 
-evalLan <- function(obj){
-  x <- obj$mapping$x
-  y <- obj$mapping$y
-  xlim <- ylim <- NULL
-  if(is_quosure(x) & is_quosure(y)){
-    xlim <- range(eval_tidy(x))
-    ylim <- range(eval_tidy(y))
-  }
-  list(xlim = xlim, ylim = ylim)
+evalLan <- function(obj) {
+    x <- obj$mapping$x
+    y <- obj$mapping$y
+    xlim <- ylim <- NULL
+    if (is_quosure(x) & is_quosure(y)) {
+        xlim <- range(eval_tidy(x))
+        ylim <- range(eval_tidy(y))
+    }
+    list(xlim = xlim, ylim = ylim)
 }
 
-
-getGeomFun <- function(geom){
-  match.fun(paste("geom_", geom, sep = ""))
+getGeomFun <- function(geom) {
+    match.fun(paste("geom_", geom, sep = ""))
 }
-getStatFun <- function(stat){
-  match.fun(paste("stat_", stat, sep = ""))
+getStatFun <- function(stat) {
+    match.fun(paste("stat_", stat, sep = ""))
 }
-getDrawFunFromGeomStat <- function(geom, stat){
-  ## how about allways start from geom??
-  if(!is.null(stat)){
-    .fun <- getStatFun(stat)
-  }else{
-    .fun <- getGeomFun(geom)
-  }
-  .fun
+getDrawFunFromGeomStat <- function(geom, stat) {
+    ## how about allways start from geom??
+    if (!is.null(stat)) {
+      .fun <- getStatFun(stat)
+    } else {
+      .fun <- getGeomFun(geom)
+    }
+    .fun
 }
 
 do.ggcall <- function(fun, args) {
@@ -199,30 +201,29 @@ filterArgs <- function(fun, args,
     args
 }
 
-.changeStrandColor <- function(p, args, fill = TRUE){
-  strandColor <- getOption("biovizBase")$strandColor
-  isStrand.color <- FALSE
-  isStrand.fill <- FALSE
-  ## default with no color
-  idx <- c("color", "colour") %in% names(args)
-  if((any(idx))){
-    nms <- c("color", "colour")[idx][1]
-    if(quo_name(args[[nms]]) == "strand")
-      isStrand.color <- TRUE
-  }
-  if(("fill" %in% names(args))){
-    if(quo_name(args$fill) == "strand")
-      isStrand.fill <- TRUE
-  }
-  if(isStrand.color)
-    p <- c(list(p), list(scale_color_manual(values = strandColor)))
-  if(fill){
-    if(isStrand.fill)
-      p <- c(p, list(scale_fill_manual(values = strandColor)))
-  }
-  p
+.changeStrandColor <- function(p, args, fill = TRUE) {
+    strandColor <- getOption("biovizBase")$strandColor
+    isStrand.color <- FALSE
+    isStrand.fill <- FALSE
+    ## default with no color
+    idx <- c("color", "colour") %in% names(args)
+    if ((any(idx))) {
+        nms <- c("color", "colour")[idx][1]
+        if (quo_name(args[[nms]]) == "strand")
+            isStrand.color <- TRUE
+    }
+    if (("fill" %in% names(args))) {
+        if (quo_name(args$fill) == "strand")
+            isStrand.fill <- TRUE
+    }
+    if (isStrand.color)
+        p <- c(list(p), list(scale_color_manual(values = strandColor)))
+    if (fill) {
+        if (isStrand.fill)
+            p <- c(p, list(scale_fill_manual(values = strandColor)))
+    }
+    p
 }
-
 
 ## need to consider a length 1 facets formula
 .buildFacetsFromArgs <- function(object, args) {
@@ -265,44 +266,44 @@ filterArgs <- function(fun, args,
     facet
 }
 
-sub_names <- function(data, name.expr){
-  .res <- c()
-  for(i in seq_len(nrow(data))){
-    res <- data[i,]
-    res <- as.list(res)
-    res <- lapply(res, function(x) {
-      if(is.numeric(x))
-        return(as.character(as.name(x)))
-      else
-        return(as.character(x))
-    })
-    subfun <- function(res, name.expr){
-      nm <- names(res[1])
-      val <- res[[1]]
-      name.expr <- gsub(nm, val, name.expr)
-      if(!length(res) == 1)
-        subfun(res[-1], name.expr)
-      else
-        return(name.expr)
+sub_names <- function(data, name.expr) {
+    .res <- c()
+    for (i in seq_len(nrow(data))) {
+      res <- data[i,]
+      res <- as.list(res)
+      res <- lapply(res, function(x) {
+        if (is.numeric(x))
+            return(as.character(as.name(x)))
+        else
+            return(as.character(x))
+      })
+      subfun <- function(res, name.expr) {
+          nm <- names(res[1])
+          val <- res[[1]]
+          name.expr <- gsub(nm, val, name.expr)
+          if (!length(res) == 1)
+            subfun(res[-1], name.expr)
+          else
+            return(name.expr)
+      }
+      .res <- c(.res, subfun(res, name.expr))
     }
-    .res <- c(.res, subfun(res, name.expr))
-  }
-  .res
+    .res
 }
 
-## subset chr
 setGeneric("subsetByChrs", function(obj, ...) starndardGeneric("subByChr"))
-setMethod("subsetByChrs", "GRanges", function(obj, subchr){
-  if(missing(subchr))
-    subchr <- as.character(seqnames(obj)[1])
-  res <- obj[seqnames(obj) %in% subchr]
-  res <- keepSeqlevels(res, subchr)
-  res
+
+setMethod("subsetByChrs", "GRanges", function(obj, subchr) {
+    if (missing(subchr))
+        subchr <- as.character(seqnames(obj)[1])
+    res <- obj[seqnames(obj) %in% subchr]
+    res <- keepSeqlevels(res, subchr)
+    res
 })
 
 setMethod("subsetByChrs", "Seqinfo", function(obj, subchr){
-  if(missing(subchr))
-    subchr <- as.character(seqnames(obj)[1])
+  if (missing(subchr))
+      subchr <- as.character(seqnames(obj)[1])
   res <- obj[subchr]
   res
 })
@@ -347,30 +348,29 @@ combineAes <- function(keep, lose) {
         return(c(keep, lose))
 }
 
-zoomLevelToGeom <- function(zoomLevel, track = c("BSgenome",
-                                           "VRanges")){
+zoomLevelToGeom <- function(zoomLevel, track = c("BSgenome", "VRanges")) {
     track <- match.arg(track)
     .level1 <- 100 # text
     .level2 <- 500 # rect
     .level3 <- 2000 # segment
     geom <- switch(track,
                    "BSgenome" = {
-                       if(zoomLevel < .level1){
+                       if (zoomLevel < .level1) {
                            g <- "text"
-                       }else if(zoomLevel >= .level1 && zoomLevel < .level2){
+                       } else if (zoomLevel >= .level1 && zoomLevel < .level2) {
                            g <- "rect"
-                       }else if(zoomLevel >= .level2 && zoomLevel < .level3){
+                       } else if (zoomLevel >= .level2 && zoomLevel < .level3) {
                            g <- "segment"
-                       }else{
+                       } else {
                            g <- "none"
                        }
                    },
                    "VRanges" = {
-                       if(zoomLevel < .level1){
+                       if (zoomLevel < .level1) {
                            g <- "text"
-                       }else if(zoomLevel >= .level1 && zoomLevel < .level3){
+                       } else if (zoomLevel >= .level1 && zoomLevel < .level3) {
                            g <- "rect"
-                       }else{
+                       } else {
                            g <- "none"
                        }
                    })

@@ -450,3 +450,7 @@ scale_y_continuous_by_group <- function(df, group, group.selfish) {
       list(scale_y_continuous(breaks = NULL))
     }
 }
+
+"%||%" <- function(a, b) {
+    if (!is.null(a)) a else b
+}

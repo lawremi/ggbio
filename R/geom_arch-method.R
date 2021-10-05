@@ -65,7 +65,7 @@ setMethod("geom_arch", "data.frame", function(data, ...,
   aesres <- do.call(aes, c(args.aes, args.aes2))
   if(nrow(apoint)){
     reslst <- c(list(data = apoint), list(aesres),args.non)
-    p <- do.ggcall(geom_line, reslst)
+  p <- do.ggcall(geom_line, reslst)
     if("ylab" %in% names(args.non)){
       ylab <- quo_name(args.non$ylab)
     }else if(length(y.name)){
@@ -92,7 +92,7 @@ setMethod("geom_arch", "GRanges", function(data, ...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   args.non$max.height <- max.height
-  facet <- build_facet(data, args, facet_grid, facet_wrap)
+  facet <- build_facet(data, args)
 
   ## note rect.height = 0.4 is default cross ggbio
   ## need to make sure they are connected by two nearest point of rectangle

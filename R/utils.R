@@ -888,8 +888,8 @@ remove_args <- function(args, remove) {
     args[!names(args) %in% remove]
 }
 
-build_facet <- function(data, args, ...) {
-    args <- subsetArgsByFormals(args, ...)
+build_facet <- function(data, args) {
+    args <- subsetArgsByFormals(args, facet_grid, facet_wrap)
     .buildFacetsFromArgs(data, args)
 }
 

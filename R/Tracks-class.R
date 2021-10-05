@@ -145,7 +145,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     N <- length(PlotList)
     if (is.null(track.plot.color)) {
         if (is.null(track.bg.color))
-            track.plot.color <- vapply(PlotList, bgColor, logical(1L))
+            track.plot.color <- vapply(PlotList, bgColor, character(1L))
         else
             track.plot.color <- rep(track.bg.color, length(PlotList))
     }

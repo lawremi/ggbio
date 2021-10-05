@@ -18,7 +18,7 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
 
-  facet <- build_facet(data, args, facet_grid, facet_wrap)
+  facet <- build_facet(data, args)
   if(length(data)){  
     if(stat == "stepping"){
     if(is.null(rect.height)) rect.height <- 0.4

@@ -25,7 +25,7 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
 
-  facet <- build_facet(data, args, facet_grid, facet_wrap)
+  facet <- build_facet(data, args)
 
   if(length(data)){
     ## small arrow

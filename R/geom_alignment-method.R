@@ -18,7 +18,7 @@ setMethod("geom_alignment", "GRanges", function(data,...,
     args$facets <- facets
     args.aes <- parseArgsForAes(args)
     args.non <- parseArgsForNonAes(args)
-    facet <- build_facet(data, args, facet_grid, facet_wrap)
+    facet <- build_facet(data, args)
 
     es <- ifelse("extend.size" %in% names(args.non), args.non$extend.size, 0)
 

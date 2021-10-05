@@ -10,7 +10,7 @@ setMethod("geom_bar", "GRanges", function(data,..., xlab, ylab, main){
   args <- list(...)
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
-  facet <- build_facet(data, args, facet_grid, facet_wrap)
+  facet <- build_facet(data, args)
   if(length(data)){
     if(!"y" %in% names(args.aes)){
       if("score" %in% colnames(values(data))){

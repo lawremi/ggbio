@@ -24,7 +24,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
   es <- ifelse("extend.size" %in% names(args.non), args.non$extend.size, 0)
-  facet <- build_facet(data, args, facet_grid, facet_wrap)
+  facet <- build_facet(data, args)
   stat <- match.arg(stat)
   if(length(data)){
   if(stat == "stepping"){

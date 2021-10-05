@@ -442,7 +442,7 @@ setMethod("backup", "Tracks", function(obj){
   obj
 })
 
-findGrobs <- function(g, type) {
+gtable_filter_grobs <- function(g, type) {
     rowSums(vapply(type, function(t) startsWith(g$layout$name, t),
                    logical(length(g$layout$name)))) > 0L
 }

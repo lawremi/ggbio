@@ -50,5 +50,5 @@ Collate: AllClasses.R AllGenerics.R Cache-class.R GGbio-class.R
         autoplot-method.R hack.R
         plotGrandLinear.R plotRangesLinkedToData.R
         plotFragLength-method.R plotSpliceSum-method.R rescale-method.R
-        utils.R zzz.R
+        scales.R utils.R zzz.R
 biocViews: Infrastructure, Visualization

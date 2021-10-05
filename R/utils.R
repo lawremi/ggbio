@@ -225,62 +225,44 @@ filterArgs <- function(fun, args,
 
 
 ## need to consider a length 1 facets formula
-.buildFacetsFromArgs <- function(object, args){
-  isOneSeq <- length(unique(as.character(seqnames(object)))) == 1
-  args.facets <- args
-  args.facets$facets <- strip_formula_dots(args$facets)
-  facets <- args.facets$facets
-  if(length(facets)){
-    ## allvars <- all.vars(as.formula(facets))
-    ## if(length(allvars) == 1){
-    biovizBase:::.checkFacetsRestrict(facets, object)
-    if(is(facets, "GRanges")){
-      args.facets$facets <- substitute(~.bioviz.facetid)
-      ## ok, default is "free"
-      if(!("scales" %in% names(args.facets)))
-        args.facets$scales <- "free"
-      facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facets)),
-                            TRUE, FALSE)
-      if(facet.logic)
-        facet <- do.call(facet_wrap, args.facets)
-      else
-        facet <- do.call(facet_grid, args.facets)
-    }else{
-      if(!("scales" %in% names(args.facets)))
-        args.facets <- c(args.facets, list(scales = "fixed"))
-      allvars <- all.vars(as.formula(args.facets$facets))
+.buildFacetsFromArgs <- function(object, args) {
+    isOneSeq <- length(unique(as.character(seqnames(object)))) == 1
+    args.facets <- args
+    args.facets$facets <- strip_formula_dots(args$facets)
+    facets <- args.facets$facets
+    facet.logic <- NULL
 
-      if(isOneSeq & biovizBase:::isFacetByOnlySeq(args.facets$facets)){
-        facet <- NULL
-      }else{
-      facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facets)),
-                            TRUE, FALSE)
-      if(facet.logic){
-        facet <- do.call(facet_wrap, args.facets)
-      }else{
-        facet <- do.call(facet_grid, args.facets)
-      }
-      facet <- do.call(facet_grid, args.facets)
-    }
-    }}else{
-      if(!("scales" %in% names(args.facets)))
-        args.facets <- c(args.facets, list(scales = "fixed"))
-      args.facets$facets <- substitute(~seqnames)
-      allvars <- all.vars(as.formula(args.facets$facets))
-
-      if(isOneSeq & biovizBase:::isFacetByOnlySeq(args.facets$facets)){
-        facet <- NULL
-      }else{
-        facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facets)),
-                              TRUE, FALSE)
-        if(facet.logic){
-          facet <- do.call(facet_wrap, args.facets)
-        }else{
-          facet <- do.call(facet_grid, args.facets)
+    if (length(facets)) {
+        biovizBase:::.checkFacetsRestrict(facets, object)
+        if (is(facets, "GRanges")) {
+            args.facets$facets <- substitute(~.bioviz.facetid)
+            if (!("scales" %in% names(args.facets)))
+                args.facets$scales <- "free"
+        } else {
+            if (!("scales" %in% names(args.facets)))
+                args.facets <- c(args.facets, list(scales = "fixed"))
+            allvars <- all.vars(as.formula(args.facets$facets))
         }
-      }
+    } else {
+        if (!("scales" %in% names(args.facets)))
+            args.facets <- c(args.facets, list(scales = "fixed"))
+        args.facets$facets <- substitute(~seqnames)
+        allvars <- all.vars(as.formula(args.facets$facets))
     }
-  facet
+
+    if (isOneSeq & biovizBase:::isFacetByOnlySeq(args.facets$facets)) {
+        facet <- NULL
+        return(facet)
+    }
+
+    facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facets)),
+                          TRUE, FALSE)
+
+    if (facet.logic)
+        facet <- do.call(facet_wrap, args.facets)
+    else
+        facet <- do.call(facet_grid, args.facets)
+    facet
 }
 
 sub_names <- function(data, name.expr){

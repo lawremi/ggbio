@@ -219,10 +219,18 @@ setMethod("layout_karyogram", "GRanges",
                                        xmax = substitute(end),
                                        ymin = .ideo.range[1],
                                        ymax = .ideo.range[2]))
-              args.aes.seg <- combineAes2(args.aes, list(x = substitute(start),
+              y <- .ideo.range[1]
+              yend <- .ideo.range[2]
+              
+              if ("ymin" %in% args.aes)
+                  y <- args.aes$ymin
+              if ("ymax" %in% args.aes)
+                  yend <- args.aes$ymax
+
+              args.aes.seg <- combineAes(args.aes, list(x = substitute(start),
                                                xend = substitute(start),
-                                               y = .ideo.range[1],
-                                               yend = .ideo.range[2]))
+                                               y = y,
+                                               yend = yend))
 
               ## this hack is to get over 1-pixel problem
               p.addon <- do.ggcall(ggplot2::geom_segment,

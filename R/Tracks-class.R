@@ -447,6 +447,60 @@ findGrobs <- function(g, type) {
                    logical(length(g$layout$name)))) > 0L
 }
 
+addLabel <- function(grobs, nms, lbs,
+                     label.bg.color =  "white",
+                     label.bg.fill = "gray80",
+                     label.text.color = "black",
+                     label.text.angle = 90,
+                     label.text.cex = 1,
+                     label.width = unit(2.5, "lines"),
+                     direction = c("row", "col")) {
+    direction <- match.arg(direction)
+    if (length(label.text.angle) == 1)
+        label.text.angle <- rep(label.text.angle, len = length(grobs))
+    if (length(label.text.color) == 1)
+        label.text.color <- rep(label.text.color, len = length(grobs))
+    if (length(label.text.cex) == 1)
+        label.text.cex <- rep(label.text.cex, len = length(grobs))
+    if (length(label.bg.color) == 1)
+        label.bg.color <- rep(label.bg.color, len = length(grobs))
+    if (length(label.bg.fill) == 1)
+        label.bg.fill <- rep(label.bg.fill, len = length(grobs))
+
+    lapply(seq_len(length(grobs)), function(i) {
+        if (identical(direction, "row")) {
+            rot <- label.text.angle[i]
+            width <- unit.c(label.width, unit(1, "null"))
+            height <- unit(1, "null")
+            l <- 2
+            t <- 1
+        } else {
+            rot <- (90 - label.text.angle[i]) %% 360
+            width <- unit(1, "null")
+            height <- unit.c(label.width, unit(1, "null"))
+            l <- 1
+            t <- 2
+        }
+
+        grob <- grobs[[i]]
+
+        if (lbs[i]) {
+            rect <- rectGrob(gp = gpar(fill = label.bg.fill[i],
+                             col = label.bg.color[i]))
+            label <- textGrob(nms[i], rot = rot,
+                              gp = gpar(col = label.text.color[i],
+                              cex = label.text.cex[i]))
+            x.grob <- grobTree(gTree(children = gList(rect, label)))
+        } else {
+            x.grob <- ggplot2::zeroGrob()
+        }
+
+        gt <- gtable(widths = width, heights = height)
+        gt <- gtable_add_grob(gt, x.grob, l = 1, t = 1)
+        gt <- gtable_add_grob(gt, grob, l = l, t = t)
+    })
+}
+
 ## TODO: adust due to left/right legend
 alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        heights = NULL, height = NULL, width = NULL,
@@ -507,68 +561,6 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
   ## parse grobs
   ## a little slow
   grobs <- do.call(GrobList, ggl)
-
-  addLabel <- function(grobs, nms, lbs,
-                       label.bg.color =  "white",
-                       label.bg.fill = "gray80",
-                       label.text.color = "black",
-                       label.text.angle = 90,
-                       label.text.cex = 1,
-                       label.width = unit(2.5, "lines"),
-                       direction = c("row", "col")
-                       ){
-
-    if(length(label.text.angle) == 1)
-        label.text.angle <- rep(label.text.angle, len = length(grobs))
-    if(length(label.text.color) == 1)
-        label.text.color <- rep(label.text.color, len = length(grobs))
-    if(length(label.text.cex) == 1)
-        label.text.cex <- rep(label.text.cex, len = length(grobs))
-    if(length(label.bg.color) == 1)
-        label.bg.color <- rep(label.bg.color, len = length(grobs))
-    if(length(label.bg.fill) == 1)
-        label.bg.fill <- rep(label.bg.fill, len = length(grobs))
-
-    direction <- match.arg(direction)
-
-    if(direction == "row"){
-      res <- lapply(1:length(grobs), function(i){
-        grob <- grobs[[i]]
-        if(lbs[i]){
-          rect <- rectGrob(gp = gpar(fill = label.bg.fill[i],
-                             col = label.bg.color[i]))
-          label <- textGrob(nms[i], rot = label.text.angle[i],
-                            gp = gpar(col = label.text.color[i],
-                              cex = label.text.cex[i]))
-          left.grob <- grobTree(gTree(children = gList(rect, label)))
-        }else{
-          left.grob <- ggplot2::zeroGrob()
-        }
-        gt <- gtable(widths = unit.c(label.width,unit(1, "null")),
-                     heights = unit(1, "null"))
-        gt <- gtable_add_grob(gt, left.grob,l = 1, t = 1)
-        gt <- gtable_add_grob(gt, grob, l = 2, t =1 )
-      })
-    }else{
-      res <- lapply(1:length(grobs), function(i){
-        if(lbs[i]){
-          grob <- grobs[[i]]
-          rect <- rectGrob(gp = gpar(fill = label.bg.fill[i],
-                             col = label.bg.color[i]))
-          label <- textGrob(nms[i], rot = (90 - label.text.angle[i]) %% 360,
-                            gp = gpar(col = label.text.color[i],
-                              cex = label.text.cex[i]))
-          top.grob <- grobTree(gTree(children = gList(rect, label)))
-        }else{
-          top.grob <- ggplot2::zeroGrob()
-        }
-        gt <- gtable(widths = unit(1, "null"),
-                     heights = unit.c(label.width,unit(1, "null")))
-        gt <- gtable_add_grob(gt, top.grob,l = 1, t = 1)
-        gt <- gtable_add_grob(gt, grob, l = 1, t =2 )
-      })
-    }
-  }
 
   if(vertical)
     grobs <- do.call(uniformAroundPanel, grobs)

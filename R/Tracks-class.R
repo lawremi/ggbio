@@ -736,102 +736,77 @@ getPanelIndex <- function(g){
   findGrobs(g, "panel")
 }
 
-spaceAroundPanel <- function(g, type = c("t", "l", "b", "r")){
-  if(inherits(g, "ggplot"))
-    g <- Grob(g)
-  idx <- getPanelIndex(g)
-  rsl <- list()
-  for(tp in type){
-    rsl[[tp]] <- switch(tp,
-                t = {
-                  id <- which(g$layout$t < min(g$layout[idx, ]$t))
-                  ## id <- id[!duplicated(g$layout$name[id])]
-                  if(length(id))
-                    res <- sum(g$height[unique(g$layout$t[id])])
-                  else
-                    res <- unit(0, "inches")
-                  res
-                },
-                l = {
-                  id <- which(g$layout$l < min(g$layout[idx, ]$l))
-                  ## id <- id[!duplicated(g$layout$name[id])]
-                  if(length(id))
-                    res <- sum(g$width[unique(g$layout$l[id])])
-                  else
-                    res <- unit(0, "inches")
-                  res
-                },
-                b = {
-                  id <- which(g$layout$b > max(g$layout[idx, ]$b))
-                  ## id <- id[!duplicated(g$layout$name[id])]
-                  if(length(id))
-                    res <- sum(g$height[unique(g$layout$b[id])])
-                  else
-                    res <- unit(0, "inches")
-                  res
+spaceAroundPanel <- function(gtable, types = c("t", "l", "b", "r")) {
+    spaces <- list()
+    # get panel positions for gtable$layout
+    panel_position <- gtable_filter_grobs(gtable, "panel")
 
-                },
-                r = {
-                  id <- which(g$layout$r > max(g$layout[idx, ]$r))
-                  ## id <- id[!duplicated(g$layout$name[id])]
-                  if(length(id))
-                    res <- sum(g$width[unique(g$layout$r[id])])
-                  else
-                    res <- unit(0, "inches")
-                  res
-                })
+    for (type in types) {
+        all_type_values <- gtable$layout[[type]]
 
-  }
-  rsl
+        if (type %in% c("b", "r")) {
+            # Find the maximum panel value and compare it to other values
+            # of gtable$layout[['type']]. It provides values that are
+            # outside of the maximum panel value.
+            max_panel_value <- max(gtable$layout[panel_position, ][[type]])
+            position <- which(all_type_values > max_panel_value)
+        } else if (type %in% c("t", "l")) {
+            # why minimum ?
+            min_panel_value <- min(gtable$layout[panel_position, ][[type]])
+            position <- which(all_type_values < min_panel_value)
+        }
+
+        # To remove duplicate position values
+        unique_position <- unique(gtable$layout[[type]][position])
+
+        # get heights and width associated with unique_position
+        # from the gtable
+        if (length(position) && type %in% c("t", "b"))
+            res <- sum(gtable$height[unique_position])
+        else if (length(position) && type %in% c("l", "r"))
+            res <- sum(gtable$width[unique_position])
+        else
+            res <- unit(0, "inches")
+
+        spaces[[type]] <- res
+    }
+    spaces
 }
 
-
 ## return uniformed grobs
+uniformAroundPanel <- function(..., direction = c("row", "col")) {
+    dir <- match.arg(direction)
+    args <- list(...)
 
-uniformAroundPanel <- function(..., direction = c("row", "col")){
-  dir <- match.arg(direction)
-  lst <- list(...)
-  if(length(lst) == 1 && is(lst[[1]], "GrobList")){
-    grobs <- lst[[1]]
-  }else{
-    grobs <- lapply(lst, function(p){
-      if(inherits(p, "ggplot"))
-        g <- Grob(p)
-      else
-        g <- p
-      g
-    })
-  }
-  if(dir == "row"){
-    slst <- lapply(grobs, spaceAroundPanel, c("l", "r"))
-    lmx <- do.call(max, lapply(slst, function(lst) lst$l))
-    rmx <- do.call(max, lapply(slst, function(lst) lst$r))
-    for(i in 1:length(grobs)){
-      .grob <- grobs[[i]]
-      gt <- gtable(unit(1, "null"), unit(1, "null"), name = "panel.ori")
-      grobs[[i]] <- gtable_add_cols(grobs[[i]], lmx - slst[[i]]$l, pos = 0)
-      grobs[[i]] <- gtable_add_cols(grobs[[i]], rmx - slst[[i]]$r, pos = -1)
-      rect.grob <- rectGrob(gp = gpar(fill = NA, col = NA), name = "bgColor")
-      all.grob <- grobTree(gTree(children = gList(rect.grob, grobs[[i]])))
-      grobs[[i]] <- gtable_add_grob(gt, all.grob, 1, 1)
-    }
-  }
-  if(dir == "col"){
+    if (length(args) == 1 && is(args[[1]], "GrobList"))
+        grobs <- args[[1]]
+    else
+        grobs <- lapply(args, function(p) Grob(p))
 
-    slst <- lapply(grobs, spaceAroundPanel, c("t", "b"))
-    tmx <- do.call(max, lapply(slst, function(lst) lst$t))
-    bmx <- do.call(max, lapply(slst, function(lst) lst$b))
-    for(i in 1:length(grobs)){
-      .grob <- grobs[[i]]
-      gt <- gtable(unit(1, "null"),unit(1, "null"), name = "panel.ori")
-      grobs[[i]] <- gtable_add_rows(grobs[[i]], tmx - slst[[i]]$t, pos = 0)
-      grobs[[i]] <- gtable_add_rows(grobs[[i]], bmx - slst[[i]]$b, pos = -1)
-      rect.grob <- rectGrob(gp = gpar(fill = NA, color = NA), name = "bgColor")
-      all.grob <- grobTree(gTree(children = gList(rect.grob, grobs[[i]])))
-      grobs[[i]] <- gtable_add_grob(gt, all.grob, 1, 1)
+    get_uniform_grobs <- function(spaces, p1, max1, p2, max2, FUN) {
+        for (i in 1:length(grobs)) {
+            gt <- gtable(unit(1, "null"), unit(1, "null"), name = "panel.ori")
+            rect.grob <- rectGrob(gp = gpar(fill = NA, color = NA), name = "bgColor")
+            grobs[[i]] <- FUN(grobs[[i]], max1 - spaces[[i]][[p1]], pos = 0)
+            grobs[[i]] <- FUN(grobs[[i]], max2 - spaces[[i]][[p2]], pos = -1)
+            all.grob <- grobTree(gTree(children = gList(rect.grob, grobs[[i]])))
+            grobs[[i]] <- gtable_add_grob(gt, all.grob, 1, 1)
+          }
+        grobs
     }
-  }
-  grobs
+
+    if (dir == "row") {
+        spaces <- lapply(grobs, spaceAroundPanel, c("l", "r"))
+        lmax <- do.call(max, lapply(spaces, function(x) x$l))
+        rmax <- do.call(max, lapply(spaces, function(x) x$r))
+        grobs <- get_uniform_grobs(spaces, "l", lmax, "r", rmax, gtable_add_cols)
+    } else if (dir == "col") {
+      spaces <- lapply(grobs, spaceAroundPanel, c("t", "b"))
+      tmax <- do.call(max, lapply(spaces, function(x) x$t))
+      bmax <- do.call(max, lapply(spaces, function(x) x$b))
+      grobs <- get_uniform_grobs(spaces, "t", tmax, "b", bmax, gtable_add_rows)
+    }
+    grobs
 }
 
 align.plots <- alignPlots

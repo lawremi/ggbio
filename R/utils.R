@@ -366,15 +366,6 @@ setMethod("highlight", "GRanges", function(obj, col = "red", fill = "red", alpha
   highlight(df, col = col, fill = fill, alpha = alpha)
 })
 
-## matrix
-scale_fill_fold_change<- function(){
-  s <- scale_fill_gradient2(low = "blue", mid = "white", high = "red")
-  ## res <- c(list(s), list(guides(fill = guide_colorbar())),
-           ##             list(scale_x_continuous(expand = c(0, 0))),
-           ##             list(scale_y_continuous(expand = c(0, 0))),
-           ## list(theme(panel.border=element_rect(colour="black",size=0.2))))
-}
-
 need_color <- function(args){
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
@@ -385,93 +376,10 @@ need_color <- function(args){
   }
 }
 
-
-trans_seq <- function(unit = c("Mb", "kb", "bp")){
-  unit <- match.arg(unit)
-  function(x){
-    res <- switch(unit,
-                  Mb = {
-                    x/1e6
-                  },
-                  kb = {
-                    x/1000
-                  },
-                  bp = {
-                    x
-                  })
-    res
-  }
-}
-
-trans_seq_format<- function(unit = c("Mb", "kb", "bp")){
-  unit <- match.arg(unit)
-  function(x){
-    res <- switch(unit,
-                  Mb = {
-                    x/1e6
-                  },
-                  kb = {
-                    x/1000
-                  },
-                  bp = {
-                    x
-                  })
-    paste(res, unit)
-  }
-}
-
-trans_seq_rev<- function(unit = c("Mb", "kb", "bp")){
-  unit <- match.arg(unit)
-  function(x){
-    res <- switch(unit,
-                  Mb = {
-                    x*1e6
-                  },
-                  kb = {
-                    x*1000
-                  },
-                  bp = {
-                    x
-                  })
-    res
-  }
-}
-
-.append_unit <- function(unit = ""){
-    function(x) {paste(x, unit)}
-}
-
-scale_x_sequnit <- function(unit = c("Mb", "kb", "bp"), append = NULL){
-  unit <- match.arg(unit)
-  if(is.null(append)){
-      scale_x_continuous(breaks = trans_breaks(trans_seq(unit),
-                             trans_seq_rev(unit)),
-                         labels = trans_format(trans_seq_format(unit), math_format(.x)))
-  }else{
-      stopifnot(is.character(append))
-      scale_x_continuous(labels = trans_format(.append_unit(append), math_format(.x)))
-  }
-}
-
 get_digits <- function(x){
   floor(log10(x))
 }
 
-
-scale_by_xlim <- function(xlim, by.unit = TRUE){
-    if(by.unit)
-      .d <- max(xlim)
-    else
-      .d <- diff(xlim)
-    if(.d > 1e6){
-      res <- scale_x_sequnit("Mb")
-    }else if(.d <= 1e6 & .d > 1e3){
-      res <- scale_x_sequnit("kb")
-    }else{
-      res <- scale_x_sequnit("bp")
-    }
-  res
-}
 
 sub_names <- function(data, name.expr){
   .res <- c()
@@ -529,18 +437,6 @@ arrangeGrobByParsingLegend <- function(..., nrow = NULL, ncol = NULL,
   print(grid.arrange(do.call(arrangeGrob, c(l.g, list(nrow = nrow, ncol = ncol))),
                      gg2, ncol = 2, widths = widths))
 }
-
-
-scale_fill_giemsa <- function(fill = getOption("biovizBase")$cytobandColor){
-  list(scale_fill_manual(values = fill))
-}
-
-
-
-
-
-
-
 
 ## subset chr
 setGeneric("subsetByChrs", function(obj, ...) starndardGeneric("subByChr"))

@@ -721,38 +721,18 @@ copyAttr <- function(x1, x2){
 }
 
 ## combineAes(keep, lost)
-combineAes <- function(keep, lose){
+combineAes <- function(keep, lose) {
+    keep.nms <- names(keep)
+    lose.nms <- names(lose)
 
-  keep.nms <- names(keep)
-  lose.nms <- names(lose)
+    nms <- intersect(lose.nms, keep.nms)
 
-  nms <- intersect(lose.nms, keep.nms)
-
-  if(length(nms)){
-    return(c(keep, lose[setdiff(lose.nms, keep.nms)]))
-  }else{
-    return(c(keep, lose))
-  }
+    if (length(nms))
+        return(c(keep, lose[setdiff(lose.nms, keep.nms)]))
+    else
+        return(c(keep, lose))
 }
 
-combineAes2 <- function(keep, lose){
-
-  keep.nms <- names(keep)
-  lose.nms <- names(lose)
-  if("ymin" %in% keep.nms && "y" %in% lose.nms){
-    lose$y <- keep$ymin
-  }
-  if("ymax" %in% keep.nms && "yend" %in% lose.nms){
-    lose$yend <- keep$ymax
-  }
-  nms <- intersect(lose.nms, keep.nms)
-
-  if(length(nms)){
-    return(c(keep, lose[setdiff(lose.nms, keep.nms)]))
-  }else{
-    return(c(keep, lose))
-  }
-}
 ## mark a plot as a blank plot which doesn't
 
 

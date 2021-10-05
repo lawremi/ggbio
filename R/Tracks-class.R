@@ -172,15 +172,16 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
     tracks
 }
 
-setMethod("summary", "Tracks", function(object){
-  cat("-------------------------------------------\n")
-  cat("Tracks contains: ", length(object@grobs), " graphic objects\n")
-  cat("-------------------------------------------\n")
-  cat("xlim:", object@xlim, "\n")
-  cat("heights", object@heights, "\n")
-  cat("fixed", object@fixed, "\n")
-  cat("track.plot.color", object@track.plot.color, "\n")
-  cat("-------------------------------------------\n")
+
+setMethod("summary", "Tracks", function(object) {
+    cat("-------------------------------------------\n")
+    cat("Tracks contains: ", length(object@grobs), " graphic objects\n")
+    cat("-------------------------------------------\n")
+    cat("xlim:", object@xlim, "\n")
+    cat("heights", object@heights, "\n")
+    cat("fixed", object@fixed, "\n")
+    cat("track.plot.color", object@track.plot.color, "\n")
+    cat("-------------------------------------------\n")
 })
 
 setAs("Tracks", "grob", function(from) {
@@ -257,189 +258,173 @@ print.Tracks <- function(x) {
     ggplot2:::set_last_plot(x)
 }
 
-setMethod("show", "Tracks", function(object){
-  print(object)
-  ggplot2:::set_last_plot(object)
+setMethod("show", "Tracks", function(object) {
+    print(object)
+    ggplot2:::set_last_plot(object)
 })
 
-
-setMethod("Arith", signature = c("Tracks", "ANY"), function(e1, e2) {
-     switch(.Generic,
-            "+"= {
-              N <- length(e1@grobs)
-              ## get attributes
-              .theme <- intersect(names(attributes(e2)),  .tracks.theme)
-              idx <- sapply(e1@grobs, mutable)
-              for(i in (1:N)[idx]){
-                  e1@grobs[[i]] <- e1@grobs[[i]] + e2
-                }
-              if(length(.theme)){
-              for(z in seq_len(length(.theme))){
-                slot(e1, .theme[z]) <- attr(e2, .theme[z])
-              }}
-            },
-            stop("unhandled 'Arith' operator '", .Generic, "'"))
+setMethod("+", signature = c("Tracks", "ANY"), function(e1, e2) {
+    N <- length(e1@grobs)
+    .theme <- intersect(names(attributes(e2)), .tracks.theme)
+    idx <- vapply(e1@grobs, mutable, logical(1L))
+    for (i in seq_len(N)[idx]) {
+        e1@grobs[[i]] <- e1@grobs[[i]] + e2
+    }
+    if (length(.theme)) {
+        for (z in seq_len(length(.theme))) {
+            slot(e1, .theme[z]) <- attr(e2, .theme[z])
+        }
+    }
     e1
 })
 
-setMethod("Arith", signature = c("Tracks", "theme"), function(e1, e2) {
-     switch(.Generic,
-            "+"= {
-              N <- length(e1@grobs)
-              ## get attributes
-              .theme <- intersect(names(attributes(e2)),  .tracks.theme)
-              idx <- sapply(e1@grobs, mutable)
-              for(i in (1:N)[idx]){
-                  e1@grobs[[i]] <- e1@grobs[[i]] + e2
-                }
-              if(length(.theme)){
-              for(z in seq_len(length(.theme))){
-                slot(e1, .theme[z]) <- attr(e2, .theme[z])
-              }}
-              e1@theme <- e2
-            },
-            stop("unhandled 'Arith' operator '", .Generic, "'"))
+setMethod("+", signature = c("Tracks", "theme"), function(e1, e2) {
+    N <- length(e1@grobs)
+    .theme <- intersect(names(attributes(e2)), .tracks.theme)
+    idx <- vapply(e1@grobs, mutable, logical(1L))
+    for (i in seq_len(N)[idx]) {
+        e1@grobs[[i]] <- e1@grobs[[i]] + e2
+    }
+    if (length(.theme)) {
+        for (z in seq_len(length(.theme))) {
+            slot(e1, .theme[z]) <- attr(e2, .theme[z])
+        }
+    }
+    e1@theme <- e2
     e1
 })
 
 setOldClass("zoom")
-setMethod("Arith", signature = c("Tracks", "zoom"), function(e1, e2) {
-
-  xlim <- e1@xlim
-
-e1@xlim <- .zoom(xlim, as.numeric(e2))$limits$x
-  N <- length(e1@grobs)
-  for(i in 1:N){
-   e1@grobs[[i]] <- e1@grobs[[i]] + e2
-  }
-  e1
+setMethod("+", signature = c("Tracks", "zoom"), function(e1, e2) {
+    xlim <- e1@xlim
+    e1@xlim <- .zoom(xlim, as.numeric(e2))$limits$x
+    N <- length(e1@grobs)
+    for (i in seq_len(N)) {
+        e1@grobs[[i]] <- e1@grobs[[i]] + e2
+    }
+    e1
 })
 
 setOldClass("position_c")
-setMethod("Arith", signature = c("Tracks", "position_c"), function(e1, e2) {
-  if("x" %in% e2$aesthetics){
-    if(!is.null(e2$limits))
-        e1@xlim <- e2$limits
-  }
-  N <- length(e1@grobs)
-  for(i in 1:N){
-      e1@grobs[[i]] <- e1@grobs[[i]] + e2
-  }
-  e1
+setMethod("+", signature = c("Tracks", "position_c"), function(e1, e2) {
+    if ("x" %in% e2$aesthetics) {
+        if (!is.null(e2$limits))
+            e1@xlim <- e2$limits
+    }
+    N <- length(e1@grobs)
+    for (i in seq_len(N)) {
+        e1@grobs[[i]] <- e1@grobs[[i]] + e2
+    }
+    e1
 })
-
 
 setOldClass("cartesian")
-setMethod("Arith", signature = c("Tracks", "cartesian"), function(e1, e2) {
-  if(!is.null(e2$limits$x))
-    e1@xlim <- e2$limits$x
-  if(!is.null(e2$limits$y)){
-    for(i in seq_len(length(e1@ylim))){
-      if(!fixed(e1@grobs[[i]]) && !is(e1@grobs[[i]], "Ideogram"))
-        e1@ylim[[i]] <- e2$limits$y
+setMethod("+", signature = c("Tracks", "cartesian"), function(e1, e2) {
+    if (!is.null(e2$limits$x))
+        e1@xlim <- e2$limits$x
+    if (!is.null(e2$limits$y)) {
+        for (i in seq_len(length(e1@ylim))) {
+            if (!fixed(e1@grobs[[i]]) && !is(e1@grobs[[i]], "Ideogram"))
+                e1@ylim[[i]] <- e2$limits$y
+        }
     }
-  }
-  N <- length(e1@grobs)
-  for(i in 1:N){
-    if(!fixed(e1@grobs[[i]]))
-      e1@grobs[[i]] <- e1@grobs[[i]] + e2
-  }
-  e1
+    N <- length(e1@grobs)
+    for (i in seq_len(N)) {
+        if (!fixed(e1@grobs[[i]]))
+            e1@grobs[[i]] <- e1@grobs[[i]] + e2
+    }
+    e1
 })
 
-
-xlim_car <- function(x){
-  class(x) <- c(class(x), "xlim")
-  x
+xlim_car <- function(x) {
+    class(x) <- c(class(x), "xlim")
+    x
 }
 
-setMethod("xlim", "numeric", function(obj, ...){
-  if(length(list(...)))
-    obj <- c(obj, ...)
-  if(length(obj) > 2){
-    obj <- range(obj)
-  }
-  res <- ggplot2::coord_cartesian(xlim = obj)
-  xlim_car(res)
+setMethod("xlim", "numeric", function(obj, ...) {
+    if (length(list(...)))
+        obj <- c(obj, ...)
+    if (length(obj) > 2) {
+        obj <- range(obj)
+    }
+    res <- ggplot2::coord_cartesian(xlim = obj)
+    xlim_car(res)
 })
 
-
-setMethod("xlim", "IRanges", function(obj, ...){
+setMethod("xlim", "IRanges", function(obj, ...) {
     xlim <- c(start(obj), end(obj))
     res <- ggplot2::coord_cartesian(xlim = xlim)
     xlim_car(res)
 })
 
-setMethod("xlim", "GRanges", function(obj, ...){
-  xlim <- c(start(ranges(reduce(obj, ignore.strand = TRUE))),
-            end(ranges(reduce(obj, ignore.strand = TRUE))))
-  res <- ggplot2::coord_cartesian(xlim = xlim)
-  chr <- unique(as.character(seqnames(obj)))
-  attr(res, "chr") <- chr
-  attr(res, "ori") <- obj
-  xlim_car(res)
+setMethod("xlim", "GRanges", function(obj, ...) {
+    xlim <- c(start(ranges(reduce(obj, ignore.strand = TRUE))),
+              end(ranges(reduce(obj, ignore.strand = TRUE))))
+    res <- ggplot2::coord_cartesian(xlim = xlim)
+    chr <- unique(as.character(seqnames(obj)))
+    attr(res, "chr") <- chr
+    attr(res, "ori") <- obj
+    xlim_car(res)
 })
 
-setMethod("xlim", "Tracks", function(obj, ...){
-  obj@xlim
+setMethod("xlim", "Tracks", function(obj, ...) {
+    obj@xlim
 })
 
-
-
-setReplaceMethod("xlim", c("Tracks", "IRanges"), function(x, value){
+setReplaceMethod("xlim", c("Tracks", "IRanges"), function(x, value) {
     xlim <- c(start(value), end(value))
     x@xlim <- xlim
-    lapply(1:length(x@grobs), function(i){
-      ylim <- x@ylim[[i]]
-      s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
-      if(i %in% which(!x@fixed))
-        x@grobs[[i]] <- x@grobs[[i]] + s
+    lapply(1:length(x@grobs), function(i) {
+        ylim <- x@ylim[[i]]
+        s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
+        if (i %in% which(!x@fixed))
+            x@grobs[[i]] <- x@grobs[[i]] + s
     })
     x
 })
 
-setReplaceMethod("xlim", c("Tracks", "GRanges"), function(x, value){
-  xlim <- c(start(ranges(reduce(value, ignore.strand = TRUE))),
-            end(ranges(reduce(value, ignore.strand = TRUE))))
-  x@xlim <- xlim
-  lapply(1:length(x@grobs), function(i){
-    ylim <- x@ylim[[i]]
-    s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
-    if(i %in% which(!x@fixed))
-      x@grobs[[i]] <- x@grobs[[i]] + s
-  })
-  x
+setReplaceMethod("xlim", c("Tracks", "GRanges"), function(x, value) {
+    xlim <- c(start(ranges(reduce(value, ignore.strand = TRUE))),
+              end(ranges(reduce(value, ignore.strand = TRUE))))
+    x@xlim <- xlim
+    lapply(1:length(x@grobs), function(i) {
+        ylim <- x@ylim[[i]]
+        s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
+        if (i %in% which(!x@fixed))
+            x@grobs[[i]] <- x@grobs[[i]] + s
+    })
+    x
 })
 
-setReplaceMethod("xlim", c("Tracks", "numeric"), function(x, value){
-  xlim <- range(value)
-  x@xlim <- xlim
-  lapply(1:length(x@grobs), function(i){
-    ylim <- x@ylim[[i]]
-    s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
-    if(i %in% which(!x@fixed))
-      x@grobs[[i]] <- x@grobs[[i]] + s
-  })
-  x
+setReplaceMethod("xlim", c("Tracks", "numeric"), function(x, value) {
+    xlim <- range(value)
+    x@xlim <- xlim
+    lapply(1:length(x@grobs), function(i) {
+        ylim <- x@ylim[[i]]
+        s <- coord_cartesian(xlim = x@xlim, ylim = ylim)
+        if (i %in% which(!x@fixed))
+            x@grobs[[i]] <- x@grobs[[i]] + s
+    })
+    x
 })
 
 setGeneric("reset", function(obj, ...) standardGeneric("reset"))
-setMethod("reset", "Tracks", function(obj){
-  nms <- setdiff(slotNames(obj), "backup")
-  for(nm in nms){
-    slot(obj, nm) <- obj@backup[[nm]]
-  }
-  xlim(obj) <- obj@xlim
-  obj
+setMethod("reset", "Tracks", function(obj) {
+    nms <- setdiff(slotNames(obj), "backup")
+    for (nm in nms) {
+        slot(obj, nm) <- obj@backup[[nm]]
+    }
+    xlim(obj) <- obj@xlim
+    obj
 })
 
 setGeneric("backup", function(obj, ...) standardGeneric("backup"))
-setMethod("backup", "Tracks", function(obj){
-  nms <- setdiff(slotNames(obj), "backup")
-  for(nm in nms){
-    obj@backup[[nm]] <- slot(obj, nm)
-  }
-  obj
+setMethod("backup", "Tracks", function(obj) {
+    nms <- setdiff(slotNames(obj), "backup")
+    for (nm in nms) {
+        obj@backup[[nm]] <- slot(obj, nm)
+    }
+    obj
 })
 
 gtable_filter_grobs <- function(g, type) {
@@ -521,219 +506,202 @@ alignPlots <- function(..., vertical = TRUE, widths = NULL,
                        remove.y.axis = FALSE,
                        remove.x.axis = FALSE,
                        .scale.grob = NULL
-                       ){
+                       ) {
 
-  if(is.numeric(scale.height) && !is.unit(scale.height))
+  if (is.numeric(scale.height) && !is.unit(scale.height))
     scale.height <- unit(scale.height, "lines")
 
-  if(is.numeric(main.height) && !is.unit(main.height))
+  if (is.numeric(main.height) && !is.unit(main.height))
     main.height <- unit(main.height, "lines")
 
-  ## check
-  if(!is.null(height) && is.null(heights))
+  if (!is.null(height) && is.null(heights))
     heights <- height
 
-  if(!is.null(width) && is.null(widths))
+  if (!is.null(width) && is.null(widths))
     widths <- width
 
   ggl <- list(...)
 
-  if(length(ggl)){
-    if(length(ggl) == 1  && !is.ggplot(ggl[[1]]) && is.list(ggl[[1]])){
-      ggl <- ggl[[1]]
-    }}else{
+  if (length(ggl)) {
+      if (length(ggl) == 1  && !is.ggplot(ggl[[1]]) && is.list(ggl[[1]])) {
+        ggl <- ggl[[1]]
+      }
+  } else {
       return(ggplot())
-    }
+  }
+
   label.name <- names(ggl)
   N <- length(ggl)
 
-  if(length(track.plot.color) == 1){
+  if (length(track.plot.color) == 1) {
       track.plot.color <- rep(track.plot.color, N)
   }
-  ## add a plot with axis and remove later
 
-  if(vertical){
-    idx.fix <- which(!sapply(ggl, fixed) & !sapply(ggl, is, "Ideogram"))[1]
-    if(is.na(idx.fix))
-      idx.fix <- length(ggl)
+  ## add a plot with axis and remove later
+  if (vertical) {
+    idx.fix <- which(!vapply(ggl, fixed, logical(1L)) & !vapply(PlotList, is, "Ideogram", FUN.VALUE = logical(1L)))[1]
+    if (is.na(idx.fix))
+        idx.fix <- length(ggl)
     ggl <- c(ggl, list(.scale.grob))
   }
-  ## parse grobs
-  ## a little slow
-  grobs <- do.call(GrobList, ggl)
 
-  if(vertical)
-    grobs <- do.call(uniformAroundPanel, grobs)
-  else
-    grobs <- do.call(uniformAroundPanel, c(grobs,list(direction = "col")))
+    ## parse grobs
+    ## a little slow
+    grobs <- do.call(GrobList, ggl)
 
-  .nms <- names(grobs)
+    if (vertical)
+        grobs <- do.call(uniformAroundPanel, grobs)
+    else
+        grobs <- do.call(uniformAroundPanel, c(grobs,list(direction = "col")))
 
-  ## change background color
-  grobs <- lapply(1:length(grobs), function(i){
-    ## better figure out a better idea
-    .grob <- grobs[[i]]
-    .col <- track.plot.color[i]
-    gt.temp <- grobs[[i]]$grobs[[1]]$children[[1]]$children$layout
-    ## edit background
-    gt.temp$grobs[[1]] <- editGrob(gt.temp$grobs[[1]],
-                                   gp = gpar(alpha = 0))
-    idx <- which(findGrobs(gt.temp, "guide-box"))
-    if(length(idx) == 1L){
-      if(findGrobs(gt.temp$grobs[[idx]]$grobs[[1]], "background")[1L]){
-        gt.temp$grobs[[idx]]$grobs[[1]]$grobs[[1]] <- editGrob(gt.temp$grobs[[idx]]$grobs[[1]]$grobs[[1]], gp = gpar(alpha = 0))
-      }
+    .nms <- names(grobs)
+
+    ## change background color
+    grobs <- lapply(seq_len(length(grobs)), function(i) {
+        ## better figure out a better idea
+        .grob <- grobs[[i]]
+        .col <- track.plot.color[i]
+        gt.temp <- grobs[[i]]$grobs[[1]]$children[[1]]$children$layout
+        ## edit background
+        gt.temp$grobs[[1]] <- editGrob(gt.temp$grobs[[1]], gp = gpar(alpha = 0))
+        idx <- which(gtable_filter_grobs(gt.temp, "guide-box"))
+        if (length(idx) == 1L) {
+            if (gtable_filter_grobs(gt.temp$grobs[[idx]]$grobs[[1]], "background")[1L]) {
+                gt.temp$grobs[[idx]]$grobs[[1]]$grobs[[1]] <-
+                    editGrob(gt.temp$grobs[[idx]]$grobs[[1]]$grobs[[1]],
+                             gp = gpar(alpha = 0))
+            }
+        }
+        grobs[[i]]$grobs[[1]]$children[[1]]$children$layout <- gt.temp
+        grobs[[i]]$grobs[[1]] <- editGrob(grobs[[i]]$grobs[[1]], "bgColor",
+                                          grep = TRUE, global = TRUE,
+                                          gp  = gpar(fill = .col, col = .col))
+        grobs[[i]]
+    })
+
+    names(grobs) <- .nms
+
+    if (vertical) {
+        g.last <- grobs[[length(grobs)]]
+        grobs <- grobs[-length(grobs)]
+        g <- g.last$grobs[[1]]$children[[1]]$children$layout
+        g.s <- scaleGrob(g)
+        if (length(track.bg.color)) {
+            rect.grob <- rectGrob(gp=gpar(col = track.bg.color, fill = track.bg.color))
+            g.s <- grobTree(gTree(children = gList(rect.grob, g.s)))
+        }
+        grobs <- c(grobs, list(g.s))
+        if (length(main)) {
+            text.grob <- textGrob(main)
+            if (length(track.bg.color)) {
+                rect.grob <- rectGrob(gp=gpar(col = track.bg.color, fill = track.bg.color))
+                text.grob <- grobTree(gTree(children = gList(rect.grob, text.grob)))
+            }
+            grobs <- c(list(text.grob), grobs)
+        }
+
+        if (length(xlab)) {
+            text.grob <- textGrob(xlab)
+            if (length(track.bg.color)) {
+                rect.grob <- rectGrob(gp=gpar(col = track.bg.color, fill = track.bg.color))
+                text.grob <- grobTree(gTree(children = gList(rect.grob, text.grob)))
+            }
+            grobs <- c(grobs, list(text.grob))
+        }
     }
-    grobs[[i]]$grobs[[1]]$children[[1]]$children$layout <- gt.temp
-    grobs[[i]]$grobs[[1]] <- editGrob(grobs[[i]]$grobs[[1]], "bgColor", grep = TRUE, global = TRUE,
-                       gp  = gpar(fill = .col, col = .col))
-    grobs[[i]]
-  })
 
-  names(grobs) <- .nms
-
-  if(vertical){
-    g.last <- grobs[[length(grobs)]]
-    grobs <- grobs[-length(grobs)]
-    g <- g.last$grobs[[1]]$children[[1]]$children$layout
-    g.s <- scaleGrob(g)
-    if(length(track.bg.color)){
-        rect.grob <- rectGrob(gp=gpar(col = track.bg.color,
-                                fill = track.bg.color))
-        g.s <- grobTree(gTree(children = gList(rect.grob, g.s)))
-      }
-    grobs <- c(grobs, list(g.s))
-    if(length(main)){
-      text.grob <- textGrob(main)
-      if(length(track.bg.color)){
-        rect.grob <- rectGrob(gp=gpar(col = track.bg.color, fill = track.bg.color))
-        text.grob <- grobTree(gTree(children = gList(rect.grob, text.grob)))
-      }
-    grobs <- c(list(text.grob), grobs)
-
+    if (any(remove.y.axis)) {
+        for (i in which(remove.y.axis))
+            grobs[[i]] <- removeYAxis(grobs[[i]])
     }
-    if(length(xlab)){
-      text.grob <- textGrob(xlab)
-      if(length(track.bg.color)){
-        rect.grob <- rectGrob(gp=gpar(col = track.bg.color, fill = track.bg.color))
-        text.grob <- grobTree(gTree(children = gList(rect.grob, text.grob)))
-      }
-      grobs <- c(grobs, list(text.grob))
 
+    if (any(remove.x.axis)) {
+        for (i in which(remove.x.axis))
+            grobs[[i]] <- removeXAxis(grobs[[i]])
     }
-  }
 
+    ## FIXME:
+    lbs <- vapply(grobs, labeled, logical(1L))
+    nms <- names(lbs)
 
-
-  if(any(remove.y.axis)){
-    for(i in which(remove.y.axis))
-      grobs[[i]] <- removeYAxis(grobs[[i]])
-  }
-  if(any(remove.x.axis)){
-    for(i in which(remove.x.axis))
-      grobs[[i]] <- removeXAxis(grobs[[i]])
-  }
-
-  ## FIXME:
-  lbs <- sapply(grobs, labeled)
-  nms <- names(lbs)
-
-  if(vertical){
-    if(any(!is.null(nms)))
-      grobs <- addLabel(grobs, nms, lbs,
-                        label.bg.color =  label.bg.color,
+    label_args <- list(grobs, nms, lbs,
+                       label.bg.color =  label.bg.color,
                        label.bg.fill = label.bg.fill,
                        label.text.color = label.text.color,
                        label.text.cex = label.text.cex,
                        label.text.angle = label.text.angle,
                        label.width = label.width)
-  }else{
-    if(any(!is.null(nms)))
-      grobs <- addLabel(grobs, nms, lbs,
-                        label.bg.color =  label.bg.color,
-                       label.bg.fill = label.bg.fill,
-                       label.text.color = label.text.color,
-                       label.text.cex = label.text.cex,
-                       label.text.angle = label.text.angle,
-                       label.width = label.width,
-                        direction = "col")
-  }
 
-  ## reduce to normal grob
-  grobs_back <- grobs
-  grobs <- lapply(grobs, function(g){
-    if(is(g, "Grob")){
-      suppressWarnings(class(g) <- g@.S3Class)
-      return(g)
-    }else{
-      return(g)
-    }
-  })
+    if (!vertical)
+        label_args <- c(label_args, list(direction = "col"))
 
+    if (any(!is.null(nms)))
+        grobs <- do.call(addLabel, label_args)
 
-  if(vertical){
-    if(!length(widths)){
-      widths <- unit(1, "null")
-    }else if(is.numeric(widths) && !is.unit(widths)){
-      widths <- unit(widths, "null")
-    }else if(!is.unit(widths)){
-      stop("widths must be unit or numeric value")
-    }
-    if(!length(heights)){
-      heights <- unit(rep(1, N), "null")
-    }else if(is.numeric(heights) && !is.unit(heights)){
-      heights <- unit(heights, "null")
-    }else if(!is.unit(heights)){
-      stop("heights must be unit or numeric value")
-    }
-    ## TODO check main later
-    if(length(main))
-      heights <- unit.c(main.height, heights)
-    if(vertical)
-      heights <- unit.c(heights, scale.height)
-    if(length(xlab))
-      heights <- unit.c(heights, xlab.height)
-    tab <- gtable(widths, heights)
-    for(i in 1:length(grobs)){
-      tab <- gtable_add_grob(tab, grobs[[i]], t = i, r = 1, l  = 1)
-    }
-    if(length(track.bg.color)){
-      rect.grob <- rectGrob(gp=gpar(col = track.bg.color,
-                              fill = track.bg.color))
-      tab <- grobTree(gTree(children = gList(rect.grob, tab)))
-    }
+    ## reduce to normal grob
+    grobs_back <- grobs
+    grobs <- lapply(grobs, function(g) {
+        if (is(g, "Grob")) {
+            suppressWarnings(class(g) <- g@.S3Class)
+            return(g)
+        } else {
+            return(g)
+        }
+    })
 
-  }else{
+    if (vertical) {
+        if (!length(widths)) {
+            widths <- unit(1, "null")
+        } else if (is.numeric(widths) && !is.unit(widths)) {
+            widths <- unit(widths, "null")
+        } else if (!is.unit(widths)) {
+            stop("widths must be unit or numeric value")
+        }
+        if (!length(heights)) {
+            heights <- unit(rep(1, N), "null")
+        } else if (is.numeric(heights) && !is.unit(heights)) {
+            heights <- unit(heights, "null")
+        } else if (!is.unit(heights)) {
+            stop("heights must be unit or numeric value")
+        }
+        ## TODO check main later
+        if (length(main))
+            heights <- unit.c(main.height, heights)
+        if (vertical)
+            heights <- unit.c(heights, scale.height)
+        if (length(xlab))
+            heights <- unit.c(heights, xlab.height)
+            tab <- gtable(widths, heights)
+            for (i in 1:length(grobs)) {
+            tab <- gtable_add_grob(tab, grobs[[i]], t = i, r = 1, l  = 1)
+        }
+        if (length(track.bg.color)) {
+            rect.grob <- rectGrob(gp=gpar(col = track.bg.color,
+                                  fill = track.bg.color))
+            tab <- grobTree(gTree(children = gList(rect.grob, tab)))
+        }
+    } else {
+        if (!length(widths)) {
+            widths <- unit(rep(1, N), "null")
+        } else if (is.numeric(widths) && !is.unit(widths)) {
+            widths <- unit(widths, "null")
+        } else if (!is.unit(width)) {
+            stop("widths must be unit or numeric value")
+        }
 
-    if(!length(widths)){
-      widths <- unit(rep(1, N), "null")
-    }else if(is.numeric(widths) && !is.unit(widths)){
-      widths <- unit(widths, "null")
-    }else if(!is.unit(width)){
-      stop("widths must be unit or numeric value")
+        if (!length(heights)) {
+            heights <- unit(1, "null")
+        } else if (is.numeric(heights) && !is.unit(heights)) {
+            heights <- unit(heights, "null")
+        } else if (!is.unit(heights)) {
+            stop("heights must be unit or numeric value")
+        }
+        tab <- gtable(widths, heights)
+        for (i in 1:N) {
+            tab <- gtable_add_grob(tab, grobs[[i]], l = i, t = 1, b = 1)
+        }
     }
-
-    if(!length(heights)){
-      heights <- unit(1, "null")
-    }else if(is.numeric(heights) && !is.unit(heights)){
-      heights <- unit(heights, "null")
-    }else if(!is.unit(heights)){
-      stop("heights must be unit or numeric value")
-    }
-    tab <- gtable(widths, heights)
-    for(i in 1:N){
-      tab <- gtable_add_grob(tab, grobs[[i]], l = i, t = 1, b = 1)
-    }
-  }
     tab
-}
-
-
-
-getPanelIndex <- function(g){
-  if(inherits(g, "ggplot"))
-    g <- Grob(g)
-  findGrobs(g, "panel")
 }
 
 spaceAroundPanel <- function(gtable, types = c("t", "l", "b", "r")) {
@@ -811,58 +779,62 @@ uniformAroundPanel <- function(..., direction = c("row", "col")) {
 
 align.plots <- alignPlots
 
-## always comes last
+gtable_remove_grobs <- function(gtable, remove) {
+    if (is.character(remove))
+        index <- gtable_filter_grobs(gtable, remove)
+    else if (is.logical(remove))
+        index <- remove
 
-scaleGrob <- function(g){
-  idx <- findGrobs(g, "axis-b")
-  idx <- unique(c(g$layout[idx, "t"], g$layout[idx, "b"]))
-  res <- g[idx,]
-  res
+    keep <- gtable$layout$name[!index]
+    gtable::gtable_filter(gtable, paste0(keep, collapse="|"))
 }
 
-removeXAxis <- function(g){
-  if(g$name == "panel.ori"){
-    g$grobs[[1]]$children[[1]]$children$layout <-
-      removeXAxis(g$grobs[[1]]$children[[1]]$children$layout)
-  }else{
-    idx <- findGrobs(g, c("xlab", "axis-b", "title"))
-    idx <- sort(unique(c(g$layout$t[idx], g$layout$b[idx])))
-    idx <- setdiff(1:nrow(g), idx)
-    g <- g[idx, ]
-  }
-  g
+scaleGrob <- function(gtable) {
+    # remove all rows except one containing "axis-b"
+    index <- !gtable_filter_grobs(gtable, "axis-b")
+    gtable_remove_grobs(gtable, index)
 }
 
-removeYAxis <- function(g){
-  if(g$name == "panel.ori"){
-    g$grobs[[1]]$children[[1]]$children$layout <-
-      removeYAxis(g$grobs[[1]]$children[[1]]$children$layout)
-  }else{
-    idx <- findGrobs(g, c("ylab", "axis-l"))
-    idx <- sort(unique(c(g$layout$l[idx], g$layout$r[idx])))
-    idx <- setdiff(1:ncol(g), idx)
-    g <- g[,idx]
-  }
-  g
+removeAxis <- function(g, remove, p1, p2) {
+    if (g$name == "panel.ori") {
+        gr <- g$grobs[[1]]$children[[1]]$children$layout
+        gr <- removeAxis(gr, remove, p1, p2)
+    } else {
+        idx <- gtable_filter_grobs(g, remove)
+        idx <- sort(unique(c(g$layout[[p1]][idx], g$layout[[p2]][idx])))
+        idx <- setdiff(seq_len(ncol(g)), idx)
+        g <- g[,idx]
+    }
+    g
 }
 
-getHeight <- function(dts){
-  hts <- do.call(unit.c, lapply(dts, height))
-  hts
+removeXAxis <- function(gtable) {
+    remove <- c("xlab", "axis-b", "title")
+    removeAxis(gtable, remove)
 }
 
-parseHeight <- function(hts, n){
-  if(length(hts) != n && length(hts) != 1)
-    stop("Heights must be of length 1 or numbers of graphics")
-  if(is.numeric(hts) && !is.unit(hts)){
-    if(length(hts) == 1)
-      res <- rep(unit(1, "null"), n)
-    if(length(hts) == n)
-      res <- unit(hts, "null")
-  }else if(is.unit(hts)){
-    res <- hts
-  }
-  res
+removeYAxis <- function(gtable) {
+    remove <- c("ylab", "axis-l")
+    removeAxis(gtable, remove)
+}
+
+getHeight <- function(dts) {
+    hts <- do.call(unit.c, lapply(dts, height))
+    hts
+}
+
+parseHeight <- function(hts, n) {
+    if (length(hts) != n && length(hts) != 1)
+        stop("Heights must be of length 1 or numbers of graphics")
+    if (is.numeric(hts) && !is.unit(hts)) {
+        if (length(hts) == 1)
+            res <- rep(unit(1, "null"), n)
+        if (length(hts) == n)
+            res <- unit(hts, "null")
+    } else if (is.unit(hts)) {
+        res <- hts
+    }
+    res
 }
 
 ## combining
@@ -872,71 +844,68 @@ parseHeight <- function(hts, n){
 ## 2. Tracks + Tracks
 ## 3. Tracks(Tracks, Tracks)
 ## 4. Tracks + plot (not yet)
-setMethod("Arith", signature = c("Tracks", "Tracks"), function(e1, e2) {
-     switch(.Generic,
-            "+"= {
-              e1 <- c(e1, e2)
-            },
-            stop("unhandled 'Arith' operator '", .Generic, "'"))
+setMethod("+", signature = c("Tracks", "Tracks"), function(e1, e2) {
+    e1 <- c(e1, e2)
     e1
 })
 
-setMethod("c", "Tracks",  function(x, ...){
-        if (missing(x)) {
-            args <- unname(list(...))
-            x <- args[[1L]]
-        } else {
-            args <- unname(list(x, ...))
-        }
-        if (length(args) == 1L)
-            return(x)
-        arg_is_null <- sapply(args, is.null)
-        if (any(arg_is_null))
-            args[arg_is_null] <- NULL  # remove NULL elements by setting them to NULL!
-        if (!all(sapply(args, is, class(x))))
-            stop("all arguments in '...' must be ", class(x), " objects (or NULLs)")
-        lst <- lapply(args, function(x){
-          x@grobs
-        })
-        ## FIXME: how to keep other attributes?
-        res <- do.call(tracks, do.call(c, lst))
-        res
+setMethod("c", "Tracks",  function(x, ...) {
+    if (missing(x)) {
+        args <- unname(list(...))
+        x <- args[[1L]]
+    } else {
+        args <- unname(list(x, ...))
+    }
+
+    if (length(args) == 1L)
+        return(x)
+
+    arg_is_null <- vapply(args, is.null, FUN.VALUE = logical(1L))
+    isClassValid <- vapply(args, is, class(x), FUN.VALUE = logical(1L))
+
+    if (any(arg_is_null))
+        args[arg_is_null] <- NULL  # remove NULL elements by setting them to NULL!
+    if (!all(isClassValid))
+        stop("all arguments in '...' must be ", class(x), " objects (or NULLs)")
+
+    lst <- lapply(args, function(x) {
+        x@grobs
+    })
+    ## FIXME: how to keep other attributes?
+    res <- do.call(tracks, do.call(c, lst))
+    res
 })
 
-setMethod("cbind", "Tracks",  function(...){
-  args <- list(...)
-  if(all(sapply(args, is, "Tracks"))){
-    lst <- lapply(args, as, "grob")
-    res <- do.call(cbind, lst)
-  }else{
-    stop("need to be of class Tracks")
-  }
-   grid.draw(res)
+setMethod("cbind", "Tracks",  function(...) {
+    args <- list(...)
+    isTrack <- vapply(args, is, "Tracks", FUN.VALUE = logical(1L))
+    if (all(isTrack)) {
+        lst <- lapply(args, as, "grob")
+        res <- do.call(cbind, lst)
+    } else {
+        stop("need to be of class Tracks")
+    }
+    grid.draw(res)
 })
 
-
-setMethod("rbind", "Tracks",  function(...){
-  args <- list(...)
-  if(all(sapply(args, is, "Tracks"))){
-    lst <- lapply(args, as, "grob")
-    res <- do.call(rbind, lst)
-  }else{
-    stop("need to be of class Tracks")
-  }
-   grid.draw(res)
+setMethod("rbind", "Tracks",  function(...) {
+    args <- list(...)
+    isTrack <- vapply(args, is, "Tracks", FUN.VALUE = logical(1L))
+    if (all(isTrack)) {
+        lst <- lapply(args, as, "grob")
+        res <- do.call(rbind, lst)
+    } else {
+        stop("need to be of class Tracks")
+    }
+    grid.draw(res)
 })
-
-
-
-
 
 setMethod("[", c("Tracks", "numeric", "missing", "ANY"),
-          function(x, i, j, ..., drop=TRUE){
+          function(x, i, j, ..., drop=TRUE) {
               i <- as.integer(i)
               initialize(x,
                   grobs = x@grobs[i],
                   plot = x@plot[i],
-                  ## backup = backup,
                   labeled = x@labeled[i],
                   heights = x@heights[i],
                   xlim = x@xlim,

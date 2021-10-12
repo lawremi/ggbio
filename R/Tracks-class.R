@@ -795,17 +795,14 @@ scaleGrob <- function(gtable) {
     gtable_remove_grobs(gtable, index)
 }
 
-removeAxis <- function(g, remove, p1, p2) {
-    if (g$name == "panel.ori") {
-        gr <- g$grobs[[1]]$children[[1]]$children$layout
-        gr <- removeAxis(gr, remove, p1, p2)
+removeAxis <- function(gtable, remove) {
+    if (gtable$name == "panel.ori") {
+        gt <- gtable$grobs[[1]]$children[[1]]$children$layout
+        gt <- removeAxis(gt, remove)
     } else {
-        idx <- gtable_filter_grobs(g, remove)
-        idx <- sort(unique(c(g$layout[[p1]][idx], g$layout[[p2]][idx])))
-        idx <- setdiff(seq_len(ncol(g)), idx)
-        g <- g[,idx]
+        gtable <- gtable_remove_grobs(gtable, remove)
     }
-    g
+    gtable
 }
 
 removeXAxis <- function(gtable) {

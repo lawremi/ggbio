@@ -18,8 +18,6 @@ jobs:
 
       - name: Checkout Repository
         uses: actions/checkout@v2
-        with:
-          ref: 'master'
 
       - name: Query dependencies
         run: |
@@ -28,7 +26,6 @@ jobs:
         shell: Rscript {0}
 
       - name: Cache R packages
-        if: runner.os != 'Windows'
         uses: actions/cache@v2
         with:
           path: /usr/local/lib/R/site-library
@@ -36,7 +33,6 @@ jobs:
           restore-keys: ${{ runner.os }}-r-1-
 
       - name: Install system dependencies
-        if: runner.os == 'Linux'
         env:
           RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
         run: |

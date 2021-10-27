@@ -63,9 +63,11 @@ setMethod("geom_arch", "data.frame", function(data, ...,
                   group = as.name("junc"))
   
   aesres <- do.call(aes, c(args.aes, args.aes2))
+  aesres <- remove_args(aesres, "height")
   if(nrow(apoint)){
+    args.non <- remove_args(args.non, "facets")
     reslst <- c(list(data = apoint), list(aesres),args.non)
-  p <- do.ggcall(geom_line, reslst)
+    p <- do.call(geom_line, reslst)
     if("ylab" %in% names(args.non)){
       ylab <- quo_name(args.non$ylab)
     }else if(length(y.name)){
@@ -114,7 +116,7 @@ setMethod("geom_arch", "GRanges", function(data, ...,
     args.res <- c(list(data = df),
                   args.non,
                   list(do.call(aes, args.aes)))
-    p <- do.ggcall(geom_arch, args.res)
+    p <- do.call(geom_arch, args.res)
     p <- c(list(p) , list(facet))
   }else{
     p <- NULL
@@ -243,11 +245,11 @@ geom_arch_flip <- function(data, ..., n = 25, max.height = 10, bottom = TRUE){
   args.aes <- list(x = as.name("xx"),
                    y = as.name("yy"),
                    group = as.name("junc"))
- 
+  args.aes2 <- remove_args(args.aes2, "height")
   aesres <- do.call(aes, c(args.aes, args.aes2))
   if(nrow(apoint)){
     reslst <- c(list(data = apoint), list(aesres),args.non)
-    p <- do.ggcall(geom_polygon, reslst)
+    p <- do.call(geom_polygon, reslst)
     if("ylab" %in% names(args.non)){
       ylab <- quo_name(args.non$ylab)
     }else if(length(y.name)){
@@ -328,11 +330,11 @@ geom_arch_flip2 <- function(data, ..., n = 25, max.height = 10, bottom = FALSE){
   args.aes <- list(x = as.name("xx"),
                    y = as.name("yy"),
                    group = as.name("junc"))
-
+  args.aes2 <- remove_args(args.aes2, "height")
   aesres <- do.call(aes, c(args.aes, args.aes2))
   if(nrow(apoint)){
     reslst <- c(list(data = apoint), list(aesres),args.non)
-    p <- do.ggcall(geom_path, reslst)
+    p <- do.call(geom_path, reslst)
     if("ylab" %in% names(args.non)){
       ylab <- quo_name(args.non$ylab)
     }else if(length(y.name)){

@@ -27,6 +27,7 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
   args$geom <- geom
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
+  args.non <- remove_args(args.non, "facets")
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
 
   if(!length(y) && "y" %in% names(args.aes))
@@ -163,10 +164,10 @@ setMethod("stat_aggregate", "GRanges", function(data, ..., xlab, ylab, main, by,
                 list(aes.res),
                 args.non)
   if(!geom %in% c("boxplot")){
-    p <- do.ggcall(ggplot2::stat_identity, args.res)
+    p <- do.call(ggplot2::stat_identity, args.res)
    }else{
      args.res <- args.res[!names(args.res) %in% "geom"]
-     p <- do.ggcall(stat_boxplot, args.res)
+     p <- do.call(stat_boxplot, args.res)
    }
   p <- c(list(p) , list(facet))
   labels <- Labels(xlab, ylab, main, fallback = c(x = ""))

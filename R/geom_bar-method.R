@@ -29,7 +29,7 @@ setMethod("geom_bar", "GRanges", function(data,..., xlab, ylab, main){
     args.aes$ymin <- 0
     args.aes$ymax <- as.name(.y)
     aes.res <- do.call(aes, args.aes)
-    p <- list(do.ggcall(geom_rect, c(list(data = mold(data)), list(aes.res), args.non)))
+    p <- list(do.call(geom_rect, c(list(data = mold(data)), list(aes.res), args.non)))
   }else{
     p <- NULL
   }

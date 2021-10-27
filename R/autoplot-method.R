@@ -115,7 +115,7 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
         .fun <- getDrawFunFromGeomStat(geom, stat)
         .xlim <- c(start(range(object, ignore.strand = TRUE)),
                    end(range(object, ignore.strand = TRUE)))
-        p <- list(do.ggcall(.fun, c(args.non, list(aes.res))))
+        p <- list(do.call(.fun, c(args.non, list(aes.res))))
         if(!is.null(stat) && stat != "aggregate")
             p <- c(p, list(scale_by_xlim(.xlim)))
         if(!legend)
@@ -211,6 +211,7 @@ setMethod("autoplot", "GRangesList", function(object, ...,
         args.aes$group <- as.name(indName)
     aes.res <- do.call(aes, args.aes)
     args.non$object <- gr
+    args.non <- remove_args(args.non, c("main.geom"))
     args.res <- c(args.non, list(aes.res))
     p <- do.call(autoplot, args.res)
     }
@@ -763,7 +764,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                         args.res <- c(list(aes.res), args.non)
                         ## p <- p + do.call(geom_text2,
                         ##                  c(args.res, list(hjust = 0, color = "white", fc = fc)))
-                        p + do.ggcall(geom_text, args.res) +
+                        p + do.call(geom_text, args.res) +
                             scale_color_manual(values = baseColor)
 
                     }else{
@@ -772,7 +773,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                         args.aes$label = as.name("seqs")
                         aes.res <- do.call(aes, args.aes)
                         args.res <- c(list(aes.res), args.non)
-                        p + do.ggcall(geom_text, args.res)
+                        p + do.call(geom_text, args.res)
                     }
 
                 },
@@ -785,7 +786,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                         args.aes$color = as.name("seqs")
                         aes.res <- do.call(aes, args.aes)
                         args.res <- c(list(aes.res), args.non)
-                        p + do.ggcall(ggplot2::geom_segment, args.res) +
+                        p + do.call(ggplot2::geom_segment, args.res) +
                             scale_color_manual(values = baseColor)+
                                 scale_y_continuous(limits = c(-10, 10))
                     }else{
@@ -796,7 +797,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                         aes.res <- do.call(aes, args.aes)
                         args.res <- c(list(aes.res), args.non)
 
-                        p + do.ggcall(ggplot2::geom_segment, args.res) +
+                        p + do.call(ggplot2::geom_segment, args.res) +
                             scale_y_continuous(limits = c(-10, 10))
                     }
                 },
@@ -807,14 +808,14 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                         args.aes$color = as.name("seqs")
                         aes.res <- do.call(aes, args.aes)
                         args.res <- c(list(aes.res), args.non)
-                        p + do.ggcall(geom_point, args.res) +
+                        p + do.call(geom_point, args.res) +
                             scale_color_manual(values = baseColor)
                     }else{
                         args.aes$x <- as.name("x")
                         args.aes$y <- 0
                         aes.res <- do.call(aes, args.aes)
                         args.res <- c(list(aes.res), args.non)
-                        p + do.ggcall(geom_point, args.res)
+                        p + do.call(geom_point, args.res)
                     }
 
                 },
@@ -828,7 +829,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                         args.aes$fill = as.name("seqs")
                         aes.res <- do.call(aes, args.aes)
                         args.res <- c(list(aes.res), args.non)
-                        p + do.ggcall(ggplot2::geom_rect, args.res) +
+                        p + do.call(ggplot2::geom_rect, args.res) +
                             scale_y_continuous(limits = c(-10, 10))+
                                 scale_color_manual(values = baseColor)+
                                     scale_fill_manual(values = baseColor)
@@ -839,7 +840,7 @@ setMethod("autoplot", c("BSgenome"), function(object,  which, ...,
                         args.aes$ymax <- 1
                         aes.res <- do.call(aes, args.aes)
                         args.res <- c(list(aes.res), args.non)
-                        p + do.ggcall(ggplot2::geom_rect, args.res) +
+                        p + do.call(ggplot2::geom_rect, args.res) +
                             scale_y_continuous(limits = c(-10, 10))
                     }},
                     none = {
@@ -902,7 +903,7 @@ setMethod("autoplot", "Rle", function(object, ...,
     if(stat == "identity"){
         aes.res <- do.call(aes, args.aes)
         args.res <- c(list(aes.res), args.non)
-        p <- ggplot() + do.ggcall(stat_identity, args.res)
+        p <- ggplot() + do.call(stat_identity, args.res)
     }
     if(stat == "bin"){
         args.non$nbin <- nbin
@@ -911,12 +912,12 @@ setMethod("autoplot", "Rle", function(object, ...,
         if(!missing(binwidth))
             args.non$binwidth <- binwidth
         args.res <- c(list(aes.res), args.non)
-        p <- ggplot() + do.ggcall(stat_bin, args.res)
+        p <- ggplot() + do.call(stat_bin, args.res)
     }
     if(stat == "slice"){
         aes.res <- do.call(aes, args.aes)
         args.res <- c(list(aes.res), args.non)
-        p <- ggplot() + do.ggcall(stat_slice, args.res)
+        p <- ggplot() + do.call(stat_slice, args.res)
     }
 
     if(!missing(xlab))
@@ -966,7 +967,7 @@ setMethod("autoplot", "RleList", function(object, ...,
     if(stat == "identity"){
         aes.res <- do.call(aes, args.aes)
         args.res <- c(list(aes.res), args.non)
-        p <- ggplot() + do.ggcall(stat_identity, args.res)
+        p <- ggplot() + do.call(stat_identity, args.res)
     }
     if(stat == "bin"){
         args.non$nbin <- nbin
@@ -974,12 +975,12 @@ setMethod("autoplot", "RleList", function(object, ...,
         if(!missing(binwidth))
             args.non$binwidth <- binwidth
         args.res <- c(list(aes.res), args.non)
-        p <- ggplot() + do.ggcall(stat_bin, args.res)
+        p <- ggplot() + do.call(stat_bin, args.res)
     }
     if(stat == "slice"){
         aes.res <- do.call(aes, args.aes)
         args.res <- c(list(aes.res), args.non)
-        p <- ggplot() + do.ggcall(stat_slice, args.res)
+        p <- ggplot() + do.call(stat_slice, args.res)
     }
     if(!missing(xlab))
         p <- p + ggplot2::xlab(xlab)
@@ -1495,7 +1496,7 @@ setMethod("autoplot", "VCF", function(object, ...,
         }
         message("Other options for potential mapping(only keep numeric/integer/character/factor variable): ")
 
-        p <- ggplot(data = df) + do.ggcall(ggplot2::geom_bar, c(list(stat = "identity"),
+        p <- ggplot(data = df) + do.call(ggplot2::geom_bar, c(list(stat = "identity"),
                         list(do.call(aes, args.aes)),
                         args.non))
     }
@@ -1632,14 +1633,14 @@ setMethod("autoplot", "matrix", function(object, ...,
     ## args2 <- colorizeArgs(args.non, args.aes)
     ## args.aes <- args2$args.aes
     ## args.non <- args2$args.non
-
     aes.args <- do.call(aes, args.aes)
     max.c <- 10
     geom <- match.arg(geom)
     df <- mold(object)
 
     if(geom == "raster"){
-        p <- ggplot(data = df) + do.ggcall(geom_raster, c(args.non, list(aes.args)))
+        aes.args <- remove_args(aes.args, c("height", "width"))
+        p <- ggplot(data = df) + do.call(geom_raster, c(args.non, list(aes.args)))
         p <- p + theme_noexpand()
         if("rownames" %in% colnames(df) && rownames.label){
             y.lab <- rownames(object)
@@ -1658,7 +1659,7 @@ setMethod("autoplot", "matrix", function(object, ...,
 
     }
     if(geom == "tile"){
-        p <- ggplot(data = df) + do.ggcall(geom_tile, c(args.non, list(aes.args)))
+        p <- ggplot(data = df) + do.call(geom_tile, c(args.non, list(aes.args)))
         p <- p + theme_noexpand()
         if("rownames" %in% colnames(df) && rownames.label){
             y.lab <- rownames(object)

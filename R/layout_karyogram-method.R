@@ -219,7 +219,7 @@ setMethod("layout_karyogram", "GRanges",
                                        xmax = substitute(end),
                                        ymin = .ideo.range[1],
                                        ymax = .ideo.range[2]))
-              y <- .ideo.range[1]
+                 y <- .ideo.range[1]
               yend <- .ideo.range[2]
               
               if ("ymin" %in% args.aes)
@@ -232,17 +232,18 @@ setMethod("layout_karyogram", "GRanges",
                                                y = y,
                                                yend = yend))
 
+              args.aes.seg <- remove_args(args.aes.seg, "fill")
               ## this hack is to get over 1-pixel problem
-              p.addon <- do.ggcall(ggplot2::geom_segment,
+              p.addon <- do.call(ggplot2::geom_segment,
                                  c(list(data = df), list(do.call(aes, args.aes.seg)),args.non))
 
-              p.addon <- c(list(p.addon), list(do.ggcall(ggplot2::geom_rect,
+              p.addon <- c(list(p.addon), list(do.call(ggplot2::geom_rect,
                           c(list(data = df), list(do.call(aes, args.aes.rect)),args.non))))
             }else{
               .drawFun <- getDrawFunFromGeomStat(geom, stat)
               aes.res <- do.call(aes, args.aes)
               args.res <- c(list(data = df), list(aes.res), args.non)
-              p.addon <- do.ggcall(.drawFun, args.res)
+              p.addon <- do.call(.drawFun, args.res)
             }
             p <- list(p.addon , facet_grid(facets))
           }else{

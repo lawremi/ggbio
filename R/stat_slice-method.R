@@ -104,7 +104,7 @@ setMethod("stat_slice", "Rle", function(data, ...,
   args.non$data <- df
   aes.args <- do.call(aes, args.aes)
   res.args <- c(list(aes.args), args.non)
-  p <- do.ggcall(ggplot2::stat_identity, res.args)
+  p <- do.call(ggplot2::stat_identity, res.args)
     if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))
   else
@@ -178,7 +178,7 @@ setMethod("stat_slice", "RleList", function(data, ...,
   args.non$data <- df
   aes.args <- do.call(aes, args.aes)
   res.args <- c(list(aes.args), args.non)
-  p <- do.ggcall(ggplot2::stat_identity, res.args)
+  p <- do.call(ggplot2::stat_identity, res.args)
     if(!missing(xlab))
     p <- c(p, list(ggplot2::xlab(xlab)))
   else

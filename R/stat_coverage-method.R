@@ -82,10 +82,11 @@ setMethod("stat_coverage", "GRanges", function(data, ...,xlim,
   aes <- do.call(aes, args.aes)
   if(geom  == "area" | geom == "polygon")
     args.non$geom <- "polygon"
+  args.non <- remove_args(args.non, "facets")
   args.res <- c(list(data = res),
                 list(aes),
                 args.non)
-  p <- do.ggcall(stat_identity, args.res)
+  p <- do.call(stat_identity, args.res)
 }else{
   p <- NULL
 }
@@ -114,7 +115,7 @@ setMethod("stat_coverage", "GRangesList", function(data, ..., xlim,
   aes.res <- do.call(aes, args.aes)
   gr <- flatGrl(data)
   args.non$data <- gr
-  p <- do.ggcall(stat_coverage, c(list(aes.res), args.non))
+  p <- do.call(stat_coverage, c(list(aes.res), args.non))
   labels <- Labels(xlab, ylab, main, fallback = c(x = "Genomic Coordinates", y = "Coverage"))
   p <- c(p, labels)
   p <- setStat(p)
@@ -156,7 +157,6 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
 
 
   args <- list(...)
-  args$facets <- facets
   args.aes <- parseArgsForAes(args)
   if(!"y" %in% names(args.aes)){
     args.aes$y <- as.name("score")
@@ -170,6 +170,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
     args.aes$x <- as.name("midpoint")
   }
   args.non <- parseArgsForNonAes(args)
+  args$facets <- facets
   args.non <- args.non[!names(args.non) %in% c("method", "maxBinSize", "data", "which")]
 
 
@@ -226,7 +227,7 @@ setMethod("stat_coverage", "BamFile", function(data, ..., maxBinSize = 2^14, xli
                 list(aes.res),
                 args.non)
 
-  p <- c(list(do.ggcall(stat_identity, args.res)), list(facet))
+  p <- c(list(do.call(stat_identity, args.res)), list(facet))
 }
   if(method == "raw"){
     p <- stat_coverage(res, ..., geom = geom, facets = facets)

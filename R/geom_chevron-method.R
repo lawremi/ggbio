@@ -14,7 +14,7 @@ setMethod("geom_chevron", "GRanges",
             args$facets <- facets
             
             args.aes <- parseArgsForAes(args)            
-            args.non <- parseArgsForNonAes(args)
+            args.non <- remove_args(parseArgsForNonAes(args), "facets")
             facet <- build_facet(data, args)
             if(length(data)) {
             if(stat == "stepping"){
@@ -50,7 +50,7 @@ setMethod("geom_chevron", "GRanges",
 
               args.res <- c(list(data = df), list(do.call(aes, args)),
                             args.non)
-              p <- c(list(do.ggcall(ggplot2::geom_segment, args.res)), list(ggplot2::ylab("")))
+              p <- c(list(do.call(ggplot2::geom_segment, args.res)), list(ggplot2::ylab("")))
 
               gpn <- ifelse("group" %in% names(args.aes), quo_name(args.aes$group), "stepping")
               
@@ -93,9 +93,9 @@ setMethod("geom_chevron", "GRanges",
               args.aes$y <- substitute(y + y.offset, list(y = .y))
               args.aes$yend <- substitute(yend + yend.offset, list(yend = .yend))
               args.res <- c(list(data = df), list(do.call(aes, args.aes)), args.non)
-              p <- c(list(do.ggcall(ggplot2::geom_segment, args.res)),
+              p <- c(list(do.call(ggplot2::geom_segment, args.res)),
                      list(ggplot2::ylab("")))
-                     
+
             }}else{
               p <- NULL
             }

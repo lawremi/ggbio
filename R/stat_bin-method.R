@@ -7,7 +7,7 @@ setMethod("stat_bin", "ANY", function(data, ...){
 stat_bin_geom_bar <- function(args.aes, args.non) {
     args.non$stat <- "identity"
     aes.args <- do.call(aes, args.aes)
-    p <- ggbio:::do.ggcall(geom_bar, c(list(aes.args), args.non))
+    p <- do.call(geom_bar, c(list(aes.args), args.non))
 }
 
 stat_bin_geom_heatmap <- function(args.aes, args.non, binwidth) {
@@ -19,7 +19,7 @@ stat_bin_geom_heatmap <- function(args.aes, args.non, binwidth) {
     args.aes$fill <- as.name("y")
     args.aes <- args.aes[!names(args.aes) %in% c("x", "y")]
     aes.args <- do.call(aes, args.aes)
-    p <- ggbio:::do.ggcall(geom_rect, c(list(aes.args), args.non))
+    p <- do.call(geom_rect, c(list(aes.args), args.non))
 }
 
 setMethod("stat_bin", "Rle", function(data, ..., binwidth, nbin = 30,

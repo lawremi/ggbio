@@ -160,47 +160,6 @@ getDrawFunFromGeomStat <- function(geom, stat) {
     .fun
 }
 
-do.ggcall <- function(fun, args) {
-    do.call(fun, filterArgs(fun, args))
-}
-
-filterArgs <- function(fun, args,
-                       layerArgs=args[names(args) %in% c("geom", "stat")])
-{
-    resolveGeneric <- function(fun, args) {
-        if (is(fun, "genericFunction")) {
-            method <- selectMethod(fun, class(args$data))
-            if (method@defined == "ANY") {
-                ggfun <- get0(fun@generic, getNamespace("ggplot2"),
-                              mode="function")
-                if (!is.null(ggfun)) { # a generic overriding a ggplot2 function
-                    fun <- ggfun
-                }
-            }
-        }
-        fun
-    }
-    fun <- resolveGeneric(fun, args)
-    ggplot2 <- !is(fun, "genericFunction")
-    if (ggplot2) {
-        aes <- vapply(args, is, "uneval", FUN.VALUE=logical(1L))
-        args[aes] <- lapply(args[aes], filterArgs, fun=fun, layerArgs=layerArgs)
-        if (is.null(names(args))) {
-            args <- args[aes]
-        } else {
-            args <- ggplot2:::rename_aes(args)
-            layer <- do.call(fun, layerArgs)
-            validArgs <- c(names(formals(fun)),
-                           layer$geom$aesthetics(),
-                           layer$stat$aesthetics(),
-                           layer$geom$parameters(TRUE),
-                           layer$stat$parameters(TRUE))
-            args <- args[names(args) %in% validArgs | aes]
-        }
-    }
-    args
-}
-
 .changeStrandColor <- function(p, args, fill = TRUE) {
     strandColor <- getOption("biovizBase")$strandColor
     isStrand.color <- FALSE

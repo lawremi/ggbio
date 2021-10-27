@@ -732,7 +732,7 @@ spaceAroundPanel <- function(gtable, types = c("t", "l", "b", "r")) {
         if (length(position) && type %in% c("t", "b"))
             res <- sum(gtable$height[unique_position])
         else if (length(position) && type %in% c("l", "r"))
-            res <- sum(gtable$width[unique_position])
+            res <- gtable$width[unique_position]
         else
             res <- unit(0, "inches")
 
@@ -765,6 +765,18 @@ uniformAroundPanel <- function(..., direction = c("row", "col")) {
 
     if (dir == "row") {
         spaces <- lapply(grobs, spaceAroundPanel, c("l", "r"))
+        low <- unit(-0.35, "cm")
+        for (x in spaces) {
+            if (length(x$r) > 3L && as.numeric(x$r[4L]) < as.numeric(low))
+                low <- x$r[4L]
+        }
+        spaces <- lapply(spaces, function(x) {
+            if (length(x$r) < 4L)
+                x$r <- unit.c(x$r, low)
+            x$l <- sum(x$l)
+            x$r <- sum(x$r)
+            x
+        })
         lmax <- do.call(max, lapply(spaces, function(x) x$l))
         rmax <- do.call(max, lapply(spaces, function(x) x$r))
         grobs <- get_uniform_grobs(spaces, "l", lmax, "r", rmax, gtable_add_cols)
@@ -779,20 +791,11 @@ uniformAroundPanel <- function(..., direction = c("row", "col")) {
 
 align.plots <- alignPlots
 
-gtable_remove_grobs <- function(gtable, remove) {
-    if (is.character(remove))
-        index <- gtable_filter_grobs(gtable, remove)
-    else if (is.logical(remove))
-        index <- remove
-
-    keep <- gtable$layout$name[!index]
-    gtable::gtable_filter(gtable, paste0(keep, collapse="|"))
-}
-
-scaleGrob <- function(gtable) {
-    # remove all rows except one containing "axis-b"
-    index <- !gtable_filter_grobs(gtable, "axis-b")
-    gtable_remove_grobs(gtable, index)
+scaleGrob <- function(gtable){
+    idx <- gtable_filter_grobs(gtable, "axis-b")
+    idx <- unique(c(gtable$layout[idx, "t"], gtable$layout[idx, "b"]))
+    res <- gtable[idx,]
+    res
 }
 
 removeAxis <- function(g, remove, p1, p2) {

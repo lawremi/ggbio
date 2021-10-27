@@ -77,7 +77,7 @@ gr <- GRanges(seqnames =
 ##  data.frame call ggplot2::geom_segment
 ## ======================================================================
 ggplot() + geom_segment(data = mtcars, aes(x = mpg, y = wt, xend = mpg + 10, yend = wt + 0.2,
-                       fill = cyl))
+                        color = cyl))
 
 
 
@@ -93,7 +93,7 @@ ggplot() + geom_segment(gr)
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot(gr) + geom_segment(facets = sample ~ seqnames, aes(color = strand, fill = strand))
+ggplot(gr) + geom_segment(facets = sample ~ seqnames, aes(color = strand))
 
 
 ## ======================================================================

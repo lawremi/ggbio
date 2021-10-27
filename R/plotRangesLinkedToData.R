@@ -71,7 +71,7 @@ setMethod("plotRangesLinkedToData", "GenomicRanges_OR_GRangesList",
             
             args.aes.seg$yend <- args.aes.seg$y
             aes.res.seg <- do.call(aes, args.aes.seg)
-            p <- p + do.ggcall(ggplot2::geom_segment,
+            p <- p + do.call(ggplot2::geom_segment,
                                c(list(aes.res.seg), args.non))
             part <- PartitioningByWidth(rep(length(gr),
                                             nlevels(df.new$.ggbio.group)))

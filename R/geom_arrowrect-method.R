@@ -16,7 +16,7 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
   args$facets <- facets
 
   args.aes <- parseArgsForAes(args)
-  args.non <- parseArgsForNonAes(args)
+  args.non <- remove_args(parseArgsForNonAes(args), "facets")
 
   facet <- build_facet(data, args)
   if(length(data)){  
@@ -32,7 +32,7 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
       args.aes$y <- as.name(".temp.y")
       args.aes$group <- as.name(".id")
       aes.temp <- do.call(aes, args.aes)                    
-      p <- do.ggcall(geom_polygon, c(list(data = df), list(aes.temp), args.non))
+      p <- do.call(geom_polygon, c(list(data = df), list(aes.temp), args.non))
       }
     if(stat == "identity"){
       if(!"y" %in% names(args.aes))
@@ -47,7 +47,7 @@ setMethod("geom_arrowrect", "GRanges", function(data, ...,
       args.aes$y <- as.name(".temp.y")
       args.aes$group <- as.name(".id")      
       aes.temp <- do.call(aes, args.aes)                    
-      p <- do.ggcall(geom_polygon, c(list(data = df), list(aes.temp), args.non))
+      p <- do.call(geom_polygon, c(list(data = df), list(aes.temp), args.non))
     }}else{
       p <- NULL
     }

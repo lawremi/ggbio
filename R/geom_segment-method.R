@@ -1,9 +1,9 @@
 setGeneric("geom_segment", function(data, ...) standardGeneric("geom_segment"))
 
 setMethod("geom_segment", "ANY", function(data, ...){
-  ggplot2::geom_segment(data  = data, ...)
+    ggplot2::geom_segment(data  = data, ...)
 })
-## alignment should be convenient toggle with chevron...
+
 setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
                                            facets = NULL,
                                            stat = c("stepping", "identity"),
@@ -13,6 +13,7 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
   args$facets <- facets
   args.aes <- parseArgsForAes(args)
   args.non <- parseArgsForNonAes(args)
+  args.non <- remove_args(args.non, "facets")
   facet <- build_facet(data, args)
   
   stat <- match.arg(stat)
@@ -32,10 +33,10 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
                                  y = substitute(stepping),
                                  yend = substitute(stepping)))
 
-    args.aes <- remove_args(args.aes, "size")
+    args.aes <- remove_args(args.aes, c("size", "fill"))
     aes.res <- do.call(aes, args.aes)
     args.res <- c(list(data = df), list(aes.res), args.non)
-    p <- list(do.ggcall(ggplot2::geom_segment,args.res))
+    p <- list(do.call(ggplot2::geom_segment,args.res))
     p <- .changeStrandColor(p, args.aes)
     .df.sub <- group_df(df, gpn)
     y_scale <- scale_y_continuous_by_group(.df.sub, gpn, group.selfish)
@@ -55,12 +56,11 @@ setMethod("geom_segment", "GRanges", function(data,..., xlab, ylab, main,
       args.aes$y <- args.aes$yend <- .y
     }
     df <- mold(data)
-    args.aes <- remove_args(args.aes, "group")
-    args.aes <- remove_args(args.aes, "size")
+    args.aes <- remove_args(args.aes, c("group", "size", "fill"))
     
     aes.res <- do.call(aes, args.aes)
     args.res <- c(list(data = df), list(aes.res),args.non)
-    p <- list(do.ggcall(ggplot2::geom_segment,args.res))
+    p <- list(do.call(ggplot2::geom_segment,args.res))
     p <- .changeStrandColor(p, args.aes)
   }
   }else{

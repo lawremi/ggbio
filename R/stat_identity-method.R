@@ -15,12 +15,12 @@ setMethod("stat_identity", "GRanges", function(data, ..., geom = NULL){
     args$geom <- geom
     data <- mold(data)
     args$data <- data
-    p <- do.ggcall(ggplot2::stat_identity, args)
+    p <- do.call(ggplot2::stat_identity, args)
   }else{
     .geom.fun <- getGeomFun(geom)
     args$stat <- "identity"
     args$data <- data
-    p <- do.ggcall(.geom.fun, args)
+    p <- do.call(.geom.fun, args)
   }
   p <- c(list(p), list(facet))
   p <- setStat(p)  
@@ -42,7 +42,7 @@ setMethod("stat_identity", "Rle", function(data, ...,
   args.non$data <- df
   args.aes <- list(x = substitute(x),
                    y = substitute(y))
-  p <- do.ggcall(ggplot2::stat_identity, c(args.non, list(do.call(aes, args.aes))))
+  p <- do.call(ggplot2::stat_identity, c(args.non, list(do.call(aes, args.aes))))
   labels <- Labels(xlab, ylab, main, fallback = c(x = "x", y = "y"))
   p <- c(p, labels)
   p <- setStat(p)  
@@ -77,7 +77,7 @@ setMethod("stat_identity", "RleList", function(data, ...,
   
     args.aes <- list(x = substitute(x),
                      y = substitute(y))
-    p <- do.ggcall(ggplot2::stat_identity, c(args.non, list(do.call(aes, args.aes))))
+    p <- do.call(ggplot2::stat_identity, c(args.non, list(do.call(aes, args.aes))))
 
   labels <- Labels(xlab, ylab, main, fallback = c(x = "x", y = "y"))
   p <- c(p, labels)

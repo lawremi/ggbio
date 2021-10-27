@@ -23,7 +23,8 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
   args$facets <- facets
   
   args.aes <- parseArgsForAes(args)
-  args.non <- parseArgsForNonAes(args)
+  args.non <- remove_args(parseArgsForNonAes(args), c("fill", "facets"))
+
 
   facet <- build_facet(data, args)
 
@@ -61,24 +62,16 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
       ## need to split to two direction/maybe three?
       p <- by2(res, res$strand, function(x){
         s <- unique(as.character(x$strand))
-        p <- switch(s,
-                    "+" = {
-                      args.non$arrow <- arrow(length = length, ends = "last",
-                                              type = type, angle = angle)
-                      aes.temp <- do.call(aes, args.aes)
-                      do.ggcall(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
-                      
-                    },
-                    "-" = {
-                      args.non$arrow <- arrow(length = length, ends = "first",
-                                              type = type, angle = angle)
-                      aes.temp <- do.call(aes, args.aes)
-                      do.ggcall(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
-                    },
-                    "*" = {
-                      aes.temp <- do.call(aes, args.aes)
-                      do.ggcall(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
-                    })
+        aes.temp <- do.call(aes, args.aes)
+        aes.temp <- remove_args(aes.temp, "fill")
+        if (identical(s, "+")) {
+            args.non$arrow <- arrow(length = length, ends = "last",
+                                    type = type, angle = angle)
+        } else if (identical(s, "-")) {
+            args.non$arrow <- arrow(length = length, ends = "first",
+                                    type = type, angle = angle)
+        }
+        p <- do.call(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
         p
       })
     }
@@ -119,18 +112,18 @@ setMethod("geom_arrow", "GRanges", function(data, ...,
                       args.non$arrow <- arrow(length = length, ends = "last",
                                               type = type, angle = angle)
                       aes.temp <- do.call(aes, args.aes)
-                      do.ggcall(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
+                      do.call(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
                       
                     },
                     "-" = {
                       args.non$arrow <- arrow(length = length, ends = "first",
                                               type = type, angle = angle)
                       aes.temp <- do.call(aes, args.aes)
-                      do.ggcall(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
+                      do.call(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
                     },
                     "*" = {
                       aes.temp <- do.call(aes, args.aes)                    
-                      do.ggcall(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
+                      do.call(ggplot2::geom_segment, c(list(data = x), list(aes.temp), args.non))
                     })
         p
       })

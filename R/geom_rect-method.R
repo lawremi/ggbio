@@ -6,7 +6,7 @@
 setGeneric("geom_rect", function(data, ...) standardGeneric("geom_rect"))
 
 setMethod("geom_rect", "ANY", function(data, ...){
-  ggplot2::geom_rect(data = data, ...)
+    ggplot2::geom_rect(data = data, ...)
 })
 
 ## alignment should be convenient toggle with chevron...
@@ -22,7 +22,7 @@ setMethod("geom_rect", "GRanges", function(data,...,
   args <- list(...)
   args$facets <- facets
   args.aes <- parseArgsForAes(args)
-  args.non <- parseArgsForNonAes(args)
+  args.non <- remove_args(parseArgsForNonAes(args), "facets")
   es <- ifelse("extend.size" %in% names(args.non), args.non$extend.size, 0)
   facet <- build_facet(data, args)
   stat <- match.arg(stat)
@@ -43,18 +43,18 @@ setMethod("geom_rect", "GRanges", function(data,...,
                                  xend = substitute(start),
                                  y = substitute(stepping - rect.height),
                                  yend = substitute(stepping + rect.height)))
-
     aes.res.seg <- do.call(aes, args.aes.seg)
-    args.res.seg <- c(list(data = df), list(aes.res.seg), args.non)
-    p <- list(do.ggcall(ggplot2::geom_segment,args.res.seg))
+    args.non.seg <- remove_args(args.non, "fill")
+    args.res.seg <- c(list(data = df), list(aes.res.seg), args.non.seg)
+    p <- list(do.call(ggplot2::geom_segment, args.res.seg))
     args.aes <- c(args.aes, list(xmin = substitute(start),
                                  xmax = substitute(end),
                                  ymin = substitute(stepping - rect.height),
                                  ymax = substitute(stepping + rect.height)))
     aes.res <- do.call(aes, args.aes)
+    aes.res <- remove_args(aes.res, "y")
     args.res <- c(list(data = df), list(aes.res), args.non)
-    
-    p <- c(p, list(do.ggcall(ggplot2::geom_rect,args.res)))
+    p <- c(p, list(do.call(ggplot2::geom_rect, args.res)))
     p <- .changeStrandColor(p, args.aes)
     .df.sub <- group_df(df, gpn)
     ## FIXME:
@@ -94,17 +94,17 @@ setMethod("geom_rect", "GRanges", function(data,...,
     df <- mold(data)
 
     ## overcome 1 pixel problem
-    args.aes.seg <- remove_args(args.aes.seg, c("group", "size"))
+    args.aes.seg <- remove_args(args.aes.seg, c("group", "size", "fill", "xmin", "xmax", "ymin", "ymax"))
     aes.res.seg <- do.call(aes, args.aes.seg)
+    args.non.seg <- remove_args(args.non, "fill")
+    args.res.seg <- c(list(data = df), list(aes.res.seg), args.non.seg)
+    p <- list(do.call(ggplot2::geom_segment, args.res.seg))
 
-    args.res.seg <- c(list(data = df), list(aes.res.seg), args.non)
-    p <- list(do.ggcall(ggplot2::geom_segment, args.res.seg))
-
-    args.aes <- remove_args(args.aes, c("group", "size"))
+    args.aes <- remove_args(args.aes, c("group", "size", "y"))
     aes.res <- do.call(aes, args.aes)
 
     args.res <- c(list(data = df), list(aes.res), args.non)
-    p <- c(p, list(do.ggcall(ggplot2::geom_rect, args.res)))
+    p <- c(p, list(do.call(ggplot2::geom_rect, args.res)))
     p <- .changeStrandColor(p, args.aes)
   }
   }else{

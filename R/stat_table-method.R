@@ -46,7 +46,7 @@ setMethod("stat_table", "GRanges", function(data, ..., xlab, ylab, main,
     }
     aes.res <- do.call(aes, args.aes)
     args.res <- c(args.non, list(aes.res))
-    p <- do.ggcall(.fun, args.res)
+    p <- do.call(.fun, args.res)
   }else{
     p <- NULL
   }

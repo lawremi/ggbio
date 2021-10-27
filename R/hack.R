@@ -109,7 +109,12 @@ for(method in .gr.name.ggplot){
 
       setMethod(.method, "missing", function(data, ...){
           method0 <- getFromNamespace(method, "ggplot2")
-          tm <- try({res <- method0(...)}, silent = TRUE)
+          args <- list(...)
+          args.aes <- parseArgsForAes(args)
+          args.non <- parseArgsForNonAes(args)
+          args.non <- remove_args(args.non, "nbin")
+          args <- c(args.non, list(args.aes))
+          tm <- try({res <- method0(args)}, silent = TRUE)
           if(inherits(tm, "try-error")){
               res <-  match.call()
           }else{
@@ -126,7 +131,12 @@ for(method in .gr.name.ggplot){
       .method <- method
       setMethod(.method, "uneval", function(data, ...){
           method0 <- getFromNamespace(method, "ggplot2")
-          tm <- try({res <- method0(data, ...)}, silent = TRUE)
+          args <- list(...)
+          args.aes <- parseArgsForAes(args)
+          args.non <- parseArgsForNonAes(args)
+          args.non <- remove_args(args.non, "facets")
+          args <- c(args.non, list(args.aes))
+          tm <- try({res <- method0(data, args)}, silent = TRUE)
           if(inherits(tm, "try-error")){
               lst <- as.list(match.call())
               idx <- names(lst) != "data"

@@ -810,12 +810,12 @@ removeAxis <- function(g, remove, p1, p2) {
 
 removeXAxis <- function(gtable) {
     remove <- c("xlab", "axis-b", "title")
-    removeAxis(gtable, remove)
+    removeAxis(gtable, remove, "t", "b")
 }
 
 removeYAxis <- function(gtable) {
     remove <- c("ylab", "axis-l")
-    removeAxis(gtable, remove)
+    removeAxis(gtable, remove, "l", "r")
 }
 
 getHeight <- function(dts) {

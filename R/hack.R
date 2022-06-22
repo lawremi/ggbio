@@ -114,7 +114,7 @@ for(method in .gr.name.ggplot){
           args.non <- parseArgsForNonAes(args)
           args.non <- remove_args(args.non, "nbin")
           args <- c(args.non, list(args.aes))
-          tm <- try({res <- method0(args)}, silent = TRUE)
+          tm <- try({res <- do.call(method0, args)}, silent = TRUE)
           if(inherits(tm, "try-error")){
               res <-  match.call()
           }else{
@@ -132,25 +132,14 @@ for(method in .gr.name.ggplot){
       setMethod(.method, "uneval", function(data, ...){
           method0 <- getFromNamespace(method, "ggplot2")
           args <- list(...)
-          args.aes <- parseArgsForAes(args)
-          args.non <- parseArgsForNonAes(args)
-          args.non <- remove_args(args.non, "facets")
+          args.non <- remove_args(args, "facets")
+          args.aes <- data
           args <- c(args.non, list(args.aes))
-          tm <- try({res <- method0(data, args)}, silent = TRUE)
+          tm <- try({res <- do.call(method0, args)}, silent = TRUE)
           if(inherits(tm, "try-error")){
-              lst <- as.list(match.call())
-              idx <- names(lst) != "data"
-              aes.u <- unname(lst[!idx])
-              res <- lst[idx]
-              res <- c(res, aes.u)
-              res <- as.call(res)
+              res <- match.call()
           }else{
-              lst <- as.list(match.call())
-              idx <- names(lst) != "data"
-              aes.u <- unname(lst[!idx])
-              res <- lst[idx]
-              res <- c(res, aes.u)
-              mc <- as.call(res)
+              mc <- match.call()
               attr(res, "call") <- TRUE
               attr(res, "mc") <- mc
           }

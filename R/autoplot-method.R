@@ -151,12 +151,15 @@ setMethod("autoplot", "GRanges", function(object, ..., chr,
         ss <- getXScale(object)
         p <- p + scale_x_continuous(breaks = ss$breaks,
                                     labels = ss$labels)
-        if(metadata(object)$x.max < 1e8){
-            sls <- seqlengths(.obj)
-            sls <- sum(sls)
-            if(!is.na(sls)){
-                .xlim <- c(0, sls)
-                p <- p + xlim(.xlim)
+        metadata <- metadata(object)
+        if (!is.null(metadata$x.max)) {
+            if(metadata$x.max < 1e8) {
+                sls <- seqlengths(.obj)
+                sls <- sum(sls)
+                if(!is.na(sls)) {
+                    .xlim <- c(0, sls)
+                    p <- p + xlim(.xlim)
+                }
             }
         }
     }
@@ -1275,8 +1278,8 @@ setMethod("autoplot", "VRanges", function(object, ...,which = NULL,
 
     if(is.null(geom)){
         geom <- zoomLevelToGeom(diff(.xlim), "VRanges")
-    }else if(!geom %in% c("text", "rect")){
-        stop("geom must be one of: ", paste("text", "rect"))
+    }else if(!geom %in% c("text", "rect", "none")){
+        stop("geom must be one of: ", paste("text", "rect", "none"))
     }
 
     message(geom, " geom is used")
@@ -1464,7 +1467,7 @@ setMethod("autoplot", "VCF", function(object, ...,
             sapply(info(x)@listData, class)
         }
         cls <- colClasses(object)
-        idx.cls <- which(cls %in% c("numeric", "integer", "character", "factor"))
+        idx <- which(cls %in% c("numeric", "integer", "character", "factor"))
         temp <- granges(object)
         values(temp) <- info(object)
         df <- mold(temp)

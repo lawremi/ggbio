@@ -138,7 +138,7 @@ tracks <- function(..., heights, xlim, xlab = NULL, main = NULL,
         PlotList <- lapply(PlotList, function(x) {
             x + xlim(wh)
         })
-        PlotList <- do.call(PlotList, PlotList)
+        PlotList <- do.call("PlotList", PlotList)
     }
 
     ## plot background

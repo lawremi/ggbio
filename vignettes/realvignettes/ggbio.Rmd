@@ -4,7 +4,9 @@ author:
 - name: Tengfei Yin
   affiliation: Seven Bridges Genomics
   email: tengfei.yin@sbgenomics.com
-
+- name: Rohit Satyam
+  affiliation: "Vignette translation from Sweave to Rmarkdown / HTML"
+  
 date: "`r Sys.Date()`"
 package: ggbio
 output:

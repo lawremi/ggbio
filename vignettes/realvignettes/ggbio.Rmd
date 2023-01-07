@@ -11,8 +11,9 @@ date: "`r Sys.Date()`"
 package: ggbio
 output:
     BiocStyle::html_document:
-      toc_float: true
-    BiocStyle::pdf_document: default
+    toc: yes
+    df_print: paged
+    number_sections: yes
 
 vignette: >
   %VignetteIndexEntry{ggbio: visualization toolkits for genomic data}

@@ -9,11 +9,10 @@ author:
   
 date: "`r Sys.Date()`"
 package: ggbio
-output:
+output: 
     BiocStyle::html_document:
-    toc: yes
-    df_print: paged
-    number_sections: yes
+      toc_float: true
+    BiocStyle::pdf_document: default
 
 vignette: >
   %VignetteIndexEntry{ggbio: visualization toolkits for genomic data}

@@ -112,6 +112,7 @@ gene model track:
 *OrganismDb* object has a simpler API to retrieve data from
 different annotation resources, so we could label our transcripts in
 different ways
+
 ```{r}
 library(ggbio)
 library(Homo.sapiens)
@@ -125,17 +126,23 @@ p.txdb
 autoplot(Homo.sapiens, which  = wh, label.color = "black", color = "brown",
           fill = "brown")
 ```
+
 To change the intron geometry, use `gap.geom` to control it,
 check out `geom_alignment` for more control parameters.
+
 ```{r}
 autoplot(Homo.sapiens, which  = wh, gap.geom = "chevron")
 ```
+
 To collapse all features, use `stat` 'reduce'
+
 ```{r fig.width = 5.5, fig.height = 1.5}
 autoplot(Homo.sapiens, which = wh, stat = "reduce")
 ```
+
 Label could be turned off by setting it to `FALSE`, you could
 also use expression to make a flexible label combination from column names.
+
 ```{r}
 columns(Homo.sapiens)
 autoplot(Homo.sapiens, which  = wh, columns = c("TXNAME", "GO"), names.expr = "TXNAME::GO")
@@ -145,6 +152,7 @@ autoplot(Homo.sapiens, which  = wh, columns = c("TXNAME", "GO"), names.expr = "T
 
 *TxDb* doesn't contain any gene symbol information, so
 we use tx_id as default for label.
+
 ```{r}
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
@@ -168,22 +176,28 @@ library(EnsDb.Hsapiens.v75)
 ensdb <- EnsDb.Hsapiens.v75
 autoplot(ensdb, GeneNameFilter("PHKG2"))
 ```
+
 We can pass any filter class defined in the `r Biocpkg("AnnotationFilter")` package
 with argument *which*. Alternatively we can combine filter classes using
 an *AnnotationFilterList* or we can pass a filter expression in form of a
 *formula*. Below we pass such a filter expression to the function.
+
 ```{r}
 autoplot(ensdb, ~ symbol == "PHKG2", names.expr="gene_name")
 ```
+
 We could also specify a genomic region and fetch all transcripts overlapping
 that region (also partially, i.e. with a part of an intron or an exon).
+
 ```{r}
 ## We specify "*" as strand, thus we query for genes encoded  on both strands
 gr <- GRanges(seqnames = 16, IRanges(30768000, 30770000), strand = "*")
 autoplot(ensdb, GRangesFilter(gr), names.expr = "gene_name")
 ```
+
 Also, we can spefify directly the gene ids and plot all transcripts of these
 genes (not only those overlapping with the region)
+
 ```{r}
 autoplot(ensdb, GeneIdFilter(c("ENSG00000196118", "ENSG00000156873")))
 ```
@@ -214,10 +228,12 @@ grl <- split(gr.txdb, gr.txdb$tx_id)
 names(grl) <- sample(LETTERS, size = length(grl), replace = TRUE)
 grl
 ```
+
 We get our example data ready, it meets all requirements, to make it a
 gene model track it's pretty simple to use autoplot, but don't forget
 mapping because we changed our column names, asssume you store you
 model key words in column 'model'.
+
 ```{r}
 autoplot(grl, aes(type = model))
 ggplot() + geom_alignment(grl, type = "model")
@@ -256,7 +272,9 @@ p.bg + zoom(1/1000)
 ## text
 p.bg + zoom(1/2500)
 ```
+
 To override a semantic zoom threshold, you simply provide a geom explicitly.
+
 ```{r eval = FALSE}
 library(BSgenome.Hsapiens.UCSC.hg19)
 bg <- BSgenome.Hsapiens.UCSC.hg19
@@ -276,25 +294,31 @@ autoplot(bg, which = resize(wh, width = width(wh)/2000), geom = "segment")
 It's simple to just pass a file path to `autoplot()` function, you can
 stream a chunk of region by providing 'which' parameter. Otherwise
 please use method 'estiamte' to show overall estiamted coverage.
+
 ```{r}
 fl.bam <- system.file("extdata", "wg-brca1.sorted.bam", package  = "biovizBase")
 wh <- keepSeqlevels(wh, "chr17")
 autoplot(fl.bam, which = wh)
 ```
+
 geom 'gapped pair' will show you alignments.
+
 ```{r}
 fl.bam <- system.file("extdata", "wg-brca1.sorted.bam", package  = "biovizBase")
 wh <- keepSeqlevels(wh, "chr17")
 autoplot(fl.bam, which = resize(wh, width = width(wh)/10), geom = "gapped.pair")
 ```
+
 To show mismatch proportion, you have to provide reference sequence,
 the mismatched proportion is color coded in the bar chart.
+
 ```{r}
 library(BSgenome.Hsapiens.UCSC.hg19)
 bg <- BSgenome.Hsapiens.UCSC.hg19
 p.mis <- autoplot(fl.bam, bsgenome = bg, which = wh, stat = "mismatch")
 p.mis
 ```
+
 To view overall estimated coverage distribution, please use method
 'estiamte'. 'which' parameter also accept characters. And there is a
 hidden value called '..coverage..' to let you do simple transformation
@@ -331,7 +355,9 @@ p.vr + xlim(gr17)
 ## text geom
 p.vr + xlim(gr17) + zoom()
 ```
+
 You can simply overide geom
+
 ```{r eval = FALSE}
 autoplot(vr, which = wh, geom = "rect", arrow = FALSE)
 ```
@@ -350,6 +376,7 @@ tks
 ```
 
 # Simple navigation {#sec:nav}
+
 We try to provide a simple navigation API for your plot, so you could
 zoom in and zoom out, or go through view chunks one by one.
 
@@ -363,6 +390,7 @@ Navigation function also works for tracks plot too.
 ## zoom in
 tks + zoom()
 ```
+
 Try following command yourself.
 
 ```{r eval = FALSE}
@@ -375,6 +403,7 @@ p.txdb + nextView()
 ## previous view page
 p.txdb + prevView()
 ```
+
 Don't forget `xlim` accept *GRanges* object (single row), so you could simply prepare a *GRanges* to store the region of interests and go through them one by one.
 
 # Overview plots {#sec:overview}
@@ -405,6 +434,7 @@ All the raw data processed and stored in `GRanges` ready for use, you can simply
 ```{r processing}
 data("CRC", package  = "biovizBase")
 ```
+
 `layout_circle` is depreciated, because you have to set up radius and trackWidth manually with this function for creating circular plot.
 
 We now present the new `circle` function, it
@@ -415,27 +445,34 @@ you just add them one by one, it will be automatically created from inner circle
 - to use `circle`, you have to use `r Biocpkg("ggbio")` constructor at the beginning instead of `r Biocpkg("ggplot")`.
 
 You can use `autoplot()` to create single track easily like
+
 ```{r}
 head(hg19sub)
 autoplot(hg19sub, layout = "circle", fill  = "gray70")
 ```
+
 However, the low level `circle` function leave you more
 flexibility to build circular plot one by one. Let's start to add tracks one by one.
 Let's use the same data to create ideogram, label and scale track, it layouts the circle by the order you created from inside to outside.
+
 ```{r}
 p <- ggbio() + circle(hg19sub, geom = "ideo", fill = "gray70") +
     circle(hg19sub, geom = "scale", size = 2) +
   circle(hg19sub, geom = "text", aes(label = seqnames), vjust = 0, size = 3)
 p
 ```
+
 To simply override the setting, you can do it globally in `r Biocpkg("ggbio")` function or individually `circle` function by specifying parameters `trackWidth` and `radius`, you can also specify the global setting for buffer in between in `r Biocpkg("ggbio")` like example below.
+
 ```{r}
 p <- ggbio(trackWidth = 10, buffer = 0, radius = 10) + circle(hg19sub, geom = "ideo", fill = "gray70") +
     circle(hg19sub, geom = "scale", size = 2) +
   circle(hg19sub, geom = "text", aes(label = seqnames), vjust = 0, size = 3)
 p
 ```
+
 Then we add a "rectangle" track to show somatic mutation, this will looks like vertical segments.
+
 ```{r lower-mut-track}
 head(mut.gr)
 p <- ggbio() + circle(mut.gr, geom = "rect", color = "steelblue") +
@@ -444,21 +481,27 @@ p <- ggbio() + circle(mut.gr, geom = "rect", color = "steelblue") +
   circle(hg19sub, geom = "text", aes(label = seqnames), vjust = 0, size = 3)
 p
 ```
+
 Next, we need to add some "links" to show the rearrangement, of course, links can be used to map any kind of association between two or more different locations to indicate relationships like copies or fusions. To create a suitable structure to plot, please use another `GRanges` to
 represent the end of the links, and stored as `elementMetadata` for the "start
 point" `GRanges`. Here we named it as "to.gr" and will be used later.
+
 ```{r}
 head(crc.gr)
 ```
+
 Here in this example, we use "intrachromosomal" to label
 rearrangement within the same chromosomes and use "interchromosomal" to label
 rearrangement in different chromosomes.
 Get subset of links data for only one sample "CRC1"
+
 ```{r subset-crc-1}
 gr.crc1 <- crc.gr[values(crc.gr)$individual == "CRC-1"]
 ```
+
 Ok, add a "point" track with grid background for rearrangement data and map `y`
 to variable "score", map `size` to variable "tumreads", re-scale the size to a proper size range.
+
 ```{r lower-point-track}
 ## manually specify radius
 p <- p + circle(gr.crc1, geom = "point", aes(y = score, size = tumreads),
@@ -468,12 +511,15 @@ p
 
 Finally, let's add links and map color to rearrangement types. Remember you need
 to specify `linked.to` parameter to the column that contain end point of the data.
+
 ```{r lower-link-track}
 ## specify radius manually
 p <- p + circle(gr.crc1, geom = "link", linked.to = "to.gr", aes(color = rearrangements), radius = 23)
 p
 ```
+
 All those code could be simply constructed by following code
+
 ```{r}
 p <- ggbio() +
    circle(gr.crc1, geom = "link", linked.to = "to.gr", aes(color = rearrangements)) +
@@ -513,12 +559,14 @@ p <- ggbio() + circle(gr.cur, geom = "link", linked.to = "to.gr",
                   theme(plot.margin = unit(rep(0, 4), "lines"))
 })
 ```
+
 We wrap the function in grid level to a more user-friendly high level function,
 called `arrangeGrobByParsingLegend`. You can pass your ggplot2
 graphics to this function , specify the legend you want to keep on the right,
 you can also specify the column/row numbers. Here we assume all plots we have
 passed follows the same color scale and have the same legend, so we only have to
 keep one legend on the right.
+
 ```{r simple-wrapper, fig.width = 7, fig.height = 5}
 arrangeGrobByParsingLegend(crc.lst, widths = c(4, 1), legend.idx = 1, ncol = 3)
 ```
@@ -549,6 +597,7 @@ values(gr.snp)$pvalue <- -log10(values(gr.snp)$P)
 head(gr.snp)
 ## done
 ```
+
 The data is ready, we need to pay attention
 
 - if seqlengths is missing, we use data range, so the chromosome length is not accurate.
@@ -559,9 +608,11 @@ The data is ready, we need to pay attention
 
 In `autoplot`, argument `coord` is just used to transform the data,
 after that, you can use it as common `GRanges`, all other geom/stat works for it.
+
 ```{r line, fig.height = 4, fig.width = 6}
 autoplot(gr.snp, geom = "point", coord = "genome", aes(y = pvalue))
 ```
+
 However, we recommend you to use more powerful function `plotGrandLinear` to generate Manhattan plot introduced in next section.
 
 ### Convenient `plotGrandLinear` function
@@ -578,15 +629,20 @@ Color mapping is automatically figured out by `r Biocpkg("ggbio")` following the
 - if `color` is single character representing color, then just use one arbitrary color.
 
 Let's test some examples for controlling colors.
+
 ```{r morecolor2, fig.height = 4, fig.width = 6}
 plotGrandLinear(gr.snp, aes(y = pvalue), color = c("#7fc97f", "#fdc086"))
 ```
+
 Let's add a cutoff line
+
 ```{r fig.height = 4, fig.width = 6}
 plotGrandLinear(gr.snp, aes(y = pvalue), color = c("#7fc97f", "#fdc086"),
                 cutoff = 3, cutoff.color = "blue", cutoff.size = 0.2)
 ```
+
 Sometimes you use color to mapping other variables so you may need a different to separate chromosomes.
+
 ```{r fig.height = 4, fig.width = 6}
 plotGrandLinear(gr.snp, aes(y = pvalue, color = OR), spaceline = TRUE, legend = TRUE)
 ```
@@ -595,6 +651,7 @@ plotGrandLinear(gr.snp, aes(y = pvalue, color = OR), spaceline = TRUE, legend = 
 
 You can provide a highlight `GRanges`, and each row highlights a set of overlapped snps, and labeled by rownames or certain columns, there is more control in the
 function as parameters, with prefix highlight.*, so you could control color, label size and color, etc.
+
 ```{r fig.height = 4, fig.width = 6}
 gro <- GRanges(c("1", "11"), IRanges(c(100, 2e6), width = 5e7))
 names(gro) <- c("group1", "group2")
@@ -624,16 +681,20 @@ generating ideogram templates.
 Let's first introduce how to use `autoplot` to generate karyogram graphic.
 The most easy one is to just plot Seqinfo by using `autoplot`, if your `GRanges`
 object has seqinfo with seqlengths information. Then you add data layer later.
+
 ```{r}
 data(ideoCyto, package = "biovizBase")
 autoplot(seqinfo(ideoCyto$hg19), layout = "karyogram")
 ```
+
 To show cytobands, your data need to have cytoband information, we stored some data for you, including *hg19, hg18, mm10, mm9*.
+
 ```{r fig.width = 5, fig.height = 4}
 ## turn on cytobands if present
 biovizBase::isIdeogram(ideoCyto$hg19)
 autoplot(ideoCyto$hg19, layout = "karyogram", cytobands = TRUE)
 ```
+
 To change order or only show a subset of the karyogram, you have to manipulate `seqlevels`, please check out manual for `keepSeqlevels, seqlevels` in `r Biocpkg("GenomicRanges")` package for more information Or you could read the example below.
 
 ### Add data on karyogram layout
@@ -643,6 +704,7 @@ We use a default data in package `r Biocpkg("biovizBase")`, which is a subset of
 editing set in human. The data involved in this `GRanges` is sparse, so
 we cannot simply use it to make karyogram template, otherwise, the estimated chromosome
 lengths will be very rough and inaccurate. So what we need to do first is to *add seglength information to this object.*
+
 ```{r load-RNAediting}
 data(darned_hg19_subset500, package = "biovizBase")
 dn <- darned_hg19_subset500
@@ -656,6 +718,7 @@ dn <- keepSeqlevels(dn, paste0("chr", c(1:22, "X")))
 seqlengths(dn)
 autoplot(dn, layout = "karyogram")
 ```
+
 Then we take one step further, the power of `r Biocpkg("ggplot")` or `r Biocpkg("ggbio")` is the
 flexible multivariate data mapping ability in graphics, make data exploration
 much more convenient. In the following example, we are trying to map a
@@ -667,21 +730,26 @@ geom(geometric object) is rectangle, and genome space is very large, so change
 both color/fill color of the rectangle to specify both border and filled color
 is necessary to get the data shown as different color, otherwise if the region
 is too small, border color is going to override the fill color.
+
 ```{r load-RNAediting-color}
 ## since default is geom rectangle, even though it's looks like segment
 ## we still use both fill/color to map colors
 autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg))
 ```
+
 Or you can set the missing value to particular color you want (NA values is not shown on the legend).
+
 ```{r}
 ## since default is geom rectangle, even though it's looks like segment
 ## we still use both fill/color to map colors
 autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg), alpha  = 0.5) +
   scale_color_discrete(na.value = "brown")
 ```
+
 Well, sometimes we have too many values, we want to separate them by groups and show them at different height, below is a hack for that purpose and in next section, we will introduce a more flexible and general way to add data layer by layer.
 
 *Template chromosome y limits is [0, 10], that's why this hack works*
+
 ```{r fig.width = 5, fig.height = 4}
 ## let's remove the NA value
 dn.nona <- dn[!is.na(dn$exReg)]
@@ -722,6 +790,7 @@ You need to pay attention to
   track.
 
 Many times we overlay different data sets, so let's break down the previous samples into 4 groups and treat them as different data and build them layer by layer, assign the color by hand. You could use `ylim` to control where they are plotted.
+
 ```{r}
 ## prepare the data
 dn3 <- dn.nona[dn.nona$exReg == '3']
@@ -735,7 +804,9 @@ autoplot(seqinfo(dn3), layout = "karyogram") +
   layout_karyogram(data = dnC, geom = "rect", ylim = c(10/3*2, 10), color = "#fdc086") +
   layout_karyogram(data = dn.na, geom = "rect", ylim = c(10, 10/3*4), color = "brown")
 ```
+
 What's more, you could even change the geom for those data
+
 ```{r edit-space, fig.width = 5, fig.height = 4}
 dn$pvalue <- runif(length(dn)) * 10
 p <- autoplot(seqinfo(dn)) + layout_karyogram(dn, aes(x = start, y = pvalue),
@@ -751,6 +822,7 @@ p.ylim + facet_wrap(~seqnames)
 
 # Link ranges to your data {#sec:linkranges}
 Plot `GRanges` object structure and linked to a even spaced parallel coordinates plot which representing the data in elementeMetadata.
+
 ```{r fig.width = 8}
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(ggbio)
@@ -771,14 +843,18 @@ values(exon.new)$significant <- sample(c(TRUE,FALSE), size = length(exon.new),re
 ## data ready
 exon.new
 ```
+
 Make the plots, you can pass a list of annotation tracks too.
+
 ```{r}
 p17 <- autoplot(txdb, genesymbol["RBM17"])
 plotRangesLinkedToData(exon.new, stat.y = c("sample1", "sample2"), annotation = list(p17))
 ```
+
 For more information, check the manual.
 
 # Miscellaneous {#sec:misc}
+
 Every plot object produced by `r Biocpkg("ggplot2")` is essentially a `r Biocpkg("ggplot2")` object, so you could use all the tricks you know with `r Biocpkg("ggplot2")` on
 `r Biocpkg("ggbio")` plots too, including scales, colors, themes, etc.
 
@@ -789,6 +865,7 @@ In `r Biocpkg("ggbio")`, we developed some more themes to make things easier.
 ## Plot theme
 
 Plot level themes are like any other themes defined in `r Biocpkg("ggplot2")`, simply apply it to a plot.
+
 ```{r}
 p.txdb
 p.txdb + theme_alignment()
@@ -800,6 +877,7 @@ When you have multiple chromosomes encoded in seqnames, you could use
 theme_genome to make a 'fake' linear view of genome coordinates
 quickly by applying this theme, because it's not equal to chromosome
 lengths, it's simply
+
 ```{r}
 library(GenomicRanges)
 set.seed(1)
@@ -825,9 +903,11 @@ Track level themes are more complex, it controls whole looking of the
 tracks, it's essentially a theme object with some attributes
 controlling the tracks appearance.
 See how we make a template, you could customize in the same way
+
 ```{r}
 theme_tracks_sunset
 ```
+
 The attributes you could control is basically passed to `tracks()` constructor, including
 
 ```{r, echo=FALSE, warning=FALSE}
@@ -845,6 +925,7 @@ kable(tbl, row.names = T, align = "c",caption = NULL)
 ```
   
 # Session Information
+
 ```{r session-info}
 sessionInfo()
 ```

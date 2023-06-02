@@ -6,21 +6,22 @@ author:
   email: tengfei.yin@sbgenomics.com
 - name: Rohit Satyam
   affiliation: "Vignette translation from Sweave to Rmarkdown / HTML"
-  
-date: "`r Sys.Date()`"
+
+clean: false
+date: "`r format(Sys.Date(), '%d %B, %Y')`"
 package: ggbio
 output: 
     BiocStyle::html_document:
       toc_float: true
-    BiocStyle::pdf_document: default
 
 vignette: >
-  %VignetteIndexEntry{ggbio: visualization toolkits for genomic data}
-  %VignetteEngine{knitr::rmarkdown}
-  %VignetteDepends{EnsDb.Hsapiens.v75}
-  %VignetteKeywords{visualization utilities}
-  %VignettePackage{ggbio}
-  %VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{ggbio: visualization toolkits for genomic data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteDepends{EnsDb.Hsapiens.v75}
+  %\VignetteKeywords{visualization utilities}
+  %\VignettePackage{ggbio}
+  %\VignetteDepends{BiocStyle}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE, cache=FALSE, eval = TRUE, echo = FALSE}

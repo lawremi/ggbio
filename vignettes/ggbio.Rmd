@@ -720,16 +720,16 @@ Then we take one step further, the power of `r Biocpkg("ggplot")` or `r Biocpkg(
 flexible multivariate data mapping ability in graphics, making data exploration
 much more convenient. In the following example, we are trying to map a
 categorical variable 'exReg' to color, this variable is included in the data,
-and have three levels, '3' indicate 3' utr, '5' means 5' utr and 'C' means
+and have three levels, '3' indicates 3' utr, '5' means 5' utr, and 'C' means
 coding region. We have some missing values indicated as `NA`, in default,
 it's going to be shown in gray color, and keep in mind, since the basic
-geom(geometric object) is rectangle, and genome space is very large, so change
+geom(geometric object) is a rectangle, and genome space is very large, so change
 both color/fill color of the rectangle to specify both border and filled color
-is necessary to get the data shown as different color, otherwise if the region
-is too small, border color is going to override the fill color.
+is necessary to get the data shown in different colors, otherwise if the region
+is too small, the border color is going to override the fill color.
 
 ```{r load-RNAediting-color}
-## Since the default is geom rectangle, even though it's looks like segment
+## Since the default is a geom rectangle, even though it looks like a segment
 ## We still use both fill/color to map colors
 autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg))
 ```
@@ -737,22 +737,22 @@ autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg))
 Or you can set the missing value to the particular color you want (NA values is not shown on the legend).
 
 ```{r}
-## since default is geom rectangle, even though it looks like a segment
-## we still use both fill/color to map colors
+## Since the default is geom rectangle, even though it looks like a segment,
+## We still use both fill/color to map colors
 autoplot(dn, layout = "karyogram", aes(color = exReg, fill = exReg), alpha  = 0.5) +
   scale_color_discrete(na.value = "brown")
 ```
 
-Well, sometimes we have too many values, we want to separate them by groups and show them at different height, below is a hack for that purpose and in the next section, we will introduce a more flexible and general way to add data layer by layer.
+Well, sometimes we have too many values, so we want to separate them by groups and show them at different heights, below is a hack for that purpose, and in the next section, we will introduce a more flexible and general way to add data layer by layer.
 
-*Template chromosome y limits is [0, 10], that's why this hack works*
+*The template chromosome y limits is [0, 10], which is why this hack works*
 
 ```{r fig.width = 5, fig.height = 4}
-## let's remove the NA value
+## Let's remove the NA value
 dn.nona <- dn[!is.na(dn$exReg)]
-## compute levels based on categories
+## Compute levels based on categories
 dn.nona$levels <- as.numeric(factor(dn.nona$exReg))
-## do a trcik show them at different height
+## Do a trick and show them at different heights
 p.ylim <- autoplot(dn.nona, layout = "karyogram", aes(color = exReg, fill = exReg,
                                        ymin = (levels - 1) * 10/3,
                                        ymax = levels * 10 /3))
@@ -761,40 +761,40 @@ p.ylim <- autoplot(dn.nona, layout = "karyogram", aes(color = exReg, fill = exRe
 ### Add more data using the layout_karyogram function
 
 In this section, a lower-level function `layout_karyogram` is going
-to be introduced. This is convenient API for constructing karyogram plot and
-adding more data layer by layer. Function `ggplot` is just to create
-blank object to add layer on.
+to be introduced. This is a convenient API for constructing a karyogram plot and
+adding more data layer by layer. The function `ggplot` is just to create
+a blank object to add a layer on.
 
 You need to pay attention to
 - when you add plots layer by layer, seqnames of different data must be the
   same to make sure the data are mapped to the same chromosome. For example, if
-  you name chromosome following schema like *chr1* and use just number
+  you name a chromosome following schema like *chr1* and use just the number
   *1* to name other data, they will be treated as different chromosomes.
-- cannot use the same aesthetics mapping multiple time for different
+- cannot use the same aesthetic mapping multiple times for different
   data. For example, if you have used aes(color = ), for one data, you cannot
   use aes(color = ) anymore for mapping variables from other add-on data, this
   is currently not allowed in `r Biocpkg("ggplot")`, even though you expect multiple color
-  legend shows up, this is going to confuse people which is which. However,
-  `color` or `fill` without `aes()` wrap around, is
-  allowed for any track, it's set single arbitrary color.
+  legend shows up; this is going to confuse people about which is which. However,
+  `color` or `fill` without `aes()` wrap-around, is
+  allowed for any track, it's set to a single arbitrary color.
 - Default rectangle y range is [0, 10], so when you add on more data layer
   by layer on existing graphics, you can use `ylim` to control how to
   normalize your data and plot it relative to chromosome space. For example,
   with default, chromosome space is plotted between y [0, 10], if you use
-  `ylim = c(10 , 20)`, you will stack data right above each chromosomes
+  `ylim = c(10 , 20)`, you will stack data right above each chromosome
   and with equal width. For geom like 'point', which you need to specify 'y'
-  value in `aes()`, we will add 5% margin on top and at bottom of that
+  value in `aes()`, we will add a 5% margin on top and at the bottom of that
   track.
 
-Many times we overlay different data sets, so let's break down the previous samples into 4 groups and treat them as different data and build them layer by layer, assign the color by hand. You could use `ylim` to control where they are plotted.
+Many times we overlay different data sets, so let's break down the previous samples into 4 groups, treat them as different data, and build them layer by layer, assigning the color by hand. You could use `ylim` to control where they are plotted.
 
 ```{r}
-## prepare the data
+## Prepare the data
 dn3 <- dn.nona[dn.nona$exReg == '3']
 dn5 <- dn.nona[dn.nona$exReg == '5']
 dnC <- dn.nona[dn.nona$exReg == 'C']
 dn.na <- dn[is.na(dn$exReg)]
-## now we have 4 different data sets
+## Now we have 4 different data sets
 autoplot(seqinfo(dn3), layout = "karyogram") +
   layout_karyogram(data = dn3, geom = "rect", ylim = c(0, 10/3), color = "#7fc97f") +
   layout_karyogram(data = dn5, geom = "rect", ylim = c(10/3, 10/3*2), color = "#beaed4") +
@@ -811,14 +811,14 @@ p <- autoplot(seqinfo(dn)) + layout_karyogram(dn, aes(x = start, y = pvalue),
 p
 ```
 
-### More flexible layout of karyogram
+### More flexible layout of a karyogram
 
 ```{r fig.width = 5, fig.height = 4}
 p.ylim + facet_wrap(~seqnames)
 ```
 
 # Link ranges to your data {#sec:linkranges}
-Plot `GRanges` object structure and linked to a even spaced parallel coordinates plot which representing the data in elementeMetadata.
+Plot `GRanges` object structure and link to an even-spaced parallel coordinates plot which represents the data in elementeMetadata.
 
 ```{r fig.width = 8}
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
@@ -829,7 +829,7 @@ model <- exonsBy(txdb, by = "tx")
 model17 <- subsetByOverlaps(model, genesymbol["RBM17"])
 exons <- exons(txdb)
 exon17 <- subsetByOverlaps(exons, genesymbol["RBM17"])
-## reduce to make sure there is no overlap
+## Reduce to make sure there is no overlap
 ## just for example
 exon.new <- reduce(exon17)
 ## suppose
@@ -852,7 +852,7 @@ For more information, check the manual.
 
 # Miscellaneous {#sec:misc}
 
-Every plot object produced by `r Biocpkg("ggplot2")` is essentially a `r Biocpkg("ggplot2")` object, so you could use all the tricks you know with `r Biocpkg("ggplot2")` on
+Every plot object produced by `r Biocpkg("ggplot2")` is essentially an `r Biocpkg("ggplot2")` object, so you could use all the tricks you know with `r Biocpkg("ggplot2")` on
 `r Biocpkg("ggbio")` plots too, including scales, colors, themes, etc.
 
 ## Themes
@@ -861,7 +861,7 @@ In `r Biocpkg("ggbio")`, we developed some more themes to make things easier.
 
 ## Plot theme
 
-Plot level themes are like any other themes defined in `r Biocpkg("ggplot2")`, simply apply it to a plot.
+Plot-level themes are like any other themes defined in `r Biocpkg("ggplot2")`, simply apply it to a plot.
 
 ```{r}
 p.txdb
@@ -896,16 +896,16 @@ autoplot(gr) + theme_genome()
 
 ### Track theme
 
-Track level themes are more complex, it controls whole looking of the
+Track-level themes are more complex; they control the whole look of the
 tracks, it's essentially a theme object with some attributes
-controlling the tracks appearance.
-See how we make a template, you could customize in the same way
+controlling the track's appearance.
+See how we make a template, which you could customize in the same way
 
 ```{r}
 theme_tracks_sunset
 ```
 
-The attributes you could control is basically passed to `tracks()` constructor, including
+The attributes you could control are basically passed to the `tracks()` constructor, including
 
 ```{r, echo=FALSE, warning=FALSE}
 

@@ -91,7 +91,7 @@ p.ideo + xlim(GRanges("chr2", IRanges(1e8, 1e8+10000000)))
 ## Add a gene model track
 
 ### Introduction
-Gene model track is one of the most frequently used track in genome
+The gene model track is one of the most frequently used tracks in genome
 browser, it is composed of genetic features CDS, UTR, introns, exons
 and non-genetic regions. In `r Biocpkg("ggbio")` we support three methods to make
 gene model track:
@@ -138,7 +138,7 @@ autoplot(Homo.sapiens, which = wh, stat = "reduce")
 ```
 
 Label could be turned off by setting it to `FALSE`, or you could
-also use expression to make a flexible label combination from column names.
+also use an expression to make a flexible label combination from column names.
 
 ```{r}
 columns(Homo.sapiens)

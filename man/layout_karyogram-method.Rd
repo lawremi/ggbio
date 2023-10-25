@@ -78,7 +78,7 @@ autoplot(hg19IdeogramCyto, layout = "karyogram", cytobands = TRUE)
 ###################################################
 ### code chunk number 3: change-order
 ###################################################
-library(GenomicRanges)
+library(GenomeInfoDb)
 hg19 <- keepSeqlevels(hg19IdeogramCyto, paste0("chr", c(1:22, "X", "Y")))
 head(hg19)
 autoplot(hg19, layout = "karyogram", cytobands = TRUE)

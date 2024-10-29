@@ -1,5 +1,5 @@
 Package: ggbio
-Version: 1.53.0
+Version: 1.54.0
 Title: Visualization tools for genomic data
 Description: The ggbio package extends and specializes the grammar of
         graphics for biological data. The graphics are designed to

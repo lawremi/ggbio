@@ -763,6 +763,7 @@ library(GenomicAlignments)
 data("genesymbol", package = "biovizBase")
 bamfile <- system.file("extdata", "SRR027894subRBM17.bam",
                        package="biovizBase")
+library(GenomeInfoDb)  # for keepStandardChromosomes()
 which <- keepStandardChromosomes(genesymbol["RBM17"])
 ## need to set use.names = TRUE
 ga <- readGAlignments(bamfile,

@@ -158,6 +158,7 @@ seqlengths(gr.snp)
 nms <- seqnames(seqinfo(gr.snp))
 nms.new <- gsub("chr", "", nms)
 names(nms.new) <- nms
+library(GenomeInfoDb)  # for renameSeqlevels() and keepSeqlevels()
 gr.snp <- renameSeqlevels(gr.snp, nms.new)
 seqlengths(gr.snp)
 
@@ -167,7 +168,6 @@ seqlengths(gr.snp)
 autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
 
 ##  sort
-library(GenomeInfoDb)  # for keepSeqlevels()
 gr.snp <- keepSeqlevels(gr.snp, c(1:22, "X", "Y"))
 autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
 

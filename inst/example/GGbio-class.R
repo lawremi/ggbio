@@ -165,6 +165,7 @@ data(genesymbol, package = "biovizBase")
 p <- autoplot(txdb, which = genesymbol["BRCA1"])
 data(genesymbol, package = "biovizBase")
 p <- autoplot(txdb, which = genesymbol["BRCA1"])
+library(GenomeInfoDb)  # for keepSeqlevels()
 autoplot(keepSeqlevels(genesymbol[1:100], "chr1"))
 class(p)
 is
@@ -177,8 +178,7 @@ library(ggbio)
 library(ggplot2)
 library(GenomicRanges)
 
-gr = GRanges("1",
-    IRanges(1:5, 1:5))
+gr = GRanges("1", IRanges(1:5, 1:5))
 
 set.seed(1)
 gr$e = runif(5)

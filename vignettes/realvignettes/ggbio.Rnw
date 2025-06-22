@@ -326,6 +326,7 @@ please use method 'estiamte' to show overall estiamted coverage.
 
 <<>>=
 fl.bam <- system.file("extdata", "wg-brca1.sorted.bam", package  = "biovizBase")
+library(GenomeInfoDb)  # for keepSeqlevels()
 wh <- keepSeqlevels(wh, "chr17")
 autoplot(fl.bam, which = wh)
 @
@@ -654,7 +655,7 @@ require(biovizBase)
 gr.snp <- transformDfToGr(snp, seqnames = "CHR", start = "BP", width = 1)
 head(gr.snp)
 ## change the seqname order
-require(GenomicRanges)
+library(GenomeInfoDb)  # for keepSeqlevels()
 gr.snp <- keepSeqlevels(gr.snp, as.character(1:22))
 seqlengths(gr.snp)
 ## need to assign seqlengths
@@ -775,7 +776,7 @@ biovizBase::isIdeogram(ideoCyto$hg19)
 autoplot(ideoCyto$hg19, layout = "karyogram", cytobands = TRUE)
 @
 
-To change order or only show a subset of the karyogram, you have to manipulate \Rfunction{seqlevels}, please check out manual for \Rfunction{keepSeqlevels, seqlevels} in \Biocpkg{GenomicRanges} package for more information. Or you could read the example below.
+To change order or only show a subset of the karyogram, you have to manipulate \Rfunction{seqlevels}, please check out manual for \Rfunction{keepSeqlevels, seqlevels} in \Biocpkg{GenomeInfoDb} package for more information. Or you could read the example below.
 
 \subsection{Add data on karyogram layout}
 If you have single data set stored as \Rclass{GRanges} to show on a karyogram layout, \autoplot{} function is enough for you to plot the data on it.
@@ -795,6 +796,7 @@ seqlengths(dn)
 ## we have seqlegnths information in another data set
 seqlengths(dn) <- seqlengths(ideoCyto$hg19)[names(seqlengths(dn))]
 ## then we change order
+library(GenomeInfoDb)  # for keepSeqlevels()
 dn <- keepSeqlevels(dn, paste0("chr", c(1:22, "X")))
 seqlengths(dn)
 autoplot(dn, layout = "karyogram")

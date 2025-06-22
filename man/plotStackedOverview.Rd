@@ -92,6 +92,7 @@ old.chrs <- seqnames(seqinfo(hg19IdeogramCyto))
 new.chrs <- gsub("chr", "", old.chrs)
 ## lst <- as.list(new.chrs)
 names(new.chrs) <- old.chrs
+library(GenomeInfoDb)  # for renameSeqlevels() and keepSeqlevels()
 new.ideo <- renameSeqlevels(hg19IdeogramCyto, new.chrs)
 new.ideo <- keepSeqlevels(new.ideo, c(as.character(1:22) , "X", "Y"))
 new.ideo

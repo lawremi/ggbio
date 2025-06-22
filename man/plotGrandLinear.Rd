@@ -167,6 +167,7 @@ seqlengths(gr.snp)
 autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
 
 ##  sort
+library(GenomeInfoDb)  # for keepSeqlevels()
 gr.snp <- keepSeqlevels(gr.snp, c(1:22, "X", "Y"))
 autoplot(gr.snp, coord = "genome", geom = "point", aes(y = pvalue), space.skip = 0.01)
 

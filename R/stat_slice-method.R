@@ -167,7 +167,7 @@ setMethod("stat_slice", "RleList", function(data, ...,
 
   facets <- as.formula(paste(indName, "~ .", sep = ""))
 
-  args$facets <- facets
+  args$rows <- facets
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- do.call(facet_grid, args.facets)
 

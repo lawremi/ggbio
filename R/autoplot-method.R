@@ -1008,7 +1008,7 @@ setMethod("autoplot", "RleList", function(object, ...,
 ##======================================================================
 
 .ggpcp <- function(data, vars = names(data), ...){
-    scaled <- as.data.frame(lapply(data[, vars], ggplot2:::rescale01))
+    scaled <- as.data.frame(lapply(data[, vars], scales::rescale))
     data <- ggplot2:::cunion(scaled, data)
     data$ROWID <- 1:nrow(data)
     molten <- reshape2::melt(data, m = vars)

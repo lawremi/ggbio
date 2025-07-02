@@ -43,7 +43,7 @@ theme_alignment <-   function (ylabel = FALSE, base_size = 12,
       else
         element_blank()},
       panel.grid.major = {if(grid)
-                            element_line(colour = "grey90", size = 0.2)
+                            element_line(colour = "grey90", linewidth = 0.2)
       else
         element_blank()},
       panel.grid.minor = element_blank(),

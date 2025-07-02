@@ -1054,8 +1054,7 @@ setMethod("autoplot", "ExpressionSet", function(object, ...,
                             axis.ticks.y = element_blank()) ,
                       theme(legend.position = "top",
                             plot.margin = ggplot2::margin(padding, 1, padding, 0.5, unit = "lines")),
-                      guides(fill = guide_legend(bycol = TRUE,
-                                 byrow = FALSE, ncol =  1,
+                      guides(fill = guide_legend(byrow = FALSE, ncol =  1,
                                  title.theme = element_blank())))
 
 
@@ -1807,8 +1806,7 @@ setMethod("autoplot", "RangedSummarizedExperiment", function(object, ...,
                             axis.ticks.y = element_blank()) ,
                       theme(legend.position = "top",
                             plot.margin = ggplot2::margin(padding, 1, padding, 0.5, unit = "lines")),
-                      guides(fill = guide_legend(bycol = TRUE,
-                                 byrow = FALSE, ncol =  1,
+                      guides(fill = guide_legend(byrow = FALSE, ncol =  1,
                                  title.theme = element_blank())))
 
             N <- ncol(pd)

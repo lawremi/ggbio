@@ -99,7 +99,7 @@ getLimitsFromScales <- function(obj) {
 }
 
 getLimitsFromLayer <- function(obj) {
-    layers <- obj$layer
+    layers <- obj$layers
     lst <- lapply(layers, function(layer) {
         if (length(obj$data) | length(layer$data)) {
             if(length(layer$data))

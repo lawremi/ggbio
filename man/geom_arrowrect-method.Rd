@@ -93,25 +93,25 @@ ggplot() + geom_arrowrect(gr)
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot(gr) + geom_arrowrect(facets = sample ~ seqnames, aes(color = strand, fill = strand))
+ggplot(gr) + geom_arrowrect(facets = sample ~ seqnames, mapping = aes(color = strand, fill = strand))
 
 
 ## ======================================================================
 ##  stat:identity
 ## ======================================================================
-ggplot(gr) + geom_arrowrect(stat = "identity", aes(y = value))
+ggplot(gr) + geom_arrowrect(stat = "identity", mapping = aes(y = value))
 
 
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot(gr) + geom_arrowrect(stat = "stepping", aes(y = value, group = pair))
+ggplot(gr) + geom_arrowrect(stat = "stepping", mapping = aes(y = value, group = pair))
 
 
 ## ======================================================================
 ##  group.selfish controls when 
 ## ======================================================================
-ggplot(gr) + geom_arrowrect(gr, stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
+ggplot(gr) + geom_arrowrect(gr, stat = "stepping", mapping = aes(y = value, group = pair), group.selfish = FALSE)
 }
 \author{Tengfei Yin}
 

@@ -54,10 +54,10 @@ gr.b <- c(gr.b, gr.b2)
 ## default use score as y
 
 ## bar
-ggplot(gr.b) + geom_bar(aes(fill = value))
+ggplot(gr.b) + geom_bar(mapping = aes(fill = value))
 ## or
-ggplot() + geom_bar(gr.b, aes(fill = value))
-ggplot(gr.b) + geom_bar(aes(y = value))
+ggplot() + geom_bar(gr.b, mapping = aes(fill = value))
+ggplot(gr.b) + geom_bar(mapping = aes(y = value))
 ## equal to
 autoplot(gr.b, geom = "bar")
 }

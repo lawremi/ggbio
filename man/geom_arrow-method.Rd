@@ -95,23 +95,23 @@ ggplot() + geom_arrow(gr)
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot(gr) + geom_arrow(facets = sample ~ seqnames, aes(color = strand, fill = strand))
+ggplot(gr) + geom_arrow(facets = sample ~ seqnames, mapping = aes(color = strand, fill = strand))
 
 ## ======================================================================
 ##  stat:identity
 ## ======================================================================
-ggplot(gr) + geom_arrow(stat = "identity", aes(y = value))
+ggplot(gr) + geom_arrow(stat = "identity", mapping = aes(y = value))
 
 
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot(gr) + geom_arrow(stat = "stepping", aes(y = value, group = pair))
+ggplot(gr) + geom_arrow(stat = "stepping", mapping = aes(y = value, group = pair))
 
 ## ======================================================================
-##  group.selfish 
+##  group.selfish
 ## ======================================================================
-ggplot(gr) + geom_arrow(stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
+ggplot(gr) + geom_arrow(stat = "stepping", mapping = aes(y = value, group = pair), group.selfish = FALSE)
 
 
 
@@ -119,7 +119,7 @@ ggplot(gr) + geom_arrow(stat = "stepping", aes(y = value, group = pair), group.s
 ## other options to control arrow angle, density, ...
 ## ======================================================================
 library(grid)
-ggplot(gr) + geom_arrow(stat = "stepping", aes(y = value, group = pair),
+ggplot(gr) + geom_arrow(stat = "stepping", mapping = aes(y = value, group = pair),
                       arrow.rate = 0.01, length = unit(0.3, "cm"), angle = 45,
                       group.selfish = FALSE)
 

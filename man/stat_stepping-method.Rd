@@ -70,11 +70,11 @@ ggplot(gr) + stat_stepping()
 ggplot() + stat_stepping(gr)
 
 ##  facet_aes
-ggplot(gr) + stat_stepping(aes(color = strand, fill = strand),
+ggplot(gr) + stat_stepping(mapping = aes(color = strand, fill = strand),
                                  facets = sample ~ seqnames)
 
 ##  geom_segment
-ggplot(gr) + stat_stepping(aes(color = strand),
+ggplot(gr) + stat_stepping(mapping = aes(color = strand),
                          geom = "segment", xlab = "Genomic coord", ylab = "y", main = "hello")
 
 
@@ -82,7 +82,7 @@ ggplot(gr) + stat_stepping(aes(color = strand),
 ## ggplot(gr) + stat_stepping(geom = "alignment")
 
 ##  geom_alignment_group
-##  ggplot(gr) + stat_stepping(aes(group = pair),geom = "alignment")
+##  ggplot(gr) + stat_stepping(mapping = aes(group = pair),geom = "alignment")
 }
 \author{Tengfei Yin}
 

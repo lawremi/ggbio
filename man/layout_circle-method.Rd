@@ -133,9 +133,9 @@ trackWidth = 1)
 
 ## more formal API
 ggplot(gr) + layout_circle(geom = "ideo", fill = "gray70", radius = 7, trackWidth = 3) +
-  layout_circle(geom = "bar", radius = 10, trackWidth = 4, aes(fill = score, y = score)) +
+  layout_circle(geom = "bar", radius = 10, trackWidth = 4, mapping = aes(fill = score, y = score)) +
   layout_circle(geom = "point", color = "red", radius = 14,
-                trackWidth = 3, grid = TRUE, aes(y = score)) +
+                trackWidth = 3, grid = TRUE, mapping = aes(y = score)) +
     layout_circle(geom = "link", linked.to = "to.gr", radius = 6, trackWidth = 1)
 
 }

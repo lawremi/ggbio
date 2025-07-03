@@ -76,7 +76,7 @@ gr <- GRanges(seqnames =
 ## ======================================================================
 ##  data.frame call ggplot2::geom_segment
 ## ======================================================================
-ggplot() + geom_segment(data = mtcars, aes(x = mpg, y = wt, xend = mpg + 10, yend = wt + 0.2,
+ggplot() + geom_segment(data = mtcars, mapping = aes(x = mpg, y = wt, xend = mpg + 10, yend = wt + 0.2,
                         color = cyl))
 
 
@@ -93,25 +93,25 @@ ggplot() + geom_segment(gr)
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot(gr) + geom_segment(facets = sample ~ seqnames, aes(color = strand))
+ggplot(gr) + geom_segment(facets = sample ~ seqnames, mapping = aes(color = strand))
 
 
 ## ======================================================================
 ##  stat:identity
 ## ======================================================================
-ggplot(gr) + geom_segment(stat = "identity", aes(y = value))
+ggplot(gr) + geom_segment(stat = "identity", mapping = aes(y = value))
 
 
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot(gr) + geom_segment(stat = "stepping", aes(y = value, group = pair))
+ggplot(gr) + geom_segment(stat = "stepping", mapping = aes(y = value, group = pair))
 
 
 ## ======================================================================
 ##  group.selfish controls when 
 ## ======================================================================
-ggplot(gr) + geom_segment(stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
+ggplot(gr) + geom_segment(stat = "stepping", mapping = aes(y = value, group = pair), group.selfish = FALSE)
 }
 \author{Tengfei Yin}
 

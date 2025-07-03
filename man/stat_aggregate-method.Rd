@@ -109,23 +109,23 @@ gr <- GRanges(seqnames =
                 replace = TRUE))
 
 
-ggplot(gr) + stat_aggregate(aes(y = value))
+ggplot(gr) + stat_aggregate(mapping = aes(y = value))
 ## or
 ## ggplot(gr) + stat_aggregate(y = "value")
-ggplot(gr) + stat_aggregate(aes(y = value), window = 36)
-ggplot(gr) + stat_aggregate(aes(y = value), select = "first")
+ggplot(gr) + stat_aggregate(mapping = aes(y = value), window = 36)
+ggplot(gr) + stat_aggregate(mapping = aes(y = value), select = "first")
 \dontrun{
 ## no hits 
-ggplot(gr) + stat_aggregate(aes(y = value), select = "first", type = "within")
+ggplot(gr) + stat_aggregate(mapping = aes(y = value), select = "first", type = "within")
 }
-ggplot(gr) + stat_aggregate(window = 30,  aes(y = value),fill = "gray40", geom = "bar")
-ggplot(gr) + stat_aggregate(window = 100, fill = "gray40", aes(y = value),
+ggplot(gr) + stat_aggregate(window = 30, mapping = aes(y = value),fill = "gray40", geom = "bar")
+ggplot(gr) + stat_aggregate(window = 100, fill = "gray40", mapping = aes(y = value),
                            method = "max", geom = "bar")
 
-ggplot(gr) + stat_aggregate(aes(y = value), geom = "boxplot")
-ggplot(gr) + stat_aggregate(aes(y = value), geom = "boxplot", window = 60)
+ggplot(gr) + stat_aggregate(mapping = aes(y = value), geom = "boxplot")
+ggplot(gr) + stat_aggregate(mapping = aes(y = value), geom = "boxplot", window = 60)
 ## now facets need to take place inside stat_* geom_* for an accurate computation
-ggplot(gr) + stat_aggregate(aes(y = value), geom = "boxplot", window = 30,
+ggplot(gr) + stat_aggregate(mapping = aes(y = value), geom = "boxplot", window = 30,
               facets = sample ~ seqnames)
 ## FIXME:
 ## autoplot(gr, stat = "aggregate", aes(y = value), window = 36)

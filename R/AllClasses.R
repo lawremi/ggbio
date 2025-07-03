@@ -21,10 +21,7 @@ setClassUnion("GRanges_OR_BasicFilter_OR_list_OR_NULL",
 setClassUnion("BasicFilterORlist",
               c("AnnotationFilter", "AnnotationFilterList", "formula", "list"))
 
-
-setOldClass("ggplot")
-setClassUnion("ggplot_OR_NULL", c("ggplot", "NULL"))
-setOldClass(c("gg", "ggplot"))
+setOldClass(c("ggplot2::ggplot", "gg", "ggplot"))
 setClassUnion("gg_OR_NULL", c("gg", "NULL"))
 
 setOldClass("grob")

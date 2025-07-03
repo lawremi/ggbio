@@ -1012,7 +1012,7 @@ setMethod("autoplot", "RleList", function(object, ...,
     data[names(scaled)] <- scaled
     data$ROWID <- 1:nrow(data)
     molten <- reshape2::melt(data, m = vars)
-    ggplot(molten, aes_string(x = "variable", y = "value", group = "ROWID"),
+    ggplot(molten, aes(x = .data[["variable"]], y = .data[["value"]], group = .data[["ROWID"]]),
            ...)
 }
 

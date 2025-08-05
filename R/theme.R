@@ -36,14 +36,14 @@ theme_alignment <-   function (ylabel = FALSE, base_size = 12,
       axis.title.y = element_text(family = base_family, size = base_size,
         angle = 90, vjust = 0.5, colour = "white"),
       axis.ticks.length = unit(0.3, "lines"),
-      axis.text = element_text(margin=unit(0.5, "lines")),
+      axis.text = element_text(margin=ggplot2::margin(0.5, 0.5, 0.5, 0.5, unit = "lines")),
       panel.background = element_blank(),
       panel.border = {if(border)
                         element_rect(fill = NA, colour = "grey50")
       else
         element_blank()},
       panel.grid.major = {if(grid)
-                            element_line(colour = "grey90", size = 0.2)
+                            element_line(colour = "grey90", linewidth = 0.2)
       else
         element_blank()},
       panel.grid.minor = element_blank(),

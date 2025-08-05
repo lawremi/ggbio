@@ -142,8 +142,7 @@ setMethod("plotRangesLinkedToData", "GenomicRanges_OR_GRangesList",
                                       "TRUE" = sig.col[2])) +
                     theme(legend.position = "none")
             }
-            p.link <- p.link +   theme(plot.margin = unit(c(0, 1,
-                                         0,  0.5), "lines"),
+            p.link <- p.link +   theme(plot.margin = ggplot2::margin(0, 1, 0, 0.5, unit = "lines"),
                                        panel.spacing = unit(c(0, 0.25, 0, 0.25),
                                          "lines")
                                        ) 

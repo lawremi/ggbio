@@ -73,26 +73,26 @@ gr <- GRanges(seqnames =
                 replace = TRUE))
 
 ##  geom_point_start
-ggplot() + stat_identity(gr, aes(x = start, y = value), geom = "point")
+ggplot() + stat_identity(gr, mapping = aes(x = start, y = value), geom = "point")
 ## or more formal
-ggplot(gr) + stat_identity(aes(x = start, y = value), geom = "point")
+ggplot(gr) + stat_identity(mapping = aes(x = start, y = value), geom = "point")
 
 ##  geom_point_midpoint
-ggplot(gr) + stat_identity(aes(x = midpoint, y = value), geom = "point")
+ggplot(gr) + stat_identity(mapping = aes(x = midpoint, y = value), geom = "point")
 
 ##  geom_rect_all
-ggplot(gr) + stat_identity(aes(xmin = start, xmax = end,
-                                 ymin = value - 0.5, ymax = value + 0.5),
+ggplot(gr) + stat_identity(mapping = aes(xmin = start, xmax = end,
+                                         ymin = value - 0.5, ymax = value + 0.5),
                            geom = "rect")
 
 ##  geom_rect_y
-ggplot(gr) + stat_identity(aes(y = value), geom = "rect")
+ggplot(gr) + stat_identity(mapping = aes(y = value), geom = "rect")
 
 ##  geom_line
-ggplot(gr) + stat_identity(aes(x = start, y = value),  geom = "line")
+ggplot(gr) + stat_identity(mapping = aes(x = start, y = value),  geom = "line")
 
 ##  geom_segment
-ggplot(gr) + stat_identity(aes(y = value), geom = "segment")
+ggplot(gr) + stat_identity(mapping = aes(y = value), geom = "segment")
 
 ## Rle/RleList
 library(IRanges)

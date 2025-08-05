@@ -201,7 +201,7 @@ setAs("Tracks", "grob", function(from) {
         grobs[[i]] <- grobs[[i]] + ggplot2::xlab("") + labs(title = "")
         padding <- as.numeric(from@padding)
         grobs[[i]] <- grobs[[i]] +
-                      theme(plot.margin = unit(c(padding, 1, padding, 0.5), "lines"))
+          theme(plot.margin = ggplot2::margin(padding, 1, padding, 0.5, unit = "lines"))
 
         if (i %in% which(!from@hasAxis))
             grobs[[i]] <- grobs[[i]] + theme(axis.text.x = element_blank(),

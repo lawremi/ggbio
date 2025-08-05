@@ -97,7 +97,7 @@ ggplot() + geom_arch(gr)
 ## =======================================
 ##  facetting and aesthetics
 ## =======================================
-ggplot(gr) + geom_arch(aes(color = value, height = value, size = value),
+ggplot(gr) + geom_arch(mapping = aes(color = value, height = value, size = value),
                      alpha = 0.2, facets = sample ~ seqnames)
 
 

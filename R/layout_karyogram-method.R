@@ -74,15 +74,15 @@ setMethod("layout_karyogram", "GRanges",
                 p.ideo <- c(p.ideo, list(do.call(ggplot2::geom_segment, c(list(data = df.p.d),
                                                                           list(aes(x = x, y = y, xend = xend, yend = yend)),
                                                                           list(color = "black",
-                                                                               alpha = 1, size = 0.3)))))
+                                                                               alpha = 1, linewidth = 0.3)))))
                 p.ideo <- c(p.ideo, list(do.call(ggplot2::geom_segment, c(list(data = df.p.d),
                                                                           list(aes(x = x, y = y2, xend = xend, yend = yend2)),
                                                                           list(color = "black",
-                                                                               alpha = 1, size = 0.3)))))
+                                                                               alpha = 1, linewidth = 0.3)))))
                 p.ideo <- c(p.ideo, list(do.call(ggplot2::geom_segment, c(list(data = df.p.d),
                                                                           list(aes(x = x, y = y, xend = x, yend = y2)),
                                                                           list(color = "black",
-                                                                               alpha = 1, size = 0.3)))))
+                                                                               alpha = 1, linewidth = 0.3)))))
 
 
 
@@ -104,16 +104,16 @@ setMethod("layout_karyogram", "GRanges",
                 p.ideo <- c(p.ideo, list(do.call(ggplot2::geom_segment, c(list(data = df.q.d),
                                                                           list(aes(x = x, y = y, xend = xend, yend = yend)),
                                                                           list(color = "black",
-                                                                               alpha = 1, size = 0.3)))))
+                                                                               alpha = 1, linewidth = 0.3)))))
                 p.ideo <- c(p.ideo, list(do.call(ggplot2::geom_segment, c(list(data = df.q.d),
                                                                           list(aes(x = x, y = y2, xend = xend, yend = yend2)),
                                                                           list(color = "black",
-                                                                               alpha = 1, size = 0.3)))))
+                                                                               alpha = 1, linewidth = 0.3)))))
 
                 p.ideo <- c(p.ideo, list(do.call(ggplot2::geom_segment, c(list(data = df.q.d),
                                                                           list(aes(x = xend, y = y, xend = xend, yend = y2)),
                                                                           list(color = "black",
-                                                                               alpha = 1, size = 0.3)))))
+                                                                               alpha = 1, linewidth = 0.3)))))
 
 
 
@@ -152,7 +152,8 @@ setMethod("layout_karyogram", "GRanges",
                                                        xend = xend,
                                                        yend = yend,
                                                        height = height),
-                                                   color = "black", size = 0.5),
+                                                   color = "black",
+                                                   linewidth = 0.5),
                                    geom_arch_flip(df.tri.p2,
                                                   aes(x = x,
                                                       y = y ,
@@ -171,7 +172,7 @@ setMethod("layout_karyogram", "GRanges",
                                                         yend = yend,
                                                         height = height),
                                                     color = "black",
-                                                    size = 0.5),
+                                                    linewidth = 0.5),
                                     geom_arch_flip(df.tri.q2,
                                                    aes(x = x,
                                                        y = y ,

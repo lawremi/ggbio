@@ -117,7 +117,7 @@ setMethod("stat_bin", "RleList", function(data, ..., binwidth, nbin = 30,
 
   facets <- as.formula(paste(indName, "~ .", sep = ""))
 
-  args$facets <- facets
+  args$row <- facets
   args.facets <- subsetArgsByFormals(args, facet_grid, facet_wrap)
   facet <- do.call(facet_grid, args.facets)
   

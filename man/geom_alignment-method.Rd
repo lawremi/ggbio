@@ -181,17 +181,17 @@ ggplot() + geom_alignment(gr)
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot(gr) + geom_alignment(facets = sample ~ seqnames, aes(color = strand, fill = strand))
+ggplot(gr) + geom_alignment(facets = sample ~ seqnames, mapping = aes(color = strand, fill = strand))
 
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot(gr) + geom_alignment(stat = "stepping", aes(group = pair))
+ggplot(gr) + geom_alignment(stat = "stepping", mapping = aes(group = pair))
 
 ## ======================================================================
 ##  group.selfish controls when
 ## ======================================================================
-ggplot(gr) + geom_alignment(stat = "stepping", aes(group = pair), group.selfish = FALSE)
+ggplot(gr) + geom_alignment(stat = "stepping", mapping = aes(group = pair), group.selfish = FALSE)
 
 ## =======================================
 ##  main/gap geom

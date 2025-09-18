@@ -73,8 +73,8 @@ gr <- c(gr[seqnames(gr) == "chr1"][sample(1:10, size = 1e4, replace = TRUE)],gr)
 
 ##  default
 ggplot(gr) + stat_table()
-ggplot(gr) + stat_table(geom = "segment", aes(y = ..score.., color = ..score..))
-ggplot(gr) + stat_table(aes(color = score))
+ggplot(gr) + stat_table(geom = "segment", mapping = aes(y = ..score.., color = ..score..))
+ggplot(gr) + stat_table(mapping = aes(color = score))
 }
 \author{Tengfei Yin}
 

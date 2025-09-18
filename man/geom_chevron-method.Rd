@@ -109,25 +109,25 @@ ggplot() + geom_chevron(gr)
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot(gr) + geom_chevron(facets = sample ~ seqnames, aes(color = strand))
+ggplot(gr) + geom_chevron(facets = sample ~ seqnames, mapping = aes(color = strand))
 
 
 ## ======================================================================
 ##  stat:identity
 ## ======================================================================
-ggplot(gr) + geom_chevron(stat = "identity", aes(y = value))
+ggplot(gr) + geom_chevron(stat = "identity", mapping = aes(y = value))
 
 
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot(gr) + geom_chevron(stat = "stepping", aes(group = pair))
+ggplot(gr) + geom_chevron(stat = "stepping", mapping = aes(group = pair))
 
 
 ## ======================================================================
 ##  group.selfish controls when 
 ## ======================================================================
-ggplot(gr) + geom_chevron(stat = "stepping", aes(group = pair), group.selfish = FALSE,
+ggplot(gr) + geom_chevron(stat = "stepping", mapping = aes(group = pair), group.selfish = FALSE,
                         xlab = "xlab", ylab = "ylab", main = "main")
 
 p <- qplot(x = mpg, y = cyl, data = mtcars)

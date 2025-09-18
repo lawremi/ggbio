@@ -14,7 +14,7 @@ Description: The ggbio package extends and specializes the grammar of
 Authors@R: c(person("Tengfei", "Yin", role=c("aut"),
                  email="yintengfei@gmail.com"),
           person("Michael", "Lawrence", role=c("aut", "ths", "cre"),
-                 email="michafla@gene.com"),
+                 email="lawremi@gmail.com"),
           person("Dianne", "Cook", role=c("aut", "ths")),
           person("Johannes", "Rainer", role="ctb"))
 Depends: methods, BiocGenerics, ggplot2 (>= 1.0.0)

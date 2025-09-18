@@ -80,7 +80,7 @@ gr <- GRanges(seqnames =
 ## ======================================================================
 ##  data.frame call ggplot2::geom_rect
 ## ======================================================================
-ggplot() + geom_rect(data = mtcars, aes(xmin = mpg, ymin = wt, xmax = mpg + 10, ymax = wt + 0.2,
+ggplot() + geom_rect(data = mtcars, mapping = aes(xmin = mpg, ymin = wt, xmax = mpg + 10, ymax = wt + 0.2,
                        fill = cyl))
 
 
@@ -96,25 +96,25 @@ ggplot() + geom_rect(gr)
 ## ======================================================================
 ##  facetting and aesthetics
 ## ======================================================================
-ggplot(gr) + geom_rect(facets = sample ~ seqnames, aes(color = strand, fill = strand))
+ggplot(gr) + geom_rect(facets = sample ~ seqnames, mapping = aes(color = strand, fill = strand))
 
 
 ## ======================================================================
 ##  stat:identity
 ## ======================================================================
-ggplot(gr) + geom_rect(stat = "identity", aes(y = value))
+ggplot(gr) + geom_rect(stat = "identity", mapping = aes(y = value))
 
 
 ## ======================================================================
 ##  stat:stepping
 ## ======================================================================
-ggplot(gr) + geom_rect(stat = "stepping", aes(y = value, group = pair))
+ggplot(gr) + geom_rect(stat = "stepping", mapping = aes(y = value, group = pair))
 
 
 ## ======================================================================
 ##  group.selfish controls when 
 ## ======================================================================
-ggplot(gr) + geom_rect(stat = "stepping", aes(y = value, group = pair), group.selfish = FALSE)
+ggplot(gr) + geom_rect(stat = "stepping", mapping = aes(y = value, group = pair), group.selfish = FALSE)
 }
 \author{Tengfei Yin}
 

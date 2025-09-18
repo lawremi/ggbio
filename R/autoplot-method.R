@@ -1008,11 +1008,11 @@ setMethod("autoplot", "RleList", function(object, ...,
 ##======================================================================
 
 .ggpcp <- function(data, vars = names(data), ...){
-    scaled <- as.data.frame(lapply(data[, vars], ggplot2:::rescale01))
-    data <- ggplot2:::cunion(scaled, data)
+    scaled <- as.data.frame(lapply(data[, vars], scales::rescale))
+    data[names(scaled)] <- scaled
     data$ROWID <- 1:nrow(data)
     molten <- reshape2::melt(data, m = vars)
-    ggplot(molten, aes_string(x = "variable", y = "value", group = "ROWID"),
+    ggplot(molten, aes(x = .data[["variable"]], y = .data[["value"]], group = .data[["ROWID"]]),
            ...)
 }
 
@@ -1053,9 +1053,8 @@ setMethod("autoplot", "ExpressionSet", function(object, ...,
             s <- list(theme(axis.text.y = element_blank(),
                             axis.ticks.y = element_blank()) ,
                       theme(legend.position = "top",
-                            plot.margin = unit(c(1, padding, 0.5, padding), "lines")),
-                      guides(fill = guide_legend(bycol = TRUE,
-                                 byrow = FALSE, ncol =  1,
+                            plot.margin = ggplot2::margin(padding, 1, padding, 0.5, unit = "lines")),
+                      guides(fill = guide_legend(byrow = FALSE, ncol =  1,
                                  title.theme = element_blank())))
 
 
@@ -1806,9 +1805,8 @@ setMethod("autoplot", "RangedSummarizedExperiment", function(object, ...,
             s <- list(theme(axis.text.y = element_blank(),
                             axis.ticks.y = element_blank()) ,
                       theme(legend.position = "top",
-                            plot.margin = unit(c(1, padding, 0.5, padding), "lines")),
-                      guides(fill = guide_legend(bycol = TRUE,
-                                 byrow = FALSE, ncol =  1,
+                            plot.margin = ggplot2::margin(padding, 1, padding, 0.5, unit = "lines")),
+                      guides(fill = guide_legend(byrow = FALSE, ncol =  1,
                                  title.theme = element_blank())))
 
             N <- ncol(pd)

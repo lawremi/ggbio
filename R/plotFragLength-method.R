@@ -61,7 +61,8 @@ setMethod("plotFragLength", c("character", "GRanges"),
      p <- p + theme(panel.grid.minor=element_blank())
     }
     if("line" %in% geom){
-      p <- p + geom_line(aes(x = (start + end)/2, y = .fragLength), size = 1.2,
+        p <- p + geom_line(aes(x = (start + end)/2, y = .fragLength),
+                           linewidth = 1.2,
                           color = "gray30")  +  theme_bw()
     if(annotation)      
      p <- p + theme(panel.grid.minor=element_blank())

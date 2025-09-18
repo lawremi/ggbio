@@ -99,7 +99,7 @@ getLimitsFromScales <- function(obj) {
 }
 
 getLimitsFromLayer <- function(obj) {
-    layers <- obj$layer
+    layers <- obj$layers
     lst <- lapply(layers, function(layer) {
         if (length(obj$data) | length(layer$data)) {
             if(length(layer$data))
@@ -220,8 +220,11 @@ getDrawFunFromGeomStat <- function(geom, stat) {
 
     if (facet.logic)
         facet <- do.call(facet_wrap, args.facets)
-    else
+    else {
+        names(args.facets) <- ifelse(names(args.facets) == "facets", "rows",
+                                     names(args.facets))
         facet <- do.call(facet_grid, args.facets)
+    }
     facet
 }
 
@@ -274,7 +277,7 @@ ggsave <- function (filename, plot = last_plot(),
     # take backup of original plot
     original_last_plot <- plot
 
-    if (!inherits(plot, "ggplot") && !is(plot, "Tracks"))
+    if (!is(plot, "any_ggplot") && !is(plot, "Tracks"))
         stop("plot should be a ggplot2 plot or tracks object")
 
     # for compatibility with ggplot2::ggsave convert derivative plot to grob

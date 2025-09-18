@@ -218,16 +218,13 @@ getDrawFunFromGeomStat <- function(geom, stat) {
     facet.logic <- ifelse(any(c("nrow", "ncol") %in% names(args.facets)),
                           TRUE, FALSE)
 
-    if (facet.logic) {
-      facet <- do.call(facet_wrap, args.facets)
-    } else {
-      if ("facets" %in% names(args.facets)) {
-        args.facets$rows <- args.facets$facets
-        args.facets$facets <- NULL
-      }
-      facet <- do.call(facet_grid, args.facets)
+    if (facet.logic)
+        facet <- do.call(facet_wrap, args.facets)
+    else {
+        names(args.facets) <- ifelse(names(args.facets) == "facets", "rows",
+                                     names(args.facets))
+        facet <- do.call(facet_grid, args.facets)
     }
-
     facet
 }
 

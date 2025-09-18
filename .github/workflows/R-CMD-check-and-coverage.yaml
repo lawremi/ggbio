@@ -16,41 +16,29 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Query dependencies
-        run: |
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-        shell: Rscript {0}
-
-      - name: Cache R packages
-        uses: actions/cache@v4
+      - name: Install system dependencies & R deps
+        uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          path: /usr/local/lib/R/site-library
-          key: ${{ runner.os }}-r-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-r-1-
+          extra-packages: |
+            any::rcmdcheck
+            any::BiocCheck
+            any::covr
+            any::sessioninfo
+            local::.
+          needs:
+            coverage
+            check
 
-      - name: Install system dependencies
-        env:
-          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
+      - name: Install LaTeX
         run: |
-          Rscript -e "remotes::install_github('r-hub/sysreqs')"
-          sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
-          latexreq="texlive-latex-base texlive-fonts-recommended texlive-fonts-extra"
-          sysreqs="$sysreqs $latexreq"
-          echo $sysreqs
-          sudo -s eval "$sysreqs"
-
-      - name: Install dependencies
-        run: |
-          options(repos = c(CRAN = "https://cran.r-project.org"))
-          BiocManager::repositories()
-          remotes::install_deps(dependencies = TRUE, repos = BiocManager::repositories())
-          remotes::install_cran("covr")
-        shell: Rscript {0}
+          apt-get update -y
+          apt-get install -y \
+            texlive-latex-base \
+            texlive-fonts-recommended \
+            texlive-fonts-extra
 
       - name: Session info
         run: |

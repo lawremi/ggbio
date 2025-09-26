@@ -11,12 +11,15 @@ Description: The ggbio package extends and specializes the grammar of
         and grand linear views. High-level plots include sequence
         fragment length, edge-linked interval to data view, mismatch
         pileup, and several splicing summaries.
-Authors@R: c(person("Tengfei", "Yin", role=c("aut"),
-                 email="yintengfei@gmail.com"),
-          person("Michael", "Lawrence", role=c("aut", "ths", "cre"),
-                 email="michafla@gene.com"),
-          person("Dianne", "Cook", role=c("aut", "ths")),
-          person("Johannes", "Rainer", role="ctb"))
+Authors@R: c(
+	person("Tengfei", "Yin", role=c("aut"),
+	email="yintengfei@gmail.com"),
+    person("Michael", "Lawrence", role=c("aut", "ths", "cre"),
+    email="michafla@gene.com"),
+	person("Rohit","Satyam", role="ctb",
+    comment = "'ggbio' vignette translation from Sweave to Rmarkdown / HTML"),
+    person("Dianne", "Cook", role=c("aut", "ths")),
+    person("Johannes", "Rainer", role="ctb"))
 Depends: methods, BiocGenerics, ggplot2 (>= 1.0.0)
 Imports: grid, grDevices, graphics, stats, utils, gridExtra, scales, reshape2,
         gtable, Hmisc, biovizBase (>= 1.29.2), Biobase, S4Vectors (>= 0.13.13),

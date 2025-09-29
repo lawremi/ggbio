@@ -2,7 +2,7 @@ setClass("Plot", contains = "Tracked")
 
 ## abstract, so different methods could dispatch on diiferent types of graphics
 ## instance
-setClass("ggplotPlot", contains = c("gg", "ggplot", "Plot"))
+setClass("ggplotPlot", contains = c("ggplot", "Plot"))
 setClass("latticePlot", contains = c("trellis","Plot"))
 setClass("ggbioPlot", contains = c("GGbio", "Plot"))
 setClass("ideogramPlot", contains = c("Ideogram", "Plot"))

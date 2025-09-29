@@ -277,7 +277,7 @@ ggsave <- function (filename, plot = last_plot(),
     # take backup of original plot
     original_last_plot <- plot
 
-    if (!is(plot, "any_ggplot") && !is(plot, "Tracks"))
+    if (!is(plot, "ggplot") && !is(plot, "Tracks"))
         stop("plot should be a ggplot2 plot or tracks object")
 
     # for compatibility with ggplot2::ggsave convert derivative plot to grob

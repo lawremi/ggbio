@@ -1038,8 +1038,6 @@ setMethod("autoplot", "ExpressionSet", function(object, ...,
     df <- as.data.frame(df.exp)
     if(type == "scatterplot.matrix"){
         stop("scatterplot.matrix is not supported yet")
-       ## p <- ggpairs(df, ...)
-          p <- ggplot()
     }
     if(type == "heatmap"){
         ## add pheno type data
@@ -1839,9 +1837,6 @@ setMethod("autoplot", "RangedSummarizedExperiment", function(object, ...,
     }
     if(type == "scatterplot.matrix"){
         stop("scatterplot.matrix is not supported yet")
-        df <- as.data.frame(res)
- ##       p <- ggpairs(df, ...)
-        p <- ggplot()
     }
 
     if(!is(p, "GGbio"))

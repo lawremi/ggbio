@@ -26,7 +26,7 @@ Imports: grid, grDevices, graphics, stats, utils, gridExtra, scales, reshape2,
         GenomicAlignments (>= 1.45.1), BSgenome (>= 1.77.1),
         VariantAnnotation (>= 1.55.1), rtracklayer (>= 1.69.1),
         GenomicFeatures (>= 1.61.4), OrganismDbi,
-        GGally, ensembldb (>= 2.33.1), AnnotationDbi, AnnotationFilter, rlang
+        ensembldb (>= 2.33.1), AnnotationDbi, AnnotationFilter, rlang
 VignetteBuilder: knitr
 Suggests: vsn, BSgenome.Hsapiens.UCSC.hg19, Homo.sapiens,
         TxDb.Hsapiens.UCSC.hg19.knownGene,

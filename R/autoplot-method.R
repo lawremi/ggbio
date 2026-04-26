@@ -1137,56 +1137,6 @@ setMethod("autoplot", "ExpressionSet", function(object, ...,
     p
 })
 
-getNR <- function(x, type = c("NUSE", "RLE"),range = 0, ...){
-    compute.nuse <- function(which) {
-        nuse <- apply(x@weights[[1]][which, ], 2, sum)
-        1/sqrt(nuse)
-    }
-
-    type <- match.arg(type)
-    model <- x@model.description$modelsettings$model
-
-    if (type == "NUSE") {
-        if (x@model.description$R.model$which.parameter.types[3] ==
-            1 & x@model.description$R.model$which.parameter.types[1] ==
-            0) {
-            grp.rma.se1.median <- apply(se(x), 1, median,
-                                        na.rm = TRUE)
-            res <- grp.rma.rel.se1.mtx <- sweep(se(x), 1, grp.rma.se1.median,
-                                                FUN = "/")
-
-        }
-        else {
-            which <- indexProbesProcessed(x)
-            ses <- matrix(0, length(which), 4)
-            if (x@model.description$R.model$response.variable ==
-                1) {
-                for (i in 1:length(which)) ses[i, ] <- compute.nuse(which[[i]])
-            }
-            else {
-                stop("Sorry I can't currently impute NUSE values for this PLMset object")
-            }
-            grp.rma.se1.median <- apply(ses, 1, median)
-            res <- grp.rma.rel.se1.mtx <- sweep(ses, 1, grp.rma.se1.median,
-                                                FUN = "/")
-
-        }
-    }
-    if(type == "RLE"){
-        if (x@model.description$R.model$which.parameter.types[3] ==
-            1) {
-            medianchip <- apply(coefs(x), 1, median)
-            res <- sweep(coefs(x), 1, medianchip, FUN = "-")
-        }
-        else {
-            stop("It doesn't appear that a model with sample effects was used.")
-        }
-    }
-    res
-}
-
-
-
 ##======================================================================
 ##  For GenomicRangesList, for circular view
 ##======================================================================
@@ -1844,5 +1794,3 @@ setMethod("autoplot", "RangedSummarizedExperiment", function(object, ...,
 
     p
 })
-
-

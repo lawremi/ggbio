@@ -23,7 +23,7 @@ setMethod("Grob", "gtable", function(x){
 })
 setMethod("Grob", "trellis", function(x){
   ## new("latticeGrob", latticeGrob(x))
-  gridExtra:::latticeGrob(x)
+  grid::grob(p = x, cl = "lattice")
 })
 setMethod("Grob", "lattice", function(x){
   x

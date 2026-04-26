@@ -76,6 +76,12 @@
 \alias{print,Tracks-method}
 \alias{Arith}
 \alias{Arith,Tracks,ANY-method}
+\alias{+,Tracks,ANY-method}
+\alias{+,Tracks,theme-method}
+\alias{+,Tracks,zoom-method}
+\alias{+,Tracks,position_c-method}
+\alias{+,Tracks,cartesian-method}
+\alias{+,Tracks,Tracks-method}
 \alias{reset}
 \alias{reset,Tracks-method}
 \alias{backup}
@@ -103,9 +109,19 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
             label.text.cex = 1,
             label.text.angle = 90,
             label.width = unit(2.5, "lines"))
+
+\S4method{+}{Tracks,ANY}(e1, e2)
+\S4method{+}{Tracks,theme}(e1, e2)
+\S4method{+}{Tracks,zoom}(e1, e2)
+\S4method{+}{Tracks,position_c}(e1, e2)
+\S4method{+}{Tracks,cartesian}(e1, e2)
+\S4method{+}{Tracks,Tracks}(e1, e2)
 }
 \arguments{
   \item{...}{plots of class ggplot, generated from ggplot2 or ggbio.}
+  \item{e1}{a \code{Tracks} object.}
+  \item{e2}{an object added to a \code{Tracks} object, such as a theme,
+    zoom, coordinate specification, or another \code{Tracks} object.}
   \item{heights}{numeric vector of the same length of passed graphic
     object to indicate the ratio of each track.}
   \item{xlim}{limits on x. could be \code{\linkS4class{IRanges}}, \code{\linkS4class{GRanges}}, \code{numeric} value}
@@ -292,29 +308,21 @@ tracks(..., heights, xlim, xlab = NULL, main = NULL,
 \details{
   \code{tracks} did following modification for passed plots.
   \itemize{
-    \item{}{
+    \item Remove x-axis text, ticks, xlab and title for each track and
+    add a shared scale at the bottom. We assume a new xlab and title
+    will be provided by the \code{tracks} function for the whole
+    display, while each plot keeps its own y axis.
 
-      remove x-axis, ticks, xlab and tile for each track and add scales
-  at bottom. We suppose a new xlab and title would be provided by the
-  \code{tracks} function for the whole tracks, but we still keep
-  individual's y axis.
-      
-    }
-    \item{}{
-      align x-scale limits to make sure every plots sitting on exactly
-      the same x scale.
-    }
-    \item{}{
-      squeezing plots together to some extent.
-    }
-    \item{
-      labeling tracks if names are provided, please check utilities section
-      about \code{labeled} method.
-    }
-    \item{
-      return a track object. This would allow many features introduced
-      in this manual.
-    }
+    \item Align x-scale limits so every plot sits on exactly the same x
+    scale.
+
+    \item Squeeze plots together to some extent.
+
+    \item Label tracks if names are provided; please check the utilities
+    section about the \code{labeled} method.
+
+    \item Return a \code{Tracks} object, which enables many of the
+    features introduced in this manual.
   }
 }
 
@@ -481,5 +489,3 @@ tracks(time1 = p1, time2 = p2, track.plot.color = c("yellow", "brown"))
 
 }
 \author{Tengfei Yin}
-
-

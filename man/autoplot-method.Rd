@@ -179,7 +179,7 @@
     color for NA value.
   }
   \item{rotate}{
-
+    logical value indicating whether to rotate the matrix-style display.
   }
   \item{pheno.plot}{
     show pheno plot or not.
@@ -349,15 +349,12 @@
   we are also setting limitation inside this package, like
 
   \itemize{
-    \item{scales}
-    {X scales is always genomic coordinates in most cases, x could be
-      specified as start/end/midpoint when it's special geoms for
-      interval data like point/line}
+    \item \code{scales}: X scales are genomic coordinates in most cases.
+    x can be specified as start/end/midpoint for interval geoms such as
+    point and line.
 
-    \item{colors}{
-      Try to use default color scheme defined in biovizBase package
-      as possible as it can
-    }
+    \item \code{colors}: Try to use the default color scheme defined in
+    the biovizBase package whenever possible.
   }
 }
 
@@ -439,20 +436,17 @@
 \section{Faceting}{
 Faceting in ggbio package is a little differnt from ggplot2 in several ways
 \itemize{
-  \item {}{
-    The faceted column could only be seqnames or regions
-  on the genome. So we limited the formula passing to facet argument,
-  e.g something \~ seqnames, is accepted formula, you can change
-  "something" to variable name in the elementMetadata. But you
-  can not change the second part.
-   }
-  \item{}{
-    Sometime, we need to view different regions, so we also have a
-    facet_gr argument which accept a \code{GRanges}. If
-    this is provided, it will override the default seqnames and use
-    provided region to facet the graphics, this might be useful for
-    different gene centric views.
-}
+  \item The faceted column can only be seqnames or genomic regions. So
+  we limit the formula passed to the facet argument. For example,
+  \code{something ~ seqnames} is accepted, and you can change
+  \code{something} to a variable name in the elementMetadata, but not
+  the second part.
+
+  \item Sometimes we need to view different regions, so we also have a
+  \code{facet_gr} argument that accepts a \code{GRanges}. If this is
+  provided, it overrides the default seqnames and uses the supplied
+  regions to facet the graphics, which can be useful for gene-centric
+  views.
 }
 }
 \author{Tengfei Yin}

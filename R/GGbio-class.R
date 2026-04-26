@@ -195,7 +195,7 @@ setMethod("+", c("GGbio"), function(e1, e2){
         object <- do.call(layout_circle, args)
         e1@ggplot <- mapToGG(e1@ggplot, object)
 
-        res <- ggplot2:::add_ggplot(e1@ggplot, object, "circle")
+        res <- ggplot_add(object, e1@ggplot, "circle")
         e1@ggplot <- res
 
         return(e1)
@@ -439,8 +439,6 @@ prevView <- function(unit = c("view", "gene", "exon", "utr")){
            })
 
 }
-
-
 
 
 

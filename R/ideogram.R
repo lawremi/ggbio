@@ -17,9 +17,10 @@ Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytobands
                      zoom.offset = 0.2, size = 1,
                      aspect.ratio = 1/20, ..., genome){
     if(missing(obj)){
-        data(ideoCyto, package = "biovizBase")
-        if(genome %in% names(ideoCyto)){
-          obj <- ideoCyto[[genome]]
+        utils::data("ideoCyto", package = "biovizBase", envir = environment())
+        ideo_cyto <- get("ideoCyto", envir = environment())
+        if(genome %in% names(ideo_cyto)){
+          obj <- ideo_cyto[[genome]]
         }else{
           obj <- getIdeogram(genome = genome, subchr = subchr, cytobands = cytobands)
         }
@@ -191,4 +192,3 @@ applyTheme <- function(plot, xlabel, subchr, aspect.ratio) {
         plot <- plot + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
     plot
 }
-

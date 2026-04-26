@@ -30,7 +30,7 @@ setMethod("plotSpliceSum", c("character", "EnsDb"),
                   if(!(seqlevels(which) %in% seqlevels(model)))
                       stop(paste0(seqlevels(which), " does not match any seqlevel ",
                                   "in argument 'model'!"))
-                  which <- GRangesFilter(which, condition="overlapping")
+                  which <- GRangesFilter(which, type = "any")
               }
               exons <- exonsBy(model, by="tx", filter=which)
               ## Check if features are all on one chromosome.
@@ -41,4 +41,3 @@ setMethod("plotSpliceSum", c("character", "EnsDb"),
               freq <- biovizBase:::spliceSummary(data, exons, weighted = weighted)
               autoplot(exons, freq = freq, ...)
           })
-

@@ -3,9 +3,9 @@
 \title{Save a ggplot object or tracks with sensible defaults}
 \usage{
   ggsave(filename, plot = last_plot(),
-    device = default_device(filename), path = NULL,
-    scale = 1, width = par("din")[1],
-    height = par("din")[2], units = c("in", "cm", "mm"),
+    device = NULL, path = NULL,
+    scale = 1, width = NA,
+    height = NA, units = c("in", "cm", "mm"),
     dpi = 300, limitsize = TRUE, ...)
 }
 \arguments{

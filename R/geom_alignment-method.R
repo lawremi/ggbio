@@ -286,7 +286,7 @@ setMethod("geom_alignment", "OrganismDb",
         which <- range(which, ignore.strand = TRUE)
     }
 
-    txdb <- OrganismDbi:::.getTxDb(data)
+    txdb <- OrganismDbi::getTxDbIfAvailable(data)
 
     gr <- crunch(txdb, which, truncate.gaps = truncate.gaps,
                      truncate.fun = truncate.fun, ratio = ratio,

@@ -25,9 +25,9 @@
     Extra parameters passed to autoplot function, \code{aes} mapping
     support \code{height, x, xend}.
     \itemize{
-      \item{x}{start of the arches}
-      \item{xend}{end of the arches}
-      \item{height}{height of arches}
+      \item \code{x}: start of the arches.
+      \item \code{xend}: end of the arches.
+      \item \code{height}: height of arches.
     }
   }
   \item{xlab}{
@@ -103,4 +103,3 @@ ggplot(gr) + geom_arch(mapping = aes(color = value, height = value, size = value
 
 }
 \author{Tengfei Yin}
-

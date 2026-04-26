@@ -16,8 +16,7 @@
 \S4method{geom_alignment}{GRanges}(data, ..., xlab, ylab, main, facets = NULL, stat =
                  c("stepping", "identity"), range.geom = c("rect",
                  "arrowrect"), gap.geom = c("chevron", "arrow",
-                 "segment"), rect.height = NULL, group.selfish = TRUE,
-                  label = TRUE)
+                 "segment"), rect.height = NULL, group.selfish = TRUE)
 
 \S4method{geom_alignment}{TxDbOREnsDb}(data, ..., which, columns = c("tx_id", "tx_name",
                  "gene_id"), names.expr = "tx_name", facets = NULL,
@@ -217,4 +216,3 @@ tracks(full = p1, reduce = p2, heights = c(3, 1)) +
 ggplot(txdb) + geom_alignment(which = genesymbol["RBM17"], names.expr = "tx_id:::gene_id")
 }
 \author{Tengfei Yin}
-

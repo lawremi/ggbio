@@ -16,6 +16,7 @@ Authors@R: c(person("Tengfei", "Yin", role=c("aut"),
           person("Michael", "Lawrence", role=c("aut", "ths", "cre"),
                  email="lawremi@gmail.com"),
           person("Dianne", "Cook", role=c("aut", "ths")),
+          person("Sanchit", "Saini", role="ctb"),
           person("Johannes", "Rainer", role="ctb"))
 Depends: methods, BiocGenerics, ggplot2 (>= 1.0.0)
 Imports: grid, grDevices, graphics, stats, utils, gridExtra, scales, reshape2,
